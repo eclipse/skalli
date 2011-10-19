@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.persistence.xstream;
 
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -226,19 +227,26 @@ public class XStreamPersistenceTest {
             String userExt2, String lastModified,
             String lastModifiedExt1,
             String lastModifiedExt2, String ext1Text, boolean ext1boolean) {
+         //the length, up to times should be the same
         assertNotNull(loadedEntity);
-        assertEquals("wrong lastModified", lastModified, loadedEntity.getLastModified());
+        assertLastModifiedDate(loadedEntity.getLastModified(), lastModified);
         assertEquals(user, loadedEntity.getLastModifiedBy());
         TestExtension ext1 = ((TestExtensibleEntityBase) loadedEntity).getExtension(TestExtension.class);
         assertNotNull(ext1);
-        assertEquals("wrong lastModifiedExt1", lastModifiedExt1, ext1.getLastModified());
+        assertLastModifiedDate(ext1.getLastModified(), lastModifiedExt1);
         assertEquals(ext1Text, ext1.getStr());
         assertEquals(ext1boolean, ext1.isBool());
         assertEquals(userExt1, ext1.getLastModifiedBy());
         TestExtension1 ext2 = ((TestExtensibleEntityBase) loadedEntity).getExtension(TestExtension1.class);
         assertNotNull(ext2);
-        assertEquals("wrong lastModifiedExt2", lastModifiedExt2, ext2.getLastModified());
-        assertEquals(userExt2, ext2.getLastModifiedBy());
+        assertLastModifiedDate(ext2.getLastModified(), lastModifiedExt2);
+    }
+
+    /**
+     * checks that in a range of seconds the dateString matches the expected one
+     */
+    private void assertLastModifiedDate(String dateString, String expectedDateString) {
+        assertThat(dateString, startsWith(expectedDateString.substring(0, "YYYY-MM-DDTHH:MM:SS".length())));
     }
 
     private Set<ClassLoader> getTestExtensibleEntityBaseClassLodades() {

@@ -11,3 +11,4 @@ Import-Package: org.apache.commons.io,
  org.eclipse.skalli.testutil,
  org.junit,
  org.w3c.dom
+Require-Bundle: org.hamcrest
