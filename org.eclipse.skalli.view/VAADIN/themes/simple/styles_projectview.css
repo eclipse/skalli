@@ -103,6 +103,9 @@
     line-height: 18px;
 }
 
+.v-app-ProjectApplication .v-panel-infobox .infobox-internalerror {
+    color: red;
+}
 
 /* common styles for labels, links and button links in info boxes */
 .v-app-ProjectApplication .v-panel-infobox .infobox-linkgroups {

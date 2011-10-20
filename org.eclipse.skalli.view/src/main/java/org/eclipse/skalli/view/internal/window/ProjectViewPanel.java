@@ -31,15 +31,21 @@ import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.Navigator;
 import org.eclipse.skalli.view.ext.ProjectInfoBox;
 import org.eclipse.skalli.view.internal.application.ProjectApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.terminal.Resource;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Layout;
 
 public class ProjectViewPanel extends CssLayout {
 
     private static final long serialVersionUID = -2756706292280384313L;
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProjectViewPanel.class);
 
     private static final String STYLE_EAST_COLUMN = "east-column"; //$NON-NLS-1$
     private static final String STYLE_WEST_COLUMN = "west-column"; //$NON-NLS-1$
@@ -50,7 +56,6 @@ public class ProjectViewPanel extends CssLayout {
 
     private final CssLayout leftLayout;
     private final CssLayout rightLayout;
-
 
     public ProjectViewPanel(ProjectApplication application, Navigator navigator, Project project) {
         super();
@@ -81,7 +86,13 @@ public class ProjectViewPanel extends CssLayout {
         Set<ProjectInfoBox> infoBoxes = getOrderedVisibleInfoBoxList();
         for (ProjectInfoBox projectInfoBox : infoBoxes) {
             ExtensionUtil context = new ProjectViewContextImpl(projectInfoBox.getClass());
-            Component content = projectInfoBox.getContent(project, context);
+            Component content;
+            try {
+                content = projectInfoBox.getContent(project, context);
+            } catch (RuntimeException e) {
+                LOG.error("Can't display project info box '" + projectInfoBox.getCaption() + "'", e);
+                content = getInternalErrorContent();
+            }
             if (content != null) {
                 InformationBox infoBox = InformationBox.getInformationBox("&nbsp;" + projectInfoBox.getCaption()); //$NON-NLS-1$
                 infoBox.getContent().addComponent(content);
@@ -109,6 +120,16 @@ public class ProjectViewPanel extends CssLayout {
                 }
             }
         }
+    }
+
+    private Component getInternalErrorContent() {
+        Layout errorContent = new CssLayout();
+        errorContent.setSizeFull();
+        Label label = new Label("Internal Error: The extension content cannot be displayed. " +
+                "An internal error occurred. Please notify the administrator.", Label.CONTENT_XHTML);
+        label.addStyleName("infobox-internalerror");
+        errorContent.addComponent(label);
+        return errorContent;
     }
 
     private Set<ProjectInfoBox> getOrderedVisibleInfoBoxList() {
