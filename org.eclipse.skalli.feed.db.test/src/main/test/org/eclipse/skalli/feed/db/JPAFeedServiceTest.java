@@ -117,12 +117,11 @@ public class JPAFeedServiceTest {
         entries.add(entry1);
         entries.add(entry2);
         fps.merge(entries);
-        assertEntriesExist(new String[] { entry1.getId(), entry2.getId(), entry3.getId() });
+        assertEntriesExist(new String[] { entry1.getId(), entry2.getId() });
 
-        // update again and add a 3 entry
+        // update again and add a third entry
         entries = new ArrayList<Entry>();
-        // entries.add(entry1); // do not set all entries, only some, and check
-        // that the old once are not deleted.
+        //entry1 is not added on purpose, so we can check that the old entries are not deleted.
         entries.add(entry2);
         entries.add(entry3);
         fps.merge(entries);
