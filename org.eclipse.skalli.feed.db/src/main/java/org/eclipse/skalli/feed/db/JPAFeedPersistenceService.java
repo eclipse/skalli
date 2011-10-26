@@ -16,7 +16,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 
-import org.eclipse.skalli.api.java.feeds.Entry;
+import org.eclipse.skalli.api.java.feeds.FeedEntry;
 import org.eclipse.skalli.api.java.feeds.FeedPersistenceService;
 import org.eclipse.skalli.api.java.feeds.FeedServiceException;
 import org.eclipse.skalli.feed.db.entities.EntryJPA;
@@ -26,8 +26,8 @@ public class JPAFeedPersistenceService implements FeedPersistenceService {
     private static EntityManagerFactory emf;
 
     @Override
-    public void merge(Collection<Entry> entries) throws FeedServiceException {
-        for (Entry entry : entries) {
+    public void merge(Collection<FeedEntry> entries) throws FeedServiceException {
+        for (FeedEntry entry : entries) {
             EntityManager em = getEntityManager();
             EntityTransaction tx = null;
             try {

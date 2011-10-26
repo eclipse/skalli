@@ -26,7 +26,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.eclipse.skalli.api.java.feeds.Content;
-import org.eclipse.skalli.api.java.feeds.Entry;
+import org.eclipse.skalli.api.java.feeds.FeedEntry;
 import org.eclipse.skalli.api.java.feeds.Link;
 import org.eclipse.skalli.api.java.feeds.Person;
 import org.eclipse.skalli.common.util.UUIDUtils;
@@ -46,12 +46,12 @@ import org.eclipse.skalli.common.util.UUIDUtils;
 
 })
 @Entity
-public class EntryJPA implements Entry {
+public class EntryJPA implements FeedEntry {
 
-    public static final String FIND_BY_PROJECT_ID = "EntryJPA.findByProjectID";
-    public static final String FIND_BY_PROJECT_AND_SOURCES = "EntryJPA.findByProjectAndSources";
-    public static final String FIND_SOURCES_BY_PROJECT_ID = "EntryJPA.findSourcesByProjectID";
-    static final String ENTRYJPA_DEFAULT_ORDER_BY = "order by e.published DESC, e.id ASC";
+    public static final String FIND_BY_PROJECT_ID = "EntryJPA.findByProjectID"; //$NON-NLS-1$
+    public static final String FIND_BY_PROJECT_AND_SOURCES = "EntryJPA.findByProjectAndSources"; //$NON-NLS-1$
+    public static final String FIND_SOURCES_BY_PROJECT_ID = "EntryJPA.findSourcesByProjectID"; //$NON-NLS-1$
+    static final String ENTRYJPA_DEFAULT_ORDER_BY = "order by e.published DESC, e.id ASC"; //$NON-NLS-1$
 
     public static final int ID_LENGTH = 40;
     public static final int URI_LENGTH = 512;
@@ -126,22 +126,12 @@ public class EntryJPA implements Entry {
         return link;
     }
 
-    // do we need this setter at all?
-    public void setLink(LinkJPA link) {
-        this.link = link;
-    }
-
     @Override
     public Content getContent() {
         if (content == null) {
             content = new ContentJPA();
         }
         return content;
-    }
-
-    // do we need this setter at all?
-    public void setContent(ContentJPA content) {
-        this.content = content;
     }
 
     @Override
@@ -160,11 +150,6 @@ public class EntryJPA implements Entry {
             author = new PersonJPA();
         }
         return author;
-    }
-
-    // do we need this setter at all?
-    public void setAuthor(PersonJPA author) {
-        this.author = author;
     }
 
     @Override

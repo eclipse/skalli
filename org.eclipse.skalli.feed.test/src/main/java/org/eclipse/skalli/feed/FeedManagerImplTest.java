@@ -25,6 +25,7 @@ import java.util.UUID;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.skalli.api.java.ProjectService;
 import org.eclipse.skalli.api.java.feeds.Entry;
+import org.eclipse.skalli.api.java.feeds.FeedEntry;
 import org.eclipse.skalli.api.java.feeds.FeedProvider;
 import org.eclipse.skalli.api.java.feeds.FeedUpdater;
 import org.eclipse.skalli.model.core.Project;
@@ -42,6 +43,7 @@ public class FeedManagerImplTest {
 
         final Date aTestDate = new Date(1318946441120L);
         HashMapFeedService hashMapfeedService = new HashMapFeedService();
+
 
         FeedManagerImpl feedManagerImpl = new FeedManagerImpl(false);
         feedManagerImpl.bindFeedPersistenceService(hashMapfeedService);
@@ -62,9 +64,9 @@ public class FeedManagerImplTest {
         //bindFeedProvider
         FeedProvider feedProviderMock = createMock(FeedProvider.class);
         expect(feedProviderMock.getFeedUpdaters(p1)).andReturn(
-                Collections.singletonList(getFeedUpdaterMock(aTestDate, "source-a")));
+                Collections.singletonList(getFeedUpdaterMock(hashMapfeedService,aTestDate, "source-a")));
         expect(feedProviderMock.getFeedUpdaters(p2)).andReturn(
-                Collections.singletonList(getFeedUpdaterMock(aTestDate, "source-b")));
+                Collections.singletonList(getFeedUpdaterMock(hashMapfeedService,aTestDate, "source-b")));
         replay(feedProviderMock);
         feedManagerImpl.bindFeedProvider(feedProviderMock);
 
@@ -111,26 +113,26 @@ public class FeedManagerImplTest {
         return null;
     }
 
-    private FeedUpdater getFeedUpdaterMock(Date date, String source) {
+    private FeedUpdater getFeedUpdaterMock(HashMapFeedService hashMapfeedService, Date date, String source) {
         FeedUpdater feedUpdaterProjectMock = createMock(FeedUpdater.class);
         expect(feedUpdaterProjectMock.getSource()).andReturn(source);
         expect(feedUpdaterProjectMock.getSource()).andReturn(source);
-        List<Entry> entries = new ArrayList<Entry>();
+        List<FeedEntry> entries = new ArrayList<FeedEntry>();
 
-        Entry e1 = new HashMapFeedService.SimpleEntry();
+        FeedEntry e1 = new HashMapFeedService.SimpleEntry();
         e1.setTitle("title1-" + source);
         e1.setPublished(date);
         entries.add(e1);
 
         if ("source-a".equals(source)) {
-            Entry e2 = new HashMapFeedService.SimpleEntry();
+            FeedEntry e2 = new HashMapFeedService.SimpleEntry();
             e2.setTitle("title2-" + source);
             e2.setPublished(date);
             e2.setId("idTitle2");
             entries.add(e2);
         }
 
-        expect(feedUpdaterProjectMock.updateFeed()).andReturn(entries);
+        expect(feedUpdaterProjectMock.updateFeed(hashMapfeedService)).andReturn(entries);
         replay(feedUpdaterProjectMock);
         return feedUpdaterProjectMock;
     }

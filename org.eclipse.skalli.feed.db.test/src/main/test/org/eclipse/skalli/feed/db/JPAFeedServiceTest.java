@@ -22,13 +22,11 @@ import java.util.UUID;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.skalli.api.java.feeds.Entry;
+import org.eclipse.skalli.api.java.feeds.FeedEntry;
 import org.eclipse.skalli.api.java.feeds.FeedPersistenceService;
 import org.eclipse.skalli.api.java.feeds.FeedService;
 import org.eclipse.skalli.api.java.feeds.FeedServiceException;
-import org.eclipse.skalli.feed.db.entities.ContentJPA;
 import org.eclipse.skalli.feed.db.entities.EntryJPA;
-import org.eclipse.skalli.feed.db.entities.LinkJPA;
-import org.eclipse.skalli.feed.db.entities.PersonJPA;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
 import org.junit.Test;
 
@@ -56,20 +54,18 @@ public class JPAFeedServiceTest {
         newEntry.setProjectId(allFieldsProjectUuid);
         newEntry.setTitle(title);
         newEntry.setPublished(testDate);
-
-        newEntry.setAuthor(new PersonJPA(author_name, author_email));
-        newEntry.setContent(new ContentJPA("text", content_value));
-
-        LinkJPA newLink = new LinkJPA();
-        newLink.setTitle(link_title);
-        newLink.setHref(link_href);
-        newEntry.setLink(newLink);
+        newEntry.getAuthor().setName(author_name);
+        newEntry.getAuthor().setEmail(author_email);
+        newEntry.getContent().setType("text");
+        newEntry.getContent().setValue(content_value);
+        newEntry.getLink().setTitle(link_title);
+        newEntry.getLink().setHref(link_href);
 
         final String id = DigestUtils.shaHex(newEntry.getProjectId().toString() + newEntry.getTitle()
                 + newEntry.getSource());
         newEntry.setId(id);
 
-        Collection<Entry> entries = new ArrayList<Entry>();
+        Collection<FeedEntry> entries = new ArrayList<FeedEntry>();
         entries.add(newEntry);
         fps.merge(entries);
 
@@ -94,7 +90,7 @@ public class JPAFeedServiceTest {
         // now update the entry and check that it updated
         final String newTitle = "new changed Title";
         newEntry.setTitle(newTitle);
-        entries = new ArrayList<Entry>();
+        entries = new ArrayList<FeedEntry>();
         entries.add(newEntry);
         fps.merge(entries);
         foundEntries = fs.findEntries(allFieldsProjectUuid, 10);
@@ -109,19 +105,20 @@ public class JPAFeedServiceTest {
     public void testMerge() throws FeedServiceException {
         FeedPersistenceService fps = new JPAFeedPersistenceService();
 
-        Entry entry1 = createDummyTestEntry(fps, "1");
-        Entry entry2 = createDummyTestEntry(fps, "2");
-        Entry entry3 = createDummyTestEntry(fps, "3");
+        FeedEntry entry1 = createDummyTestEntry(fps, "1");
+        FeedEntry entry2 = createDummyTestEntry(fps, "2");
+        FeedEntry entry3 = createDummyTestEntry(fps, "3");
 
-        Collection<Entry> entries = new ArrayList<Entry>();
+        Collection<FeedEntry> entries = new ArrayList<FeedEntry>();
         entries.add(entry1);
         entries.add(entry2);
         fps.merge(entries);
         assertEntriesExist(new String[] { entry1.getId(), entry2.getId() });
 
         // update again and add a third entry
-        entries = new ArrayList<Entry>();
-        //entry1 is not added on purpose, so we can check that the old entries are not deleted.
+        entries = new ArrayList<FeedEntry>();
+        // entries.add(entry1); // do not set all entries, only some, and check
+        // that the old once are not deleted.
         entries.add(entry2);
         entries.add(entry3);
         fps.merge(entries);
@@ -148,8 +145,8 @@ public class JPAFeedServiceTest {
         assertThat(hasEntry, is(true));
     }
 
-    private Entry createDummyTestEntry(FeedPersistenceService s, String title) {
-        Entry newEntry = s.createEntry();
+    private FeedEntry createDummyTestEntry(FeedPersistenceService s, String title) {
+        FeedEntry newEntry = s.createEntry();
         newEntry.setSource(("source-" + JPAFeedPersistenceServiceTest.class.getSimpleName()).substring(0,
                 EntryJPA.SOURCE_LENGTH));
         newEntry.setProjectId(defaultProjectUuid);
@@ -173,35 +170,35 @@ public class JPAFeedServiceTest {
 
         final Date testDate = new Date(1318946441120L);
 
-        Entry e1 = fps.createEntry();
+        FeedEntry e1 = fps.createEntry();
         e1.setSource("source-a");
         e1.setProjectId(testFindProjectUuid);
         e1.setTitle("t1");
         e1.setPublished(testDate);
         updateId(e1);
 
-        Entry e2 = fps.createEntry();
+        FeedEntry e2 = fps.createEntry();
         e2.setSource("source-a");
         e2.setProjectId(testFindProjectUuid);
         e2.setTitle("t2");
         e2.setPublished(new Date(testDate.getTime() + 1));
         updateId(e2);
 
-        Entry e3 = fps.createEntry();
+        FeedEntry e3 = fps.createEntry();
         e3.setSource("source-a");
         e3.setProjectId(testFindProjectUuid);
         e3.setTitle("t3");
         e3.setPublished(new Date(testDate.getTime() + 2));
         updateId(e3);
 
-        Entry e4 = fps.createEntry();
+        FeedEntry e4 = fps.createEntry();
         e4.setSource("source-b");
         e4.setProjectId(testFindProjectUuid);
         e4.setTitle("t4");
         e4.setPublished(new Date(testDate.getTime() + 3));
         updateId(e4);
 
-        Collection<Entry> entries = new ArrayList<Entry>();
+        Collection<FeedEntry> entries = new ArrayList<FeedEntry>();
         entries.add(e1);
         entries.add(e2);
         entries.add(e3);
@@ -264,7 +261,7 @@ public class JPAFeedServiceTest {
         assertThat(foundSources.get(1), is("source-b"));
     }
 
-    private void updateId(Entry newEntry) {
+    private void updateId(FeedEntry newEntry) {
         // in this test we calculate the id via project, title and source.
         String id = newEntry.getProjectId().toString() + newEntry.getTitle() + newEntry.getSource();
         newEntry.setId(DigestUtils.shaHex(id));

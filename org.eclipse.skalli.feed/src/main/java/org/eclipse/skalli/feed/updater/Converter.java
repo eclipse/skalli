@@ -8,13 +8,14 @@
  * Contributors:
  * SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.feed.db.entities;
+package org.eclipse.skalli.feed.updater;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.skalli.api.java.feeds.Entry;
+import org.eclipse.skalli.api.java.feeds.FeedEntry;
+import org.eclipse.skalli.api.java.feeds.FeedFactory;
 import org.eclipse.skalli.common.util.CollectionUtils;
 
 import com.sun.syndication.feed.synd.SyndContent;
@@ -23,58 +24,53 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndLink;
 import com.sun.syndication.feed.synd.SyndPerson;
 
-public class Converter {
+class Converter {
 
-    static public List<Entry> syndFeed2Entry(SyndFeed syndFeed) {
+    private FeedFactory feedFactory;
+
+    Converter(FeedFactory feedFactory) {
+        this.feedFactory = feedFactory;
+    }
+
+    public List<FeedEntry> syndFeed2Entry(SyndFeed syndFeed) {
         if (syndFeed == null) {
             return Collections.emptyList();
         }
-        List<Entry> entries = new ArrayList<Entry>();
+        List<FeedEntry> entries = new ArrayList<FeedEntry>();
         for (Object o : syndFeed.getEntries()) {
             entries.add(syndEntry2Entry((SyndEntry) o));
         }
         return entries;
     }
 
-    private static Entry syndEntry2Entry(SyndEntry syndEntry) {
+    private FeedEntry syndEntry2Entry(SyndEntry syndEntry) {
         if (syndEntry == null) {
             return null;
         }
-        EntryJPA entry = new EntryJPA();
+        FeedEntry entry = feedFactory.createEntry();
 
         entry.setTitle(syndEntry.getTitle());
 
         if (CollectionUtils.isNotBlank(syndEntry.getLinks())) {
-            entry.setLink(syndLink2Link((SyndLink) syndEntry.getLinks().get(0)));
+            SyndLink syndLink = (SyndLink) syndEntry.getLinks().get(0);
+            entry.getLink().setHref(syndLink.getHref());
+            entry.getLink().setTitle(syndLink.getTitle());
         }
 
         if (CollectionUtils.isNotBlank(syndEntry.getContents())) {
-            entry.setContent(syndContent2Content((SyndContent) syndEntry.getContents().get(0)));
+            SyndContent syndContent = (SyndContent) syndEntry.getContents().get(0);
+            entry.getContent().setType(syndContent.getType());
+            entry.getContent().setValue(syndContent.getValue());
         }
 
         if (CollectionUtils.isNotBlank(syndEntry.getAuthors())) {
-            entry.setAuthor(syndPerson2Person((SyndPerson) syndEntry.getAuthors().get(0)));
+            SyndPerson syndAuthor = (SyndPerson) syndEntry.getAuthors().get(0);
+            entry.getAuthor().setName(syndAuthor.getName());
+            entry.getAuthor().setEmail(syndAuthor.getEmail());
         }
 
         entry.setPublished(syndEntry.getPublishedDate());
         return entry;
     }
 
-    private static PersonJPA syndPerson2Person(SyndPerson syndEntry) {
-        return new PersonJPA(syndEntry.getName(),syndEntry.getEmail());
-    }
-
-    private static LinkJPA syndLink2Link(SyndLink syndEntry) {
-        LinkJPA l = new LinkJPA();
-        l.setHref(syndEntry.getHref());
-        l.setTitle(syndEntry.getTitle());
-        return l;
-    }
-
-    private static ContentJPA syndContent2Content(SyndContent syndEntry) {
-        ContentJPA c = new ContentJPA();
-        c.setType(syndEntry.getType());
-        c.setValue(syndEntry.getValue());
-        return c;
-    }
 }

@@ -21,10 +21,10 @@ import java.util.List;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.skalli.api.java.feeds.Entry;
+import org.eclipse.skalli.api.java.feeds.FeedEntry;
+import org.eclipse.skalli.api.java.feeds.FeedFactory;
 import org.eclipse.skalli.api.java.feeds.FeedUpdater;
 import org.eclipse.skalli.common.util.HttpUtils;
-import org.eclipse.skalli.feed.db.entities.Converter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,11 +48,11 @@ public class SyndFeedUpdater implements FeedUpdater {
         this.caption = caption;
     }
 
-    private List<Entry> getEntries() throws FeedException {
+    private List<FeedEntry> getEntries(FeedFactory factory) throws FeedException {
         if (LOG.isInfoEnabled()) {
             LOG.info(MessageFormat.format("Updating ''{0}'' feed for project ''{1}'' from {2}", source, projectName, url.toString()));
         }
-        return Converter.syndFeed2Entry(getSyndFeed());
+        return (new Converter(factory)).syndFeed2Entry(getSyndFeed());
     }
 
     private SyndFeed getSyndFeed() throws FeedException {
@@ -77,9 +77,9 @@ public class SyndFeedUpdater implements FeedUpdater {
     }
 
     @Override
-    public List<Entry> updateFeed() {
+    public List<FeedEntry> updateFeed(FeedFactory factory) {
         try {
-            return getEntries();
+            return getEntries(factory);
         } catch (Exception e) {
             LOG.error("Problems updating the Feed (" + url.toString() + ":" + e.getMessage(), e);
         }

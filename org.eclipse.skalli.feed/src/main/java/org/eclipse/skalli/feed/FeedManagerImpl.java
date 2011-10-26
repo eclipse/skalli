@@ -19,7 +19,7 @@ import java.util.Set;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.api.java.feeds.Entry;
+import org.eclipse.skalli.api.java.feeds.FeedEntry;
 import org.eclipse.skalli.api.java.feeds.FeedManager;
 import org.eclipse.skalli.api.java.feeds.FeedPersistenceService;
 import org.eclipse.skalli.api.java.feeds.FeedProvider;
@@ -92,6 +92,10 @@ public class FeedManagerImpl implements FeedManager {
      */
     @Override
     public void updateAllFeeds() {
+        if (feedPersistenceService== null) {
+            LOG.error("Can't updatate all projects feeds, as no feedPersistenceService bound!");
+            return;
+        }
         LOG.info("Updating all project feeds...");
         List<Project> projects = projectService.getAll();
         for (Project project : projects) {
@@ -103,10 +107,10 @@ public class FeedManagerImpl implements FeedManager {
                 List<FeedUpdater> feedUpdaters = feedProvider.getFeedUpdaters(project);
                 for (FeedUpdater feedUpdater : feedUpdaters) {
                     try {
-                        List<Entry> entries = feedUpdater.updateFeed();
+                        List<FeedEntry> entries = feedUpdater.updateFeed(feedPersistenceService);
                         if (!entries.isEmpty()) {
                             try {
-                                for (Entry entry : entries) {
+                                for (FeedEntry entry : entries) {
                                     setSource(entry, feedUpdater);
                                     entry.setProjectId(project.getUuid());
                                     setEntryId(entry);
@@ -134,7 +138,7 @@ public class FeedManagerImpl implements FeedManager {
         LOG.info("Updating all project feeds: done");
     }
 
-    private void setSource(Entry entry, FeedUpdater feedUpdater) {
+    private void setSource(FeedEntry entry, FeedUpdater feedUpdater) {
         String source = entry.getSource();
         if (StringUtils.isBlank(source)) {
             source = feedUpdater.getSource();
@@ -145,7 +149,7 @@ public class FeedManagerImpl implements FeedManager {
         }
     }
 
-    private void setEntryId(Entry entry) {
+    private void setEntryId(FeedEntry entry) {
         StringBuilder newId = new StringBuilder(entry.getProjectId().toString());
         Date published = entry.getPublished();
         if (published != null) {

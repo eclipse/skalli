@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import org.eclipse.skalli.api.java.feeds.Content;
 import org.eclipse.skalli.api.java.feeds.Entry;
+import org.eclipse.skalli.api.java.feeds.FeedEntry;
 import org.eclipse.skalli.api.java.feeds.FeedPersistenceService;
 import org.eclipse.skalli.api.java.feeds.FeedService;
 import org.eclipse.skalli.api.java.feeds.FeedServiceException;
@@ -33,7 +34,7 @@ import org.eclipse.skalli.api.java.feeds.Person;
  */
 public class HashMapFeedService implements FeedService, FeedPersistenceService {
 
-    static public class SimpleEntry implements Entry {
+    static public class SimpleEntry implements FeedEntry {
         private String id;
         private String title;
         private Link link;
@@ -143,7 +144,7 @@ public class HashMapFeedService implements FeedService, FeedPersistenceService {
      * @see org.eclipse.skalli.api.java.feeds.FeedPersistenceService#createEntry()
      */
     @Override
-    public Entry createEntry() {
+    public FeedEntry createEntry() {
         return new SimpleEntry();
     }
 
@@ -151,7 +152,7 @@ public class HashMapFeedService implements FeedService, FeedPersistenceService {
      * @see org.eclipse.skalli.api.java.feeds.FeedPersistenceService#merge(java.util.Collection)
      */
     @Override
-    public void merge(Collection<Entry> newEntries) throws FeedServiceException {
+    public void merge(Collection<FeedEntry> newEntries) throws FeedServiceException {
         for (Entry newEntry : newEntries) {
             this.entries.put(newEntry.getId(), newEntry);
         }
@@ -202,4 +203,6 @@ public class HashMapFeedService implements FeedService, FeedPersistenceService {
         }
         return new ArrayList<String>(sources);
     }
+
+
 }

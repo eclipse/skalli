@@ -12,10 +12,19 @@ package org.eclipse.skalli.api.java.feeds;
 
 import java.util.Collection;
 
-public interface FeedPersistenceService {
+/**
+ * Service to persist entries for a project timeline.
+ */
+public interface FeedPersistenceService extends FeedFactory {
 
-    public Entry createEntry();
-
-    public void merge(Collection<Entry> entries) throws FeedServiceException;
+    /**
+     * Merges the given collection of feed entries with the previously
+     * stored timeline information. Entries are compared by their
+     * {@link Entry#getId() unique identifiers}, duplicates are rejected.
+     *
+     * @param entries  a collection of feed entries to merge.
+     * @throws FeedServiceException  if the feed entries could not be merged.
+     */
+    public void merge(Collection<FeedEntry> entries) throws FeedServiceException;
 
 }
