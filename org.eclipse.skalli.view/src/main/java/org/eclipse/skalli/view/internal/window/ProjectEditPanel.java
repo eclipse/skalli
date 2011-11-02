@@ -102,7 +102,6 @@ public class ProjectEditPanel extends Panel implements Issuer {
     private Button headerCheckButton;
     private Button footerCheckButton;
 
-
     private CssLayout indicatorArea;
     private ProgressIndicator progressIndicator;
     private ProgressThread progressThread;
@@ -270,7 +269,7 @@ public class ProjectEditPanel extends Panel implements Issuer {
         setMessage(footerLabel, message);
     }
 
-    private void setMessage(SortedSet<Issue> issues, Map<String,String> displayNames) {
+    private void setMessage(SortedSet<Issue> issues, Map<String, String> displayNames) {
         String message = Issues.asHTMLList(null, issues, displayNames);
         setMessage(headerLabel, message);
         setMessage(footerLabel, message);
@@ -375,14 +374,16 @@ public class ProjectEditPanel extends Panel implements Issuer {
     private void updateProgressIndicator() {
         if (validatorThread != null && validatorThread.isFinished()) {
             indicatorArea.setVisible(false);
-            persistedIssues.addLatestDuration(validatorThread.getDuration());
+            if (persistedIssues != null) {
+                persistedIssues.addLatestDuration(validatorThread.getDuration());
+            }
             progressThread.interrupt();
             validatorThread.interrupt();
             progressThread = null;
             validatorThread = null;
             headerCheckButton.setEnabled(true);
             footerCheckButton.setEnabled(true);
-        } else if (progressThread != null){
+        } else if (progressThread != null) {
             progressIndicator.setValue(progressThread.progress());
         } else {
             progressIndicator.setValue(0f);
@@ -398,11 +399,12 @@ public class ProjectEditPanel extends Panel implements Issuer {
 
         @Override
         public void run() {
-            averageDuration = persistedIssues.getAverageDuration();
-            if (averageDuration < 0) {
-                averageDuration = UNKNOWN_AVERAGE_DURATION;
+            averageDuration = UNKNOWN_AVERAGE_DURATION;
+            if (persistedIssues != null && persistedIssues.getAverageDuration() > 0) {
+                averageDuration = persistedIssues.getAverageDuration();
             }
-            for (; elapsedTime < averageDuration ; elapsedTime += SLEEPING_TIME) {
+
+            for (; elapsedTime < averageDuration; elapsedTime += SLEEPING_TIME) {
                 try {
                     Thread.sleep(SLEEPING_TIME);
                 } catch (InterruptedException e) {
@@ -415,18 +417,19 @@ public class ProjectEditPanel extends Panel implements Issuer {
         }
 
         private float progress() {
-            return Math.min((float)elapsedTime/averageDuration, 0.95f); // never return 100%
+            return Math.min((float) elapsedTime / averageDuration, 0.95f); // never return 100%
         }
     }
 
     private class ValidatorThread extends Thread {
         private long startTime;
         private long duration = -1L;
+
         @Override
         public void run() {
             ProjectService projectService = Services.getRequiredService(ProjectService.class);
             startTime = System.currentTimeMillis();
-            SortedSet<Issue> issues =  projectService.validate(modifiedProject, Severity.INFO);
+            SortedSet<Issue> issues = projectService.validate(modifiedProject, Severity.INFO);
             synchronized (getApplication()) {
                 renderIssues(issues, false);
                 if (issues.size() == 0) {
@@ -570,7 +573,7 @@ public class ProjectEditPanel extends Panel implements Issuer {
             Issues emptyIssues = new Issues(modifiedProject.getUuid());
             emptyIssues.setStale(true);
             issuesService.persist(emptyIssues, application.getLoggedInUser());
-         }
+        }
     }
 
     private class OKButtonListener implements Button.ClickListener {
@@ -585,14 +588,15 @@ public class ProjectEditPanel extends Panel implements Issuer {
                 if (dataLossWarnings.isEmpty() && confirmationWarnings.isEmpty()) {
                     doCommit();
                 } else {
-                    ConfirmPopup popup = new ConfirmPopup(dataLossWarnings, confirmationWarnings, new ConfirmPopup.OnConfirmation() {
-                        @Override
-                        public void onConfirmation(boolean confirmed) {
-                            if (confirmed) {
-                                doCommit();
-                            }
-                        }
-                    });
+                    ConfirmPopup popup = new ConfirmPopup(dataLossWarnings, confirmationWarnings,
+                            new ConfirmPopup.OnConfirmation() {
+                                @Override
+                                public void onConfirmation(boolean confirmed) {
+                                    if (confirmed) {
+                                        doCommit();
+                                    }
+                                }
+                            });
                     getWindow().addWindow(popup);
                 }
             } catch (RuntimeException e) {
@@ -698,7 +702,8 @@ public class ProjectEditPanel extends Panel implements Issuer {
             this.callback = callback;
 
             StringBuilder sb = new StringBuilder();
-            append(sb, "The following changes will <strong>remove data permanently</strong> from the project:", dataLossWarnings);
+            append(sb, "The following changes will <strong>remove data permanently</strong> from the project:",
+                    dataLossWarnings);
             append(sb, "The following changes might not be your intention:", confirmationWarnings);
             sb.append("<p>Continue anyway?</p>");
             Label content = new Label(sb.toString(), Label.CONTENT_XHTML);
