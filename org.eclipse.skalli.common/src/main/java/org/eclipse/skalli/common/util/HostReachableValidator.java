@@ -65,6 +65,7 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
     private static final String TXT_HOST_NOT_REACHABLE = "''{0}'' is not reachable.";
     private static final String TXT_HOST_UNKNOWN = "''{0}'' is unknown.";
     private static final String TXT_CONNECT_FAILED = "Could not connect to host ''{0}''.";
+    private static final String TXT_MALFORMED_URL = "''{0}'' is malformed.";
 
     // general timeout for connection requests
     private static final int TIMEOUT = 10000;
@@ -149,7 +150,10 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
             issues.add(newIssue(Severity.ERROR, entityId, item, TXT_HOST_UNKNOWN, url.getHost()));
         } catch (ConnectException e) {
             issues.add(newIssue(Severity.ERROR, entityId, item, TXT_CONNECT_FAILED, url.getHost()));
-        } catch (IOException e) {
+        } catch (MalformedURLException e) {
+            issues.add(newIssue(Severity.ERROR, entityId, item, TXT_MALFORMED_URL, url));
+        }
+        catch (IOException e) {
             LOG.warn(MessageFormat.format("I/O Exception on validation: {0}", e.getMessage()), e); //$NON-NLS-1$
         } catch (RuntimeException e) {
             LOG.error(MessageFormat.format("RuntimeException on validation: {0}", e.getMessage()), e); //$NON-NLS-1$
