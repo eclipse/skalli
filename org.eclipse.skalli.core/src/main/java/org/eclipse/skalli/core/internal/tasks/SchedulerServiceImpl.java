@@ -163,6 +163,9 @@ public class SchedulerServiceImpl implements SchedulerService {
         registerTask(new Task(new CleanupDoneTasksRunner(), unit.toMillis(period), unit.toMillis(period)));
     }
 
+
+    private Calendar lastCronRun = null;
+
     /**
      * Runnable that is executed periodically asking all registered
      * schedules, if there are any due task. Starts due tasks as one-shot actions.
@@ -172,13 +175,15 @@ public class SchedulerServiceImpl implements SchedulerService {
         public void run() {
             Calendar now = new GregorianCalendar(TIMEZONE, Locale.ENGLISH);
             for (RunnableSchedule schedule : schedules.values()) {
-                if (schedule.isDue(now)) {
-                    Runnable runnable = schedule.getRunnable();
-                    if (runnable != null) {
+                Runnable runnable = schedule.getRunnable();
+                if (runnable != null) {
+                    if (schedule.isDue(now, lastCronRun)) {
                         singleShotExecutor.submit(runnable);
                     }
                 }
             }
+            lastCronRun = new GregorianCalendar();
+            lastCronRun.setTime(now.getTime());
         }
     }
 

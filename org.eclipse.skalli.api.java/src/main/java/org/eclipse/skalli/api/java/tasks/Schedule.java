@@ -12,6 +12,7 @@ package org.eclipse.skalli.api.java.tasks;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -98,6 +99,36 @@ public class Schedule {
         return getDaysOfWeekSet().contains(now.get(Calendar.DAY_OF_WEEK))
                 && getHoursSet().contains(now.get(Calendar.HOUR_OF_DAY))
                 && getMinutesSet().contains(now.get(Calendar.MINUTE));
+    }
+
+    /**
+     * Returns <code>true</code> if the recurring task that this schedule describes
+     * is due ant now ore any time between lastRun and now is due.
+     *
+     * @param now  the current day of week/hour/minute.
+     * @param lastRun  the lastRun date or null
+     * @return  <code>true</code>, if the task is due.
+     */
+    public boolean isDue(Calendar now, Calendar lastRun) {
+        if (isDue(now)) {
+            return true;
+        }
+
+        if (lastRun == null) {
+            return false;
+        }
+
+        //is one of the minute due, which is between lastRun and now?
+        Calendar i = new GregorianCalendar(lastRun.getTimeZone());
+        i.setTime(lastRun.getTime());
+        i.add(Calendar.MINUTE, 1);
+        while (i.before(now)) {
+            if (isDue(i)) {
+                return true;
+            }
+            i.add(Calendar.MINUTE, 1);
+        }
+        return false;
     }
 
     /**

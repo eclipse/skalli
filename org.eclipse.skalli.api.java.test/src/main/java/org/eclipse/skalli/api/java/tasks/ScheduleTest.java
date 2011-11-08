@@ -10,15 +10,17 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.java.tasks;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.eclipse.skalli.api.java.tasks.Schedule.SortedIntSet;
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.eclipse.skalli.api.java.tasks.Schedule.SortedIntSet;
 
 @SuppressWarnings("nls")
 public class ScheduleTest {
@@ -391,6 +393,21 @@ public class ScheduleTest {
                 }
             }
         }
+    }
+
+    @Test
+    public void testIsDueWithLastRunnerDate() {
+        Schedule schedule = new Schedule("MONDAY", "2", "10"); // Monday 2:10am
+        Calendar now = getUTCCalendar(Calendar.MONDAY, 2, 15); // Monday 2:15am
+        Calendar lastRun1= getUTCCalendar(Calendar.MONDAY, 2, 0);  //  2:00am -> last run was before now
+        Calendar lastRun2 = getUTCCalendar(Calendar.MONDAY, 2, 10); // 2:10am -> last run was at schedule time
+        Calendar lastRun3 = getUTCCalendar(Calendar.MONDAY, 2, 15); // 2:15am -> last run had same time as now
+        Calendar lastRun4 = getUTCCalendar(Calendar.MONDAY, 2, 20); // 2:20am -> value after now ; should never be called
+        assertFalse(schedule.isDue(now, null));
+        assertTrue(schedule.isDue(now, lastRun1));
+        assertFalse(schedule.isDue(now, lastRun2));
+        assertFalse(schedule.isDue(now, lastRun3));
+        assertFalse(schedule.isDue(now, lastRun4));
     }
 
     private Calendar getUTCCalendar(int dayOfWeek, int hour, int minute) {
