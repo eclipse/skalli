@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<entity-project lastModified="2011-05-09T14:08:17.588Z" modifiedBy="guest" version="16">
+<entity-project lastModified="2011-11-10T13:25:54.745Z" modifiedBy="guest" version="18">
   <uuid>9616953c-9d88-4914-b283-2311c2831512</uuid>
   <deleted>false</deleted>
   <parentEntityId>2f833ff4-20c2-4bc8-95ce-ceb06080a507</parentEntityId>
@@ -13,7 +13,7 @@
       <metricsUrl/>
       <reviewUrl/>
       <scmLocations>
-        <string>scm:git:git://git.wdf.sap.corp/eclipse/org.eclipse.skalli.git</string>
+        <string>scm:git:git://git.eclipse.org/gitroot/skalli/org.eclipse.skalli.git</string>
       </scmLocations>
       <javadocs/>
     </entity-devInf>
@@ -31,30 +31,48 @@
           <org.eclipse.skalli.common.LinkGroup>
             <items>
               <org.eclipse.skalli.model.ext.Link>
-                <label>skalli overview</label>
-                <url>http://www.eclipse.org/skalli/</url>
+                <label>Forum</label>
+                <url>http://www.eclipse.org/forums/index.php?t=thread&amp;frm_id=215</url>
               </org.eclipse.skalli.model.ext.Link>
               <org.eclipse.skalli.model.ext.Link>
-                <label>user guide</label>
-                <url>http://wiki.eclipse.org/Skalli/User_Guide</url>
+                <label>wiki</label>
+                <url>http://wiki.eclipse.org/Skalli</url>
               </org.eclipse.skalli.model.ext.Link>
               <org.eclipse.skalli.model.ext.Link>
-                <label>contributer guilde</label>
-                <url>http://wiki.eclipse.org/Skalli/Contributor_Guide</url>
+                <label>eclipse git web</label>
+                <url>http://git.eclipse.org/c/skalli/org.eclipse.skalli.git/</url>
               </org.eclipse.skalli.model.ext.Link>
             </items>
-            <caption>wiki</caption>
+            <caption>Community</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Skalli CQs</label>
+                <url>https://dev.eclipse.org/ipzilla/buglist.cgi?cmdtype=runnamed&amp;namedcmd=Skalli%20CQ</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>IP Log</label>
+                <url>http://www.eclipse.org/projects/ip_log.php?projectid=technology.skalli</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>IP Process</caption>
           </org.eclipse.skalli.common.LinkGroup>
         </items>
       </linkGroups>
     </entity-linkGroups>
-    <entity-maven lastModified="2011-05-09T13:29:44.463Z" modifiedBy="guest">
+    <entity-maven>
       <deleted>false</deleted>
       <groupID>org.eclipse.skalli</groupID>
       <reactorPOM/>
       <siteUrl/>
     </entity-maven>
-    <entity-people lastModified="2011-05-09T12:59:18.402Z" modifiedBy="guest">
+    <entity-relatedProjects>
+      <deleted>false</deleted>
+      <relatedProjects/>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-people>
       <deleted>false</deleted>
       <leads>
         <no-comparator/>
@@ -80,10 +98,10 @@
     </entity-people>
   </extensions>
   <inheritedExtensions/>
-  <projectId>skalli</projectId>
+  <projectId>technology.skalli</projectId>
   <projectTemplateId>default</projectTemplateId>
-  <name>Skalli</name>
-  <shortName>Skalli</shortName>
+  <name>technology.skalli</name>
+  <shortName>skalli</shortName>
   <description>One of the major goals of this project is to make a new generation project management tool accessible and usable by the Eclipse community and other open source projects. Thereby Skalli forms the central entry point to all projects and creates transparency over the existing projects. It leverages search technologies and social network mechanisms in order to structure and find them. This project however does not aim at replacing existing tools like wiki, bugtracker and source code management system. It merely links to them and integrates their data and services as far as needed in order to let users - and through a REST API also other tools - gain an overview on each project's state and locate its resources. </description>
   <tags>
     <no-comparator/>
