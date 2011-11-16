@@ -32,7 +32,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.api.java.ProjectService;
 import org.eclipse.skalli.common.Consts;
@@ -43,6 +42,8 @@ import org.eclipse.skalli.common.util.CollectionUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritService;
 import org.eclipse.skalli.gerrit.client.config.ConfigKeyGerrit;
+import org.eclipse.skalli.gerrit.client.exception.CommandException;
+import org.eclipse.skalli.gerrit.client.exception.ConnectionException;
 import org.eclipse.skalli.gerrit.client.exception.GerritClientException;
 import org.eclipse.skalli.model.core.Project;
 import org.eclipse.skalli.model.core.ProjectMember;
@@ -50,6 +51,8 @@ import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.model.ext.people.PeopleProjectExt;
 import org.eclipse.skalli.view.internal.filter.FilterException;
 import org.eclipse.skalli.view.internal.filter.FilterUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GitGerritFilter implements Filter {
 
@@ -89,6 +92,8 @@ public class GitGerritFilter implements Filter {
     public static final String GIT_EXT = ".git"; //$NON-NLS-1$
 
     private static final String SPACE = " "; //$NON-NLS-1$
+
+    private static final Logger LOG = LoggerFactory.getLogger(GitGerritFilter.class);
 
     @Override
     public void init(FilterConfig arg0) throws ServletException {
@@ -153,8 +158,11 @@ public class GitGerritFilter implements Filter {
                         StringUtils.isNotBlank(group) ? group : generateName(project, "_", "_committers")); //$NON-NLS-1$ //$NON-NLS-2$
                 request.setAttribute(ATTRIBUTE_PROPOSED_REPO,
                         StringUtils.isNotBlank(repo) ? repo : generateName(project, "/", StringUtils.EMPTY)); //$NON-NLS-1$
-                if (BooleanUtils.toBoolean(request.getParameter(PARAMETER_PROPOSE_EXISTING_GROUPS))) {
+                String groupMode = request.getParameter(PARAMETER_PROPOSE_EXISTING_GROUPS);
+                if ("related".equals(groupMode)) {
                     request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_GROUPS, getGroupsFromHierarchy(client, project));
+                } else if ("all".equals(groupMode)) {
+                    request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_GROUPS, getAllGroups(client, project));
                 }
             }
             // (2) CHECK (validate input against Gerrit)
@@ -308,16 +316,25 @@ public class GitGerritFilter implements Filter {
         List<Project> relevantSkalliProjects = projectService.getParentChain(project.getUuid());
         relevantSkalliProjects.addAll(getSiblingsAndAllDescendants(projectService, project));
 
-        Set<String> proposedGroups = new TreeSet<String>(new Comparator<String>() {
-            @Override
-            public int compare(String g1, String g2) {
-                return g1.compareTo(g2);
-            }
-        });
+        Set<String> proposedGroups = new TreeSet<String>();
         proposedGroups.addAll(client.getGroups(getRelevantGerritProjects(relevantSkalliProjects, newScmUri).toArray(
                 new String[0])));
 
         return proposedGroups;
+    }
+
+    private Set<String> getAllGroups(final GerritClient client, final Project project) {
+        Set<String> result = new TreeSet<String>();
+        try {
+            result.addAll(client.getGroups());
+            return result;
+        } catch (ConnectionException e) {
+            LOG.warn("Can't connect to gerrit:",e);
+            return Collections.emptySet();
+        } catch (CommandException e) {
+            LOG.warn("Can't connect to gerrit:",e);
+            return Collections.emptySet();
+        }
     }
 
     private List<Project> getSiblingsAndAllDescendants(ProjectService projectService, final Project project) {

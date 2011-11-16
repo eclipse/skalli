@@ -82,10 +82,12 @@
       <form name="toggleGroupProposals" action="gitgerrit" method="get">
         <p>
           <input type="hidden" name="id" value="${project.projectId}"/>
-          <input type="radio" name="proposeExistingGroups" value="false" <c:if test="${empty param.proposeExistingGroups || !param.proposeExistingGroups}">checked="checked"</c:if> onclick="document.toggleGroupProposals.submit();" />
+          <input type="radio" name="proposeExistingGroups" value="new" <c:if test="${empty param.proposeExistingGroups || param.proposeExistingGroups == 'new'}">checked="checked"</c:if> onclick="document.toggleGroupProposals.submit();" />
           <small>Enter a new group name</small>
-          <input type="radio" name="proposeExistingGroups" value="true" <c:if test="${param.proposeExistingGroups}">checked="checked"</c:if> onclick="document.toggleGroupProposals.submit();" />
+          <input type="radio" name="proposeExistingGroups" value="related" <c:if test="${param.proposeExistingGroups == 'related'}">checked="checked"</c:if> onclick="document.toggleGroupProposals.submit();" />
           <small>Choose from an existing Gerrit group related to this project</small>
+          <input type="radio" name="proposeExistingGroups" value="all" <c:if test="${param.proposeExistingGroups == 'all'}">checked="checked"</c:if> onclick="document.toggleGroupProposals.submit();" />
+          <small>Choose from all existing Gerrit groups</small>
         </p>
         <p id="submitButton">
           <input type="submit" name="btnSubmit" value="Go" class="searchsubmit"/>
@@ -100,7 +102,7 @@
               <td>Gerrit Group:</td>
               <td>
                  <c:choose>
-                   <c:when test="${param.proposeExistingGroups}">
+                   <c:when test="${(param.proposeExistingGroups == 'related')  || (param.proposeExistingGroups == 'all')}">
                       <select name="<%= GitGerritFilter.PARAMETER_GROUP %>" style="width:100%;">
                         <c:forEach var="group" items="${proposedExistingGroups}">
                           <option>${group}</option>
