@@ -13,12 +13,14 @@ package org.eclipse.skalli.view.internal.filter.ext;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -302,8 +304,9 @@ public class GitGerritFilter implements Filter {
             return Collections.emptySet();
         }
 
-        List<Project> relevantSkalliProjects = Services.getRequiredService(ProjectService.class).getParentChain(
-                project.getUuid());
+        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        List<Project> relevantSkalliProjects = projectService.getParentChain(project.getUuid());
+        relevantSkalliProjects.addAll(getSiblingsAndAllDescendants(projectService, project));
 
         Set<String> proposedGroups = new TreeSet<String>(new Comparator<String>() {
             @Override
@@ -315,6 +318,27 @@ public class GitGerritFilter implements Filter {
                 new String[0])));
 
         return proposedGroups;
+    }
+
+    private List<Project> getSiblingsAndAllDescendants(ProjectService projectService, final Project project) {
+        List<Project> result = new ArrayList<Project>();
+
+        UUID parent = project.getParentProject();
+        List<Project> siblings = projectService.getSubProjects(parent);
+        result.addAll(siblings);
+
+        //now add all Descendants of all the siblings
+        for (Project sibling : siblings) {
+            Comparator<Project> comparator = new Comparator<Project>() {
+                @Override
+                public int compare(Project p1, Project p2) {
+                    return p1.getProjectId().compareTo(p2.getProjectId());
+                }
+            };
+
+            result.addAll(projectService.getSubProjects(sibling.getUuid(), comparator, Integer.MAX_VALUE));
+        }
+        return result;
     }
 
     private Set<String> getRelevantGerritProjects(List<Project> skalliProjects, final URI newScmUri) {
