@@ -16,6 +16,7 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -199,8 +200,8 @@ public class GitGerritFilter implements Filter {
                                 client.createGroup(group, StringUtils.EMPTY, description, knownAccounts);
                             }
                             if (createRepo) {
-                                client.createProject(repo, null, CollectionUtils.asSet(group),
-                                        fromConfig(ConfigKeyGerrit.PARENT), false, description, null, false, false);
+                                client.createProject(repo, null, CollectionUtils.asSet(group), null, false,
+                                        description, null, false, false);
                             }
                         }
 
@@ -293,22 +294,32 @@ public class GitGerritFilter implements Filter {
      */
     private Set<String> getGroupsFromHierarchy(final GerritClient client, final Project project)
             throws GerritClientException {
-        Set<String> relevantParentProjects = new HashSet<String>();
+
+        URI newScmUri = null;
+        try {
+            newScmUri = new URI(StringUtils.removeStart(getScmLocationStaticPart(), GIT_PREFIX));
+        } catch (URISyntaxException e) {
+            return Collections.emptySet();
+        }
+
+        List<Project> relevantSkalliProjects = Services.getRequiredService(ProjectService.class).getParentChain(
+                project.getUuid());
+
         Set<String> proposedGroups = new TreeSet<String>(new Comparator<String>() {
             @Override
             public int compare(String g1, String g2) {
                 return g1.compareTo(g2);
             }
         });
+        proposedGroups.addAll(client.getGroups(getRelevantGerritProjects(relevantSkalliProjects, newScmUri).toArray(
+                new String[0])));
 
-        URI newScmUri = null;
-        try {
-            newScmUri = new URI(StringUtils.removeStart(getScmLocationStaticPart(), GIT_PREFIX));
-        } catch (URISyntaxException e) {
-            return relevantParentProjects;
-        }
+        return proposedGroups;
+    }
 
-        for (Project parent : Services.getRequiredService(ProjectService.class).getParentChain(project.getUuid())) {
+    private Set<String> getRelevantGerritProjects(List<Project> skalliProjects, final URI newScmUri) {
+        Set<String> relevantParentProjects = new HashSet<String>();
+        for (Project parent : skalliProjects) {
             DevInfProjectExt devInf = parent.getExtension(DevInfProjectExt.class);
             if (devInf == null || parent.isInherited(DevInfProjectExt.class)) {
                 continue;
@@ -334,9 +345,7 @@ public class GitGerritFilter implements Filter {
                 relevantParentProjects.add(relevantProjectName);
             }
         }
-        proposedGroups.addAll(client.getGroups(relevantParentProjects.toArray(new String[0])));
-
-        return proposedGroups;
+        return relevantParentProjects;
     }
 
     /**
