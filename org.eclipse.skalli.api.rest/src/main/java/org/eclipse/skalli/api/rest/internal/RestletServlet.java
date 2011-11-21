@@ -73,11 +73,6 @@ public class RestletServlet extends ServerServlet {
                 // referer not defined in request header, try to fetch it from url
                 referer = request.getParameter("referer"); //$NON-NLS-1$
             }
-            if (StringUtils.isBlank(referer)) {
-                // referer not defined neither in request header nor as url parameter
-                response.sendError(403, "No referer provided, access denied."); //$NON-NLS-1$
-                return;
-            }
             Statistics.getDefault().trackReferer(referer);
         }
         super.service(request, response);
