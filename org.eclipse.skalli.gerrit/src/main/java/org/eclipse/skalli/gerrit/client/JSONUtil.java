@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.gerrit.client;
 
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public final class JSONUtil {
 
@@ -30,7 +30,7 @@ public final class JSONUtil {
    * @return the Integer value, null in case of failure
    */
   public static Integer getInteger(final String json, final String attributeName) {
-      return getValue(json, attributeName);
+    return getValue(json, attributeName);
   }
 
   /**
@@ -45,7 +45,7 @@ public final class JSONUtil {
    * @return the String value, null in case of failure
    */
   public static String getString(final String json, final String attributeName) {
-      return getValue(json, attributeName);
+    return getValue(json, attributeName);
   }
 
   /**
@@ -72,8 +72,7 @@ public final class JSONUtil {
       }
 
       return (T) jObj.get(split[i]);
-    }
-    catch (JSONException e) {
+    } catch (JSONException e) {
       throw new RuntimeException(e);
     }
   }

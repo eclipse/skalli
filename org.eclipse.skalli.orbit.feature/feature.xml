@@ -136,13 +136,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.codehaus.jettison.jettison"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.restlet"
          download-size="0"
          install-size="0"
@@ -169,7 +162,7 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-         
+
    <plugin
          id="org.eclipse.gemini.jpa.weaving"
          download-size="0"
@@ -193,6 +186,13 @@
 
    <plugin
          id="com.jcraft.jsch"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.json"
          download-size="0"
          install-size="0"
          version="0.0.0"

@@ -45,6 +45,7 @@
 <unit id="org.easymock" version="2.4.0.v20090202-0900"/>
 <unit id="org.slf4j.api" version="1.5.11.v20100519-1910"/>
 <unit id="com.jcraft.jsch" version="0.1.44.v201101211721"/>
+<unit id="org.json" version="1.0.0.v201011060100"/>
 <unit id="com.sun.syndication" version="0.9.0.v200803061811"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20110523182458/repository"/>
 </location>
