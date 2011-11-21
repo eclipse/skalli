@@ -20,7 +20,8 @@ public enum ConfigKeyGerrit implements ConfigKey {
   USER("scm.gerrit.username", "", false),
   PRIVATEKEY("scm.gerrit.privatekey", "", true),
   PASSPHRASE("scm.gerrit.passphrase", "", true),
-  CONTACT("scm.gerrit.contact", "", false);
+  CONTACT("scm.gerrit.contact", "", false),
+  PARENT("scm.gerrit.parent", "", false);
 
   private final String key;
   private final String defaultValue;

@@ -197,7 +197,7 @@ public class GitGerritFilter implements Filter {
                   client.createGroup(group, StringUtils.EMPTY, description, knownAccounts);
                 }
                 if (createRepo) {
-                  client.createProject(repo, null, CollectionUtils.asSet(group), null, false, description, null, false, false);
+                  client.createProject(repo, null, CollectionUtils.asSet(group), fromConfig(ConfigKeyGerrit.PARENT), false, description, null, false, false);
                 }
               }
 

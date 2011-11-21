@@ -37,6 +37,7 @@ public class GerritResource extends ConfigResource<ConfigKeyGerrit, GerritConfig
     ret.put(ConfigKeyGerrit.PASSPHRASE, configObject.getPassphrase());
     ret.put(ConfigKeyGerrit.PRIVATEKEY, configObject.getPrivateKey());
     ret.put(ConfigKeyGerrit.CONTACT, configObject.getContact());
+    ret.put(ConfigKeyGerrit.PARENT, configObject.getParent());
     return ret;
   }
 
@@ -49,6 +50,7 @@ public class GerritResource extends ConfigResource<ConfigKeyGerrit, GerritConfig
     ret.setPassphrase(values.get(ConfigKeyGerrit.PASSPHRASE));
     ret.setPrivateKey(values.get(ConfigKeyGerrit.PRIVATEKEY));
     ret.setContact(values.get(ConfigKeyGerrit.CONTACT));
+    ret.setParent(values.get(ConfigKeyGerrit.PARENT));
     return ret;
   }
 

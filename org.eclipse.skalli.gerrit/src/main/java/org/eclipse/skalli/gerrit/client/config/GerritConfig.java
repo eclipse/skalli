@@ -21,6 +21,7 @@ public class GerritConfig {
   private String privateKey;
   private String passphrase;
   private String contact;
+  private String parent;
 
   public String getHost() {
     return host;
@@ -57,6 +58,12 @@ public class GerritConfig {
   }
   public String getContact() {
     return contact;
+  }
+  public String getParent() {
+    return parent;
+  }
+  public void setParent(String parent) {
+    this.parent = parent;
   }
 
 }
