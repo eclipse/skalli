@@ -21,16 +21,6 @@ Import-Package: com.thoughtworks.xstream,
  org.apache.commons.io,
  org.apache.commons.io.filefilter,
  org.apache.commons.lang,
- org.apache.lucene.analysis,
- org.apache.lucene.analysis.standard,
- org.apache.lucene.document,
- org.apache.lucene.index,
- org.apache.lucene.queryParser,
- org.apache.lucene.search,
- org.apache.lucene.search.highlight,
- org.apache.lucene.search.similar,
- org.apache.lucene.store,
- org.apache.lucene.util,
  org.apache.velocity,
  org.apache.velocity.app,
  org.apache.velocity.context,
@@ -78,7 +68,6 @@ Service-Component: OSGI-INF/PersistenceComponent.xml,
  OSGI-INF/ValidationsConfigSection.xml,
  OSGI-INF/FileStorageComponent.xml
 Bundle-ActivationPolicy: lazy
-
-
-
-
+Require-Bundle: org.apache.lucene.highlighter;bundle-version="3.0.3",
+ org.apache.lucene.queries;bundle-version="3.0.3",
+ org.apache.lucene.core;bundle-version="3.0.3"

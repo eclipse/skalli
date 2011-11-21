@@ -87,42 +87,42 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.skalli.org.apache.lucene.lucene-core"
+         id="org.apache.lucene.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.skalli.org.apache.lucene.lucene-highlighter"
+         id="org.apache.lucene.highlighter"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.skalli.org.apache.lucene.lucene-queries"
+         id="org.apache.lucene.queries"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.springsource.com.thoughtworks.xstream"
+         id="com.thoughtworks.xstream"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.springsource.org.custommonkey.xmlunit"
+         id="org.custommonkey.xmlunit"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.springsource.org.xmlpull"
+         id="org.xmlpull"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -158,13 +158,6 @@
 
    <plugin
          id="org.eclipse.gemini.jpa"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.gemini.jpa.weaving"
          download-size="0"
          install-size="0"
          version="0.0.0"

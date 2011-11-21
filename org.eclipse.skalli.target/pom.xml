@@ -38,9 +38,9 @@
                         <configuration>
                             <artifacts>
                                 <artifact>
-                                    <file>skalli-for-tycho.target</file>
+                                    <file>skalli.target</file>
                                     <type>target</type>
-                                    <classifier>skalli-for-tycho</classifier>
+                                    <classifier>skalli</classifier>
                                 </artifact>
                             </artifacts>
                         </configuration>

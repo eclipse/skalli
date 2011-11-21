@@ -81,7 +81,7 @@
                             <groupId>org.eclipse.skalli</groupId>
                             <artifactId>org.eclipse.skalli.target</artifactId>
                             <version>${project.version}</version>
-                            <classifier>skalli-for-tycho</classifier>
+                            <classifier>skalli</classifier>
                         </artifact>
                     </target>
                     <environments>
