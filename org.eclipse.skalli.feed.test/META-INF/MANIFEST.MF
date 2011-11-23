@@ -9,5 +9,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.easymock,
  org.eclipse.skalli.testutil,
  org.eclipse.skalli.testutil.feeds
-Require-Bundle: org.junit4,
+Require-Bundle: org.junit,
  org.hamcrest
