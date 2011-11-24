@@ -61,11 +61,15 @@ public class RelatedProjectsInfoBox extends InfoBox implements ProjectInfoBox {
                 ProjectService projectService = Services.getRequiredService(ProjectService.class);
                 for (UUID uuid : ids) {
                     Project relatedProject = projectService.getByUUID(uuid);
-                    ExternalResource externalResource = new ExternalResource("/projects/"
-                            + relatedProject.getProjectId());
-                    String content = HSPACE + "<a href=" + externalResource.getURL() + ">" + relatedProject.getName()
-                            + "</a>";
-                    createLabel(layout, content);
+                    if (relatedProject != null) {
+                        //project might have deleted meanwhile
+                        ExternalResource externalResource = new ExternalResource("/projects/"
+                                + relatedProject.getProjectId());
+                        String content = HSPACE + "<a href=\"" + externalResource.getURL() + "\">"
+                                + relatedProject.getName()
+                                + "</a>";
+                        createLabel(layout, content);
+                    }
                 }
             }
         }
