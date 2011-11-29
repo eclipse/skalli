@@ -43,7 +43,7 @@ public class Consts {
     public static final String ATTRIBUTE_PROJECTADMIN = "isProjectAdmin";
     public static final String ATTRIBUTE_SHOW_ISSUES = "showIssues";
     public static final String ATTRIBUTE_EDITMODE = "editmode";
-    public static final String ATTRIBUTE_PATHINFO = "pathInfo";
+    public static final String ATTRIBUTE_WINDOWNAME = "windowName";
     public static final String ATTRIBUTE_PROJECTTEMPLATE = "projectTemplate";
     public static final String ATTRIBUTE_FAVORITES = "favorites";
     public static final String ATTRIBUTE_PROJECTCONTEXTLINKS = "projectContextLinks";
@@ -76,7 +76,7 @@ public class Consts {
     public static final String URL_MYFAVORITES = "/myfavorites";
     public static final String URL_REINDEX = "/reindex";
     public static final String URL_CREATEPROJECT = "/create";
-    public static final String URL_VAADIN_PROJECTS = "/vprojects";
+    public static final String URL_VAADIN_PROJECTS = "/vprojects/";
     public static final String URL_ERROR = "/error";
 
     public static final String URL_PROJECTS_QUERY = URL_PROJECTS + "?" + PARAM_QUERY + "=";

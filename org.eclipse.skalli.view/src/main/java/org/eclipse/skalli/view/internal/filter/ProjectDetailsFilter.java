@@ -121,7 +121,7 @@ public class ProjectDetailsFilter implements Filter {
                         getOrderedVisibleProjectContextLinks(project, userId));
             }
         } else {
-            request.setAttribute(Consts.ATTRIBUTE_PATHINFO, httpRequest.getPathInfo());
+            request.setAttribute(Consts.ATTRIBUTE_WINDOWNAME, httpRequest.getPathInfo());
             // do nothing else as we have to support creation of projects and search urls, too
         }
 

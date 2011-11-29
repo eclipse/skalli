@@ -75,8 +75,7 @@ public class ProjectFilter implements Filter {
             }
 
             if (project == null) {
-                // refactored, don't know if we still need this???
-                request.setAttribute(Consts.ATTRIBUTE_PATHINFO, httpRequest.getPathInfo());
+                request.setAttribute(Consts.ATTRIBUTE_WINDOWNAME, httpRequest.getPathInfo());
             }
         }
 

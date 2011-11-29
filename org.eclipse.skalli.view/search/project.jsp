@@ -27,7 +27,6 @@
 <body>
 
 <%
-    String pathInfo = null;
     String windowName = null;
     Project project = (Project) request.getAttribute(Consts.ATTRIBUTE_PROJECT);
     if (project != null) {
@@ -36,24 +35,24 @@
         } else {
             windowName = project.getUuid().toString();
         }
-        pathInfo = "/" + windowName;
-    } else if (request.getAttribute(Consts.ATTRIBUTE_PATHINFO) != null) {
-        pathInfo = (String) request.getAttribute(Consts.ATTRIBUTE_PATHINFO);
-        windowName = pathInfo;
+    } else if (request.getAttribute(Consts.ATTRIBUTE_WINDOWNAME) != null) {
+        windowName = (String) request.getAttribute(Consts.ATTRIBUTE_WINDOWNAME);
     } else {
         Exception e = new RuntimeException("Problem in project servlet filter: Both attributes '"
-                + Consts.ATTRIBUTE_PATHINFO + "' and '" + Consts.ATTRIBUTE_PROJECT + "' are null!");
+                + Consts.ATTRIBUTE_WINDOWNAME + "' and '" + Consts.ATTRIBUTE_PROJECT + "' are both undefined");
         request.setAttribute("exception", e);
         request.getRequestDispatcher("/error").forward(request, response);
         throw new RuntimeException(e);
     }
 
+    String appUri = Consts.URL_VAADIN_PROJECTS + windowName;
+
     request.setAttribute(Consts.ATTRIBUTE_EDITMODE, false);
     String action = request.getParameter(Consts.PARAM_ACTION);
     if (action != null) {
         if (action.equals(Consts.PARAM_VALUE_EDIT)) {
-            pathInfo = pathInfo + "/" + Consts.PARAM_VALUE_EDIT;
             request.setAttribute(Consts.ATTRIBUTE_EDITMODE, true);
+            appUri = appUri + "/edit";
         }
     }
 
@@ -71,7 +70,7 @@ vaadin.debug = true;
 document.write('<iframe tabIndex="-1" id="__gwt_historyFrame" style="position:absolute;width:0;height:0;border:0;overflow:hidden;" src="javascript:false"></iframe>');
 document.write("<script language='javascript' src='/VAADIN/widgetsets/com.vaadin.terminal.gwt.DefaultWidgetSet/com.vaadin.terminal.gwt.DefaultWidgetSet.nocache.js'><\/script>");
 }
-vaadin.vaadinConfigurations["project"] = {appUri:'/vprojects', pathInfo: '<%=pathInfo%>', windowName: '<%=windowName%>', themeUri:'/VAADIN/themes/simple', versionInfo : {vaadinVersion:"6.4.0",applicationVersion:"NONVERSIONED"},"comErrMsg": {"caption":"Communication problem","message" : "Take note of any unsaved data, and <u>click here</u> to continue.","url" : null}};
+vaadin.vaadinConfigurations["project"] = {appUri:'<%=appUri%>', windowName: '<%=windowName%>', themeUri:'/VAADIN/themes/simple', versionInfo : {vaadinVersion:"6.4.0",applicationVersion:"NONVERSIONED"},"comErrMsg": {"caption":"Communication problem","message" : "Take note of any unsaved data, and <u>click here</u> to continue.","url" : null}};
 //]]>
 </script>
 <script type="text/javascript">

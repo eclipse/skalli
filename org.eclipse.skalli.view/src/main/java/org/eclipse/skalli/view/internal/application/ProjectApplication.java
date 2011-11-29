@@ -17,25 +17,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-
 import org.eclipse.skalli.api.java.ProjectService;
 import org.eclipse.skalli.api.java.authentication.LoginUtil;
+import org.eclipse.skalli.common.Consts;
 import org.eclipse.skalli.common.Services;
 import org.eclipse.skalli.common.User;
 import org.eclipse.skalli.common.util.UUIDUtils;
 import org.eclipse.skalli.model.core.Project;
 import org.eclipse.skalli.view.internal.window.ProjectWindow;
+
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.ui.Window;
 
 /**
- * project portal (vaadin) application. implements the layout and screenflow of
- * this application.
+ * Project Portal Vaadin application. Implements the layout and screen flow of this application.
  */
 @SuppressWarnings("serial")
 public class ProjectApplication extends com.vaadin.Application implements HttpServletRequestListener {
 
-    public static final String WINDOW_TITLE = "ProjectPortal";
+    public static final String DEFAULT_THEME = "simple"; //$NON-NLS-1$
+    public static final String WINDOW_TITLE = "ProjectPortal"; //$NON-NLS-1$
 
     private String userId;
 
@@ -44,14 +45,9 @@ public class ProjectApplication extends com.vaadin.Application implements HttpSe
         this.setUser(user);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.vaadin.Application#init()
-     */
     @Override
     public void init() {
-        setTheme("simple"); //$NON-NLS-1$
+        setTheme(DEFAULT_THEME);
         setMainWindow(new Window(WINDOW_TITLE));
     }
 
@@ -94,39 +90,27 @@ public class ProjectApplication extends com.vaadin.Application implements HttpSe
         return window;
     }
 
-    /***********************
-     * some helper methods
-     ***********************/
-
     public String getLoggedInUser() {
         return userId;
     }
 
     /**************************************
      * Interface HttpServletRequestListener
-     *
-     * implementing the edit link of projects is a hack...
-     * replace edit link implementation as soon as possible
-     */
+     ***************************************/
 
     @Override
     public void onRequestStart(HttpServletRequest request, HttpServletResponse response) {
         LoginUtil util = new LoginUtil(request);
         userId = util.getLoggedInUserId();
 
-        if (request.getParameter("windowName") != null) { //$NON-NLS-1$
+        String windowName = request.getParameter(Consts.ATTRIBUTE_WINDOWNAME);
+        if (StringUtils.isNotBlank(windowName)) {
+            String prefix = Consts.URL_VAADIN_PROJECTS + windowName;
             String requestUri = request.getRequestURI();
-            String windowName = request.getParameter("windowName"); //$NON-NLS-1$
-            String uidlUri = "UIDL/" + windowName; //$NON-NLS-1$
-
-            if (requestUri.contains(uidlUri)) {
-                String[] uriparts = requestUri.split(uidlUri);
-                String relativeUri = ""; //$NON-NLS-1$
-                if (uriparts.length > 1) {
-                    relativeUri = uriparts[uriparts.length - 1];
-                    if (relativeUri.startsWith("/")) { //$NON-NLS-1$
-                        relativeUri = relativeUri.replaceFirst("/", ""); //$NON-NLS-1$ //$NON-NLS-2$
-                    }
+            if (requestUri.startsWith(prefix)) {
+                String relativeUri = null;
+                if (requestUri.indexOf("/edit/") > 0) { //$NON-NLS-1$
+                    relativeUri = "edit";  //$NON-NLS-1$
                 }
                 ((ProjectWindow) getWindow(windowName)).handleRelativeURI(relativeUri);
             }

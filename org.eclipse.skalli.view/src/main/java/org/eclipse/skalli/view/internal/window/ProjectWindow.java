@@ -17,6 +17,7 @@ import org.eclipse.skalli.view.ext.Navigator;
 import org.eclipse.skalli.view.ext.ProjectEditMode;
 import org.eclipse.skalli.view.internal.application.ProjectApplication;
 import org.eclipse.skalli.view.internal.application.ProjectNavigator;
+
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.HorizontalLayout;
@@ -31,8 +32,8 @@ import com.vaadin.ui.Window;
 @SuppressWarnings("serial")
 public class ProjectWindow extends Window {
 
-    private static final String STYLE_PROJECT = "projectarea";
-    private static final String STYLE_WINDOW = "projectview";
+    private static final String STYLE_PROJECT = "projectarea"; //$NON-NLS-1$
+    private static final String STYLE_WINDOW = "projectview"; //$NON-NLS-1$
 
     private final ProjectApplication application;
     private final HorizontalLayout mainContainer = new HorizontalLayout();
@@ -128,7 +129,7 @@ public class ProjectWindow extends Window {
     }
 
     public void handleRelativeURI(String relativeUri) {
-        if (relativeUri.equals("edit")) {
+        if ("edit".equals(relativeUri)) { //$NON-NLS-1$
             if (!isProjectEditView()) {
                 setMainContent(getProjectEditView());
             }
