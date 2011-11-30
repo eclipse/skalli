@@ -13,6 +13,7 @@ package org.eclipse.skalli.api.rest.internal.resources;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.skalli.api.java.PagingInfo;
 import org.eclipse.skalli.api.java.ProjectService;
 import org.eclipse.skalli.api.java.QueryParseException;
@@ -42,13 +43,22 @@ public class ProjectsResource extends ServerResource {
             String query = form.getFirstValue(Consts.PARAM_QUERY);
             String tag = form.getFirstValue(Consts.PARAM_TAG);
 
+            int start = NumberUtils.toInt(form.getFirstValue(Consts.PARAM_START), 0);
+            if (start < 0) {
+                start = 0;
+            }
+            int count = NumberUtils.toInt(form.getFirstValue(Consts.PARAM_COUNT), Integer.MAX_VALUE);
+            if (count < 0) {
+                count = Integer.MAX_VALUE;
+            }
+
             List<Project> projectList = null;
             if (query != null) {
                 SearchService searchService = Services.getRequiredService(SearchService.class);
-                projectList = searchService.findProjectsByQuery(query, new PagingInfo(0, Integer.MAX_VALUE)).getEntities();
+                projectList = searchService.findProjectsByQuery(query, new PagingInfo(start, count)).getEntities();
             } else if (tag != null) {
                 SearchService searchService = Services.getRequiredService(SearchService.class);
-                projectList = searchService.findProjectsByTag(tag, new PagingInfo(0, Integer.MAX_VALUE)).getEntities();
+                projectList = searchService.findProjectsByTag(tag, new PagingInfo(start, count)).getEntities();
             } else {
                 ProjectService projectService = Services.getRequiredService(ProjectService.class);
                 projectList = projectService.getAll();
@@ -63,7 +73,7 @@ public class ProjectsResource extends ServerResource {
                 extensions = extensionParam.split(Consts.PARAM_LIST_SEPARATOR);
             }
             return new ResourceRepresentation<Projects>(projects,
-                   new ProjectsConverter(getRequest().getResourceRef().getHostIdentifier(), extensions));
+                   new ProjectsConverter(getRequest().getResourceRef().getHostIdentifier(), extensions, start));
         } catch (QueryParseException e) {
             getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
             return new StringRepresentation("Error parsing query: " + e.getMessage()); //$NON-NLS-1$

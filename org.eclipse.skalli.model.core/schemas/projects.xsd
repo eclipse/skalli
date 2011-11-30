@@ -35,6 +35,23 @@
         <xsd:element name="project" type="Project" minOccurs="0" maxOccurs="unbounded"/>
       </xsd:sequence>
       <xsd:attribute name="apiVersion" type="ModelVersion" use="required" />
+      <xsd:attribute name="start" type="xsd:int" use="optional">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="EN">
+            The index of the first project element in a multi-page search response.
+            If not specified, a client should assume start="0".
+            This attribute is useful when evaluating the result of a search query
+            of the form /api/projects?query=...&amp;start=...&amp;count=... page by page.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="count" type="xsd:int" use="optional">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="EN">
+            The number of project elements contained in the response.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
     </xsd:complexType>
   </xsd:element>
 

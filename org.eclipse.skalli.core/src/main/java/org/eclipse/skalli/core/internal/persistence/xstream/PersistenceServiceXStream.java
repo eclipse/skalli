@@ -338,6 +338,12 @@ public class PersistenceServiceXStream extends AbstractPersistenceService implem
     }
 
     @Override
+    public <T extends EntityBase> int size(Class<T> entityClass) {
+        loadModel(entityClass);
+        return cache.size(entityClass);
+    }
+
+    @Override
     public <T extends EntityBase> T getEntity(Class<T> entityClass, EntityFilter<T> filter) {
         loadModel(entityClass);
         return cache.getEntity(entityClass, filter);

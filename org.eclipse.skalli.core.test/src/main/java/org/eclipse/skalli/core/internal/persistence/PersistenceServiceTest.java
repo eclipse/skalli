@@ -64,6 +64,11 @@ public class PersistenceServiceTest {
         @Override
         public void refreshAll() {
         }
+
+        @Override
+        public <T extends EntityBase> int size(Class<T> entityClass) {
+            return 0;
+        }
     }
 
     private static class TestExtensionService extends ExtensionServiceBase<ExtensionEntityBase> {

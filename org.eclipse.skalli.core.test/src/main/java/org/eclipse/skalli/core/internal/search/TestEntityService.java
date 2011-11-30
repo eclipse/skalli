@@ -65,4 +65,9 @@ public class TestEntityService implements EntityService<TestEntity> {
     public Class<TestEntity> getEntityClass() {
         return TestEntity.class;
     }
+
+    @Override
+    public int size() {
+        return entities.size();
+    }
 }

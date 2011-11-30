@@ -277,7 +277,8 @@ public class LuceneIndex<T extends EntityBase> {
             mlt.setMinTermFreq(0);
             mlt.setAnalyzer(analyzer);
             Query query = mlt.like(baseDoc.doc);
-            TopScoreDocCollector collector = TopScoreDocCollector.create(count + 1, false); // count + 1 because baseDoc will be one of the hits
+            int numHits = Math.min(count + 1, entityService.size()); // count + 1 because baseDoc will be one of the hits
+            TopScoreDocCollector collector = TopScoreDocCollector.create(numHits, false);
             searcher.search(query, collector);
 
             List<String> fieldList = Arrays.asList(fields);
@@ -336,12 +337,18 @@ public class LuceneIndex<T extends EntityBase> {
                 QueryParser parser = new MultiFieldQueryParser(Version.LUCENE_30, fields, analyzer);
                 Query query = getQuery(parser, queryString);
 
+                // it is not possible that we have more hits than projects!
+                int maxHits = entityService.size();
+                int numHits = pagingInfo.getStart() + pagingInfo.getCount();
+                if (numHits < 0 || numHits > maxHits) {
+                    numHits = maxHits;
+                }
+
                 TopDocsCollector<ScoreDoc> collector;
                 if (facetFields == null) {
-                    collector = TopScoreDocCollector.create(pagingInfo.getStart() + pagingInfo.getCount(), false);
+                    collector = TopScoreDocCollector.create(numHits, false);
                 } else {
-                    collector = new FacetedCollector(facetFields, searcher.getIndexReader(), pagingInfo.getStart()
-                            + pagingInfo.getCount());
+                    collector = new FacetedCollector(facetFields, searcher.getIndexReader(), numHits);
                 }
 
                 searcher.search(query, collector);

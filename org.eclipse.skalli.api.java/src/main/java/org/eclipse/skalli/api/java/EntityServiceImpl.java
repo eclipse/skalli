@@ -150,6 +150,11 @@ public abstract class EntityServiceImpl<T extends EntityBase> implements EntityS
     }
 
     @Override
+    public int size() {
+        return getPersistenceService().size(getEntityClass());
+    }
+
+    @Override
     public void persist(T entity, String userId) throws ValidationException {
         if (entity.getUuid() == null) {
             entity.setUuid(UUID.randomUUID());

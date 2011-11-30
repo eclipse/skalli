@@ -43,6 +43,12 @@ public interface EntityService<T extends EntityBase> {
     public List<T> getAll();
 
     /**
+     * Returns the overall number of entities.
+     * @return the number of entities {@link #getAll()} would return.
+     */
+    public int size();
+
+    /**
      * Persists the given entity and {@link #scheduleForValidation(UUID, Severity, String) schedules}
      * a re-validation of the entity.
      *

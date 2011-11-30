@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.internal.resources;
 
+import java.util.Set;
+
 import org.eclipse.skalli.model.core.Project;
 import org.eclipse.skalli.model.ext.AbstractConverter;
 
@@ -21,17 +23,29 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 class ProjectsConverter extends AbstractConverter<Projects> {
 
     private String[] extensions;
+    private int start = 0;
 
     public ProjectsConverter(String host, String[] extensions) {
         super(Projects.class, "projects", host); //$NON-NLS-1$
         this.extensions = extensions;
     }
 
+    public ProjectsConverter(String host, String[] extensions, int start) {
+        this(host, extensions);
+        this.start = start;
+    }
+
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         marshalNSAttributes(writer);
         marshalApiVersion(writer);
-        for (Project project : ((Projects) source).getProjects()) {
+
+        Set<Project> projects = ((Projects) source).getProjects();
+
+        writer.addAttribute("start", Integer.toString(start)); //$NON-NLS-1$
+        writer.addAttribute("count", Integer.toString(projects.size())); //$NON-NLS-1$
+
+        for (Project project : projects) {
             writer.startNode("project"); //$NON-NLS-1$
             new ProjectConverter(getHost(), extensions, true).marshal(project, writer, context);
             writer.endNode();
