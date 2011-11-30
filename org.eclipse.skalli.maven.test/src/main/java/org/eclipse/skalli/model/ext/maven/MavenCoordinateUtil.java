@@ -25,14 +25,14 @@ public class MavenCoordinateUtil {
     public static final String PARENT_GROUPID = "org.example.test";
     public static final String PARENT_RELATIVE_PATH = "../parentpath";
 
-    public static MavenCoordinate TEST_COORD = new MavenCoordinate(GROUPID, ARTIFACT, PACKAGING);
-    public static MavenCoordinate TEST_PARENT_COORD = new MavenCoordinate(PARENT_GROUPID, PARENT_ARTIFACT,
+    public static MavenModule TEST_COORD = new MavenModule(GROUPID, ARTIFACT, PACKAGING);
+    public static MavenModule TEST_PARENT_COORD = new MavenModule(PARENT_GROUPID, PARENT_ARTIFACT,
             PARENT_PACKAGING);
 
-    public static List<MavenCoordinate> TEST_MODULES = Arrays.asList(
-            new MavenCoordinate("a.b.c", "art1", "jar"),
-            new MavenCoordinate("a.b.c", "art2", "jar"),
-            new MavenCoordinate("a.b.c", "art3", "war"),
-            new MavenCoordinate("d.e", "art4711", "jar"),
-            new MavenCoordinate("f.g.h", "art1", "jar"));
+    public static List<MavenModule> TEST_MODULES = Arrays.asList(
+            new MavenModule("a.b.c", "art1", "jar"),
+            new MavenModule("a.b.c", "art2", "jar"),
+            new MavenModule("a.b.c", "art3", "war"),
+            new MavenModule("d.e", "art4711", "jar"),
+            new MavenModule("f.g.h", "art1", "jar"));
 }

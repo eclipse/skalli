@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal;
 
-import static org.eclipse.skalli.model.ext.maven.MavenCoordinateUtil.*;
-import static org.eclipse.skalli.model.ext.maven.MavenPomUtility.*;
 import static org.apache.commons.httpclient.HttpStatus.*;
 import static org.easymock.EasyMock.*;
+import static org.eclipse.skalli.model.ext.maven.MavenCoordinateUtil.*;
+import static org.eclipse.skalli.model.ext.maven.MavenPomUtility.*;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
@@ -22,14 +22,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import org.eclipse.skalli.model.ext.Issue;
 import org.eclipse.skalli.model.ext.Severity;
-import org.eclipse.skalli.model.ext.maven.MavenCoordinate;
+import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenPathResolver;
 import org.eclipse.skalli.model.ext.maven.MavenPomUtility;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
@@ -38,6 +33,10 @@ import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.HttpServerMock;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 @SuppressWarnings("nls")
 public class MavenResolverTest {
@@ -114,7 +113,7 @@ public class MavenResolverTest {
     public void testPomWithParent() throws Exception {
         MavenResolverMock mavenResolver = new MavenResolverMock(parserMock, pathResolver);
         InputStream in = mavenResolver.getStream(reactorPath);
-        reactorPom.setSelf(new MavenCoordinate(null, PARENT_ARTIFACT, PARENT_PACKAGING));
+        reactorPom.setSelf(new MavenModule(null, PARENT_ARTIFACT, PARENT_PACKAGING));
         reactorPom.setParent(getParentCoordinates());
         expect(parserMock.parse(in)).andReturn(reactorPom);
         replay(parserMock);
@@ -227,11 +226,11 @@ public class MavenResolverTest {
         assertEquals(expectedMavenProject, actual);
     }
 
-    private MavenCoordinate getModuleCoordinate(String moduleName) {
-        return new MavenCoordinate(GROUPID, moduleName, PACKAGING);
+    private MavenModule getModuleCoordinate(String moduleName) {
+        return new MavenModule(GROUPID, moduleName, PACKAGING);
     }
 
-    private MavenPom asModulePom(MavenCoordinate parent, String moduleName) {
+    private MavenPom asModulePom(MavenModule parent, String moduleName) {
         MavenPom pom = new MavenPom();
         pom.setSelf(getModuleCoordinate(moduleName));
         pom.setParent(parent);

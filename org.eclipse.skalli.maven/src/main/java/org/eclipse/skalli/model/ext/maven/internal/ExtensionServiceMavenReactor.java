@@ -10,8 +10,12 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.eclipse.skalli.model.ext.AbstractIndexer;
 import org.eclipse.skalli.model.ext.AliasedConverter;
+import org.eclipse.skalli.model.ext.DataMigration;
 import org.eclipse.skalli.model.ext.ExtensionService;
 import org.eclipse.skalli.model.ext.ExtensionServiceBase;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
@@ -80,6 +84,15 @@ public class ExtensionServiceMavenReactor
     @Override
     public AbstractIndexer<MavenReactorProjectExt> getIndexer() {
         return new MavenReactorIndexer();
-      }
+    }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.skalli.model.ext.ExtensionServiceBase#getMigrations()
+     */
+    @Override
+    public Set<DataMigration> getMigrations() {
+        Set<DataMigration> migrations = new TreeSet<DataMigration>();
+        migrations.add(new DataMigrationMavenModule());
+        return migrations;
+    }
 }

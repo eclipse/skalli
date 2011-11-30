@@ -15,7 +15,7 @@ import java.util.TreeSet;
 
 import org.junit.Test;
 
-import org.eclipse.skalli.model.ext.maven.MavenCoordinate;
+import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.testutil.PropertyHelper;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
@@ -28,7 +28,7 @@ public class MavenReactorTest {
 
         values.put(MavenReactor.PROPERTY_COORDINATE, MavenCoordinateUtil.TEST_COORD);
 
-        TreeSet<MavenCoordinate> modules = new TreeSet<MavenCoordinate>();
+        TreeSet<MavenModule> modules = new TreeSet<MavenModule>();
         modules.addAll(MavenCoordinateUtil.TEST_MODULES);
 
         values.put(MavenReactor.PROPERTY_MODULES, modules);

@@ -12,8 +12,9 @@ package org.eclipse.skalli.model.ext.maven.internal;
 
 import java.util.TreeSet;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.ext.AbstractConverter;
-import org.eclipse.skalli.model.ext.maven.MavenCoordinate;
+import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
 
@@ -45,17 +46,17 @@ class MavenReactorConverter extends AbstractConverter<MavenReactorProjectExt> {
         MavenReactorProjectExt ext = (MavenReactorProjectExt) source;
         MavenReactor reactor = ext.getMavenReactor();
         if (reactor != null) {
-            MavenCoordinate reactorCoordinate = reactor.getCoordinate();
+            MavenModule reactorCoordinate = reactor.getCoordinate();
             if (reactorCoordinate != null) {
                 writer.startNode(TAG_COORDINATE); // <mavenReactor>
                 writeContent(writer, reactorCoordinate);
                 writer.endNode(); // </coordinate>
             }
 
-            TreeSet<MavenCoordinate> modules = reactor.getModules();
+            TreeSet<MavenModule> modules = reactor.getModules();
             if (modules.size() > 0) {
                 writer.startNode(TAG_MODULES); // <modules>
-                for (MavenCoordinate moduleCoordinate : modules) {
+                for (MavenModule moduleCoordinate : modules) {
                     writer.startNode(TAG_MODULE); // <module>
                     writeContent(writer, moduleCoordinate);
                     writer.endNode(); // </module>
@@ -65,11 +66,13 @@ class MavenReactorConverter extends AbstractConverter<MavenReactorProjectExt> {
         }
     }
 
-    private void writeContent(HierarchicalStreamWriter writer, MavenCoordinate reactorCoordinate) {
+    private void writeContent(HierarchicalStreamWriter writer, MavenModule reactorCoordinate) {
         writeNode(writer, TAG_GROUPID, reactorCoordinate.getGroupId());
         writeNode(writer, TAG_ARTIFACTID, reactorCoordinate.getArtefactId());
         writeNode(writer, TAG_VERSIONS, TAG_VERSION, reactorCoordinate.getSortedVersions());
-        writeNode(writer, TAG_PACKAGING, reactorCoordinate.getPackaging());
+        if (StringUtils.isNotBlank(reactorCoordinate.getPackaging())) {
+            writeNode(writer, TAG_PACKAGING, reactorCoordinate.getPackaging());
+        }
     }
 
     @Override

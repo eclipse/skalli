@@ -23,31 +23,31 @@ public class MavenReactor {
     @Derived
     public static final String PROPERTY_MODULES = "modules"; //$NON-NLS-1$
 
-    private MavenCoordinate coordinate;
-    private TreeSet<MavenCoordinate> modules = new TreeSet<MavenCoordinate>();
+    private MavenModule coordinate;
+    private TreeSet<MavenModule> modules = new TreeSet<MavenModule>();
 
-    public MavenCoordinate getCoordinate() {
+    public MavenModule getCoordinate() {
         return coordinate;
     }
 
-    public void setCoordinate(MavenCoordinate coordinate) {
-        this.coordinate = coordinate;
+    public void setCoordinate(MavenModule module) {
+        this.coordinate = module;
     }
 
-    public synchronized TreeSet<MavenCoordinate> getModules() {
+    public synchronized TreeSet<MavenModule> getModules() {
         if (modules == null) {
-            modules = new TreeSet<MavenCoordinate>();
+            modules = new TreeSet<MavenModule>();
         }
         return modules;
     }
 
-    public void addModule(MavenCoordinate module) {
+    public void addModule(MavenModule module) {
         if (module != null) {
             getModules().add(module);
         }
     }
 
-    public void addModules(Collection<MavenCoordinate> modules) {
+    public void addModules(Collection<MavenModule> modules) {
         if (modules != null) {
             getModules().addAll(modules);
         }

@@ -83,7 +83,7 @@ public class XStreamPersistence implements Issuer {
      * "version" information in the persisted xml? => Maybe something like a
      * checksum (must be stable with respect to the order of calculation)
      */
-    private static final int CURRENT_VERISON = 18;
+    private static final int CURRENT_VERISON = 19;
 
     int getCurrentVersion() {
         return CURRENT_VERISON;

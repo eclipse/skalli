@@ -17,6 +17,7 @@ import java.util.TreeSet;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.ext.AbstractIndexer;
 import org.eclipse.skalli.model.ext.maven.MavenCoordinate;
+import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
 
@@ -65,7 +66,7 @@ public class MavenReactorIndexer extends AbstractIndexer<MavenReactorProjectExt>
         }
     }
 
-    private void indexModuleCoodinates(TreeSet<MavenCoordinate> mavenCoordinates) {
+    private void indexModuleCoodinates(TreeSet<MavenModule> mavenCoordinates) {
         if (mavenCoordinates == null) {
             return;
         }

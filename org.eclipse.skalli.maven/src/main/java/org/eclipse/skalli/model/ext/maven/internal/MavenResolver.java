@@ -28,7 +28,7 @@ import org.eclipse.skalli.model.ext.Issue;
 import org.eclipse.skalli.model.ext.Issuer;
 import org.eclipse.skalli.model.ext.Severity;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
-import org.eclipse.skalli.model.ext.maven.MavenCoordinate;
+import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenPathResolver;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
@@ -87,8 +87,8 @@ public class MavenResolver implements Issuer {
             throw new MavenValidationException(MessageFormat.format(
                     "no pom for scm location {0} and reactorPomPath {1}", scmLocation, reactorPomPath));
         }
-        MavenCoordinate parent = reactorPom.getParent();
-        MavenCoordinate self = getSelf(reactorPom, parent);
+        MavenModule parent = reactorPom.getParent();
+        MavenModule self = getSelf(reactorPom, parent);
         mavenReactor.setCoordinate(self);
 
         Set<String> moduleTags = reactorPom.getModuleTags();
@@ -99,14 +99,14 @@ public class MavenResolver implements Issuer {
         return mavenReactor;
     }
 
-    private Set<MavenCoordinate> getModules(String scmLocation, String relativePath, MavenCoordinate parent)
+    private Set<MavenModule> getModules(String scmLocation, String relativePath, MavenModule parent)
             throws IOException, MavenValidationException {
-        TreeSet<MavenCoordinate> result = new TreeSet<MavenCoordinate>();
+        TreeSet<MavenModule> result = new TreeSet<MavenModule>();
         MavenPom modulePom = getMavenPom(scmLocation, relativePath);
         if (modulePom == null) {
             return result;
         }
-        MavenCoordinate self = getSelf(modulePom, parent);
+        MavenModule self = getSelf(modulePom, parent);
         result.add(self);
         Set<String> moduleTags = modulePom.getModuleTags();
         for (String moduleTag : moduleTags) {
@@ -124,8 +124,8 @@ public class MavenResolver implements Issuer {
         return normalizedPath;
     }
 
-    private MavenCoordinate getSelf(MavenPom mavenPom, MavenCoordinate parent) {
-        MavenCoordinate self = mavenPom.getSelf();
+    private MavenModule getSelf(MavenPom mavenPom, MavenModule parent) {
+        MavenModule self = mavenPom.getSelf();
         if (parent != null) {
             if (self.getGroupId() == null) {
                 self.setGroupId(parent.getGroupId());

@@ -22,6 +22,7 @@ import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.model.ext.devinf.ScmLocationMapper;
 import org.eclipse.skalli.model.ext.devinf.ScmLocationMappingConfig;
 import org.eclipse.skalli.model.ext.maven.MavenCoordinate;
+import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
@@ -79,12 +80,12 @@ public class ProjectMavenBox extends InfoBox implements ProjectInfoBox {
                 groupId = coordinate.getGroupId();
                 createLabel(layout, "GroupId: <b>" + groupId + "</b>");//$NON-NLS-1$ //$NON-NLS-2$
                 createLabel(layout, "ArtifactId: <b>" + coordinate.getArtefactId() + "</b>");//$NON-NLS-1$ //$NON-NLS-2$
-                TreeSet<MavenCoordinate> modules = mavenReactor.getModules();
+                TreeSet<MavenModule> modules = mavenReactor.getModules();
                 StringBuilder sb = new StringBuilder();
 
                 if (modules.size() > 0) {
                     int lineLength = 0;
-                    for (MavenCoordinate module : modules) {
+                    for (MavenModule module : modules) {
                         //create popup with xml snippet
                         sb.append("<dependency>\n");
                         sb.append("    <artifactId>" + module.getArtefactId() + "</artifactId>\n");

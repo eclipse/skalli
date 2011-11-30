@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.skalli.model.ext.maven.MavenCoordinate;
+import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.nexus.NexusArtifact;
 import org.eclipse.skalli.nexus.NexusClient;
@@ -69,11 +70,11 @@ public class NexusVersionsResolverTest {
     public void testSetNexusVersionsMavenReactor() throws NexusClientException, IOException {
 
         MavenReactor mavenReactor = new MavenReactor();
-        MavenCoordinate mavenCoordinateParent = new MavenCoordinate("org.example.helloworld",
+        MavenModule mavenCoordinateParent = new MavenModule("org.example.helloworld",
                 "org.example.helloworld", null);
-        MavenCoordinate moduleA = new MavenCoordinate("org.example.helloworld",
+        MavenModule moduleA = new MavenModule("org.example.helloworld",
                 "org.example.helloworld.modulA", null);
-        MavenCoordinate moduleB = new MavenCoordinate("org.example.helloworld",
+        MavenModule moduleB = new MavenModule("org.example.helloworld",
                 "org.example.helloworld.modulB", null);
 
         mavenReactor.setCoordinate(mavenCoordinateParent);
@@ -106,7 +107,7 @@ public class NexusVersionsResolverTest {
 
     @Test
     public void testSetNexusVersionsMavenCoordinate() throws NexusClientException, IOException {
-        MavenCoordinate mavenCoordinate = new MavenCoordinate("org.example.helloworld",
+        MavenModule mavenCoordinate = new MavenModule("org.example.helloworld",
                 "org.example.helloworld.updatesite", "zip");
         NexusClient nexusClientMock = createMock(NexusClient.class);
         expectSearchArtifactVersions(nexusClientMock, mavenCoordinate, new String[] { "0.0.1", "0.0.2" });
@@ -123,7 +124,7 @@ public class NexusVersionsResolverTest {
 
     @Test
     public void testSetNexusVersionsMavenCoordinate_withNexusClientException() throws NexusClientException, IOException {
-        MavenCoordinate mavenCoordinate = new MavenCoordinate("org.example.helloworld",
+        MavenModule mavenCoordinate = new MavenModule("org.example.helloworld",
                 "org.example.helloworld.updatesite", "zip");
         mavenCoordinate.addVersion("0.0.1");
         mavenCoordinate.addVersion("0.0.2");
@@ -146,15 +147,15 @@ public class NexusVersionsResolverTest {
     public void testAddVersions() {
         MavenReactor oldMavenReactor = new MavenReactor();
 
-        MavenCoordinate oldMavenCoordinateParent = new MavenCoordinate("org.example.helloworld",
+        MavenModule oldMavenCoordinateParent = new MavenModule("org.example.helloworld",
                 "org.example.helloworld", null);
         oldMavenCoordinateParent.addVersion("0.9.19");
 
-        MavenCoordinate oldModuleA = new MavenCoordinate("org.example.helloworld",
+        MavenModule oldModuleA = new MavenModule("org.example.helloworld",
                 "org.example.helloworld.modulA", null);
         oldModuleA.addVersion("0.0.1");
 
-        MavenCoordinate oldModuleB = new MavenCoordinate("org.example.helloworld",
+        MavenModule oldModuleB = new MavenModule("org.example.helloworld",
                 "org.example.helloworld.modulB", null);
         oldModuleB.addVersion("0.0.2");
         oldModuleB.addVersion("0.0.3");
@@ -166,16 +167,16 @@ public class NexusVersionsResolverTest {
         NexusVersionsResolver resolver = new NexusVersionsResolver(null);
 
         MavenReactor newReactor = new MavenReactor();
-        MavenCoordinate newMavenCoordinateParent = new MavenCoordinate(oldMavenCoordinateParent);
+        MavenModule newMavenCoordinateParent = new MavenModule(oldMavenCoordinateParent);
         newMavenCoordinateParent.getVersions().clear();
 
         newReactor.setCoordinate(newMavenCoordinateParent);
 
-        MavenCoordinate newModuleA = new MavenCoordinate(oldModuleA);
+        MavenModule newModuleA = new MavenModule(oldModuleA);
         newModuleA.getVersions().clear();
         newReactor.addModule(newModuleA);
 
-        MavenCoordinate newModuleC = new MavenCoordinate("org.example.helloworld",
+        MavenModule newModuleC = new MavenModule("org.example.helloworld",
                 "org.example.helloworld.modulC", null);
         newReactor.addModule(newModuleC);
 
@@ -185,7 +186,7 @@ public class NexusVersionsResolverTest {
         assertThat(newReactor.getCoordinate().getVersions(), hasItem("0.9.19"));
 
         assertThat(newReactor.getModules().size(), is(2));
-        for (MavenCoordinate coordinate : newReactor.getModules()) {
+        for (MavenModule coordinate : newReactor.getModules()) {
             if ("org.example.helloworld.modulA".equals(coordinate.getArtefactId())) {
                 assertThat(coordinate.getVersions().size(), is(1));
                 assertThat(coordinate.getVersions(), hasItem("0.0.1"));

@@ -17,11 +17,11 @@ import org.eclipse.skalli.testutil.AssertUtils;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
-public class MavenCoordinateTest {
+public class MavenModuleTest {
 
     @Test
     public void testConstructor() throws Exception {
-        MavenCoordinate c =  new MavenCoordinate(MavenCoordinateUtil.GROUPID,
+        MavenCoordinate c =  new MavenModule(MavenCoordinateUtil.GROUPID,
                 MavenCoordinateUtil.ARTIFACT, MavenCoordinateUtil.PACKAGING);
         assertEquals(MavenCoordinateUtil.GROUPID, c.getGroupId());
         assertEquals(MavenCoordinateUtil.ARTIFACT, c.getArtefactId());
@@ -30,7 +30,7 @@ public class MavenCoordinateTest {
 
     @Test
     public void testConstructor_defaultPackaing() throws Exception {
-        MavenCoordinate c =  new MavenCoordinate(MavenCoordinateUtil.GROUPID,
+        MavenCoordinate c =  new MavenModule(MavenCoordinateUtil.GROUPID,
                 MavenCoordinateUtil.ARTIFACT, null);
         assertEquals(MavenCoordinateUtil.GROUPID, c.getGroupId());
         assertEquals(MavenCoordinateUtil.ARTIFACT, c.getArtefactId());
@@ -40,9 +40,9 @@ public class MavenCoordinateTest {
 
     @Test
     public void testCopyConstructor() throws Exception {
-        MavenCoordinate original = new MavenCoordinate(TEST_COORD);
+        MavenModule original = new MavenModule(TEST_COORD);
         original.addVersion("1.0");
-        MavenCoordinate clone = new MavenCoordinate(original);
+        MavenModule clone = new MavenModule(original);
 
         // ensure that original and clone are equal
         assertEquals(original, clone);
@@ -62,7 +62,7 @@ public class MavenCoordinateTest {
 
     @Test
     public void testBasics() {
-        MavenCoordinate clone = new MavenCoordinate(TEST_COORD);
+        MavenModule clone = new MavenModule(TEST_COORD);
         assertEquals(MavenCoordinateUtil.GROUPID, clone.getGroupId());
         assertEquals(MavenCoordinateUtil.ARTIFACT, clone.getArtefactId());
         assertEquals(MavenCoordinateUtil.PACKAGING, clone.getPackaging());
@@ -78,27 +78,27 @@ public class MavenCoordinateTest {
 
     @Test
     public void testCompareAndEquals() throws Exception {
-        MavenCoordinate left = TEST_COORD;
-        MavenCoordinate right = new MavenCoordinate("com.example.test", MavenCoordinateUtil.ARTIFACT,
+        MavenModule left = TEST_COORD;
+        MavenModule right = new MavenModule("com.example.test", MavenCoordinateUtil.ARTIFACT,
                 MavenCoordinateUtil.PACKAGING);
         assertGreater(left, right);
 
-        right = new MavenCoordinate(MavenCoordinateUtil.GROUPID, "b", MavenCoordinateUtil.PACKAGING);
+        right = new MavenModule(MavenCoordinateUtil.GROUPID, "b", MavenCoordinateUtil.PACKAGING);
         assertLower(left, right);
 
-        right = new MavenCoordinate(MavenCoordinateUtil.GROUPID, MavenCoordinateUtil.ARTIFACT, "eclipse-plugin");
+        right = new MavenModule(MavenCoordinateUtil.GROUPID, MavenCoordinateUtil.ARTIFACT, "eclipse-plugin");
         assertGreater(left, right);
 
-        right = new MavenCoordinate(null, MavenCoordinateUtil.ARTIFACT, MavenCoordinateUtil.PACKAGING);
+        right = new MavenModule(null, MavenCoordinateUtil.ARTIFACT, MavenCoordinateUtil.PACKAGING);
         assertGreater(left, right);
 
-        right = new MavenCoordinate(MavenCoordinateUtil.GROUPID, null, MavenCoordinateUtil.PACKAGING);
+        right = new MavenModule(MavenCoordinateUtil.GROUPID, null, MavenCoordinateUtil.PACKAGING);
         assertGreater(left, right);
 
-        right = new MavenCoordinate(MavenCoordinateUtil.GROUPID, MavenCoordinateUtil.ARTIFACT, null);
+        right = new MavenModule(MavenCoordinateUtil.GROUPID, MavenCoordinateUtil.ARTIFACT, null);
         assertEqual(left, right);
 
-        right = new MavenCoordinate(MavenCoordinateUtil.GROUPID.toUpperCase(), MavenCoordinateUtil.ARTIFACT,
+        right = new MavenModule(MavenCoordinateUtil.GROUPID.toUpperCase(), MavenCoordinateUtil.ARTIFACT,
                 MavenCoordinateUtil.PACKAGING);
         assertTrue(left.compareTo(right) != 0);
         assertFalse(left.equals(right));
@@ -110,10 +110,10 @@ public class MavenCoordinateTest {
 
     @Test
     public void testCompareWithVersions() throws Exception {
-        MavenCoordinate left = new MavenCoordinate(TEST_COORD);
+        MavenModule left = new MavenModule(TEST_COORD);
         left.addVersion("1.0");
         left.addVersion("2.0");
-        MavenCoordinate right = new MavenCoordinate(TEST_COORD);
+        MavenModule right = new MavenModule(TEST_COORD);
         right.addVersion("1.0");
         right.addVersion("1.5");
         right.addVersion("2.0");
@@ -122,18 +122,18 @@ public class MavenCoordinateTest {
         assertEquals(left, right);
     }
 
-    private void assertGreater(MavenCoordinate left, MavenCoordinate right) {
+    private void assertGreater(MavenModule left, MavenModule right) {
         assertTrue(left.compareTo(right) > 0);
         assertTrue(right.compareTo(left) < 0);
         assertFalse(left.equals(right));
         assertFalse(right.equals(left));
     }
 
-    private void assertLower(MavenCoordinate left, MavenCoordinate right) {
+    private void assertLower(MavenModule left, MavenModule right) {
         assertGreater(right, left);
     }
 
-    private void assertEqual(MavenCoordinate left, MavenCoordinate right) {
+    private void assertEqual(MavenModule left, MavenModule right) {
         assertTrue(right.compareTo(left) == 0);
         assertTrue(left.compareTo(right) == 0);
         assertTrue(left.equals(right));

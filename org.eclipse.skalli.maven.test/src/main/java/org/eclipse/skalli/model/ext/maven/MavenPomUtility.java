@@ -12,7 +12,6 @@ package org.eclipse.skalli.model.ext.maven;
 
 import static org.eclipse.skalli.model.ext.maven.MavenCoordinateUtil.*;
 
-import org.eclipse.skalli.model.ext.maven.MavenCoordinate;
 import org.eclipse.skalli.model.ext.maven.internal.MavenPom;
 
 @SuppressWarnings("nls")
@@ -45,6 +44,9 @@ public class MavenPomUtility {
         sb.append("<groupId>").append(GROUPID).append("</groupId>");
         sb.append("<artifactId>").append(ARTIFACT).append("</artifactId>");
         sb.append("<packaging>").append(PACKAGING).append("</packaging>");
+        sb.append("<name>").append("name-").append(GROUPID).append("-").append(ARTIFACT).append("</name>");
+        sb.append("<description>").append("description-").append(GROUPID).append("-").append(ARTIFACT)
+                .append("</description>");
     }
 
     public static void addCoordinatesWithoutGroupId(StringBuilder sb) {
@@ -59,16 +61,19 @@ public class MavenPomUtility {
         sb.append("</modules>");
     }
 
-    public static MavenCoordinate getCoordinatesWithGroupId() {
-        return new MavenCoordinate(GROUPID, ARTIFACT, PACKAGING);
+    public static MavenModule getCoordinatesWithGroupId() {
+        MavenModule c = new MavenModule(GROUPID, ARTIFACT, PACKAGING);
+        c.setName("name-" + GROUPID + "-" + ARTIFACT);
+        c.setDescription("description-" + GROUPID + "-" + ARTIFACT);
+        return c;
     }
 
-    public static MavenCoordinate getCoordinatesWithoutGroupId() {
-        return new MavenCoordinate(null, ARTIFACT, PACKAGING);
+    public static MavenModule getCoordinatesWithoutGroupId() {
+        return new MavenModule(null, ARTIFACT, PACKAGING);
     }
 
-    public static MavenCoordinate getParentCoordinates() {
-        return new MavenCoordinate(PARENT_GROUPID, PARENT_ARTIFACT, null);
+    public static MavenModule getParentCoordinates() {
+        return new MavenModule(PARENT_GROUPID, PARENT_ARTIFACT, null);
     }
 
     public static void addModules(MavenPom pom) {

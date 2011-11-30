@@ -15,13 +15,12 @@ import java.io.InputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.skalli.common.util.XMLUtils;
+import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import org.eclipse.skalli.common.util.XMLUtils;
-import org.eclipse.skalli.model.ext.maven.MavenCoordinate;
 
 public class MavenPomParserImpl implements MavenPomParser {
 
@@ -32,6 +31,9 @@ public class MavenPomParserImpl implements MavenPomParser {
     private static final String PACKAGING = "packaging"; //$NON-NLS-1$
     private static final String ARTIFACT_ID = "artifactId"; //$NON-NLS-1$
     private static final String GROUP_ID = "groupId"; //$NON-NLS-1$
+    private static final String NAME = "name"; //$NON-NLS-1$
+    private static final String DESCRIPTION = "description"; //$NON-NLS-1$
+    private static final String CLASSIFIER = "classifier"; //$NON-NLS-1$
 
     @Override
     public MavenPom parse(InputStream in) throws IOException, MavenValidationException {
@@ -49,11 +51,11 @@ public class MavenPomParserImpl implements MavenPomParser {
     private MavenPom parse(Document document) {
         MavenPom result = new MavenPom();
 
-        MavenCoordinate self = parseMavenCoordinate(document, PROJECT);
+        MavenModule self = parseMavenCoordinate(document, PROJECT);
         result.setSelf(self);
 
         if (elementExists(document, PARENT)) {
-            MavenCoordinate parent = parseMavenCoordinate(document, PARENT);
+            MavenModule parent = parseMavenCoordinate(document, PARENT);
             result.setParent(parent);
 
             String relativePath = extractTextContent(document, PARENT, RELATIVE_PATH);
@@ -68,16 +70,16 @@ public class MavenPomParserImpl implements MavenPomParser {
         return result;
     }
 
-    private MavenCoordinate parseMavenCoordinate(Document document, String parentTagName) {
-        MavenCoordinate coordinate = new MavenCoordinate();
-        String groupId = extractTextContent(document, parentTagName, GROUP_ID);
-        coordinate.setGroupId(groupId);
+    private MavenModule parseMavenCoordinate(Document document, String parentTagName) {
+        MavenModule coordinate = new MavenModule();
 
-        String artifactId = extractTextContent(document, parentTagName, ARTIFACT_ID);
-        coordinate.setArtefactId(artifactId);
+        coordinate.setGroupId(extractTextContent(document, parentTagName, GROUP_ID));
+        coordinate.setArtefactId(extractTextContent(document, parentTagName, ARTIFACT_ID));
+        coordinate.setPackaging(extractTextContent(document, parentTagName, PACKAGING));
+        coordinate.setName(extractTextContent(document, parentTagName, NAME));
+        coordinate.setDescription(extractTextContent(document, parentTagName, DESCRIPTION));
+        coordinate.setClassifier(extractTextContent(document, parentTagName, CLASSIFIER));
 
-        String packaging = extractTextContent(document, parentTagName, PACKAGING);
-        coordinate.setPackaging(packaging);
         return coordinate;
     }
 

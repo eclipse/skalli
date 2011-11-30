@@ -14,28 +14,28 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.skalli.common.util.ComparatorUtils;
-import org.eclipse.skalli.model.ext.maven.MavenCoordinate;
+import org.eclipse.skalli.model.ext.maven.MavenModule;
 
 public class MavenPom {
 
-    private MavenCoordinate self;
-    private MavenCoordinate parent;
+    private MavenModule self;
+    private MavenModule parent;
     private String parentRelativePath;
     private TreeSet<String> modules = new TreeSet<String>();
 
-    public MavenCoordinate getSelf() {
+    public MavenModule getSelf() {
         return self;
     }
 
-    void setSelf(MavenCoordinate self) {
+    void setSelf(MavenModule self) {
         this.self = self;
     }
 
-    public MavenCoordinate getParent() {
+    public MavenModule getParent() {
         return parent;
     }
 
-    void setParent(MavenCoordinate parent) {
+    void setParent(MavenModule parent) {
         this.parent = parent;
     }
 

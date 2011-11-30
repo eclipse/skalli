@@ -14,6 +14,7 @@ import java.text.MessageFormat;
 
 import org.eclipse.skalli.common.util.ComparatorUtils;
 import org.eclipse.skalli.model.ext.maven.MavenCoordinate;
+import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.nexus.NexusArtifact;
 import org.eclipse.skalli.nexus.NexusClient;
@@ -37,7 +38,7 @@ public class NexusVersionsResolver {
             return;
         }
         setNexusVersion(mavenReactor.getCoordinate());
-        for (MavenCoordinate mavenCoordinate : mavenReactor.getModules()) {
+        for (MavenModule mavenCoordinate : mavenReactor.getModules()) {
             if (mavenCoordinate != null) {
                 setNexusVersion(mavenCoordinate);
             }
@@ -45,7 +46,7 @@ public class NexusVersionsResolver {
         return;
     }
 
-    void setNexusVersion(MavenCoordinate mavenCoordinate) {
+    void setNexusVersion(MavenModule mavenCoordinate) {
         if (mavenCoordinate == null) {
             return;
         }
@@ -74,9 +75,9 @@ public class NexusVersionsResolver {
             newReactor.getCoordinate().getVersions().addAll(oldReactor.getCoordinate().getVersions());
         }
 
-        for (MavenCoordinate mavenCoordinate : newReactor.getModules()) {
+        for (MavenModule mavenCoordinate : newReactor.getModules()) {
             if (mavenCoordinate != null) {
-                MavenCoordinate oldCoordinate = findModuleCoordinate(oldReactor, mavenCoordinate);
+                MavenModule oldCoordinate = findModuleCoordinate(oldReactor, mavenCoordinate);
                 if (oldCoordinate != null) {
                     mavenCoordinate.getVersions().addAll(oldCoordinate.getVersions());
                 }
@@ -86,11 +87,11 @@ public class NexusVersionsResolver {
 
     }
 
-    private MavenCoordinate findModuleCoordinate(MavenReactor reactor, MavenCoordinate mavenCoordinate) {
+    private MavenModule findModuleCoordinate(MavenReactor reactor, MavenCoordinate mavenCoordinate) {
         if (reactor == null || mavenCoordinate == null) {
             return null;
         }
-        for (MavenCoordinate reactorCoordinate : reactor.getModules()) {
+        for (MavenModule reactorCoordinate : reactor.getModules()) {
             if (haveSameGroupArtifact(mavenCoordinate, reactorCoordinate)) {
                 return reactorCoordinate;
             }

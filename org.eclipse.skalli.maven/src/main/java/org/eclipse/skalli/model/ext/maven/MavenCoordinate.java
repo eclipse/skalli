@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 SAP AG and others.
+ * Copyright (c) 2010 - 2011 SAP AG and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,30 +10,23 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven;
 
-import java.util.Collections;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.common.util.ComparatorUtils;
 
-public class MavenCoordinate implements Comparable<MavenCoordinate> {
+public class MavenCoordinate {
 
     private static String DEFAULT_PACKAGING = "jar";
-
-    private String groupId = ""; //$NON-NLS-1$
-    private String artefactId = ""; //$NON-NLS-1$
-    private String packaging = ""; //$NON-NLS-1$
-    private TreeSet<String> versions = new TreeSet<String>();
+    private String groupId;
+    private String artefactId;
+    private String packaging;
+    private String classifier;
 
     public MavenCoordinate() {
+        super();
     }
 
     public MavenCoordinate(MavenCoordinate coordinate) {
         this(coordinate.getGroupId(), coordinate.getArtefactId(), coordinate.getPackaging());
-        getVersions().addAll(coordinate.getVersions());
     }
 
     public MavenCoordinate(String groupId, String artefactId, String packaging) {
@@ -64,50 +57,22 @@ public class MavenCoordinate implements Comparable<MavenCoordinate> {
 
     public void setPackaging(String packaging) {
         if (packaging == null || packaging.length() == 0) {
-            this.packaging= DEFAULT_PACKAGING;
+            this.packaging = DEFAULT_PACKAGING;
         } else {
             this.packaging = packaging;
         }
     }
 
-    public synchronized Set<String> getVersions() {
-        if (versions == null) {
-            versions = new TreeSet<String>();
+    public String getClassifier() {
+        return classifier;
+    }
+
+    public void setClassifier(String classifier) {
+        if (StringUtils.isNotBlank(classifier)) {
+            this.classifier = classifier;
+        } else {
+            this.classifier = null;
         }
-        return versions;
-    }
-
-    /**
-     * @return String - the last (highest) version currently in {@link #getVersions()}.
-     */
-    public String getLatestVersion() {
-        try {
-            return getSortedVersions().first();
-        } catch (NoSuchElementException e) {
-            return null;
-        }
-
-    }
-
-    /**
-     * @return an unmodifiable set of available artifact versions sorted according to {@link MavenVersionsGreatestFirstComparator}.
-     */
-    public SortedSet<String> getSortedVersions() {
-        TreeSet<String> sortedVersions = new TreeSet<String>(new MavenVersionsComparator(MavenVersionsComparator.SortOrder.DESCENDING));
-        sortedVersions.addAll(getVersions());
-        return Collections.unmodifiableSortedSet(sortedVersions);
-    }
-
-    public void addVersion(String version) {
-        getVersions().add(version);
-    }
-
-    public boolean hasVersion(String version) {
-        return getVersions().contains(version);
-    }
-
-    public void removeVersion(String version) {
-        getVersions().remove(version);
     }
 
     @Override
@@ -117,9 +82,7 @@ public class MavenCoordinate implements Comparable<MavenCoordinate> {
         result = prime * result + ((artefactId == null) ? 0 : artefactId.hashCode());
         result = prime * result + ((groupId == null) ? 0 : groupId.hashCode());
         result = prime * result + ((packaging == null) ? 0 : packaging.hashCode());
-        for (String version : getVersions()) {
-            result = prime * result + ((version == null) ? 0 : version.hashCode());
-        }
+        result = prime * result + ((classifier == null) ? 0 : classifier.hashCode());
         return result;
     }
 
@@ -131,22 +94,21 @@ public class MavenCoordinate implements Comparable<MavenCoordinate> {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof MavenCoordinate)) {
             return false;
+        } else {
+            return 0 == compareTo((MavenCoordinate) obj);
         }
-        MavenCoordinate other = (MavenCoordinate) obj;
-        return compareTo(other) == 0;
     }
 
-    @Override
-    public int compareTo(MavenCoordinate o) {
-        int result = ComparatorUtils.compare(groupId, o.groupId);
+    public int compareTo(MavenCoordinate obj) {
+        int result = ComparatorUtils.compare(getGroupId(), obj.getGroupId());
         if (result == 0) {
-            result = ComparatorUtils.compare(artefactId, o.artefactId);
+            result = ComparatorUtils.compare(getArtefactId(), obj.getArtefactId());
             if (result == 0) {
-                result = ComparatorUtils.compare(packaging, o.packaging);
+                result = ComparatorUtils.compare(getPackaging(), obj.getPackaging());
                 if (result == 0) {
-                    result = ComparatorUtils.compare(versions, o.versions);
+                    result = ComparatorUtils.compare(getClassifier(), obj.getClassifier());
                 }
             }
         }
@@ -163,10 +125,12 @@ public class MavenCoordinate implements Comparable<MavenCoordinate> {
             sb.append(':');
             sb.append(packaging);
         }
-        if (getVersions().size() > 0) {
-            sb.append(':');
-            sb.append(StringUtils.join(getVersions(), ','));
+        if (StringUtils.isNotBlank(classifier)) {
+            sb.append("classifier=\'");
+            sb.append(classifier);
+            sb.append("\'");
         }
         return sb.toString();
     }
+
 }
