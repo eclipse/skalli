@@ -1,25 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Skalli Project Portal (Incubation)" uid="Skalli" version="0.1.0" useFeatures="true" includeLaunchers="false">
+<product name="Skalli (Incubation)" uid="Skalli" application="org.eclipse.ui.ide.workbench" version="0.1.0" useFeatures="true" includeLaunchers="true">
+
+   <aboutInfo>
+      <image path="/org.eclipse.skalli.view.theme/VAADIN/themes/simple/images/logo_large.png"/>
+   </aboutInfo>
 
    <configIni use="default">
    </configIni>
 
    <launcherArgs>
-      <programArgs>-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl} -console -consoleLog</programArgs>
-      <vmArgs>-Declipse.ignoreApp=true -Dosgi.noShutdown=true -Dorg.osgi.service.http.port=8080 -Dequinox.ds.print=true -Djetty.home=./jetty -Dlogback.configurationFile=./jetty/etc/logback.xml</vmArgs>
+      <programArgs>-console -consoleLog</programArgs>
+      <vmArgs>-Dosgi.compatibility.bootdelegation=true -Declipse.ignoreApp=true -Dosgi.noShutdown=true -Dorg.osgi.service.http.port=8080 -Dequinox.ds.print=true -Djetty.home=./jetty -Dlogback.configurationFile=./jetty/etc/logback.xml</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
    <windowImages/>
 
-   <launcher name="skalli">
+
+   <launcher>
       <solaris/>
       <win useIco="false">
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
@@ -35,15 +41,17 @@
    </plugins>
 
    <features>
+      <feature id="org.eclipse.skalli.orbit.feature" version="0.1.0.qualifier"/>
+      <feature id="org.eclipse.skalli.eclipse.feature" version="0.1.0.qualifier"/>
       <feature id="org.eclipse.skalli.feature" version="0.1.0.qualifier"/>
-      <feature id="org.eclipse.jetty.core" version="7.3.1.201103121747"/>
-      <feature id="javax.servlet.jsp.glassfish" version="2.1.0.201103121747"/>
+      <feature id="org.eclipse.jetty.all" version="7.5.1.201109140245"/>
    </features>
 
    <configurations>
-      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
-      <plugin id="org.eclipse.jetty.osgi.boot" autoStart="true" startLevel="3" />
+      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="1" />
+      <plugin id="org.eclipse.jetty.osgi.boot" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.osgi" autoStart="true" startLevel="-1" />
    </configurations>
 
 </product>

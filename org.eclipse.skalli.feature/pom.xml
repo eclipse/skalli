@@ -22,4 +22,46 @@
     <artifactId>org.eclipse.skalli.feature</artifactId>
     <packaging>eclipse-feature</packaging>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>copy-storage</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/rootfiles/storage</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/../org.eclipse.skalli.target/workdir/storage</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-jettyconfig</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/rootfiles/jetty</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/../org.eclipse.skalli.target/jetty</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

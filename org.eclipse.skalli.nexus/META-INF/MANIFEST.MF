@@ -7,15 +7,17 @@ Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Import-Package: com.thoughtworks.xstream.annotations,
+ javax.xml.parsers,
  org.apache.commons.httpclient,
  org.apache.commons.httpclient.methods,
  org.apache.commons.lang,
  org.eclipse.skalli.api.rest.config,
  org.eclipse.skalli.common.configuration,
  org.eclipse.skalli.common.util,
- org.eclipse.skalli.model.ext,
  org.restlet.resource,
- org.slf4j
+ org.slf4j,
+ org.w3c.dom,
+ org.xml.sax
 Export-Package: org.eclipse.skalli.nexus
 Service-Component: OSGI-INF/NexusConfigSection.xml,
  OSGI-INF/NexusClient.xml

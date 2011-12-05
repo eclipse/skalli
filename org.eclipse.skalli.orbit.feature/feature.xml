@@ -27,200 +27,299 @@
          id="javax.mail"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.4.0.v201005080615"
          unpack="false"/>
 
    <plugin
          id="javax.persistence"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.0.3.v201010191057"
          unpack="false"/>
 
    <plugin
          id="javax.xml"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.3.4.v201005080400"
          unpack="false"/>
 
    <plugin
          id="javax.xml.stream"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.1.v201004272200"
          unpack="false"/>
 
    <plugin
          id="org.apache.commons.collections"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.2.0.v201005080500"
          unpack="false"/>
 
    <plugin
          id="org.apache.commons.io"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.4.0.v20081110-1000"
          unpack="false"/>
 
    <plugin
          id="org.apache.commons.lang"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.4.0.v201005080502"
          unpack="false"/>
 
    <plugin
          id="org.apache.derby"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="10.5.1.1"
          unpack="false"/>
 
    <plugin
          id="org.apache.velocity"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.5.0.v200905192330"
          unpack="false"/>
 
    <plugin
          id="org.apache.lucene.core"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.0.3.v201111231628"
          unpack="false"/>
 
    <plugin
          id="org.apache.lucene.highlighter"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.0.3.v201111141847"
          unpack="false"/>
 
    <plugin
          id="org.apache.lucene.queries"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.0.3.v201111141847"
          unpack="false"/>
 
    <plugin
          id="com.thoughtworks.xstream"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.3.1.v201111240924"
          unpack="false"/>
 
    <plugin
          id="org.custommonkey.xmlunit"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.3.0.v201111161502"
          unpack="false"/>
 
    <plugin
          id="org.xmlpull"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.1.3.4_201111240955"
          unpack="false"/>
 
    <plugin
          id="com.vaadin"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="6.5.3.v201111241034"
          unpack="false"/>
 
    <plugin
          id="org.restlet"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.0.5.v201111161502"
          unpack="false"/>
 
    <plugin
          id="org.restlet.ext.servlet"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.0.5.v201111161502"
          unpack="false"/>
 
    <plugin
          id="osgi.enterprise"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="4.2.0.201003190513"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.gemini.jpa"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0.201110190912"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.gemini.dbaccess.derby"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0.RELEASE"
          unpack="false"/>
 
    <plugin
          id="org.jdom"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.1.1.v201101151400"
          unpack="false"/>
 
    <plugin
          id="com.jcraft.jsch"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.1.44.v201101211721"
          unpack="false"/>
 
    <plugin
          id="org.json"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0.v201011060100"
          unpack="false"/>
 
    <plugin
          id="com.sun.syndication"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.9.0.v200803061811"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.persistence.asm"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.3.1.v20110908-r10021"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.persistence.antlr"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.3.1.v20110908-r10021"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.persistence.core"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="2.3.1.v20110908-r10021"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.persistence.jpa"
+         download-size="0"
+         install-size="0"
+         version="2.3.1.v20110908-r10021"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.lucene.memory"
+         download-size="0"
+         install-size="0"
+         version="3.0.3.v201111151751"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.httpclient"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.codec"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.logging"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.servlet"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.activation"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.servlet.jsp"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.el"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ch.qos.logback.classic"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ch.qos.logback.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ch.qos.logback.slf4j"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="com.sun.el"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.servlet.jsp.jstl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.slf4j.api"
          download-size="0"
          install-size="0"
          version="0.0.0"
