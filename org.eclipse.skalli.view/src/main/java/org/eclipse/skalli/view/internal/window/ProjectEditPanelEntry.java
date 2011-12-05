@@ -25,6 +25,8 @@ import org.eclipse.skalli.model.ext.Issues;
 import org.eclipse.skalli.view.ext.ExtensionFormService;
 import org.eclipse.skalli.view.ext.ExtensionStreamSource;
 import org.eclipse.skalli.view.ext.ProjectEditContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.Application;
 import com.vaadin.terminal.StreamResource;
@@ -70,6 +72,8 @@ class ProjectEditPanelEntry extends CustomComponent {
     private static final String STYLE_TRAY_CLOSED = "closed"; //$NON-NLS-1$
     private static final String STYLE_BUTTON_SELECTED = "selected"; //$NON-NLS-1$
     private static final String STYLE_ISSUES = "prjedt-issues"; //$NON-NLS-1$
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProjectEditPanelEntry.class);
 
     private Project project;
     private Class<? extends ExtensionEntityBase> extensionClass;
@@ -485,7 +489,15 @@ class ProjectEditPanelEntry extends CustomComponent {
     }
 
     private void layoutNewEditForm() {
-        Form newForm = formService.createForm(project, context);
+        Form newForm;
+        try {
+            newForm = formService.createForm(project, context);
+        } catch (RuntimeException e) {
+            LOG.error("Failed to render '" + getDisplayName() + "' form", e);
+            newForm = new Form();
+            tray.addComponent(new Label("<span style=\"font-weight:bold;color:red\">Sorry, can't display this form. " +
+                    "An internal error occurred. Please notify the administrator.</span>", Label.CONTENT_XHTML));
+        }
         if (form != null) {
             tray.replaceComponent(form, newForm);
         } else {
