@@ -23,16 +23,19 @@ Import-Package: com.thoughtworks.xstream.annotations,
  org.eclipse.skalli.model.core,
  org.eclipse.skalli.model.ext,
  org.eclipse.skalli.model.ext.devinf,
+ org.eclipse.skalli.model.ext.maven.recommendedupdatesites,
  org.eclipse.skalli.nexus,
  org.osgi.service.component,
  org.restlet.resource,
  org.slf4j,
  org.w3c.dom,
  org.xml.sax
-Export-Package: org.eclipse.skalli.model.ext.maven
+Export-Package: org.eclipse.skalli.model.ext.maven,
+ org.eclipse.skalli.model.ext.maven.recommendedupdatesites
 Service-Component: OSGI-INF/ExtensionServiceMaven.xml,
  OSGI-INF/ExtensionServiceMavenReactor.xml,
  OSGI-INF/MavenResolverComponent.xml,
- OSGI-INF/MavenResolverConfigSection.xml
+ OSGI-INF/MavenResolverConfigSection.xml,
+ OSGI-INF/RecommendedUpdateSitesService.xml
 Bundle-ActivationPolicy: lazy
 
