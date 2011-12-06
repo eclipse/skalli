@@ -187,7 +187,7 @@ public class PersistenceServiceXStream extends AbstractPersistenceService implem
             updateCache(savedEntity);
             LOG.debug("entity '" + savedEntity + "' successfully saved");
         } else {
-            throw new RuntimeException("Failed to save entity '" + entity + "'");
+            throw new RuntimeException("Failed to save entity " + entity + " of type " + entity.getClass().getName()+".");
         }
     }
 
@@ -285,9 +285,9 @@ public class PersistenceServiceXStream extends AbstractPersistenceService implem
                     getEntityClassLoaders(),
                     getMigrations(), getAliases());
         } catch (StorageException e) {
-            new RuntimeException(e);
+            LOG.warn("Cannot load entity " + entityClass + "/" + uuid + " of type " + entityClass.getName() + "):", e);
         } catch (ValidationException e) {
-            new RuntimeException(e);
+            LOG.warn("Cannot load entity " + entityClass + "/" + uuid + " of type " + entityClass.getName() + "):", e);
         }
 
         if (entity == null) {
