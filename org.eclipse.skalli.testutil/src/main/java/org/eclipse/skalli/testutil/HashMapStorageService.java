@@ -137,4 +137,11 @@ public class HashMapStorageService implements StorageService {
         }
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "HashMapStorageService [blobStore=" + blobStore + "]";
+    }
+
+
 }
