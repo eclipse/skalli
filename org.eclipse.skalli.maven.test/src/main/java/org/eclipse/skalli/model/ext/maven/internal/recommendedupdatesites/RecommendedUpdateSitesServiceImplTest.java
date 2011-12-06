@@ -96,4 +96,26 @@ public class RecommendedUpdateSitesServiceImplTest {
         }
     }
 
+    @Test
+    public void testGetRecommendedUpdateSites() throws ValidationException
+    {
+        final String userId = "owner1234";
+        final String updateSiteId = "Id1234";
+
+        RecommendedUpdateSites testUpdateSites = new RecommendedUpdateSites();
+        testUpdateSites.setUserId(userId);
+        testUpdateSites.setDescription("My Test recommendedUpdatesites");
+        testUpdateSites.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
+        testUpdateSites.setId(updateSiteId);
+
+        UpdateSite updateSite1 = createUpdatesite("testGetRecommended");
+        UpdateSite updateSite2 = createUpdatesite("2");
+
+        testUpdateSites.getUpdateSites().add(updateSite1);
+        testUpdateSites.getUpdateSites().add(updateSite2);
+
+        recommendedUpdateSitesService.persist(testUpdateSites, TEST_USER_ID);
+        RecommendedUpdateSites foundSite = recommendedUpdateSitesService.getRecommendedUpdateSites(userId, updateSiteId);
+        assertSame(foundSite,testUpdateSites);
+    }
 }

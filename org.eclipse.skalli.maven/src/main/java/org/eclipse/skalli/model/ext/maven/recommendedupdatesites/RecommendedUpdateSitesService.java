@@ -13,4 +13,7 @@ package org.eclipse.skalli.model.ext.maven.recommendedupdatesites;
 import org.eclipse.skalli.api.java.EntityService;
 
 public interface RecommendedUpdateSitesService extends EntityService<RecommendedUpdateSites> {
+
+    public RecommendedUpdateSites getRecommendedUpdateSites(String userId, String updateSiteId);
+
 }

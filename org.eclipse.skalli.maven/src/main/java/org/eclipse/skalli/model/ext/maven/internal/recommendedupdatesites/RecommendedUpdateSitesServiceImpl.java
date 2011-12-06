@@ -13,6 +13,7 @@ package org.eclipse.skalli.model.ext.maven.internal.recommendedupdatesites;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.eclipse.skalli.api.java.EntityFilter;
 import org.eclipse.skalli.api.java.EntityServiceImpl;
 import org.eclipse.skalli.model.ext.Issue;
 import org.eclipse.skalli.model.ext.Severity;
@@ -45,6 +46,31 @@ public class RecommendedUpdateSitesServiceImpl extends EntityServiceImpl<Recomme
     @Override
     protected SortedSet<Issue> validateEntity(RecommendedUpdateSites entity, Severity minSeverity) {
         return new TreeSet<Issue>();
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.skalli.api.java.RecommendedUpdateSitesService#getRecommendedUpdateSitesService(java.lang.String)
+     */
+    @Override
+    public RecommendedUpdateSites getRecommendedUpdateSites(String userId, String updateSiteId) {
+        RecommendedUpdateSites sites = getPersistenceService().getEntity(RecommendedUpdateSites.class,
+                new RecommendedUpdateSitesFilter(userId, updateSiteId));
+        return sites;
+    }
+
+    protected static class RecommendedUpdateSitesFilter implements EntityFilter<RecommendedUpdateSites> {
+        private String updateSiteId;
+        private String userId;
+
+        public RecommendedUpdateSitesFilter(String userId, String updateSiteId) {
+            this.userId = userId;
+            this.updateSiteId = updateSiteId;
+        }
+
+        @Override
+        public boolean accept(Class<RecommendedUpdateSites> entityClass, RecommendedUpdateSites entity) {
+            return entity.getId().equals(updateSiteId) && entity.getUserId().equals(userId);
+        }
     }
 
 }
