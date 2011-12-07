@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.internal.admin;
 
-import org.eclipse.skalli.api.rest.internal.util.ResourceRepresentation;
+import org.eclipse.skalli.api.rest.ResourceRepresentation;
 import org.eclipse.skalli.common.util.Statistics;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;

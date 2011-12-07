@@ -1,4 +1,4 @@
-package org.eclipse.skalli.api.rest.internal.util;
+package org.eclipse.skalli.api.rest;
 
 import java.io.IOException;
 import java.io.Writer;

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.monitor;
 
-import org.eclipse.skalli.api.rest.internal.util.ResourceRepresentation;
+import org.eclipse.skalli.api.rest.ResourceRepresentation;
 import org.eclipse.skalli.model.ext.AliasedConverter;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;

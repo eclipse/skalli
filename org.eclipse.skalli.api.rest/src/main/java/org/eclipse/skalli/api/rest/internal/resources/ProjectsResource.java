@@ -18,7 +18,7 @@ import org.eclipse.skalli.api.java.PagingInfo;
 import org.eclipse.skalli.api.java.ProjectService;
 import org.eclipse.skalli.api.java.QueryParseException;
 import org.eclipse.skalli.api.java.SearchService;
-import org.eclipse.skalli.api.rest.internal.util.ResourceRepresentation;
+import org.eclipse.skalli.api.rest.ResourceRepresentation;
 import org.eclipse.skalli.common.Consts;
 import org.eclipse.skalli.common.Services;
 import org.eclipse.skalli.common.util.Statistics;

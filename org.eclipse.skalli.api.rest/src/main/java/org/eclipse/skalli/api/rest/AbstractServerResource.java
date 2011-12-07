@@ -8,7 +8,7 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.api.rest.internal.resources;
+package org.eclipse.skalli.api.rest;
 
 import java.text.MessageFormat;
 

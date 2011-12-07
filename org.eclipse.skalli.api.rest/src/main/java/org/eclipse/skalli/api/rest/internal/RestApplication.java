@@ -13,6 +13,7 @@ package org.eclipse.skalli.api.rest.internal;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.skalli.api.rest.RestExtension;
 import org.eclipse.skalli.api.rest.config.ConfigSection;
 import org.eclipse.skalli.api.rest.internal.admin.ProjectBackupResource;
 import org.eclipse.skalli.api.rest.internal.admin.StatisticsResource;
@@ -36,6 +37,7 @@ public class RestApplication extends Application {
 
     private final static Set<ConfigSection> configSections = new HashSet<ConfigSection>();
     private final static Set<Monitorable> serviceMonitors = new HashSet<Monitorable>();
+    private final static Set<RestExtension> extensions = new HashSet<RestExtension>();
 
     @Override
     public synchronized Restlet createInboundRoot() {
@@ -56,6 +58,7 @@ public class RestApplication extends Application {
         router.attach("/projects/{id}/subprojects", SubprojectsResource.class); //$NON-NLS-1$
 
         router.attach("/user/{id}", UserResource.class); //$NON-NLS-1$
+        attachCustomResources(router);
 
         return router;
     }
@@ -83,10 +86,25 @@ public class RestApplication extends Application {
         serviceMonitors.remove(monitorable);
     }
 
+    protected void bindRestExtension(RestExtension restExtension) {
+        // TODO  find out if resources can be attached dynamically to the router:
+        // monitors come and go together with their service, but currently
+        // everything is attached to the router in createInboundRoot()
+        //
+        extensions.add(restExtension);
+    }
+
+    protected void unbindRestExtension(RestExtension restExtension) {
+        // TODO  find out if resources can be detached dynamically from the router:
+        // monitors come and go together with their service, but currently
+        // everything is attached to the router in createInboundRoot()
+        extensions.remove(restExtension);
+    }
+
     private void attachServiceMonitors(String basePath, Router router) {
-        for (Monitorable serviceMonitor: serviceMonitors) {
+        for (Monitorable serviceMonitor : serviceMonitors) {
             String servicePath = basePath + serviceMonitor.getServiceComponentName() + "/"; //$NON-NLS-1$
-            for (String resourceName: serviceMonitor.getResourceNames()) {
+            for (String resourceName : serviceMonitor.getResourceNames()) {
                 String path = servicePath + "monitors/" + resourceName; //$NON-NLS-1$
                 Class<? extends ServerResource> monitorResource = serviceMonitor.getServerResource(resourceName);
                 if (monitorResource != null) {
@@ -95,6 +113,22 @@ public class RestApplication extends Application {
                 } else {
                     LOG.warn("No monitor resource provided for path " + path);
                 }
+            }
+        }
+    }
+
+    private void attachCustomResources(Router router) {
+        for (RestExtension ext : extensions) {
+            String resourcePath = ext.getResourcePath();
+            if (!resourcePath.startsWith("/")) {
+                resourcePath = "/" + resourcePath;
+            }
+            Class<? extends ServerResource> resource = ext.getServerResource();
+            if (resource != null) {
+                router.attach(resourcePath, resource);
+                LOG.info("Attached REST extension " + resource.getName() + " to path " + resourcePath);
+            } else {
+                LOG.warn("No REST resource provided for path " + resourcePath);
             }
         }
     }

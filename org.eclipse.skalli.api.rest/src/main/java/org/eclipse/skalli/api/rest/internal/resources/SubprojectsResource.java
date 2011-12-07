@@ -7,7 +7,8 @@ import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.api.rest.internal.util.ResourceRepresentation;
+import org.eclipse.skalli.api.rest.AbstractServerResource;
+import org.eclipse.skalli.api.rest.ResourceRepresentation;
 import org.eclipse.skalli.common.Consts;
 import org.eclipse.skalli.common.Services;
 import org.eclipse.skalli.common.util.Statistics;

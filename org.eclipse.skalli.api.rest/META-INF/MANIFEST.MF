@@ -36,7 +36,8 @@ Import-Package: com.thoughtworks.xstream,
  org.slf4j
 Web-ContextPath: /api
 Service-Component: OSGI-INF/RestComponent.xml
-Export-Package: org.eclipse.skalli.api.rest.config,
+Export-Package: org.eclipse.skalli.api.rest,
+ org.eclipse.skalli.api.rest.config,
  org.eclipse.skalli.api.rest.monitor
 Bundle-ActivationPolicy: lazy
 

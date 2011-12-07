@@ -1,5 +1,6 @@
-package org.eclipse.skalli.api.rest.internal.util;
+package org.eclipse.skalli.api.rest;
 
+import org.eclipse.skalli.api.rest.internal.util.IgnoreUnknownElementsXStream;
 import org.eclipse.skalli.model.ext.AliasedConverter;
 import org.restlet.data.MediaType;
 import org.restlet.representation.WriterRepresentation;

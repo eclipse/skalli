@@ -14,7 +14,7 @@ import java.io.IOException;
 
 import org.eclipse.skalli.api.java.authentication.LoginUtil;
 import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.api.rest.internal.util.ResourceRepresentation;
+import org.eclipse.skalli.api.rest.ResourceRepresentation;
 import org.eclipse.skalli.common.Services;
 import org.eclipse.skalli.common.configuration.ConfigurationService;
 import org.restlet.data.MediaType;

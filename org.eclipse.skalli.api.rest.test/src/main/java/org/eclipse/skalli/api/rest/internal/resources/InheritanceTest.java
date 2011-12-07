@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import org.eclipse.skalli.api.rest.internal.util.ResourceRepresentation;
+import org.eclipse.skalli.api.rest.ResourceRepresentation;
 import org.eclipse.skalli.model.core.Project;
 import org.eclipse.skalli.model.ext.ExtensionEntityBase;
 import org.eclipse.skalli.model.ext.ExtensionService;

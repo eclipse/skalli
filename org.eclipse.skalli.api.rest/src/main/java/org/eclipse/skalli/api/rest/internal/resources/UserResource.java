@@ -11,7 +11,8 @@
 package org.eclipse.skalli.api.rest.internal.resources;
 
 import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.api.rest.internal.util.ResourceRepresentation;
+import org.eclipse.skalli.api.rest.AbstractServerResource;
+import org.eclipse.skalli.api.rest.ResourceRepresentation;
 import org.eclipse.skalli.common.User;
 import org.eclipse.skalli.common.util.Statistics;
 import org.restlet.data.Status;
