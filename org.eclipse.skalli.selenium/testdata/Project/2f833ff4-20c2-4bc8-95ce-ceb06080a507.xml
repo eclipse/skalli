@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-05-11T13:54:45.237Z" modifiedBy="admin" version="16">
+  <uuid>2f833ff4-20c2-4bc8-95ce-ceb06080a507</uuid>
+  <deleted>false</deleted>
+  <extensions>
+    <no-comparator/>
+    <entity-info lastModified="2011-05-09T13:39:51.512Z" modifiedBy="guest">
+      <deleted>false</deleted>
+      <pageUrl>http://eclipse.org/technology/</pageUrl>
+      <mailingLists>
+        <string>technology-pmc@eclipse.org</string>
+        <string>technology-projects@eclipse.org</string>
+      </mailingLists>
+    </entity-info>
+    <entity-people lastModified="2011-05-11T13:54:45.255Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>guest</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>guest</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <inheritedExtensions/>
+  <projectId>eclipsetechnology</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Eclipse Technology Project</name>
+  <shortName>eclipstech</shortName>
+  <description>The Eclipse Technology Project is a top-level project at The Eclipse Foundation. As a top-level project, the Technology Project does not itself contain code, but rather plays host to a large assortment of projects covering a wide diversity of subject areas.
+
+Projects under the Eclipse Technology Project tend to have limited lifecycles. Unlike the other top-level Projects, the Technology Projects are meant to be technology explorations or incubators. When these projects have explored, proved, or disproved their associated technologies, the project comes to its natural end. For some projects, this end is a paper publishing the research results; for others, this end is to be incorporated into the base technology of another top-level project.</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>initial</phase>
+  <registered>1304948391489</registered>
+</entity-project>

@@ -22,6 +22,7 @@ import org.eclipse.skalli.selenium.tests.TestUtilities;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
@@ -36,7 +37,7 @@ public class EditPageRelatedProjectsExtensionEditFormTest {
 
     @BeforeClass
     public static void setupClass() {
-        TestUtilities.initializeDriver(driver);
+        driver = TestUtilities.initializeDriver();
 
         initializePageObjects();
 
@@ -96,6 +97,7 @@ public class EditPageRelatedProjectsExtensionEditFormTest {
         Assert.assertTrue("could not add related project", editForm.getNumberOfRelatedProjects() == num + 1);
     }
 
+    @Ignore("ignored as setting a value to a comboBox field yields unpredictable results")
     @Test
     public void relatedProjectsEditFormSetRelatedProjectTest() {
         String text = "test";

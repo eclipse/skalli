@@ -1,0 +1,4 @@
+<org.eclipse.skalli.view.internal.config.NewsConfig>
+    <alert>THIS IS A TEST SYSTEM!&lt;br&gt;Changing data might break the selenium tests</alert>
+</org.eclipse.skalli.view.internal.config.NewsConfig>
+

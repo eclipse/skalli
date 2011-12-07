@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<org.eclipse.skalli.model.core.Favorites lastModified="2011-08-16T08:38:27.278Z" modifiedBy="admin" version="17">
+  <uuid>30216e7c-d2dc-4233-b6eb-5fc72f9a35e3</uuid>
+  <deleted>false</deleted>
+  <userId>admin</userId>
+  <projects>
+    <uuid>595734a1-e0f1-4d50-947a-806480169327</uuid>
+    <uuid>52275aeb-c07a-4dcc-84c1-0bab09ab04cb</uuid>
+  </projects>
+</org.eclipse.skalli.model.core.Favorites>

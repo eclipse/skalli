@@ -76,7 +76,9 @@ public class InfoExtensionEditForm extends AbstractExtensionEditForm {
     }
 
     public void sendKeysToProjectHomepageField(String text) {
-        getProjectHomepageField().sendKeys(text);
+        WebElement projectHomepageField = getProjectHomepageField();
+        projectHomepageField.click();
+        projectHomepageField.sendKeys(text);
     }
 
     public void clickAddMailingListLink() {

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-08-08T08:12:17.786Z" modifiedBy="admin" version="17">
+  <uuid>ddae21e7-7199-4cb6-9f25-2854f6b17046</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>8578165a-d57f-41ac-9c92-5ef34286e1fc</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-08-05T14:12:06.103Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <scmUrl/>
+      <bugtrackerUrl>https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced;bug_status=NEW;bug_status=ASSIGNED;bug_status=REOPENED;product=MAT</bugtrackerUrl>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations/>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-08-05T14:12:06.103Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/projects/project_summary.php?projectid=tools.mat</pageUrl>
+      <mailingLists>
+        <string>mat-dev@eclipse.org</string>
+      </mailingLists>
+    </entity-info>
+    <entity-relatedProjects lastModified="2011-08-05T14:47:07.243Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <relatedProjects/>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-people lastModified="2011-08-05T14:12:06.103Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>admin</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+      </members>
+    </entity-people>
+    <entity-scrum lastModified="2011-08-05T14:12:06.103Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <scrumMasters>
+        <no-comparator/>
+      </scrumMasters>
+      <productOwners>
+        <no-comparator/>
+      </productOwners>
+      <backlogUrl>http://www.eclipse.org/projects/project-plan.php?projectid=tools.mat</backlogUrl>
+    </entity-scrum>
+  </extensions>
+  <inheritedExtensions/>
+  <projectId>memoryanalyzer</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Memory Analyzer</name>
+  <shortName>MA</shortName>
+  <description>The Eclipse Memory Analyzer is a fast and feature-rich Java heap analyzer that helps you find memory leaks and reduce memory consumption.
+
+Use the Memory Analyzer to analyze productive heap dumps with hundreds of millions of objects, quickly calculate the retained sizes of objects, see who is preventing the Garbage Collector from collecting objects, run a report to automatically extract leak suspects.</description>
+  <tags>
+    <no-comparator/>
+    <string>eclipse</string>
+    <string>grandchild</string>
+    <string>toolsproject</string>
+  </tags>
+  <logoUrl/>
+  <phase>initial</phase>
+  <registered>1312553526083</registered>
+</entity-project>

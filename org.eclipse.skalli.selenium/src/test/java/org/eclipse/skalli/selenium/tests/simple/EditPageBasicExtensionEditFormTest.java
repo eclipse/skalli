@@ -18,6 +18,7 @@ import org.eclipse.skalli.selenium.tests.TestUtilities;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
@@ -32,7 +33,7 @@ public class EditPageBasicExtensionEditFormTest {
 
     @BeforeClass
     public static void setupClass() {
-        TestUtilities.initializeDriver(driver);
+        driver = TestUtilities.initializeDriver();
 
         initializePageObjects();
 
@@ -101,6 +102,7 @@ public class EditPageBasicExtensionEditFormTest {
                 editForm.getDescriptionAreaFieldContent().equals(text));
     }
 
+    @Ignore("ignored as setting a value to a comboBox field yields unpredictable results")
     @Test
     public void basicExtensionEditFormProjectTemplateFieldTest() {
         String text = "testProjectTemplate";
@@ -115,6 +117,7 @@ public class EditPageBasicExtensionEditFormTest {
                 editForm.getProjectTemplateFieldContent().equals(text));
     }
 
+    @Ignore("ignored as setting a value to a comboBox field yields unpredictable results")
     @Test
     public void basicExtensionEditFormParentProjectFieldTest() {
         String text = "testParentProject";

@@ -17,10 +17,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
 
 public class TestUtilities {
-    public static void initializeDriver(WebDriver driver) {
-        driver = DriverProvider.getDriver();
+    public static WebDriver initializeDriver() {
+        WebDriver driver = DriverProvider.getDriver();
         DriverProvider.navigateToBaseUrl(driver);
         DriverProvider.login(driver);
+        return driver;
     }
 
     public static void navigateToExistingProjectsEditPage(WebDriver driver) {

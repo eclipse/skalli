@@ -29,7 +29,7 @@ public class ProjectDetailsPageTest {
 
     @BeforeClass
     public static void setupClass() {
-        TestUtilities.initializeDriver(driver);
+        driver = TestUtilities.initializeDriver();
 
         PageFactory.initElements(driver, MainPage.class).isDisplayedWithExplicitWait();
 

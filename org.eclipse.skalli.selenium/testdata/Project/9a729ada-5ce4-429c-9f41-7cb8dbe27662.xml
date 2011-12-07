@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-08-08T08:10:14.775Z" modifiedBy="admin" version="17">
+  <uuid>9a729ada-5ce4-429c-9f41-7cb8dbe27662</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>44855ab3-f934-48c9-ba6d-ff50fc7f037c</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-info lastModified="2011-08-05T13:33:02.488Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/equinox/incubator/</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-linkGroups lastModified="2011-08-05T13:33:02.488Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <linkGroups>
+        <items>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>HowTo</label>
+                <url>http://www.eclipse.org/equinox/incubator/howto.php</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Resource Monitoring</label>
+                <url>http://www.eclipse.org/equinox/incubator/monitoring/index.php</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Security</label>
+                <url>http://www.eclipse.org/equinox/incubator/security/</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Server Side OSGi</label>
+                <url>http://www.eclipse.org/equinox/incubator/server/</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>p2</label>
+                <url>http://www.eclipse.org/equinox/incubator/provisioning/</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>OSGi Next</label>
+                <url>http://www.eclipse.org/equinox/incubator/osgi-next/</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Console</label>
+                <url>http://www.eclipse.org/equinox/incubator/console/index.php</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>Information</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+        </items>
+      </linkGroups>
+    </entity-linkGroups>
+    <entity-relatedProjects lastModified="2011-08-05T14:44:48.536Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <relatedProjects/>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-08-05T14:44:48.536Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>TWO_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-08-05T13:33:02.488Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>admin</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+      </members>
+    </entity-people>
+  </extensions>
+  <inheritedExtensions/>
+  <projectId>equinoxincubator</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Equinox Incubator</name>
+  <shortName>EI</shortName>
+  <description>The goal of the Equinox Incubator is to experiment with techniques for broadening the range of Eclipse platform runtime configurations. For example, areas such as security, the use of Equinox on the server and Aspect weaving are prime candidates for investigation in the Incubator.
+
+These issues do not severely impact the usefulness of Eclipse as a development tool platform but they do affect the use of Eclipse in more constrained environments (e.g., handheld devices, IT managed environments, mass-appeal applications, servers, etc.). The Incubator project will investigate such issues and develop approaches which are practical and applicable to the main Equinox code base. </description>
+  <tags>
+    <no-comparator/>
+    <string>eclipse</string>
+    <string>grandchild</string>
+    <string>incubator</string>
+  </tags>
+  <logoUrl/>
+  <phase>initial</phase>
+  <registered>1312551182447</registered>
+</entity-project>

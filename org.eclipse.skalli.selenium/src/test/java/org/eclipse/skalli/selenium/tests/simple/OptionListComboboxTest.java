@@ -38,7 +38,7 @@ public class OptionListComboboxTest {
 
     @BeforeClass
     public static void setupClass() {
-        TestUtilities.initializeDriver(driver);
+        driver = TestUtilities.initializeDriver();
 
         initializePageObjects();
 
@@ -65,10 +65,7 @@ public class OptionListComboboxTest {
     public void printProjectPhaseEntriesTest() {
         BasicsExtensionEditForm basicsExtensionEditForm = editPage.getBasicsExtensionEditForm();
         basicsExtensionEditForm.isDisplayedWithExplicitWait();
-
-        basicsExtensionEditForm.sendKeysToProjectPhaseField(" ", true);
-        basicsExtensionEditForm.sendKeysToProjectPhaseField(new String(new char[basicsExtensionEditForm
-                .getProjectPhaseFieldContent().length()]).replace('\0', '\b'), false);
+        basicsExtensionEditForm.clickProjectPhaseSelectionButton();
 
         OptionListCombobox combobox = PageFactory.initElements(driver, OptionListCombobox.class);
         combobox.isDisplayedWithExplicitWait();

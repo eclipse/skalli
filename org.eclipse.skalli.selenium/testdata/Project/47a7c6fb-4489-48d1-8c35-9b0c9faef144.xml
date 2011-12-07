@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-08-08T07:54:30.243Z" modifiedBy="admin" version="17">
+  <uuid>47a7c6fb-4489-48d1-8c35-9b0c9faef144</uuid>
+  <deleted>false</deleted>
+  <extensions>
+    <no-comparator/>
+    <entity-info lastModified="2011-08-05T13:11:18.033Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-linkGroups lastModified="2011-08-05T13:11:18.033Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <linkGroups>
+        <items>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>newcomers</label>
+                <url>http://www.eclipse.org/home/newcomers.php</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>About us</label>
+                <url>http://www.eclipse.org/org/</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Projects</label>
+                <url>http://www.eclipse.org/projects/</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>Information</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Packages</label>
+                <url>http://www.eclipse.org/downloads/</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Projects</label>
+                <url>http://www.eclipse.org/downloads/index_project.php</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>Downloads</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+        </items>
+      </linkGroups>
+    </entity-linkGroups>
+    <entity-relatedProjects lastModified="2011-08-05T14:43:56.262Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <relatedProjects/>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-people lastModified="2011-08-05T13:11:18.033Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>admin</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+      </members>
+    </entity-people>
+  </extensions>
+  <inheritedExtensions/>
+  <projectId>eclipse</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Eclipse</name>
+  <shortName>Eclipse</shortName>
+  <description>Eclipse is an open source community whose projects are focused on building an extensible development platform, runtimes and application frameworks for building, deploying and managing software across the entire software lifecycle. Many people know us, and hopefully love us, as a Java IDE but Eclipse is much more than a Java IDE.
+
+The Eclipse open source community has over 200 open source projects. These projects can be conceptually organized into seven different "pillars" or categories:
+
+    Enterprise Development
+    Embedded and Device Development
+    Rich Client Platform
+    Rich Internet Applications
+    Application Frameworks
+    Application Lifecycle Management (ALM)
+    Service Oriented Architecture (SOA)
+
+The Eclipse community is also supported by a large and vibrant ecosystem of major IT solution providers, innovative start-ups, universities and research institutions and individuals that extend, support and complement the Eclipse Platform.
+
+One very exciting thing about Eclipse is that many people are using Eclipse in ways that we have never imagined. The common thread is that they are building innovative, industrial-strength software and want to use great tools, frameworks and runtimes to make their job easier.</description>
+  <tags>
+    <no-comparator/>
+    <string>eclipse</string>
+  </tags>
+  <logoUrl/>
+  <phase>initial</phase>
+  <registered>1312549877919</registered>
+</entity-project>

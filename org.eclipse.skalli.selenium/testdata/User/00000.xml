@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<org.eclipse.skalli.common.User>
+    <userId>admin</userId>
+    <firstname>A.</firstname>
+    <lastname>Admin</lastname>
+    <email>admin@acopany.com</email>
+    <telephone>+49 6227 123</telephone>
+    <room>G3.10</room>
+    <location></location>
+    <department>Skalli Division</department>
+    <company>acopany</company>
+    <sip>sip:admin@acopany.com</sip>
+    <detailsMissing>false</detailsMissing>
+</org.eclipse.skalli.common.User>

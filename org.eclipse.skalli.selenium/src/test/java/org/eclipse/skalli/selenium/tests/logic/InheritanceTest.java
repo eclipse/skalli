@@ -36,7 +36,7 @@ public class InheritanceTest {
 
     @BeforeClass
     public static void setupClass() {
-        TestUtilities.initializeDriver(driver);
+        driver = TestUtilities.initializeDriver();
 
         initializePageObjects();
     }
@@ -96,8 +96,7 @@ public class InheritanceTest {
             Assert.assertTrue("mailing list (" + mailingListEntry + ") is not inherited",
                     inheritedMailingsListEntries.contains(mailingListEntry));
         }
-
-        createProjectPage.clickCancelButton();
+        editPage.clickLowerCancelButton();
     }
 
     private void createNewProject() {

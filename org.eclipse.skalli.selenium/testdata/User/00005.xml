@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<org.eclipse.skalli.common.User>
+    <userId>00005</userId>
+    <firstname>Juergen</firstname>
+    <lastname>Schneider</lastname>
+    <email></email>
+    <telephone></telephone>
+    <room></room>
+    <location></location>
+    <department></department>
+    <company></company>
+    <sip></sip>
+    <detailsMissing>false</detailsMissing>
+</org.eclipse.skalli.common.User>

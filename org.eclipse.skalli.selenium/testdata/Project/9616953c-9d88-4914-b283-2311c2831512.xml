@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-05-09T14:08:17.588Z" modifiedBy="guest" version="16">
+  <uuid>9616953c-9d88-4914-b283-2311c2831512</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>2f833ff4-20c2-4bc8-95ce-ceb06080a507</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf>
+      <deleted>false</deleted>
+      <scmUrl/>
+      <bugtrackerUrl>https://bugs.eclipse.org/bugs/buglist.cgi?query_format=specific&amp;order=relevance+desc&amp;bug_status=__open__&amp;product=Skalli</bugtrackerUrl>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations>
+        <string>scm:git:git://git.eclipse.org/gitroot/skalli/org.eclipse.skalli.git</string>
+      </scmLocations>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info>
+      <deleted>false</deleted>
+      <pageUrl>https://www.eclipse.org/skalli</pageUrl>
+      <mailingLists>
+        <string>skalli-dev@eclipse.org</string>
+      </mailingLists>
+    </entity-info>
+    <entity-linkGroups>
+      <deleted>false</deleted>
+      <linkGroups>
+        <items>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>skalli overview</label>
+                <url>http://www.eclipse.org/skalli/</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>user guide</label>
+                <url>http://wiki.eclipse.org/Skalli/User_Guide</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>contributer guilde</label>
+                <url>http://wiki.eclipse.org/Skalli/Contributor_Guide</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>wiki</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+        </items>
+      </linkGroups>
+    </entity-linkGroups>
+    <entity-maven lastModified="2011-05-09T13:29:44.463Z" modifiedBy="guest">
+      <deleted>false</deleted>
+      <groupID>org.eclipse.skalli</groupID>
+      <reactorPOM/>
+      <siteUrl/>
+    </entity-maven>
+    <entity-people lastModified="2011-05-09T12:59:18.402Z" modifiedBy="guest">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>00004</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>00006</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>00005</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>00007</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>guest</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <inheritedExtensions/>
+  <projectId>skalli</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Skalli</name>
+  <shortName>Skalli</shortName>
+  <description>One of the major goals of this project is to make a new generation project management tool accessible and usable by the Eclipse community and other open source projects. Thereby Skalli forms the central entry point to all projects and creates transparency over the existing projects. It leverages search technologies and social network mechanisms in order to structure and find them. This project however does not aim at replacing existing tools like wiki, bugtracker and source code management system. It merely links to them and integrates their data and services as far as needed in order to let users - and through a REST API also other tools - gain an overview on each project's state and locate its resources. </description>
+  <tags>
+    <no-comparator/>
+    <string>skalli</string>
+  </tags>
+  <logoUrl/>
+  <phase>initial</phase>
+  <registered>1304941470753</registered>
+</entity-project>

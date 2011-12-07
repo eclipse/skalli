@@ -36,7 +36,7 @@ public class AbstractEditPageTest {
 
     @BeforeClass
     public static void setupClass() {
-        TestUtilities.initializeDriver(driver);
+        driver = TestUtilities.initializeDriver();
 
         PageFactory.initElements(driver, MainPage.class).isDisplayedWithExplicitWait();
 
@@ -175,7 +175,7 @@ public class AbstractEditPageTest {
 
             editForm.makeExtensionShown();
 
-            Assert.assertTrue(editForm.getTitle() + " is shown", !editForm.isShown());
+            Assert.assertTrue(editForm.getTitle() + " is not shown", editForm.isShown());
 
             Assert.assertTrue("extension " + editForm.getTitle() + " is not displayed",
                     editForm.isDisplayedWithExplicitWait());

@@ -108,23 +108,23 @@ public class AddLinkForm extends AbstractPage {
     }
 
     private String getXPathToLinkGroupField() {
-        return "html/body/div[7]/div/div/div/div[" + 3 + "]/div/div/div/div/div[1]/div[2]/div/input";
+        return "html/body/div[7]/div/div/div/div[" + 3 + "]/div/div/div/div[1]/div[2]/div/input";
     }
 
     private String getXPathToLinkGroupSelectionButton() {
-        return "html/body/div[7]/div/div/div/div[" + 3 + "]/div/div/div/div/div[1]/div[2]/div/div";
+        return "html/body/div[7]/div/div/div/div[" + 3 + "]/div/div/div/div[1]/div[2]/div/div";
     }
 
     private String getXPathToPageTitleField() {
-        return "html/body/div[7]/div/div/div/div[" + 3 + "]/div/div/div/div/div[2]/div[2]/input";
+        return "html/body/div[7]/div/div/div/div[" + 3 + "]/div/div/div/div[2]/div[2]/input";
     }
 
     private String getXPathToUrlField() {
-        return "html/body/div[7]/div/div/div/div[" + 3 + "]/div/div/div/div/div[3]/div[2]/input";
+        return "html/body/div[7]/div/div/div/div[" + 3 + "]/div/div/div/div[3]/div[2]/input";
     }
 
     private String getXPathToOkAndCloseButton() {
-        return "html/body/div[7]/div/div/div/div[" + 3 + "]/div/div/div/div/div[4]/div/div";
+        return "html/body/div[7]/div/div/div/div[" + 3 + "]/div/div/div/div[4]/div/div";
     }
 
     private String getXPathToCloseButton() {

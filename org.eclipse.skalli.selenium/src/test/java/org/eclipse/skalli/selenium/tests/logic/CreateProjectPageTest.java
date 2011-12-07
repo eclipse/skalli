@@ -12,13 +12,10 @@ package org.eclipse.skalli.selenium.tests.logic;
 
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.Assert;
-
 import org.eclipse.skalli.selenium.pageobjects.concrete.CreateProjectPage;
 import org.eclipse.skalli.selenium.pageobjects.concrete.EditPage;
 import org.eclipse.skalli.selenium.pageobjects.concrete.MainPage;
 import org.eclipse.skalli.selenium.pageobjects.concrete.ProjectDetailsPage;
-import org.eclipse.skalli.selenium.pageobjects.ext.editform.AdditionalLinksExtensionEditForm;
 import org.eclipse.skalli.selenium.pageobjects.ext.editform.BasicsExtensionEditForm;
 import org.eclipse.skalli.selenium.pageobjects.ext.editform.DevelopmentInfrastructureExtensionEditForm;
 import org.eclipse.skalli.selenium.pageobjects.ext.editform.InfoExtensionEditForm;
@@ -27,7 +24,6 @@ import org.eclipse.skalli.selenium.pageobjects.ext.editform.ProjectMembersExtens
 import org.eclipse.skalli.selenium.pageobjects.ext.editform.RatingsAndReviewExtensionEditForm;
 import org.eclipse.skalli.selenium.pageobjects.ext.editform.RelatedProjectsExtensionEditForm;
 import org.eclipse.skalli.selenium.pageobjects.ext.editform.ScrumExtensionEditForm;
-import org.eclipse.skalli.selenium.pageobjects.ext.util.AddLinkForm;
 import org.eclipse.skalli.selenium.pageobjects.ext.util.AddUserForm;
 import org.eclipse.skalli.selenium.tests.TestUtilities;
 import org.eclipse.skalli.selenium.utils.DriverProvider;
@@ -50,8 +46,7 @@ public class CreateProjectPageTest {
 
     @BeforeClass
     public static void setupClass() {
-        TestUtilities.initializeDriver(driver);
-
+        driver = TestUtilities.initializeDriver();
         initializePageObjects();
     }
 
@@ -169,7 +164,8 @@ public class CreateProjectPageTest {
         fillBasicExtension(basicsExtensionEditForm, projectId, displayName);
         fillProjectMembersExtension(addUserForm);
         fillInfoExtension();
-        fillAdditionalLinksExtension();
+        //ignored as setting a value to a comboBox field yields unpredictable results
+        //fillAdditionalLinksExtension();
         fillRatingsAndReviewsExtension();
         fillRelatedProjectsExtension();
         fillDevelopmentInfrastructureExtension();
@@ -279,7 +275,8 @@ public class CreateProjectPageTest {
         ratingsAndReviewExtensionEditForm.checkAllowAnonymusReviewsCheckBox(true);
     }
 
-    public void fillAdditionalLinksExtension() {
+    //ignored as setting a value to a comboBox field yields unpredictable results
+   /* public void fillAdditionalLinksExtension() {
         AdditionalLinksExtensionEditForm additionalLinksExtensionEditForm = editPage
                 .getAdditionalLinksExtensionEditForm();
         additionalLinksExtensionEditForm.isDisplayedWithExplicitWait();
@@ -303,7 +300,7 @@ public class CreateProjectPageTest {
         //(for full verification process see EditPageAdditionalLinksExtensionEditFormTest.additionalLinksEditFormAddLinkTest())
         int size = additionalLinksExtensionEditForm.getLinkEntries().size();
         Assert.assertTrue("the number of entries is incorrect (2 expected - " + size + " found)", size == 2);
-    }
+    }*/
 
     public void fillInfoExtension() {
         InfoExtensionEditForm infoExtensionEditForm = editPage.getInfoExtensionEditForm();

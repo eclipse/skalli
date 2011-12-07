@@ -39,6 +39,7 @@ import org.openqa.selenium.support.PageFactory;
  * "Cancel", "Expand All", "Collapse All" and the extensions)
  */
 public class EditPage extends SearchAndNavigationbarPage {
+
     @FindBy(how = How.XPATH, using = "//div[@id='project']/div/div[2]/div[2]/div/div/div[1]/div/div/div/div[1]/div/div/div[2]/div/div/div["
             + 1 + "]/div/div/div/div/div[" + 1 + "]")
     private WebElement upperOkButton;
@@ -292,7 +293,6 @@ public class EditPage extends SearchAndNavigationbarPage {
 
     private String getXPathToLowerOkButton() {
         initializeExtensions();
-
         return "//div[@id='project']/div/div[2]/div[2]/div/div/div[1]/div/div/div/div[1]/div/div/div[2]/div/div/div["
                 + (extensions.size() + AbstractExtensionEditForm.LOWER_BUTTON_AREA_OFFSET) + "]/div/div/div/div/div["
                 + 1 + "]";

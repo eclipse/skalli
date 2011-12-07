@@ -36,7 +36,7 @@ public class EditPageInfoExtensionEditFormTest {
 
     @BeforeClass
     public static void setupClass() {
-        TestUtilities.initializeDriver(driver);
+        driver = TestUtilities.initializeDriver();
 
         initializePageObjects();
 
@@ -90,6 +90,9 @@ public class EditPageInfoExtensionEditFormTest {
         editForm.isDisplayedWithExplicitWait();
 
         Assert.assertTrue("could not add mailing list", editForm.getNumberOfMailingLists() == num + 1);
+
+        //clean up
+        editForm.clickRemoveMailingListLink(0);
     }
 
     @Test

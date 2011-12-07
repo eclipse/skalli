@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-08-08T08:12:24.962Z" modifiedBy="admin" version="17">
+  <uuid>024c8d49-d073-4204-b0c7-4653676ed2f1</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>8578165a-d57f-41ac-9c92-5ef34286e1fc</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-info lastModified="2011-08-05T14:14:11.857Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/projects/project_summary.php?projectid=tools.tm</pageUrl>
+      <mailingLists>
+        <string>tm-dev@eclipse.org</string>
+        <string>tm-cvs-commit@eclipse.org</string>
+      </mailingLists>
+    </entity-info>
+    <entity-relatedProjects lastModified="2011-08-05T14:47:19.134Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <relatedProjects/>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-people lastModified="2011-08-05T14:14:11.857Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>admin</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+      </members>
+    </entity-people>
+    <entity-scrum lastModified="2011-08-05T14:14:11.857Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <scrumMasters>
+        <no-comparator/>
+      </scrumMasters>
+      <productOwners>
+        <no-comparator/>
+      </productOwners>
+      <backlogUrl>http://www.eclipse.org/projects/project-plan.php?projectid=tools.tm</backlogUrl>
+    </entity-scrum>
+  </extensions>
+  <inheritedExtensions/>
+  <projectId>targetmanagement</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Target Management</name>
+  <shortName>TM</shortName>
+  <description>The Target Management project creates data models and frameworks to configure and manage remote systems, their connections, and their services.
+Our main offering is the Remote System Explorer (RSE), which is also part of the Eclipse Indigo coordinated release train. It integrates any sort of heterogeneous remote resources under a single, consistent UI and allows transparent working on remote computers just like the local one. For Indigo, it provides access to remote file systems for other projects to consume via the Eclipse Filesystem (EFS).
+As a stand-alone offering, the project also provides a lightweight Terminal view.</description>
+  <tags>
+    <no-comparator/>
+    <string>eclipse</string>
+    <string>grandchild</string>
+    <string>toolsproject</string>
+  </tags>
+  <logoUrl/>
+  <phase>initial</phase>
+  <registered>1312553651837</registered>
+</entity-project>

@@ -108,23 +108,23 @@ public class AddUserForm extends AbstractPage {
     }
 
     private String getXPathToSearchForField() {
-        return "html/body/div[7]/div/div/div/div[3]/div/div/div/div/" + "div[1]/div/div/div/div[1]/div[2]/input";
+       return "html/body/div[7]/div/div/div/div[3]/div/div/div/div[1]/div/div/div/div[1]/div[2]/input";
     }
 
     private String getXPathToSearchButton() {
-        return "html/body/div[7]/div/div/div/div[3]/div/div/div/div/" + "div[1]/div/div/div/div[2]/div/button";
+        return "html/body/div[7]/div/div/div/div[3]/div/div/div/div[1]/div/div/div/div[2]/div/button";
     }
 
     private String getXPathToSelectField() {
-        return "html/body/div[7]/div/div/div/div[3]/div/div/div/div/" + "div[2]/div[2]/div/select";
+        return "html/body/div[7]/div/div/div/div[3]/div/div/div/div[2]/div[2]/div/select";
     }
 
     private String getXPathToAddButton() {
-        return "html/body/div[7]/div/div/div/div[3]/div/div/div/div/" + "div[3]/div/div/div/div[1]/div/div";
+        return "html/body/div[7]/div/div/div/div[3]/div/div/div/div[3]/div/div/div/div[1]/div/div";
     }
 
     private String getXPathToAddAndCloseButton() {
-        return "html/body/div[7]/div/div/div/div[3]/div/div/div/div/" + "div[3]/div/div/div/div[2]/div/div";
+        return "html/body/div[7]/div/div/div/div[3]/div/div/div/div[3]/div/div/div/div[2]/div/div";
     }
 
     private String getXPathToCloseButton() {

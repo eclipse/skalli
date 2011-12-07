@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-08-08T08:11:55.917Z" modifiedBy="admin" version="17">
+  <uuid>3756c4de-347d-4b77-86e4-d55c9508be93</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>47a7c6fb-4489-48d1-8c35-9b0c9faef144</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-info lastModified="2011-08-05T14:05:19.884Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/projects/project_summary.php?projectid=rt.rap</pageUrl>
+      <mailingLists>
+        <string>rap-dev@eclipse.org</string>
+      </mailingLists>
+    </entity-info>
+    <entity-relatedProjects lastModified="2011-08-05T14:46:06.719Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <relatedProjects/>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-people lastModified="2011-08-05T14:05:19.884Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>admin</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+      </members>
+    </entity-people>
+    <entity-scrum lastModified="2011-08-05T14:05:19.884Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <scrumMasters>
+        <no-comparator/>
+      </scrumMasters>
+      <productOwners>
+        <no-comparator/>
+      </productOwners>
+      <backlogUrl>http://www.eclipse.org/projects/project-plan.php?projectid=rt.rap</backlogUrl>
+    </entity-scrum>
+  </extensions>
+  <inheritedExtensions/>
+  <projectId>richajaxplatform</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Rich Ajax Platform</name>
+  <shortName>RAP</shortName>
+  <description>The Rich Ajax Platform (RAP) enables developers to build rich, Ajax-enabled Web applications by using the same tools and APIs as for RCP development. Frontends can be built with SWT, JFace, and the Eclipse Workbench including the well known extension points. Applications are composed of OSGi bundles that run on server-side Equinox.
+The project has released version 1.3 that is part of Eclipse Helios and is working on version 1.4 that will be released together with Eclipse Indigo in June 2011. </description>
+  <tags>
+    <no-comparator/>
+    <string>child</string>
+    <string>eclipse</string>
+    <string>richajaxplatform</string>
+  </tags>
+  <logoUrl/>
+  <phase>initial</phase>
+  <registered>1312553119857</registered>
+</entity-project>

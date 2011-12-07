@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-05T09:26:36.119Z" modifiedBy="admin" version="18">
+  <uuid>9ddb66e6-0aa9-464b-9b10-8cb7b2636a66</uuid>
+  <deleted>true</deleted>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-05T09:26:31.605Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <scmUrl>http://git.eclipse.org/c/skalli/org.eclipse.skalli.git/</scmUrl>
+      <bugtrackerUrl>https://bugs.eclipse.org/bugs/buglist.cgi?query_format=specific&amp;order=relevance+desc&amp;bug_status=__open__&amp;product=Skalli</bugtrackerUrl>
+      <ciUrl>https://hudson.eclipse.org/hudson/job/skalli/</ciUrl>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations>
+        <string>scm:git:git://git.wdf.sap.corp/eclipse/org.eclipse.skalli.git</string>
+      </scmLocations>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-05T09:26:31.605Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <pageUrl>http://www.test.org</pageUrl>
+      <mailingLists>
+        <string>skalli-dev@eclipse.org</string>
+      </mailingLists>
+    </entity-info>
+    <entity-maven lastModified="2011-12-05T09:26:31.605Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <groupID/>
+      <reactorPOM/>
+      <siteUrl/>
+    </entity-maven>
+    <entity-relatedProjects lastModified="2011-12-05T09:26:31.605Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <relatedProjects>
+        <uuid>a4d8c0a6-d858-4bdb-bad7-ddcb23c8c706</uuid>
+      </relatedProjects>
+      <calculated>false</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-05T09:26:31.605Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>true</allowAnonymous>
+      <ratingStyle>TWO_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-05T09:26:31.605Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>00005</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>00005</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+    <entity-scrum lastModified="2011-12-05T09:26:31.605Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <scrumMasters>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>00005</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </scrumMasters>
+      <productOwners>
+        <no-comparator/>
+      </productOwners>
+      <backlogUrl/>
+    </entity-scrum>
+  </extensions>
+  <inheritedExtensions/>
+  <projectId>new_project</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>My new Project</name>
+  <shortName>shortName</shortName>
+  <description>description
+
+line1
+line2</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>initial</phase>
+  <registered>1323077191593</registered>
+</entity-project>

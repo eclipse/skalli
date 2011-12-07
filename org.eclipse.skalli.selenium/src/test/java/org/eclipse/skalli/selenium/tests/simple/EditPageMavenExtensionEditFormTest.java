@@ -32,7 +32,7 @@ public class EditPageMavenExtensionEditFormTest {
 
     @BeforeClass
     public static void setupClass() {
-        TestUtilities.initializeDriver(driver);
+        driver = TestUtilities.initializeDriver();
 
         initializePageObjects();
 

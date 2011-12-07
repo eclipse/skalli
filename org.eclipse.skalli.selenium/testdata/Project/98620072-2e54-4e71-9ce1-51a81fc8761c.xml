@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-05-11T15:03:48.254Z" modifiedBy="admin" version="16">
+  <uuid>98620072-2e54-4e71-9ce1-51a81fc8761c</uuid>
+  <deleted>false</deleted>
+  <extensions>
+    <no-comparator/>
+    <entity-info lastModified="2011-05-09T12:03:45.930Z" modifiedBy="guest">
+      <deleted>false</deleted>
+      <pageUrl/>
+      <mailingLists/>
+    </entity-info>
+    <entity-maven lastModified="2011-05-09T13:31:48.851Z" modifiedBy="guest">
+      <deleted>false</deleted>
+      <groupID>org.example</groupID>
+      <reactorPOM/>
+      <siteUrl/>
+    </entity-maven>
+    <entity-reviews lastModified="2011-05-09T13:31:48.853Z" modifiedBy="guest">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>true</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-05-11T15:03:48.257Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>guest</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>00002</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>guest</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <inheritedExtensions/>
+  <projectId>hello</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Hello World</name>
+  <shortName>hello</shortName>
+  <description>The Hello World projects is a default dummy project-</description>
+  <tags>
+    <no-comparator/>
+    <string>hello</string>
+  </tags>
+  <logoUrl/>
+  <phase>initial</phase>
+  <registered>1304942625902</registered>
+</entity-project>

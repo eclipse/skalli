@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.skalli.selenium.pageobjects.concrete.LoginFailedPage;
 import org.eclipse.skalli.selenium.pageobjects.concrete.LoginPage;
 import org.eclipse.skalli.selenium.pageobjects.concrete.MainPage;
@@ -22,6 +23,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.support.PageFactory;
+
+import com.thoughtworks.selenium.SeleniumException;
 
 /**
  * The DriverProvider can be used to get a {@link org.openqa.selenium.WebDriver} instance which
@@ -46,6 +49,16 @@ public class DriverProvider {
      * The folder containing the browser plugins
      */
     private static final File BROWSER_PLUGINS_FOLDER = new File("browser_plugins");
+
+    /**
+     * Directory where test content can be copied from
+     */
+    private static final File TEST_CONTENT_DIR = new File("testdata");
+
+    /**
+     * Storage directory for test content
+     */
+    private static final File STORAGE_DIR = new File("workdir/storage");
 
     /**
      * The driver
@@ -142,6 +155,24 @@ public class DriverProvider {
         driver = new FirefoxDriver(profile);
         registerShutdownHook();
         driver.get(getHTTPBaseUrl());
+
+        copyTestContent();
+    }
+
+    private static void copyTestContent() {
+        try {
+            FileUtils.copyDirectory(TEST_CONTENT_DIR, STORAGE_DIR);
+        } catch (IOException e) {
+            throw new SeleniumException("failed to copy test content", e);
+        }
+    }
+
+    private static void removeTestContent() {
+        try {
+            FileUtils.deleteDirectory(STORAGE_DIR);
+        } catch (IOException e) {
+            throw new SeleniumException("failed to delete test content", e);
+        }
     }
 
     /**
@@ -150,6 +181,7 @@ public class DriverProvider {
     private static void stopDriver() {
         driver.quit();
         driver = null;
+        removeTestContent();
     }
 
     /**

@@ -30,14 +30,14 @@ public abstract class AbstractExtensionEditForm extends AbstractExtension {
     //subtract 1 because we want to start with zero
     //subtract 1 for the upper buttons area
     //subtract 1 for the upper place holder
-    public static final int CONTAINER_EXTENSION_OFFSET = 3;
+    public static final int CONTAINER_EXTENSION_OFFSET = 4;
 
     //needed because in the buttons are in first "extension location" and a place holder in the second "extension location"
     //subtract 1 because we want to start with zero
     //subtract 1 for the upper buttons area
     //subtract 1 for the upper place holder
     //subtract 1 for the lower place holder
-    public static final int LOWER_BUTTON_AREA_OFFSET = 4;
+    public static final int LOWER_BUTTON_AREA_OFFSET = 5;
 
     //subtract 1 because we want to start with zero
     //subtract 1 for the upper buttons area
@@ -45,7 +45,7 @@ public abstract class AbstractExtensionEditForm extends AbstractExtension {
     //subtract 1 for the lower buttons area
     //subtract 1 for the lower place holder
     //the rest is the number of extensions displayed
-    public static final int EXTENSION_COUNT_DIFF = 5;
+    public static final int EXTENSION_COUNT_DIFF = 6;
 
     private static final String EXTENSION_OPEN_CLASS_INDICATOR_STRING = "open";
 

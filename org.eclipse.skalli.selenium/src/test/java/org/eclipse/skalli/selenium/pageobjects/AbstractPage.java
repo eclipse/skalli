@@ -89,6 +89,8 @@ public abstract class AbstractPage {
                     }
                 } catch (Exception e) {
                     //avoid that any exception causes the wait to be stopped
+                    //print out the error message to identify which UI element cannot be found
+                    System.out.println(e.getMessage());
                 }
 
                 return null;
