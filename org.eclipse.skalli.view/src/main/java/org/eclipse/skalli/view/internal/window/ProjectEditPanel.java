@@ -72,6 +72,14 @@ public class ProjectEditPanel extends Panel implements Issuer {
     private static final String STYLE_EDIT_PROJECT_ERROR = "prjedt-errorLabel"; //$NON-NLS-1$
     private static final String STYLE_ISSUES = "prjedt-issues"; //$NON-NLS-1$
 
+    private static final String HEADER = "header_"; //$NON-NLS-1$
+    private static final String FOOTER = "footer_"; //$NON-NLS-1$
+    private static final String BUTTON_OK = "button_ok"; //$NON-NLS-1$
+    private static final String BUTTON_CANCEL = "button_cancel"; //$NON-NLS-1$
+    private static final String BUTTON_EXPAND_ALL = "button_expand_all"; //$NON-NLS-1$
+    private static final String BUTTON_COLLAPSE_ALL = "button_collapse_all"; //$NON-NLS-1$
+    private static final String BUTTON_VALIDATE = "button_validate"; //$NON-NLS-1$
+
     private static final String PANEL_WIDTH = "600px"; //$NON-NLS-1$
     private static final String CONFIRM_POPUP_WIDTH = "350px"; //$NON-NLS-1$
 
@@ -218,12 +226,12 @@ public class ProjectEditPanel extends Panel implements Issuer {
 
     void renderContent(VerticalLayout content) {
         content.setStyleName(STYLE_EDIT_PROJECT_LAYOUT);
-        headerCheckButton = renderButtons(content);
+        headerCheckButton = renderButtons(content, true);
         renderProgessIndicator(content);
         headerLabel = renderMessageArea(content);
         renderPanels(content);
         footerLabel = renderMessageArea(content);
-        footerCheckButton = renderButtons(content);
+        footerCheckButton = renderButtons(content, false);
         renderPersistedIssues();
     }
 
@@ -279,25 +287,29 @@ public class ProjectEditPanel extends Panel implements Issuer {
      * Renders a OK/Cancel/Validate/Expand All/Collapse All button bar.
      */
     @SuppressWarnings("serial")
-    private Button renderButtons(VerticalLayout layout) {
+    private Button renderButtons(VerticalLayout layout, boolean header) {
         CssLayout buttons = new CssLayout();
         buttons.addStyleName(STYLE_EDIT_PROJECT_BUTTONS);
+        String prefix = header ? HEADER : FOOTER;
 
         Button okButton = new Button("OK");
         okButton.setIcon(ICON_BUTTON_OK);
         okButton.setDescription("Save the modified project");
+        okButton.addStyleName(prefix + BUTTON_OK);
         okButton.addListener(new OKButtonListener());
         buttons.addComponent(okButton);
 
         Button cancelButton = new Button("Cancel");
         cancelButton.setIcon(ICON_BUTTON_CANCEL);
         cancelButton.setDescription("Discard all changes to the project");
+        cancelButton.addStyleName(prefix + BUTTON_CANCEL);
         cancelButton.addListener(new CancelButtonListener());
         buttons.addComponent(cancelButton);
 
         Button checkButton = new Button("Check");
         checkButton.setIcon(ICON_BUTTON_VALIDATE);
         checkButton.setDescription("Checks the modified project for issues without saving it");
+        checkButton.addStyleName(prefix + BUTTON_VALIDATE);
         checkButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
@@ -309,6 +321,7 @@ public class ProjectEditPanel extends Panel implements Issuer {
         Button expandAllButton = new Button("Expand All");
         expandAllButton.setIcon(ICON_BUTTON_EXPAND_ALL);
         expandAllButton.setDescription("Expand all panels");
+        expandAllButton.addStyleName(prefix + BUTTON_EXPAND_ALL);
         expandAllButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
@@ -320,6 +333,7 @@ public class ProjectEditPanel extends Panel implements Issuer {
         Button collapseAllButton = new Button("Collapse All");
         collapseAllButton.setIcon(ICON_BUTTON_COLLAPSE_ALL);
         collapseAllButton.setDescription("Collapse all panels");
+        collapseAllButton.addStyleName(prefix + BUTTON_COLLAPSE_ALL);
         collapseAllButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {

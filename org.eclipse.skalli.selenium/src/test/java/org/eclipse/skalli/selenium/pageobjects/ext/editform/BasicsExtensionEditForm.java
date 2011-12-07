@@ -182,57 +182,46 @@ public class BasicsExtensionEditForm extends AbstractExtensionEditForm {
     }
 
     private String getXPathToProjectId() {
-        return getXPathToExtensionContainer() + "/div/div/div/div/div/div[3]/fieldset/div[2]/div/table/tbody/tr[" + 1
-                + "]/td[3]/" + "input";
+        return "//input[contains(@class, 'project_projectId')]";
     }
 
     private String getXPathToDisplayName() {
-        return getXPathToExtensionContainer() + "/div/div/div/div/div/div[3]/fieldset/div[2]/div/table/tbody/tr[" + 2
-                + "]/td[3]/" + "input";
+        return "//input[contains(@class, 'project_name')]";
     }
 
     private String getXPathToShortName() {
-        return getXPathToExtensionContainer() + "/div/div/div/div/div/div[3]/fieldset/div[2]/div/table/tbody/tr[" + 3
-                + "]/td[3]/" + "input";
+        return "//input[contains(@class, 'project_shortName')]";
     }
 
     private String getXPathToDescription() {
-        return getXPathToExtensionContainer() + "/div/div/div/div/div/div[3]/fieldset/div[2]/div/table/tbody/tr[" + 4
-                + "]/td[3]/" + "textarea";
+        return "//textarea[contains(@class, 'project_description')]";
     }
 
     private String getXPathToProjectTemplate() {
-        return getXPathToExtensionContainer() + "/div/div/div/div/div/div[3]/fieldset/div[2]/div/table/tbody/tr[" + 5
-                + "]/td[3]/" + "div/input";
+        return "//div[contains(@class, 'project_projectTemplateId')]/input";
     }
 
     private String getXPathToProjectTemplateSelectionButton() {
-        return getXPathToExtensionContainer() + "/div/div/div/div/div/div[3]/fieldset/div[2]/div/table/tbody/tr[" + 5
-                + "]/td[3]/" + "div/div";
+        return "//div[contains(@class, 'project_projectTemplateId')]/div";
     }
 
     private String getXPathToParentProject() {
-        return getXPathToExtensionContainer() + "/div/div/div/div/div/div[3]/fieldset/div[2]/div/table/tbody/tr[" + 6
-                + "]/td[3]/" + "div/input";
+        return "//div[contains(@class, 'project_parentEntity')]/input";
     }
 
     private String getXPathToParentProjectSelectionButton() {
-        return getXPathToExtensionContainer() + "/div/div/div/div/div/div[3]/fieldset/div[2]/div/table/tbody/tr[" + 6
-                + "]/td[3]/" + "div/div";
+        return "//div[contains(@class, 'project_parentEntity')]/div";
     }
 
     private String getXPathToProjectPhase() {
-        return getXPathToExtensionContainer() + "/div/div/div/div/div/div[3]/fieldset/div[2]/div/table/tbody/tr[" + 7
-                + "]/td[3]/" + "div/div/div/div/div/input";
+        return "//div[contains(@class, 'project_phase')]/div/div/div/div/input";
     }
 
     private String getXPathToProjectPhaseSelectionButton() {
-        return getXPathToExtensionContainer() + "/div/div/div/div/div/div[3]/fieldset/div[2]/div/table/tbody/tr[" + 7
-                + "]/td[3]/" + "div/div/div/div/div/div";
+        return "//div[contains(@class, 'project_phase')]/div/div/div/div/div";
     }
 
     private String getXPathToDeletedCheckBox() {
-        return getXPathToExtensionContainer() + "/div/div/div/div/div/div[3]/fieldset/div[2]/div/table/tbody/tr[" + 7
-                + "]/td[3]/" + "div/div/div/div/span/input";
+        return "//div[contains(@class, 'project_phase')]/div/div/div/span/input";
     }
 }

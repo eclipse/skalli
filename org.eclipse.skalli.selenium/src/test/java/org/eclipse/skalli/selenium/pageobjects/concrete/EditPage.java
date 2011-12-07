@@ -25,7 +25,6 @@ import org.eclipse.skalli.selenium.pageobjects.ext.editform.ProjectMembersExtens
 import org.eclipse.skalli.selenium.pageobjects.ext.editform.RatingsAndReviewExtensionEditForm;
 import org.eclipse.skalli.selenium.pageobjects.ext.editform.RelatedProjectsExtensionEditForm;
 import org.eclipse.skalli.selenium.pageobjects.ext.editform.ScrumExtensionEditForm;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -40,25 +39,35 @@ import org.openqa.selenium.support.PageFactory;
  */
 public class EditPage extends SearchAndNavigationbarPage {
 
-    @FindBy(how = How.XPATH, using = "//div[@id='project']/div/div[2]/div[2]/div/div/div[1]/div/div/div/div[1]/div/div/div[2]/div/div/div["
-            + 1 + "]/div/div/div/div/div[" + 1 + "]")
+    @FindBy(how = How.XPATH, using = "//div[contains(@class, 'header_button_ok')]")
     private WebElement upperOkButton;
 
-    @FindBy(how = How.XPATH, using = "//div[@id='project']/div/div[2]/div[2]/div/div/div[1]/div/div/div/div[1]/div/div/div[2]/div/div/div["
-            + 1 + "]/div/div/div/div/div[" + 2 + "]")
+    @FindBy(how = How.XPATH, using = "//div[contains(@class, 'header_button_cancel')]")
     private WebElement upperCancelButton;
 
-    @FindBy(how = How.XPATH, using = "//div[@id='project']/div/div[2]/div[2]/div/div/div[1]/div/div/div/div[1]/div/div/div[2]/div/div/div["
-            + 1 + "]/div/div/div/div/div[" + 3 + "]")
+    @FindBy(how = How.XPATH, using = "//div[contains(@class, 'header_button_validate')]")
     private WebElement upperValidateButton;
 
-    @FindBy(how = How.XPATH, using = "//div[@id='project']/div/div[2]/div[2]/div/div/div[1]/div/div/div/div[1]/div/div/div[2]/div/div/div["
-            + 1 + "]/div/div/div/div/div[" + 4 + "]")
+    @FindBy(how = How.XPATH, using = "//div[contains(@class, 'header_button_expand_all')]")
     private WebElement upperExpandAllButton;
 
-    @FindBy(how = How.XPATH, using = "//div[@id='project']/div/div[2]/div[2]/div/div/div[1]/div/div/div/div[1]/div/div/div[2]/div/div/div["
-            + 1 + "]/div/div/div/div/div[" + 5 + "]")
+    @FindBy(how = How.XPATH, using = "//div[contains(@class, 'header_button_collapse_all')]")
     private WebElement upperCollapseAllButton;
+
+    @FindBy(how = How.XPATH, using = "//div[contains(@class, 'footer_button_ok')]")
+    private WebElement lowerOkButton;
+
+    @FindBy(how = How.XPATH, using = "//div[contains(@class, 'footer_button_cancel')]")
+    private WebElement lowerCancelButton;
+
+    @FindBy(how = How.XPATH, using = "//div[contains(@class, 'footer_button_validate')]")
+    private WebElement lowerValidateButton;
+
+    @FindBy(how = How.XPATH, using = "//div[contains(@class, 'footer_button_expand_all')]")
+    private WebElement lowerExpandAllButton;
+
+    @FindBy(how = How.XPATH, using = "//div[contains(@class, 'footer_button_collapse_all')]")
+    private WebElement lowerCollapseAllButton;
 
     private List<AbstractExtensionEditForm> extensions;
 
@@ -272,61 +281,23 @@ public class EditPage extends SearchAndNavigationbarPage {
     }
 
     protected WebElement getLowerOkButton() {
-        return driver.findElement(By.xpath(getXPathToLowerOkButton()));
+        return lowerOkButton;
     }
 
     protected WebElement getLowerCancelButton() {
-        return driver.findElement(By.xpath(getXPathToLowerCancelButton()));
+        return lowerCancelButton;
     }
 
     protected WebElement getLowerValidateButton() {
-        return driver.findElement(By.xpath(getXPathToLowerValidateButton()));
+        return lowerValidateButton;
     }
 
     protected WebElement getLowerExpandAllButton() {
-        return driver.findElement(By.xpath(getXPathToLowerExpandAllButton()));
+        return lowerExpandAllButton;
     }
 
     protected WebElement getLowerCollapseAllButton() {
-        return driver.findElement(By.xpath(getXPathToLowerCollapseAllButton()));
+        return lowerCollapseAllButton;
     }
 
-    private String getXPathToLowerOkButton() {
-        initializeExtensions();
-        return "//div[@id='project']/div/div[2]/div[2]/div/div/div[1]/div/div/div/div[1]/div/div/div[2]/div/div/div["
-                + (extensions.size() + AbstractExtensionEditForm.LOWER_BUTTON_AREA_OFFSET) + "]/div/div/div/div/div["
-                + 1 + "]";
-    }
-
-    private String getXPathToLowerCancelButton() {
-        initializeExtensions();
-
-        return "//div[@id='project']/div/div[2]/div[2]/div/div/div[1]/div/div/div/div[1]/div/div/div[2]/div/div/div["
-                + (extensions.size() + AbstractExtensionEditForm.LOWER_BUTTON_AREA_OFFSET) + "]/div/div/div/div/div["
-                + 2 + "]";
-    }
-
-    private String getXPathToLowerValidateButton() {
-        initializeExtensions();
-
-        return "//div[@id='project']/div/div[2]/div[2]/div/div/div[1]/div/div/div/div[1]/div/div/div[2]/div/div/div["
-                + (extensions.size() + AbstractExtensionEditForm.LOWER_BUTTON_AREA_OFFSET) + "]/div/div/div/div/div["
-                + 3 + "]";
-    }
-
-    private String getXPathToLowerExpandAllButton() {
-        initializeExtensions();
-
-        return "//div[@id='project']/div/div[2]/div[2]/div/div/div[1]/div/div/div/div[1]/div/div/div[2]/div/div/div["
-                + (extensions.size() + AbstractExtensionEditForm.LOWER_BUTTON_AREA_OFFSET) + "]/div/div/div/div/div["
-                + 4 + "]";
-    }
-
-    private String getXPathToLowerCollapseAllButton() {
-        initializeExtensions();
-
-        return "//div[@id='project']/div/div[2]/div[2]/div/div/div[1]/div/div/div/div[1]/div/div/div[2]/div/div/div["
-                + (extensions.size() + AbstractExtensionEditForm.LOWER_BUTTON_AREA_OFFSET) + "]/div/div/div/div/div["
-                + 5 + "]";
-    }
 }

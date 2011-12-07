@@ -70,7 +70,9 @@ public abstract class DefaultProjectFieldFactory<T extends ExtensionEntityBase> 
                 field.setCaption(caption);
             }
         }
+
         setImmediate(field);
+        field.addStyleName(extensionService.getShortName() + "_" + propertyName);
         initializeField(propertyId, field);
 
         removeLegacyValidators(field);
@@ -177,9 +179,11 @@ public abstract class DefaultProjectFieldFactory<T extends ExtensionEntityBase> 
         }
         Collection<Validator> vaadinValidators = field.getValidators();
         if (vaadinValidators != null) {
-            for (Validator vaadinValidator: vaadinValidators) {
-                LOG.warn("Validator " + vaadinValidator.getClass().getName() + " removed from field " + field.getCaption()
-                        + " of project " + project.getName() +". Attach a suitable " + PropertyValidator.class.getName()
+            for (Validator vaadinValidator : vaadinValidators) {
+                LOG.warn("Validator " + vaadinValidator.getClass().getName() + " removed from field "
+                        + field.getCaption()
+                        + " of project " + project.getName() + ". Attach a suitable "
+                        + PropertyValidator.class.getName()
                         + " to the field.");
                 field.removeValidator(vaadinValidator);
             }
