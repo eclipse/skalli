@@ -3,6 +3,6 @@ target/
 org.eclipse.skalli.target/jetty/logs/
 org.eclipse.skalli.target/target-platform-3rdparty/
 org.eclipse.skalli.target/workdir/
-org.eclipse.skalli.selenium/workdir/
+org.eclipse.skalli.selenium/workdir/storage/
 org.eclipse.skalli.selenium/logs/
 
