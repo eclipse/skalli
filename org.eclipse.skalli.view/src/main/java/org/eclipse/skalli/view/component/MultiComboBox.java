@@ -124,6 +124,7 @@ public class MultiComboBox extends CustomField {
 
     private ComboBox createComboBox(UUID uuid) {
         ComboBox comboBox = new ComboBox(null, new ProjectDataSource());
+        comboBox.setImmediate(true);
         if (description != null) {
             comboBox.setDescription(description);
         }

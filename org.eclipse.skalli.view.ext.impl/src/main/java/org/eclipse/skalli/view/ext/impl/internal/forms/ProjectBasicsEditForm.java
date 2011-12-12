@@ -106,7 +106,6 @@ public class ProjectBasicsEditForm extends AbstractExtensionFormService<Project>
                 cb.setItemCaptionPropertyId(ProjectTemplateDataSource.PROPERTY_DISPLAYNAME);
                 cb.setItemCaptionMode(AbstractSelect.ITEM_CAPTION_MODE_PROPERTY);
                 cb.setFilteringMode(Filtering.FILTERINGMODE_CONTAINS);
-                cb.setImmediate(true);
                 cb.setNewItemsAllowed(false);
                 cb.setNullSelectionAllowed(true);
                 cb.setNullSelectionItemId(DefaultProjectTemplate.ID);
@@ -116,7 +115,6 @@ public class ProjectBasicsEditForm extends AbstractExtensionFormService<Project>
                 cb.setItemCaptionPropertyId(ProjectParentDataSource.PROPERTY_DISPLAYNAME);
                 cb.setItemCaptionMode(AbstractSelect.ITEM_CAPTION_MODE_PROPERTY);
                 cb.setFilteringMode(Filtering.FILTERINGMODE_CONTAINS);
-                cb.setImmediate(true);
                 cb.setNewItemsAllowed(false);
                 cb.setNullSelectionAllowed(true);
                 cb.select(project.getParentEntity());
@@ -129,7 +127,6 @@ public class ProjectBasicsEditForm extends AbstractExtensionFormService<Project>
             } else if (Project.PROPERTY_PHASE.equals(propertyId)) {
                 final PhaseSelect cb = (PhaseSelect) field;
                 cb.setFilteringMode(Filtering.FILTERINGMODE_STARTSWITH);
-                cb.setImmediate(true);
                 cb.setNewItemsAllowed(true);
                 cb.setNullSelectionAllowed(false);
                 cb.select(project.getPhase());

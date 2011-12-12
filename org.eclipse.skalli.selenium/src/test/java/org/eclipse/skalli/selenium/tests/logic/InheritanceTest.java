@@ -76,6 +76,7 @@ public class InheritanceTest {
 
         if (!infoExtensionEditForm.isInherited()) {
             infoExtensionEditForm.clickInheritInheritedLink();
+            infoExtensionEditForm.isDisplayedWithExplicitWait();
         }
 
         //get inherited content

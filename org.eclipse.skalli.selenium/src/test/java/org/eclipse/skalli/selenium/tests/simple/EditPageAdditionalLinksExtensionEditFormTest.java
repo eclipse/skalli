@@ -25,7 +25,6 @@ import org.eclipse.skalli.selenium.pageobjects.ext.util.AdditionalLinksExtension
 import org.eclipse.skalli.selenium.tests.TestUtilities;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -72,7 +71,6 @@ public class EditPageAdditionalLinksExtensionEditFormTest {
         editPage.isDisplayedWithExplicitWait();
     }
 
-    @Ignore("ignored as setting a value to a comboBox field yields unpredictable results")
     @Test
     public void additionalLinksEditFormAddLinkTest() {
         //add an additional link

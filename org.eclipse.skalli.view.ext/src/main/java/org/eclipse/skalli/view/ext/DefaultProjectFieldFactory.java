@@ -70,6 +70,7 @@ public abstract class DefaultProjectFieldFactory<T extends ExtensionEntityBase> 
                 field.setCaption(caption);
             }
         }
+        setImmediate(field);
         initializeField(propertyId, field);
 
         removeLegacyValidators(field);
@@ -134,6 +135,16 @@ public abstract class DefaultProjectFieldFactory<T extends ExtensionEntityBase> 
         } catch (Exception e) {
             // not all Vaadin Field implementations allow to set the columns, so this is ok
             LOG.debug(MessageFormat.format("Field {0} does not allow to set columns", field.getCaption()));
+        }
+    }
+
+    private void setImmediate(Field field) {
+        try {
+            Method method = field.getClass().getMethod("setImmediate", boolean.class); //$NON-NLS-1$
+            method.invoke(field, true);
+        } catch (Exception e) {
+            // not all Vaadin Field implementations allow to set the immediate flag, so this is ok
+            LOG.debug(MessageFormat.format("Field {0} does not allow to set immediate flag", field.getCaption()));
         }
     }
 

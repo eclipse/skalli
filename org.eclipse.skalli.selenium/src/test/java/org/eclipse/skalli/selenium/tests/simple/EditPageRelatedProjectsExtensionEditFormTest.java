@@ -97,13 +97,12 @@ public class EditPageRelatedProjectsExtensionEditFormTest {
         Assert.assertTrue("could not add related project", editForm.getNumberOfRelatedProjects() == num + 1);
     }
 
-    @Ignore("ignored as setting a value to a comboBox field yields unpredictable results")
     @Test
     public void relatedProjectsEditFormSetRelatedProjectTest() {
-        String text = "test";
+        String text = "test <test>";
 
         //sends the keys to the field
-        editForm.sendKeysToRelatedProjectField(text, true, 0);
+        editForm.sendKeysToRelatedProjectField(text, false, 0);
         editForm.isDisplayedWithExplicitWait();
 
         Assert.assertTrue("could not set related project", editForm.getRelatedProject(0).equals(text));
@@ -118,9 +117,10 @@ public class EditPageRelatedProjectsExtensionEditFormTest {
                 editForm.isCalculateRelatedProjectCheckBoxChecked());
     }
 
+    //TODO https://bugs.eclipse.org/bugs/show_bug.cgi?id=366372
+    @Ignore
     @Test
     public void relatedProjectsEditFormAddRemoveTest() {
-        //TODO this test does not work correctly (the entry Eclipse <eclipse> is always empty after removing the first entry!?!?)
         //uncheck calculate related projects to be able to add links
         editForm.checkCalculateRelatedProjectCheckBox(false);
         editForm.isDisplayedWithExplicitWait();

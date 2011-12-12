@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.skalli.api.java.ProjectService;
 import org.eclipse.skalli.common.Services;
 import org.eclipse.skalli.model.core.Project;
+
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
@@ -55,9 +56,11 @@ public class PhaseSelect extends CustomField {
     private Layout createLayout(boolean showDeletedCheckbox) {
         final FloatLayout layout = new FloatLayout();
         cb = new ComboBox(null, phases);
+        cb.setImmediate(true);
         layout.addComponent(cb);
         if (showDeletedCheckbox) {
             deleted = new CheckBox("Deleted", project.isDeleted());
+            deleted.setImmediate(true);
             layout.addComponent(deleted, "margin-left:20px;margin-top:3px");
         }
         return layout;

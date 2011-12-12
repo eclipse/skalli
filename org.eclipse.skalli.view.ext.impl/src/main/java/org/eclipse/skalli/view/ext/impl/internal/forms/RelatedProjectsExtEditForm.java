@@ -63,7 +63,6 @@ public class RelatedProjectsExtEditForm extends AbstractExtensionFormService<Rel
 
             if (RelatedProjectsExt.PROPERTY_CALCULATED.equals(propertyId)) {
                 final CheckBox field = new CheckBox(caption);
-                field.setImmediate(true);
                 field.addListener(new ValueChangeListener() {
 
                     private static final long serialVersionUID = 3996507266934851419L;

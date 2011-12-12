@@ -18,7 +18,6 @@ import org.eclipse.skalli.selenium.tests.TestUtilities;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
@@ -68,6 +67,7 @@ public class EditPageBasicExtensionEditFormTest {
 
         //sends the keys to the field
         editForm.sendKeysToProjectIdField(text);
+        editForm.isDisplayedWithExplicitWait();
         Assert.assertTrue("value of project id is not \"" + text + "\"",
                 editForm.getProjectIdFieldContent().equals(text));
     }
@@ -78,6 +78,7 @@ public class EditPageBasicExtensionEditFormTest {
 
         //sends the keys to the field
         editForm.sendKeysToDisplayNameField(text);
+        editForm.isDisplayedWithExplicitWait();
         Assert.assertTrue("value of display name is not \"" + text + "\"", editForm.getDisplayNameFieldContent()
                 .equals(text));
     }
@@ -88,6 +89,7 @@ public class EditPageBasicExtensionEditFormTest {
 
         //sends the keys to the field
         editForm.sendKeysToShortNameField(text);
+        editForm.isDisplayedWithExplicitWait();
         Assert.assertTrue("value of short name is not \"" + text + "\"",
                 editForm.getShortNameFieldContent().equals(text));
     }
@@ -98,11 +100,11 @@ public class EditPageBasicExtensionEditFormTest {
 
         //sends the keys to the field
         editForm.sendKeysToDescriptionAreaField(text);
+        editForm.isDisplayedWithExplicitWait();
         Assert.assertTrue("value of description area is not \"" + text + "\"",
                 editForm.getDescriptionAreaFieldContent().equals(text));
     }
 
-    @Ignore("ignored as setting a value to a comboBox field yields unpredictable results")
     @Test
     public void basicExtensionEditFormProjectTemplateFieldTest() {
         String text = "testProjectTemplate";
@@ -110,22 +112,26 @@ public class EditPageBasicExtensionEditFormTest {
         //clear
         editForm.sendKeysToProjectTemplateField(
                 new String(new char[editForm.getProjectTemplateFieldContent().length()]).replace('\0', '\b'), true);
+        editForm.isDisplayedWithExplicitWait();
 
         //sends the keys to the field
         editForm.sendKeysToProjectTemplateField(text, true);
+        editForm.isDisplayedWithExplicitWait();
+
         Assert.assertTrue("value of project template is not \"" + text + "\"",
-                editForm.getProjectTemplateFieldContent().equals(text));
+                editForm.getProjectTemplateFieldContent().equals("Free-Style Project"));
     }
 
-    @Ignore("ignored as setting a value to a comboBox field yields unpredictable results")
     @Test
     public void basicExtensionEditFormParentProjectFieldTest() {
         String text = "testParentProject";
 
         //sends the keys to the field
-        editForm.sendKeysToParentProjectField(text, true);
+        editForm.sendKeysToParentProjectField(text, false);
+        editForm.isDisplayedWithExplicitWait();
+
         Assert.assertTrue("value of parent project is not \"" + text + "\"", editForm.getParentProjectFieldContent()
-                .equals(text));
+                .equals(""));
     }
 
     @Test
@@ -135,9 +141,11 @@ public class EditPageBasicExtensionEditFormTest {
         //clear
         editForm.sendKeysToProjectPhaseField(
                 new String(new char[editForm.getProjectPhaseFieldContent().length()]).replace('\0', '\b'), true);
+        editForm.isDisplayedWithExplicitWait();
 
         //sends the keys to the field
         editForm.sendKeysToProjectPhaseField(text, true);
+        editForm.isDisplayedWithExplicitWait();
         Assert.assertTrue("value of project phase is not \"" + text + "\"", editForm.getProjectPhaseFieldContent()
                 .equals(text));
     }

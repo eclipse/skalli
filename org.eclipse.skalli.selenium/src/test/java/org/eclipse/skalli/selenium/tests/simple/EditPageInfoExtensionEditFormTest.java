@@ -93,6 +93,7 @@ public class EditPageInfoExtensionEditFormTest {
 
         //clean up
         editForm.clickRemoveMailingListLink(0);
+        editForm.isDisplayedWithExplicitWait();
     }
 
     @Test
@@ -107,6 +108,7 @@ public class EditPageInfoExtensionEditFormTest {
 
         //clear
         editForm.sendKeysToMailingListField(new String(new char[text.length()]).replace('\0', '\b'), 0);
+        editForm.isDisplayedWithExplicitWait();
     }
 
     @Test

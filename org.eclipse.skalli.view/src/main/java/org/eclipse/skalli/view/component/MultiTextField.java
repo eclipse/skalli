@@ -113,6 +113,7 @@ public class MultiTextField extends CustomField {
 
     private TextField createTextField(String value) {
         TextField tf = new TextField();
+        tf.setImmediate(true);
         if (columns > 0) {
             tf.setColumns(columns);
         }

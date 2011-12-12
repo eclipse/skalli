@@ -73,7 +73,6 @@ public class ReviewProjectExtEditForm extends AbstractExtensionFormService<Revie
                 cb.setItemCaptionMode(AbstractSelect.ITEM_CAPTION_MODE_PROPERTY);
                 cb.setItemIconPropertyId(STYLE_ICON);
                 cb.setNullSelectionAllowed(false);
-                cb.setImmediate(true);
                 cb.select(extension.getRatingStyle());
                 field = cb;
             }
