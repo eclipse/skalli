@@ -59,7 +59,7 @@
 </location>
 <location includeAllPlatforms="true" includeMode="slicer" includeSource="false" type="InstallableUnit">
 <unit id="org.eclipse.gemini.jpa.feature.feature.group" version="0.0.0"/>
-<repository location="https://hudson.eclipse.org/hudson/job/gemini-jpa/ws/trunk/org.eclipse.gemini.jpa.updatesite/target/site/"/>
+<repository location="https://hudson.eclipse.org/hudson/job/gemini-jpa/lastSuccessfulBuild/artifact/trunk/org.eclipse.gemini.jpa.updatesite/target/site/"/>
 </location>
 <location includeAllPlatforms="true" includeMode="slicer" includeSource="false" type="InstallableUnit">
 <unit id="org.apache.derby" version="0.0.0"/>
