@@ -110,7 +110,7 @@ public class GerritClientImpl implements GerritClient {
       session.setTimeout(TIMEOUT);
       session.connect();
     } catch (JSchException e) {
-      throw andDisconnect(new ConnectionException("Failed to connect.", e));
+      throw andDisconnect(new ConnectionException("Failed to connect to Gerrit", e));
     } finally {
       if (privateKeyFile != null) {
         privateKeyFile.delete();
@@ -548,6 +548,7 @@ public class GerritClientImpl implements GerritClient {
    * @throws T
    */
   private <T extends Throwable> T andDisconnect(T e) {
+    LOG.error("The last command could not be completed", e);
     disconnect();
     return e;
   }
