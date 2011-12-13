@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.common.util.ComparatorUtils;
 
@@ -72,6 +75,31 @@ public class MavenCoordinate {
             this.classifier = classifier;
         } else {
             this.classifier = null;
+        }
+    }
+
+    /**
+     * Returns a path of the form <tt>&lt;groupId&gt;/&lt;artifactId&gt;/</tt> where the dots in
+     * <tt>groupId</tt> have been replaced with forward slashes.
+     * @return a path, or an empty string if <tt>groupId</tt> or <tt>artifactId</tt> is undefined.
+     */
+    public String asPath() {
+        if (StringUtils.isBlank(groupId) || StringUtils.isBlank(artefactId)) {
+            return "";
+        }
+        return StringUtils.replace(groupId, ".", "/") + "/" + artefactId + "/";
+    }
+
+    /**
+     * Combines the given URL with {@link #asPath()}.
+     * @param root  the URL to which {@link #asPath()} is appended.
+     * @throws IllegalArgumentException if the combined URL is invalid.
+     */
+    public URL asURL(URL root) {
+        try {
+            return new URL(root, asPath());
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 
