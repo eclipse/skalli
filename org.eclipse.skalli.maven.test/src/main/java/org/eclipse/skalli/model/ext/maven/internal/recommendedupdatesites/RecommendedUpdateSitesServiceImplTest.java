@@ -57,7 +57,7 @@ public class RecommendedUpdateSitesServiceImplTest {
         return null;
     }
 
-    @Ignore("we cant initalice a getPersistenceServiceMock")
+    @Ignore("we cant initialize a getPersistenceServiceMock")
     @Test
     public void testPersistAndLoad() throws ValidationException {
 
@@ -96,6 +96,7 @@ public class RecommendedUpdateSitesServiceImplTest {
         }
     }
 
+    @Ignore("we cant initialize a getPersistenceServiceMock")
     @Test
     public void testGetRecommendedUpdateSites() throws ValidationException
     {
