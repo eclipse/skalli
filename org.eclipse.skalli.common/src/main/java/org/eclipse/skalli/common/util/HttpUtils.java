@@ -19,6 +19,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.skalli.common.Services;
 import org.eclipse.skalli.common.configuration.ConfigurationService;
 import org.eclipse.skalli.common.configuration.proxy.ConfigKeyProxy;
@@ -33,6 +34,12 @@ public class HttpUtils {
 
     public static final String HTTP = "http"; //$NON-NLS-1$
     public static final String PROTOCOL_HTTP = HTTP + PROTOCOL_SEPARATOR;
+
+    private static final String HTTP_PROXY_HOST = "http.proxyHost"; //$NON-NLS-1$
+    private static final String HTTP_PROXY_PORT = "http.proxyPort"; //$NON-NLS-1$
+    private static final String HTTPS_PROXY_HOST = "https.proxyHost"; //$NON-NLS-1$
+    private static final String HTTPS_PROXY_PORT = "https.proxyPort"; //$NON-NLS-1$
+    private static final String NON_PROXY_HOSTS = "proxy.nonProxyHosts"; //$NON-NLS-1$
 
     // RegExp for non proxy hosts
     private static final String[] RE_SEARCH = new String[] { ";", "*", "." }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -77,32 +84,54 @@ public class HttpUtils {
     }
 
     private static void setProxy(HttpClient client, URL url) {
-        String proxyHost = null;
-        int proxyPort = -1;
-        String nonProxyHostsPattern = StringUtils.EMPTY;
+        String protocol = url.getProtocol();
+
+        // use the system properties as default
+        String defaultProxyHost = System.getProperty(HTTP_PROXY_HOST);
+        String defaultProxyPort = System.getProperty(HTTP_PROXY_PORT);
+        String proxyHost = HTTPS.equals(protocol) ?
+                System.getProperty(HTTPS_PROXY_HOST, defaultProxyHost)
+                : defaultProxyHost;
+        int proxyPort = NumberUtils.toInt(HTTPS.equals(protocol) ?
+                System.getProperty(HTTPS_PROXY_PORT, defaultProxyPort)
+                : defaultProxyPort);
+        String nonProxyHosts = System.getProperty(NON_PROXY_HOSTS, StringUtils.EMPTY);
+
+        // allows to overwrite the system properties with configuration /api/config/proxy
         ConfigurationService configService = Services.getService(ConfigurationService.class);
         if (configService != null) {
-            String host = configService.readString(ConfigKeyProxy.HOST);
-            String port = configService.readString(ConfigKeyProxy.PORT);
-            String nonProxyHosts = configService.readString(ConfigKeyProxy.NONPROXYHOSTS);
-            if (StringUtils.isNotBlank(host) && StringUtils.isNotBlank(port) && StringUtils.isNumeric(port)) {
-                proxyHost = host;
-                proxyPort = Integer.valueOf(port);
-                if (StringUtils.isNotBlank(nonProxyHosts)) {
-                    nonProxyHostsPattern = StringUtils.replaceEach(StringUtils.deleteWhitespace(nonProxyHosts),
-                            RE_SEARCH, RE_REPLACE);
-                } else {
-                    nonProxyHostsPattern = StringUtils.EMPTY;
+            String defaultConfigProxyHost = configService.readString(ConfigKeyProxy.HOST);
+            String defaultConfigProxyPort = configService.readString(ConfigKeyProxy.PORT);
+            String configProxyHost = HTTPS.equals(protocol) ?
+                    configService.readString(ConfigKeyProxy.HTTPS_HOST)
+                    : defaultConfigProxyHost;
+            int configProxyPort = NumberUtils.toInt(HTTPS.equals(protocol) ?
+                    configService.readString(ConfigKeyProxy.HTTPS_PORT)
+                    : defaultConfigProxyPort);
+            String configNonProxyHosts = configService.readString(ConfigKeyProxy.NONPROXYHOSTS);
+            if (StringUtils.isNotBlank(configProxyHost) && configProxyPort > 0) {
+                proxyHost = configProxyHost;
+                proxyPort = configProxyPort;
+                if (StringUtils.isNotBlank(configNonProxyHosts)) {
+                    nonProxyHosts = configNonProxyHosts;
                 }
             }
         }
+
+        // sanitize the nonProxyHost pattern (remove whitespace etc.)
+        if (StringUtils.isNotBlank(nonProxyHosts)) {
+            nonProxyHosts = StringUtils.replaceEach(StringUtils.deleteWhitespace(nonProxyHosts),
+                    RE_SEARCH, RE_REPLACE);
+        }
+
         if (StringUtils.isNotBlank(proxyHost)
-                && proxyPort >= 0
-                && !Pattern.matches(nonProxyHostsPattern, url.getHost())) {
+                && proxyPort > 0
+                && !Pattern.matches(nonProxyHosts, url.getHost())) {
             HostConfiguration config = client.getHostConfiguration();
             config.setProxy(proxyHost, proxyPort);
         }
     }
+
 
     /**
      * Returns <code>true</code>, if the given URL starts with a known
