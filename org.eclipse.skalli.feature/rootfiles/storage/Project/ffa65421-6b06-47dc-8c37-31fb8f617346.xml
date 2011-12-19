@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-15T08:50:51.767Z" modifiedBy="admin" version="18">
+  <uuid>ffa65421-6b06-47dc-8c37-31fb8f617346</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>0aea9256-c65a-406f-9c34-4305a5fc1b0c</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:11:31.884Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://git.eclipse.org/c/linuxtools/org.eclipse.linuxtools.eclipse-build.git</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations>
+        <string>scm:git:git://git.eclipse.org/gitroot/linuxtools/org.eclipse.linuxtools.eclipse-build.git</string>
+      </scmLocations>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:11:31.884Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/linuxtools/</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-linkGroups lastModified="2011-12-14T17:11:31.884Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <linkGroups>
+        <items>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Mailing List</label>
+                <url>http://dev.eclipse.org/mailman/listinfo/linuxtools-dev</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Wiki</label>
+                <url>http://wiki.eclipse.org/index.php/Linux_Tools_Project</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Forum</label>
+                <url>http://www.eclipse.org/forums/eclipse.technology.linuxtools</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>Community Links</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+        </items>
+      </linkGroups>
+    </entity-linkGroups>
+    <entity-relatedProjects lastModified="2011-12-15T08:50:51.771Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <relatedProjects/>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:11:31.884Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-15T08:50:51.771Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ad</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>akurtakov</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>aoverholt</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>jjohnston</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>akurtakov</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>aoverholt</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>apjanakiraman</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>bhufmann</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>caniszczyk</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ebaron</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>fchouinard</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>jjohnston</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>nthykier</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>opontes</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ptasse</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>rgrunberg</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>sgehwolf</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>swagiaalla</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>xraynaud</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <inheritedExtensions/>
+  <projectId>technology.linux-distros</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Linux Tools</name>
+  <shortName/>
+  <description>The Linux Tools project aims to bring a full-featured C and C++ IDE to Linux developers.
+We build on the source editing and debugging features of the
+CDT and integrate popular native
+development tools such as the GNU Autotools, Valgrind, OProfile, RPM, SystemTap, GCov, GProf, LTTng, etc.
+Current
+projects include LTTng trace viewers and analyzers, an RPM .spec editor, Autotools build integration, a
+Valgrind heap 
+usage analysis tool, and OProfile call profiling tools.  The project also provides a place for Linux
+distributions to collaboratively overcome issues surrounding distribution packaging of
+Eclipse technology.  The project produces both best practices and tools related to
+packaging.  One of our features is a source archive of the
+Eclipse SDK that can be used by all Linux distributions building and distributing it.</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Incubation</phase>
+  <registered>0</registered>
+</entity-project>

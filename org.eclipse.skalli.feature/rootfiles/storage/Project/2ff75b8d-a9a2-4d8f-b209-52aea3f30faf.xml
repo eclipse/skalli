@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:10:24.984Z" modifiedBy="importer" version="18">
+  <uuid>2ff75b8d-a9a2-4d8f-b209-52aea3f30faf</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>2776b394-1ae9-4f8b-a714-c43e2b23077f</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:10:24.984Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://git.eclipse.org/c/mylyn/org.eclipse.mylyn.versions.git</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations>
+        <string>scm:git:git://git.eclipse.org/gitroot/mylyn/org.eclipse.mylyn.versions.git</string>
+      </scmLocations>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:10:24.984Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <mailingLists/>
+    </entity-info>
+    <entity-relatedProjects lastModified="2011-12-14T17:10:24.984Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:10:24.984Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:10:24.984Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>relves</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>spingel</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>asanchezleon</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>bmuskalla</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>kmatt</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>mbernhart</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>relves</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>spingel</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>sreiterer</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>mylyn.versions</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Mylyn Versions</name>
+  <shortName/>
+  <description>Eclipse integration for source code and configuration management tools and bi-directional linking to change management tools. This project and APIs it provides builds on the existing Eclipse Team APIs.</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Incubation</phase>
+  <registered>0</registered>
+</entity-project>

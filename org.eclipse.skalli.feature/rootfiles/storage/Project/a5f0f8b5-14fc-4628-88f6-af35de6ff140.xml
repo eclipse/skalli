@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:10:37.575Z" modifiedBy="importer" version="18">
+  <uuid>a5f0f8b5-14fc-4628-88f6-af35de6ff140</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>f71e1a51-9770-4e18-96b9-8f5ceb790851</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:10:37.575Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://dev.eclipse.org/viewcvs/viewvc.cgi/?root=RT_GEMINI</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations/>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:10:37.575Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/gemini</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-linkGroups lastModified="2011-12-14T17:10:37.575Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <linkGroups>
+        <items>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Mailing List</label>
+                <url>http://dev.eclipse.org/mailman/listinfo/gemini-dev</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Wiki</label>
+                <url>http://wiki.eclipse.org/Gemini</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Forum</label>
+                <url>http://www.eclipse.org/forums/eclipse.gemini</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>Community Links</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+        </items>
+      </linkGroups>
+    </entity-linkGroups>
+    <entity-relatedProjects lastModified="2011-12-14T17:10:37.575Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:10:37.575Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:10:37.575Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>mkeith</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>cfrost</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>cleau</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>jgkissner</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ktsvetkov</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>mkeith</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>vgeorgieva</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>rt.gemini</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Gemini - Enterprise Modules Project</name>
+  <shortName/>
+  <description>The Enterprise Modules Project (Gemini) is all about modular implementations 
+of Java EE technology. It provides the ability for users to consume individual modules as needed, 
+without requiring unnecessary additional runtime pieces. Gemini is composed of subprojects, each of 
+which implements a specific modularized technology.</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Incubation</phase>
+  <registered>0</registered>
+</entity-project>

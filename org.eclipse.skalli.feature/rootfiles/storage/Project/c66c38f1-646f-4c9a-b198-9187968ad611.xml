@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:08:47.865Z" modifiedBy="importer" version="18">
+  <uuid>c66c38f1-646f-4c9a-b198-9187968ad611</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>9c432a67-6ef0-4196-8aa4-b4772be86857</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:08:47.865Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://git.eclipse.org/c/amalgam/org.eclipse.amalgam.git</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations>
+        <string>scm:git:git://git.eclipse.org/gitroot/amalgam/org.eclipse.amalgam.git</string>
+      </scmLocations>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:08:47.865Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/modeling/amalgam</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-linkGroups lastModified="2011-12-14T17:08:47.865Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <linkGroups>
+        <items>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Mailing List</label>
+                <url>http://dev.eclipse.org/mailman/listinfo/amalgam-dev</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Wiki</label>
+                <url>http://wiki.eclipse.org/ModelingAmalgam</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Forum</label>
+                <url>http://www.eclipse.org/forums/eclipse.modeling.amalgam</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>Community Links</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+        </items>
+      </linkGroups>
+    </entity-linkGroups>
+    <entity-relatedProjects lastModified="2011-12-14T17:08:47.866Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:08:47.866Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:08:47.865Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>cbrun</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>atikhomirov</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>cbrun</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>pfriese</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>modeling.amalgam</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Amalgamation</name>
+  <shortName/>
+  <description>Modeling Amalgamation Project 
+The Modeling Amalgamation Project (Amalgam) provides improved packaging, integration, and usability of Modeling project components.</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Mature</phase>
+  <registered>0</registered>
+</entity-project>

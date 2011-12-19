@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:11:29.797Z" modifiedBy="importer" version="18">
+  <uuid>56b11e19-7131-4392-8bf5-a996acb7073c</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>0aea9256-c65a-406f-9c34-4305a5fc1b0c</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:11:29.797Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://git.eclipse.org/c/jubula/org.eclipse.jubula.core.git</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations>
+        <string>scm:git:git://git.eclipse.org/gitroot/jubula/org.eclipse.jubula.core.git</string>
+      </scmLocations>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:11:29.797Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/jubula/</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-linkGroups lastModified="2011-12-14T17:11:29.797Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <linkGroups>
+        <items>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Mailing List</label>
+                <url>http://dev.eclipse.org/mailman/listinfo/jubula-dev</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Wiki</label>
+                <url>http://wiki.eclipse.org/Jubula</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Forum</label>
+                <url>http://www.eclipse.org/forums/eclipse.jubula</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>Community Links</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+        </items>
+      </linkGroups>
+    </entity-linkGroups>
+    <entity-relatedProjects lastModified="2011-12-14T17:11:29.797Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:11:29.797Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:11:29.797Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>aloerke</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>aloerke</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>aschladebeck</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>mtiede</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>twinselmann</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>zfordreitz</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>technology.jubula</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Jubula Functional Testing Tool</name>
+  <shortName/>
+  <description>Jubula will provide functional GUI testing support for Java and HTML applications. It will further try to be an anchor point for a broader testing scope including requirements analysis, code coverage of Java applications and test metrics.</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Mature</phase>
+  <registered>0</registered>
+</entity-project>

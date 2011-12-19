@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:08:27.990Z" modifiedBy="importer" version="18">
+  <uuid>94eaf311-b37a-450b-a4ed-c302e39e63da</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>f873a546-c337-4f20-9a71-e4504706929b</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:08:27.990Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://dev.eclipse.org/viewcvs/viewvc.cgi/jdt-core-home/?root=Eclipse_Project</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations/>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:08:27.990Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/jdt/</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-linkGroups lastModified="2011-12-14T17:08:27.990Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <linkGroups>
+        <items>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Mailing List</label>
+                <url>http://dev.eclipse.org/mailman/listinfo/jdt-dev</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Forum</label>
+                <url>http://www.eclipse.org/forums/eclipse.tools.jdt</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>Community Links</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+        </items>
+      </linkGroups>
+    </entity-linkGroups>
+    <entity-relatedProjects lastModified="2011-12-14T17:08:27.990Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:08:27.990Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:08:27.990Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>dmegert</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>dmegert</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>dwright</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>kmoir</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>mkeller</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>mrennie</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>othomann</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ssankaran</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>eclipse.jdt</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>JDT - Java development tools</name>
+  <shortName/>
+  <description>The JDT project provides the tool plug-ins that implement a Java IDE 
+        supporting the development of any Java application, including Eclipse 
+        plug-ins. It adds a Java project nature and Java perspective to the Eclipse 
+        Workbench as well as a number of views, editors, wizards, builders, and 
+        code merging and refactoring tools. The JDT project allows Eclipse to 
+        be a development environment for itself.
+        More details...</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Mature</phase>
+  <registered>0</registered>
+</entity-project>

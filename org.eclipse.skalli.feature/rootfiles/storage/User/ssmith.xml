@@ -1,0 +1,6 @@
+<org.eclipse.skalli.common.User>
+  <userId>ssmith</userId>
+  <firstname>Shaun</firstname>
+  <lastname>Smith</lastname>
+  <detailsMissing>false</detailsMissing>
+</org.eclipse.skalli.common.User>

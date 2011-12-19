@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:10:23.940Z" modifiedBy="importer" version="18">
+  <uuid>077ac4a4-e68b-4b53-b951-bd613cc7f2c2</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>2776b394-1ae9-4f8b-a714-c43e2b23077f</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:10:23.940Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://git.eclipse.org/c/mylyn/org.eclipse.mylyn.tasks.git</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations>
+        <string>scm:git:git://git.eclipse.org/gitroot/mylyn/org.eclipse.mylyn.tasks.git</string>
+      </scmLocations>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:10:23.940Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <mailingLists/>
+    </entity-info>
+    <entity-relatedProjects lastModified="2011-12-14T17:10:23.940Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:10:23.940Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:10:23.940Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>spingel</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>fbecker</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>mkersten</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>relves</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>sminto</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>mylyn.tasks</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Mylyn Tasks</name>
+  <shortName/>
+  <description>Integration with Agile, issue, bug and defect tracking servers. The project provides rich task editing, task list management and offline synchronization for ALM servers. Central portion of the ALM integration framework used by other projects, eg, task-based changed tracking for the SCM project.</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Mature</phase>
+  <registered>0</registered>
+</entity-project>

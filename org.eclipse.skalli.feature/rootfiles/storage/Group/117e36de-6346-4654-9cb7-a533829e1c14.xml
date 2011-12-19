@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<org.eclipse.skalli.common.Group lastModified="2011-05-24T09:31:27.704Z" modifiedBy="org.eclipse.skalli.commands.AdminCommand" version="16">
+  <uuid>117e36de-6346-4654-9cb7-a533829e1c14</uuid>
+  <deleted>false</deleted>
+  <groupId>administrators</groupId>
+  <groupMembers>
+    <no-comparator/>
+    <string>admin</string>
+  </groupMembers>
+</org.eclipse.skalli.common.Group>

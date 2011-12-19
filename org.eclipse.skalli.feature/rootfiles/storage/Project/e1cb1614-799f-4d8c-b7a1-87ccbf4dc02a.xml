@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:09:59.940Z" modifiedBy="importer" version="18">
+  <uuid>e1cb1614-799f-4d8c-b7a1-87ccbf4dc02a</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>c80f9264-d1fc-4037-908e-445c10b00b36</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:09:59.940Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://git.eclipse.org/c/mdt/org.eclipse.ocl.git</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations>
+        <string>scm:git:git://git.eclipse.org/gitroot/mdt/org.eclipse.ocl.git</string>
+      </scmLocations>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:09:59.941Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/projects/project.php?id=modeling.mdt.ocl</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-linkGroups lastModified="2011-12-14T17:09:59.941Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <linkGroups>
+        <items>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Mailing List</label>
+                <url>http://dev.eclipse.org/mailman/listinfo/mdt-ocl.dev</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Wiki</label>
+                <url>http://wiki.eclipse.org/MDT/OCL</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Forum</label>
+                <url>http://www.eclipse.org/forums/eclipse.modeling.mdt.ocl</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>Community Links</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+        </items>
+      </linkGroups>
+    </entity-linkGroups>
+    <entity-relatedProjects lastModified="2011-12-14T17:09:59.941Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:09:59.941Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:09:59.941Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ewillink</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>asanchezbarbudoherrera</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>auhl</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ewillink</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>modeling.mdt.ocl</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>OCL (Object Constraint Language)</name>
+  <shortName/>
+  <description>Eclipse OCL is an implementation of the Object Constraint Language (OCL) OMG standard for EMF-based models.
+The core OCL component provides the following capabilities to support OCL integration:
+
+	Defines APIs for parsing and evaluating OCL constraints and queries on Ecore or UML models.
+	Defines Ecore and UML implementations of the OCL abstract syntax model, including support for
+	    serialization of parsed OCL expressions.
+	Provides a Visitor API for analyzing/transforming the AST model of OCL expressions.
+	Provides an extensibility API for clients to customize the parsing and evaluation
+	    environments used by the parser.
+
+The accompanying examples provide:
+
+	A Console for interactive evaluation of OCL expression on models.
+	(Indigo) An Impact Analyzer to support analysis and optimised re-evaluation. 
+
+The additional OCL Examples and Editors component provides interactive support for OCL:
+
+	An Xtext editor for OCL expressions (used by Papyrus and the Console).
+	An Xtext editor for OCL expressions (used by Papyrus and the Console).
+	An Xtext editor for OCL documents complemementing meta-models (Complete OCL).
+	An Xtext editor for the OCL 'Standard' Library model.
+	(Indigo) A UML-aligned OCL meta-model supporting templates and reflection. 
+	(Indigo) An OCL evaluator exploiting the extensible OCL library model. 
+	(Indigo) An Xtext Console for interactive evaluation of OCL expression on models. 
+
+The core OCL parser is generated by the LALR Parser Generator, a SourceForge project,
+licensed under the EPL v1.0.
+Download it from the LPG home page.
+This site includes the generator executable required to regenerate the parser code.</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Mature</phase>
+  <registered>0</registered>
+</entity-project>

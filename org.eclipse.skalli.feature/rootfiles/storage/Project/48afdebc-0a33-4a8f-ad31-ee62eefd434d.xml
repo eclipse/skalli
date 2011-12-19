@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:08:56.216Z" modifiedBy="importer" version="18">
+  <uuid>48afdebc-0a33-4a8f-ad31-ee62eefd434d</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>b5aa7c94-1726-43a2-87b7-4b9689887217</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:08:56.216Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://dev.eclipse.org/viewcvs/viewvc.cgi/org.eclipse.emf/org.eclipse.emf.query2/?root=Modeling_Project</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations/>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:08:56.216Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/query2/</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-linkGroups lastModified="2011-12-14T17:08:56.216Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <linkGroups>
+        <items>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Wiki</label>
+                <url>http://wiki.eclipse.org/EMF/Query2</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>Community Links</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+        </items>
+      </linkGroups>
+    </entity-linkGroups>
+    <entity-relatedProjects lastModified="2011-12-14T17:08:56.216Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:08:56.216Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:08:56.216Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>akrsharma</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>akrsharma</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ssarkar</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>modeling.emf.query2</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>EMF Query2</name>
+  <shortName/>
+  <description>The Query2 component facilitates the process of search and retrieval of emf model elements in a structured format with an additional advantage that resource loading is minimized during execution.
+Query2 uses an in-built index mechanism to speed up the queries.
+The indexes are build before query execution and used during query execution. The indexes can be re-used by multiple query executions.
+For majority of queries, the resources are not needed to be loaded, and hence it provide incredible improvements in terms of memory consumption.
+
+ Query2 supports multiple ways to specify queries. 
+
+User can use APIs for the basic EObject based Condition objects that are used to formulate queries for EMF models.
+User can specify queries in SQL like syntax. e.g from Manuscript as a select a.pages where a.title = "Learning Query2"</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Mature</phase>
+  <registered>0</registered>
+</entity-project>

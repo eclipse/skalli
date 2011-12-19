@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:08:59.348Z" modifiedBy="importer" version="18">
+  <uuid>0c4b8183-6611-4da7-bd72-924af25ceda5</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>b5aa7c94-1726-43a2-87b7-4b9689887217</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:08:59.349Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://dev.eclipse.org/viewcvs/viewvc.cgi/org.eclipse.emf/org.eclipse.emf.transaction/?root=Modeling_Project</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations/>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:08:59.349Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/modeling/emf/?project=transaction</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-relatedProjects lastModified="2011-12-14T17:08:59.349Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:08:59.349Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:08:59.349Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>bkolb</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ahunter</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>bgruschko</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>bkolb</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>nboldt</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>modeling.emf.transaction</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>EMF Transaction</name>
+  <shortName/>
+  <description>The transaction component provides the following capabilities.
+
+	Multi-threading - Supports a protocol for clients to read and write EMF models on multiple threads.
+	Model Integrity - Semantic integrity is ensured by automatic validation to detect invalid changes and semantic procedures to proactively maintain correctness of semantic dependencies.
+	Batched Events - Clients are notified of groups of related changes in batches, rather than as a stream of EMF notifications. In particular, this allows applications to analyze change sets in their entirety.
+	Undo/Redo -  For a simplified programming model, the API automatically tracks changes applied to models without the need for client code to use EMF edit Commands. These changes are encapsulated in transactions/operations that can undo and redo themselves.
+	Editing Domain - Support cooperative editing of models by multiple editors/applications. EMF resources can be shared amongst different editing domains.
+	Eclipse Workspace  - The API provides traceability between EMF resources and workspace resources. Multi-threaded access is coordinated via the Eclipse jobs API and its integration with the workspace.
+	Eclipse Operations - The API supports the Eclipse operation history as an undo stack for undo/redo of resource changes. The API provides a framework for undoable operations that automatically capture undo/redo information, which can be interleaved on the same history with dependent operations that do not modify the EMF model.</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Mature</phase>
+  <registered>0</registered>
+</entity-project>

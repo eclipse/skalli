@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:10:53.139Z" modifiedBy="importer" version="18">
+  <uuid>4ee7d963-0055-400d-a0f8-ec57967d6ab9</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>ecb9c4f9-470e-41a7-b87a-4767ab7d76d2</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:10:53.139Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://git.eclipse.org/c/bpmn2-modeler/org.eclipse.bpmn2-modeler.git</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations>
+        <string>scm:git:git://git.eclipse.org/gitroot/bpmn2-modeler/org.eclipse.bpmn2-modeler.git</string>
+      </scmLocations>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:10:53.139Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <mailingLists/>
+    </entity-info>
+    <entity-relatedProjects lastModified="2011-12-14T17:10:53.139Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:10:53.139Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:10:53.139Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>rbrodt</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>akitsik</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>bfitzpatrick</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>imeikas</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>kverlaenen</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>rbrodt</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>soa.bpmn2-modeler</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>BPMN2 Modeler Project</name>
+  <shortName/>
+  <description>The mission of the SOA
+Project is to build frameworks and extensible tools that enable the
+design, configuration, assembly, deployment, monitoring, and management
+of software designed around a Service Oriented Architecture. The project
+is guided by the values of transparency, extensibility, vendor
+neutrality, community collaboration, agile development, and
+standards-based innovation.
+
+There has been a lot of interest recently in the BPMN 2.0 specification, and many feel that what UML is to object modeling,
+ BPMN 2.0 will be to business process modeling and will become the de facto standard.
+
+The BPMN 2.0 Modeler provides a graphical modeling tool which
+allows creation and editing of BPMN ( Business
+Process Modeling Notation ) diagrams. The tool is built on Eclipse Graphiti and uses
+the BPMN 2.0 EMF meta model currently being developed
+within the Eclipse Model
+Development Tools (MDT) project. This meta model is compatible with the
+BPMN 2.0
+specification (herafter &amp;quot;the specification&amp;quot;) proposed by the Object Management
+Group.</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Incubation</phase>
+  <registered>0</registered>
+</entity-project>

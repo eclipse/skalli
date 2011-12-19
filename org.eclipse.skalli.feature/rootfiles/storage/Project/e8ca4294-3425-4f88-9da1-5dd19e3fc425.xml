@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-15T08:22:43.943Z" modifiedBy="admin" version="18">
+  <uuid>e8ca4294-3425-4f88-9da1-5dd19e3fc425</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>f873a546-c337-4f20-9a71-e4504706929b</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:08:32.201Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://git.eclipse.org/c/pde/eclipse.pde.ui.git</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations>
+        <string>scm:git:git://git.eclipse.org/gitroot/pde/eclipse.pde.ui.git</string>
+      </scmLocations>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:08:32.201Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/pde/</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-linkGroups lastModified="2011-12-14T17:08:32.201Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <linkGroups>
+        <items>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Mailing List</label>
+                <url>http://dev.eclipse.org/mailman/listinfo/pde-dev</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Wiki</label>
+                <url>http://wiki.eclipse.org/PDE</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Forum</label>
+                <url>http://www.eclipse.org/forums/eclipse.platform.pde</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>Community Links</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+        </items>
+      </linkGroups>
+    </entity-linkGroups>
+    <entity-relatedProjects lastModified="2011-12-15T08:22:27.197Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <relatedProjects/>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:08:32.201Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:08:32.201Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>cwindatt</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>aniefer</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>asharma</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>bcabe</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>caniszczyk</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>cwindatt</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>dmegert</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>dwright</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>jmcaffer</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>kmoir</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <inheritedExtensions/>
+  <projectId>eclipse.pde</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>PDE - Plugin Development Environment</name>
+  <shortName/>
+  <description>About the PDE Subproject
+  	
+		The Plug-in Development Environment (PDE) provides tools to create, develop, test, debug, build and deploy Eclipse plug-ins, fragments, features, update sites and RCP products. 
+  	PDE also provides comprehensive OSGi tooling, which makes it an ideal environment for component programming, not just Eclipse plug-in development.
+  	PDE is built atop the Platform  and JDT, and ships as part of the Eclipse SDK. 
+  	In PDE we do tooling, but our business is people! 
+
+  PDE Components
+	
+		The PDE subproject is broken down into three main components, Build, UI and API Tools.  Each of
+		these components operate like a project unto its own, with its own set of committers, bug categories 
+		and mailing lists.  There are two additional components in PDE, Doc which handles the help documentation 
+		and Incubator which develops non-SDK features.
+	
+	
+	 
+		Name
+		Description
+	
+	 
+		PDE Build
+		Ant based tools and scripts to automate build processes
+	
+	 
+		PDE UI
+		Models, builders, editors and more to faciliate plug-in development in the Eclipse IDE.
+	
+	 
+		PDE API Tools
+		Eclipse IDE and build process integrated tooling to maintain API
+	
+	 
+		PDE Incubator
+		Development of new tools that are not ready to be added to the Eclipse SDK
+	
+	 
+		PDE Doc
+		Help documentation for PDE, shared by the other components.
+	
+	
+	
+  Getting Involved
+	
+		The development of PDE is driven by the community in an open and transparent manner.  By getting involved with PDE, you can help influence the future of the platform improve the quality of Eclipse.  There are many ways to assist, filing bug reports, contributing fixes, producing new features, participating in milestone testing, etc.  Each PDE component has its own bug triage rules, coding guidelines, and testing format, however a good place to start is the PDE UI Getting Involved page.</description>
+  <tags>
+    <no-comparator/>
+    <string>eclipse</string>
+    <string>osgi</string>
+    <string>pde</string>
+    <string>plugin</string>
+    <string>tools</string>
+  </tags>
+  <logoUrl/>
+  <phase>Mature</phase>
+  <registered>0</registered>
+</entity-project>

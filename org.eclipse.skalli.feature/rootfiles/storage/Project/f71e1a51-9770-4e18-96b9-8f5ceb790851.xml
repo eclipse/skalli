@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:10:26.027Z" modifiedBy="importer" version="18">
+  <uuid>f71e1a51-9770-4e18-96b9-8f5ceb790851</uuid>
+  <deleted>false</deleted>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:10:26.027Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://dev.eclipse.org/viewcvs/viewvc.cgi//?root=RT_Project</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations/>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:10:26.027Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <mailingLists/>
+    </entity-info>
+    <entity-relatedProjects lastModified="2011-12-14T17:10:26.027Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:10:26.027Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:10:26.027Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ccampo</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>twatson</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>dclarke</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>jkrause</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>jmcaffer</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>twatson</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>ec.rt</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>RT(ec.rt)</name>
+  <shortName/>
+  <description>RT is designed to foster, promote and house runtime efforts in Eclipse .  
+It is part of a larger Equinox Community move to 
+drive Equinox-base technology across a broad range of computing environments and problem domains. 
+These efforts strive
+ towards the common goal of providing a uniform component model across a wide variety of computing environments.  The 
+ Equinox framework and OSGi form the basis of this infrastructure.  
+ 
+ Eclipse RT projects target "clients" and "servers" across embedded devices, desktops, and enterprise systems, 
+ and provide those intermediate software services which enable applications to be more easily and concisely 
+ constructed across these environments.  This supports and extends the Equinox vision of a consistent 
+ programming and component model where developers create application domain code that runs on a variety of platforms. 
+ 
+ By providing a consistent symmetric architecture, Eclipse RT technology enables developers to focus on the 
+ business problem at hand and still have many system architecture options available at deployment time.</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Mature</phase>
+  <registered>0</registered>
+</entity-project>

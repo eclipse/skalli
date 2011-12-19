@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-15T08:23:37.891Z" modifiedBy="admin" version="18">
+  <uuid>c80f9264-d1fc-4037-908e-445c10b00b36</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>9c432a67-6ef0-4196-8aa4-b4772be86857</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:09:51.573Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://dev.eclipse.org/viewcvs/viewvc.cgi/org.eclipse.mdt/?root=Modeling_Project</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations/>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:09:51.573Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/modeling/mdt/</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-linkGroups lastModified="2011-12-14T17:09:51.573Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <linkGroups>
+        <items>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Mailing List</label>
+                <url>http://dev.eclipse.org/mailman/listinfo/mdt.dev</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Wiki</label>
+                <url>http://wiki.eclipse.org/MDT</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Forum</label>
+                <url>http://www.eclipse.org/forums/eclipse.modeling.mdt</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>Community Links</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+        </items>
+      </linkGroups>
+    </entity-linkGroups>
+    <entity-relatedProjects lastModified="2011-12-15T08:23:30.502Z" modifiedBy="admin">
+      <deleted>false</deleted>
+      <relatedProjects/>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:09:51.574Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:09:51.573Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>khussey</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>aigdalov</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>asanchezbarbudoherrera</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>carmstrong</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>cdumoulin</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>dcarlson</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>dsteinberg</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ejuliot</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>emerks</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ewillink</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>hbruneliere</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>jbenois</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>jbruck</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>khussey</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>lgoubet</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>mgolubev</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>mpaternostro</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>nboldt</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ptessier</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>rfaudou</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>sgerard</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>sgribovsky</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>tdigre</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>tfesenko</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>tlandre</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ytanguy</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>yyang</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <inheritedExtensions/>
+  <projectId>modeling.mdt</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Model Development Tools (MDT)</name>
+  <shortName/>
+  <description>MDT Plan Summary
+	
+
+
+
+  
+    Project Name: MDT
+    
+    Project Leaders: Kenn Hussey
+    
+    Project Description: 
+      The Model Development Tools (MDT) project focuses on big "M" modeling within the Modeling project.
+      See http://www.eclipse.org/mdt.
+    
+    Executive Summary: 
+      The objectives of this project are to provide an implementation of industry standard metamodels and exemplary tools for developing models based on those metamodels.
+  
+    Key Release Dates: 
+  
+  
+    Wednesday, August 18 - Milestone 1 (Helios M1) - Stable Build based on Eclipse 3.7 M1
+    Wednesday, September 29 - Milestone 2 (Helios M2) - Stable Build based on Eclipse 3.7 M2
+    Wednesday, November 10 - Milestone 3 (Helios M3) - Stable Build based on Eclipse 3.7 M3
+    Wednesday, December 15 - Milestone 4 (Helios M4) - Stable Build based on Eclipse 3.7 M4
+    Wednesday, February 9 - Milestone 5 (Helios M5) - Stable Build based on Eclipse 3.7 M5
+    Wednesday, March 16 - Milestone 6 (Helios M6) - API Freeze - Stable Build based on Eclipse 3.7 M6
+    Wednesday, May 4 - Milestone 7 (Helios M7) - Feature Freeze - Stable Build based on Eclipse 3.7 M7
+    Wednesday, May 18 - Release Candidate 1 (Helios RC1) - Stable Build based on Eclipse 3.7 RC1
+    Wednesday, May 25 - Release Candidate 2 (Helios RC2) - Stable Build based on Eclipse 3.7 RC2
+    Wednesday, June 1 - Release Candidate 3 (Helios RC3) - Stable Build based on Eclipse 3.7 RC3
+    Wednesday, June 8 - Release Candidate 4 (Helios RC4) - Stable Build based on Eclipse 3.7 RC4
+    Wednesday, June 22 - Release (Indigo) - Release Build based on Eclipse 3.7
+  
+
+
+    
+    
+    
+    
+    
+    
+      API Freeze
+    
+    
+      Feature Freeze
+    
+    
+    
+    
+    
+    
+
+
+
+  
+    URL to current planning document: 
+      The MDT Helios development plan is available here.</description>
+  <tags>
+    <no-comparator/>
+    <string>build</string>
+    <string>mdt</string>
+    <string>modeling</string>
+  </tags>
+  <logoUrl/>
+  <phase>Incubation</phase>
+  <registered>0</registered>
+</entity-project>

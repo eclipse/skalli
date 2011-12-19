@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:12:20.852Z" modifiedBy="importer" version="18">
+  <uuid>685ffa2e-f4fa-4593-bb30-533c07d7affb</uuid>
+  <deleted>false</deleted>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:12:20.853Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://dev.eclipse.org/viewcvs/viewvc.cgi//?root=TPTP_Project</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations/>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:12:20.853Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/tptp/</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-linkGroups lastModified="2011-12-14T17:12:20.853Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <linkGroups>
+        <items>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Mailing List</label>
+                <url>http://dev.eclipse.org/mailman/listinfo/tptp-tracing-profiling-tools-dev</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Wiki</label>
+                <url>http://wiki.eclipse.org/index.php/TPTP</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Forum</label>
+                <url>http://www.eclipse.org/forums/eclipse.tptp</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>Community Links</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+        </items>
+      </linkGroups>
+    </entity-linkGroups>
+    <entity-relatedProjects lastModified="2011-12-14T17:12:20.853Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:12:20.853Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:12:20.853Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>wbeaton</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>tptp</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Test and Performance Tools Platform Project</name>
+  <shortName/>
+  <description>Eclipse Test and Performance Tools Platform (TPTP) Project
+
+	The Eclipse Test and Performance Tools Platform (TPTP) Project provides 
+	an open platform supplying powerful frameworks and services that allow 
+	software developers to build unique test and performance tool, both 
+	open source and commercial, that can be easily integrated with the platform 
+	and with other tools.
+
+	TPTP addresses the entire test and performance life cycle, 
+	from early testing to production application monitoring, including test 
+	editing and execution, monitoring, tracing and profiling, and log 
+	analysis capabilities. The platform supports a broad spectrum of 
+	computing systems including embedded, standalone, enterprise, and 
+	high-performance and will continue to expand support to encompass the 
+	widest possible range of systems.
+	
+	
+	TPTP will change the approach to application life cycle management, affecting 
+	IT organizations and tool vendors alike.   Not only TPTP-based tools are 
+	interoperable, but also they are tightly integrated with the Eclipse Platform-
+	based development tools. An IT organization will be able to assemble just the 
+	right combination of tools from different vendors that it needs throughout the 
+	application life cycle, from development through production.   On the other 
+	hand, TPTP will enable the emergence of completely new tool models that 
+	simultaneously leverage and integrate multiple  data across the life cycle 
+	yielding advanced capabilities and productivity.</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Mature</phase>
+  <registered>0</registered>
+</entity-project>

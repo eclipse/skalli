@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:12:17.707Z" modifiedBy="importer" version="18">
+  <uuid>61c7d34f-4fea-4787-9920-6a35b9c73da3</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>13faf17c-32e1-4b12-82ed-e22b62acbd3d</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:12:17.707Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://git.eclipse.org/c/tmw/org.eclipse.tmw.core.git</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations>
+        <string>scm:git:git://git.eclipse.org/gitroot/tmw/org.eclipse.tmw.core.git</string>
+      </scmLocations>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:12:17.707Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <mailingLists/>
+    </entity-info>
+    <entity-relatedProjects lastModified="2011-12-14T17:12:17.707Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:12:17.707Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:12:17.707Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>pbeusterien</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>pbeusterien</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>tools.sequoyah.tmw</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Tools for Mobile Web</name>
+  <shortName/>
+  <description>Historically, mobile tools providers have been customizing desktop web tools in a proprietary way
+to create their tools.
+
+
+This project aims to seed the Eclipse community with a complete web tools solution, including editing, 
+building, deploying and debugging. It also includes a reference target - 
+
+Web Runtime - with
+complete preview and debug capabilities.
+
+
+
+	Tools for Mobile Web (TMW) provieds a basis for web development tooling for mobile devices. It
+	will leverage other projects, such as JSDT, for generic development. Since TMW is focusing one
+	of the types of the mobile developer tooling, it is a sub-project of Sequoyah. For Web 
+	applications, TMW will add 
+	functionality for mobile specific features like previewing, skinning, configuration, device 
+	deployment, and debugging.
+	TMW :
+
+
+Provides set of extensible frameworks that will enable creation of the IDEs for specific mobile runtimes.
+Provides a unified architecture that will improve compatibility between offerings from different vendors.
+Leverages existing Eclipse projects and frameworks.</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Incubation</phase>
+  <registered>0</registered>
+</entity-project>

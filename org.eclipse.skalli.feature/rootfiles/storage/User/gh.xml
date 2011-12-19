@@ -1,0 +1,23 @@
+<!--
+    Copyright (c) 2010, 2011 SAP AG and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        SAP AG - initial API and implementation
+ -->
+<org.eclipse.skalli.common.User>
+  <userId>gh</userId>
+  <firstname>Gregory</firstname>
+  <lastname>House</lastname>
+  <email>greg.house@princeton-plainsborough.com</email>
+  <telephone>+001 555 1234 5678</telephone>
+  <room>42</room>
+  <location>Princeton</location>
+  <department>Diagnostics</department>
+  <company>Princeton Plainsborough Teaching Hospital</company>
+  <sip>sip:greg.house@princeton-plainsborough.com</sip>
+  <detailsMissing>false</detailsMissing>
+</org.eclipse.skalli.common.User>

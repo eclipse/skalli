@@ -1,0 +1,18 @@
+<org.eclipse.skalli.model.ext.info.MailingListMappingsConfig>
+  <mailingListMappings>
+    <org.eclipse.skalli.model.ext.info.MailingListMappingConfig>
+      <id>listinfo.eclipse.org</id>
+      <purpose>subscribe</purpose>
+      <pattern>^(.+)@eclipse.org$</pattern>
+      <template>https://dev.eclipse.org/mailman/listinfo/{1}</template>
+      <name>Subscribe/Unsubscribe</name>
+    </org.eclipse.skalli.model.ext.info.MailingListMappingConfig>
+    <org.eclipse.skalli.model.ext.info.MailingListMappingConfig>
+      <id>mhonarc.eclipse.org</id>
+      <purpose>browse-archive</purpose>
+      <pattern>^(.+)@eclipse.org$</pattern>
+      <template>http://dev.eclipse.org/mhonarc/lists/{1}</template>
+      <name>Browse Archive</name>
+    </org.eclipse.skalli.model.ext.info.MailingListMappingConfig>
+  </mailingListMappings>
+</org.eclipse.skalli.model.ext.info.MailingListMappingsConfig>

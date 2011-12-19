@@ -1,0 +1,4 @@
+<org.eclipse.skalli.view.internal.config.FeedbackConfig>
+  <url>mailto:skalli-dev@eclipse.org?subject=Feedback</url>
+  <displayName>Feedback</displayName>
+</org.eclipse.skalli.view.internal.config.FeedbackConfig>

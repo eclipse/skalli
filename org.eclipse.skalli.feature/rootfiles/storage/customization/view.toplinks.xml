@@ -1,0 +1,36 @@
+<org.eclipse.skalli.view.internal.config.TopLinksConfig>
+  <topLinks>
+    <org.eclipse.skalli.view.internal.config.TopLinkConfig>
+      <displayName>Home</displayName>
+      <url>http://www.eclipse.org</url>
+    </org.eclipse.skalli.view.internal.config.TopLinkConfig>
+    <org.eclipse.skalli.view.internal.config.TopLinkConfig>
+      <displayName>Downloads</displayName>
+      <url>http://www.eclipse.org/downloads/</url>
+    </org.eclipse.skalli.view.internal.config.TopLinkConfig>
+    <org.eclipse.skalli.view.internal.config.TopLinkConfig>
+      <displayName>Users</displayName>
+      <url>http://www.eclipse.org/users/</url>
+    </org.eclipse.skalli.view.internal.config.TopLinkConfig>
+    <org.eclipse.skalli.view.internal.config.TopLinkConfig>
+      <displayName>Members</displayName>
+      <url>http://www.eclipse.org/membership/</url>
+    </org.eclipse.skalli.view.internal.config.TopLinkConfig>
+    <org.eclipse.skalli.view.internal.config.TopLinkConfig>
+      <displayName>Committers</displayName>
+      <url>http://www.eclipse.org/committers/</url>
+    </org.eclipse.skalli.view.internal.config.TopLinkConfig>
+    <org.eclipse.skalli.view.internal.config.TopLinkConfig>
+      <displayName>Resources</displayName>
+      <url>http://www.eclipse.org/resources/</url>
+    </org.eclipse.skalli.view.internal.config.TopLinkConfig>
+    <org.eclipse.skalli.view.internal.config.TopLinkConfig>
+      <displayName>Projects</displayName>
+      <url>http://www.eclipse.org/projects/</url>
+    </org.eclipse.skalli.view.internal.config.TopLinkConfig>
+    <org.eclipse.skalli.view.internal.config.TopLinkConfig>
+      <displayName>About Us</displayName>
+      <url>http://www.eclipse.org/org/</url>
+    </org.eclipse.skalli.view.internal.config.TopLinkConfig>
+  </topLinks>
+</org.eclipse.skalli.view.internal.config.TopLinksConfig>

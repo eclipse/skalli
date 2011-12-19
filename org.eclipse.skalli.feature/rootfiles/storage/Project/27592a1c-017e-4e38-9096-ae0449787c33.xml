@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:10:50.009Z" modifiedBy="importer" version="18">
+  <uuid>27592a1c-017e-4e38-9096-ae0449787c33</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>f71e1a51-9770-4e18-96b9-8f5ceb790851</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:10:50.009Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://git.eclipse.org/c/virgo/org.eclipse.virgo.apps.git</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations>
+        <string>scm:git:git://git.eclipse.org/gitroot/virgo/org.eclipse.virgo.apps.git</string>
+      </scmLocations>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:10:50.009Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/virgo/</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-linkGroups lastModified="2011-12-14T17:10:50.009Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <linkGroups>
+        <items>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Mailing List</label>
+                <url>http://dev.eclipse.org/mailman/listinfo/virgo-dev</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Wiki</label>
+                <url>http://wiki.eclipse.org/Virgo</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Forum</label>
+                <url>http://www.eclipse.org/forums/eclipse.virgo</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>Community Links</caption>
+          </org.eclipse.skalli.common.LinkGroup>
+        </items>
+      </linkGroups>
+    </entity-linkGroups>
+    <entity-relatedProjects lastModified="2011-12-14T17:10:50.009Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:10:50.009Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:10:50.009Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>gnormington</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>bkapukaranov</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>cdupuis</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>cfrost</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>dsklyut</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>fwaibel</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>gnormington</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>hiliev</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ldossantos</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>lkirchev</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>mlippert</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>spingel</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>spowell</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>vgeorgieva</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>rt.virgo</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>Virgo</name>
+  <shortName/>
+  <description>The Virgo Web Server from EclipseRT is a completely module-based Java application server
+			that is designed to run enterprise Java applications and Spring-powered applications
+			with a high degree of flexibility and reliability. It offers a simple yet comprehensive
+			platform to develop, deploy, and service enterprise Java applications. 
+		
+		
+			The Virgo kernel supports the core concepts of Virgo and is not biased towards the web
+			server, thus enabling other types of server to be created. The kernel can also be used
+			stand-alone as a rich OSGi application platform. A server runtime can easily be constructed
+			by deploying suitable bundles on top of the kernel.
+		
+		
+			Virgo features:
+			
+				
+					admin console - deploy and manage artifacts, examine diagnostic dumps,
+					and examine bundle wiring, either in the live system or from a
+					resolution failure
+				
+				
+					Equinox console extension - manage Virgo and deployed artifacts
+				
+				
+					plans - define the artifacts that comprise an application, optionally
+					making the application atomic to tie the artifact lifecycles together,
+					and scoped to isolate the application from other applications
+				
+				
+					provisioning - automatically supply the dependencies of an application including
+					bundles, plans, plan archives (PARs), and configurations, from both local
+					and remote repositories
+				
+				
+					web container - supports vanilla WAR files, with all their dependencies in
+					WEB-INF/lib, and Web Application Bundles, that import their dependencies
+					via OSGi manifest metadata, via the embedded Tomcat-based reference implementation
+					of the OSGi Web	Container specification, configured using the standard Tomcat
+					server.xml
+				
+				
+					user region - isolates the kernel from user-installed applications and enables
+					admins to focus on application artifacts and their dependencies without seeing
+					those of the kernel as well
+				
+				
+					Spring 3 - Virgo packages Spring 3.0 final, but can easily be configured to
+					use a different version of Spring
+				
+				
+					hot deployment - deploy artifacts to Virgo by copying them into the pickup directory,
+					either in archive or exploded form, as an alternative to deploying via the admin console
+				
+				
+					logging - via embedded LogBack, configured in
+					config/serviceability.xml, with a rich set of appenders available out of the box</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Mature</phase>
+  <registered>0</registered>
+</entity-project>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<entity-project lastModified="2011-12-14T17:08:55.176Z" modifiedBy="importer" version="18">
+  <uuid>50659bdb-fa74-4d4b-8c28-22d032e68438</uuid>
+  <deleted>false</deleted>
+  <parentEntityId>b5aa7c94-1726-43a2-87b7-4b9689887217</parentEntityId>
+  <extensions>
+    <no-comparator/>
+    <entity-devInf lastModified="2011-12-14T17:08:55.176Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <scmUrl>http://dev.eclipse.org/viewcvs/viewvc.cgi/org.eclipse.emf/org.eclipse.emf.query/?root=Modeling_Project</scmUrl>
+      <bugtrackerUrl/>
+      <ciUrl/>
+      <metricsUrl/>
+      <reviewUrl/>
+      <scmLocations/>
+      <javadocs/>
+    </entity-devInf>
+    <entity-info lastModified="2011-12-14T17:08:55.176Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <pageUrl>http://www.eclipse.org/modeling/emf/?project=query2</pageUrl>
+      <mailingLists/>
+    </entity-info>
+    <entity-relatedProjects lastModified="2011-12-14T17:08:55.176Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <calculated>true</calculated>
+    </entity-relatedProjects>
+    <entity-reviews lastModified="2011-12-14T17:08:55.176Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <reviews/>
+      <numberVotes>0</numberVotes>
+      <numberThumbsUp>0</numberThumbsUp>
+      <numberThumbsDown>0</numberThumbsDown>
+      <averageRating>0.0</averageRating>
+      <allowAnonymous>false</allowAnonymous>
+      <ratingStyle>FIVE_STATES</ratingStyle>
+    </entity-reviews>
+    <entity-people lastModified="2011-12-14T17:08:55.176Z" modifiedBy="importer">
+      <deleted>false</deleted>
+      <leads>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ahunter</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </leads>
+      <members>
+        <no-comparator/>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ahunter</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>akrsharma</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>bgruschko</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>bkolb</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>cmohr</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>mstrenge</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>nboldt</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+        <org.eclipse.skalli.model.core.ProjectMember>
+          <userID>ssarkar</userID>
+        </org.eclipse.skalli.model.core.ProjectMember>
+      </members>
+    </entity-people>
+  </extensions>
+  <projectId>modeling.emf.query</projectId>
+  <projectTemplateId>default</projectTemplateId>
+  <name>EMF Query</name>
+  <shortName/>
+  <description>The query component facilitates the process of search and retrieval of model elements of interest in a flexible yet controlled and structured manner. Provides API support for the basic EObject based Condition objects that are used to formulate queries for EMF models.
+The query component provides the following classes/interfaces to support queries.
+
+	The IEObjectSource interface provides the search scope elements to be used in a query.
+	The SELECT class implements a template-function that does the iteration over model elements and applies the search condition on each; it collects the resulting elements into a QueryResultSet object and returns it to the caller.
+	The FROM class represents the elements to search. It is responsible of providing an appropriate iterator for the elements in the search space.
+	The WHERE class applies the search conditions over the elements in the search set.
+	The UPDATE class passes the elements who satisfy the search condition to a caller-supplied modification function. It collects the modified elements into a QueryResultSet object and returns it to the caller.
+	The QueryResultSet class represents the set of elements returned by a given query.
+	The EObjectCondition class is the abstract parent of all conditions that deal with model-elements (i.e., EObjects). It incorporates the services of a PruneHandler in order to answers whether or not to prune the element tree at a specific element and thus ignore its children.
+	The ConditionPolicy class is used to allow the user to decide how to apply a given condition on a collection of a model-element EAttributes or EReferences values. Supports both the: exists (ANY) and for-all (ALL) semantics.
+	The EObjectStructuralFeatureValueCondition class is the parent class for conditions that are responsible for checking the values held in model-elements attributes or references.</description>
+  <tags>
+    <no-comparator/>
+  </tags>
+  <logoUrl/>
+  <phase>Mature</phase>
+  <registered>0</registered>
+</entity-project>
