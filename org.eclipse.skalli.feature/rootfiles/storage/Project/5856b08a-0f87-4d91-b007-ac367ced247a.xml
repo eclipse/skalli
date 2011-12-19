@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<entity-project lastModified="2011-12-15T08:49:04.546Z" modifiedBy="admin" version="18">
+<entity-project version="18">
   <uuid>5856b08a-0f87-4d91-b007-ac367ced247a</uuid>
   <deleted>false</deleted>
   <extensions>
     <no-comparator/>
-    <entity-devInf lastModified="2011-12-14T15:00:51.749Z" modifiedBy="admin">
+    <entity-devInf>
       <deleted>false</deleted>
-      <scmUrl>http://git.eclipse.org/c/skalli/org.eclipse.skalli.git/</scmUrl>
+      <scmUrl/>
       <bugtrackerUrl>https://bugs.eclipse.org/bugs/buglist.cgi?query_format=specific&amp;order=relevance+desc&amp;bug_status=__open__&amp;product=Skalli</bugtrackerUrl>
       <ciUrl>https://hudson.eclipse.org/hudson/job/skalli/</ciUrl>
       <metricsUrl/>
       <reviewUrl/>
       <scmLocations>
-        <string>scm:git:git://git.example.org/skalli.git</string>
+        <string>scm:git:git://git.eclipse.org/gitroot/skalli/org.eclipse.skalli.git</string>
       </scmLocations>
       <javadocs/>
     </entity-devInf>
-    <entity-info lastModified="2011-12-14T15:00:51.750Z" modifiedBy="admin">
+    <entity-info>
       <deleted>false</deleted>
       <pageUrl>http://www.eclipse.org/projects/project.php?id=technology.skalli</pageUrl>
       <mailingLists>
-        <string>skalli-dev@mail.example.org</string>
+        <string>skalli-dev@eclipse.org</string>
       </mailingLists>
     </entity-info>
-    <entity-linkGroups lastModified="2011-12-14T15:00:51.750Z" modifiedBy="admin">
+    <entity-linkGroups>
       <deleted>false</deleted>
       <linkGroups>
         <items>
@@ -44,15 +44,34 @@
             </items>
             <caption>Community Links</caption>
           </org.eclipse.skalli.common.LinkGroup>
+          <org.eclipse.skalli.common.LinkGroup>
+            <items>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>Skalli CQs</label>
+                <url>https://dev.eclipse.org/ipzilla/buglist.cgi?cmdtype=runnamed&amp;namedcmd=Skalli%20CQ</url>
+              </org.eclipse.skalli.model.ext.Link>
+              <org.eclipse.skalli.model.ext.Link>
+                <label>IP Log</label>
+                <url>http://www.eclipse.org/projects/ip_log.php?projectid=technology.skalli</url>
+              </org.eclipse.skalli.model.ext.Link>
+            </items>
+            <caption>IP Process</caption>
+          </org.eclipse.skalli.common.LinkGroup>
         </items>
       </linkGroups>
     </entity-linkGroups>
-    <entity-relatedProjects lastModified="2011-12-14T14:54:05.335Z" modifiedBy="admin">
+    <entity-maven>
+      <deleted>false</deleted>
+      <groupID>org.eclipse.skalli</groupID>
+      <reactorPOM/>
+      <siteUrl/>
+    </entity-maven>
+    <entity-relatedProjects>
       <deleted>false</deleted>
       <relatedProjects/>
       <calculated>true</calculated>
     </entity-relatedProjects>
-    <entity-people lastModified="2011-12-15T08:49:04.550Z" modifiedBy="admin">
+    <entity-people>
       <deleted>false</deleted>
       <leads>
         <no-comparator/>
@@ -91,7 +110,7 @@
         </org.eclipse.skalli.model.core.ProjectMember>
       </members>
     </entity-people>
-    <entity-scrum lastModified="2011-12-14T15:00:51.751Z" modifiedBy="admin">
+    <entity-scrum>
       <deleted>false</deleted>
       <scrumMasters>
         <no-comparator/>
@@ -102,14 +121,14 @@
       <productOwners>
         <no-comparator/>
         <org.eclipse.skalli.model.core.ProjectMember>
-          <userID>skaufmann</userID>
+          <userID>mochmann</userID>
         </org.eclipse.skalli.model.core.ProjectMember>
       </productOwners>
       <backlogUrl/>
     </entity-scrum>
   </extensions>
   <inheritedExtensions/>
-  <projectId>eclipse.skalli</projectId>
+  <projectId>technology.skalli</projectId>
   <projectTemplateId>default</projectTemplateId>
   <name>Skalli</name>
   <shortName>skalli</shortName>
@@ -117,6 +136,7 @@
   <tags>
     <no-comparator/>
     <string>osgi</string>
+    <string>project management</string>
   </tags>
   <logoUrl/>
   <phase>Incubation</phase>
