@@ -278,28 +278,6 @@
 .v-app-ProjectApplication .v-panel-infobox .infobox-timeline {
 }
 
-.v-app-ProjectApplication .v-panel-infobox .infobox-timeline .timeline-panel {
-}
-
-.v-app-ProjectApplication .v-panel-infobox .infobox-timeline .source-select {
-    height:30px;
-}
-
-.v-app-ProjectApplication .v-panel-infobox .infobox-timeline .source-select > div {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 0px;
-    padding-right: 0px;
-}
-
-.v-app-ProjectApplication .v-panel-infobox .infobox-timeline .source-select > div > div > span {
-    padding-right: 10px;
-    float: left;
-}
-
-.v-app-ProjectApplication .v-panel-infobox .infobox-timeline .timeline-content {
-}
-
 .v-app-ProjectApplication .v-panel-infobox .infobox-timeline .timeline-entry {
     margin-bottom: 0px;
     margin-top: 5px;
@@ -311,23 +289,4 @@
     border-top-style: solid;
     border-top-width: 1px;
     border-top-color: #C9C9C9;
-}
-
-.v-app-ProjectApplication .v-panel-infobox .infobox-timeline .toggle-btn {
-    margin-bottom: 0px;
-    margin-top: 0px;
-    margin-left: 1px;
-    margin-right: 1px;
-}
-
-.v-app-ProjectApplication .v-panel-infobox .infobox-timeline .timeline-details {
-    margin-bottom: 0px;
-    margin-top: 0px;
-    margin-left: 3px;
-    margin-right: 3px;
-    padding-left: 3px;
-    padding-right: 3px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    background-color: #FAFAFA;
 }

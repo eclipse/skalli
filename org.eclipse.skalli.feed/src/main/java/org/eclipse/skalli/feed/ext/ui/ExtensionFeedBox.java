@@ -13,6 +13,7 @@ package org.eclipse.skalli.feed.ext.ui;
 
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,47 +32,47 @@ import org.eclipse.skalli.api.java.feeds.FeedUpdater;
 import org.eclipse.skalli.common.util.HtmlBuilder;
 import org.eclipse.skalli.model.core.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
+import org.eclipse.skalli.view.component.FloatLayout;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;
 import org.eclipse.skalli.view.ext.ProjectInfoBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
-import com.vaadin.ui.Panel;
 
 public class ExtensionFeedBox extends InfoBox implements ProjectInfoBox {
 
     private static final String CAPTION = "Timeline"; //$NON-NLS-1$
-    private static final String CAPTION_COLLAPSE = "collapse"; //$NON-NLS-1$
-    private static final String CAPTION_EXPAND = "expand"; //$NON-NLS-1$
 
     private static final String ICON = "res/icons/feed.png"; //$NON-NLS-1$
 
-    private static final ThemeResource ICON_COLLAPSED = new ThemeResource("icons/feed/bullet_arrow_right.png"); //$NON-NLS-1$
-    private static final ThemeResource ICON_EXPANDED = new ThemeResource("icons/feed/bullet_arrow_down.png"); //$NON-NLS-1$
-
     private static final String STYLE_TIMELINE_INFOBOX = "infobox-timeline"; //$NON-NLS-1$
-    private static final String INFOBOX_HEIGHT = "200px"; //$NON-NLS-1$
-
-    private static final String STYLE_TIMELINE_PANEL = "timeline-panel"; //$NON-NLS-1$
-    private static final String STYLE_SOURCE_SELECT = "source-select"; //$NON-NLS-1$
-    private static final String STYLE_TIMELINE_CONTENT = "timeline-content"; //$NON-NLS-1$
     private static final String STYLE_TIMELINE_ENTRY = "timeline-entry"; //$NON-NLS-1$
-    private static final String STYLE_TOOGLE_BUTTON = "toggle-btn"; //$NON-NLS-1$
-    private static final String STYLE_DETAILS = "timeline-details"; //$NON-NLS-1$
 
     private static final Logger LOG = LoggerFactory.getLogger(ExtensionFeedBox.class);
 
     private FeedService feedService;
     private Set<FeedProvider> feedProviders = new HashSet<FeedProvider>();
+
+    private static final int MAX_DISPLAY_LENGTH_TITLE = 80;
+    private static final int INITAL_MAX_FEED_ENTRIES = 7;
+    private int maxFeedEntries = INITAL_MAX_FEED_ENTRIES;
+
+    private class SourceDetails {
+        private boolean selected;
+        private String caption;
+
+        public SourceDetails(boolean selected, String caption) {
+            this.selected = selected;
+            this.caption = caption;
+        }
+    }
 
     protected void bindFeedService(FeedService feedService) {
         this.feedService = feedService;
@@ -123,20 +124,25 @@ public class ExtensionFeedBox extends InfoBox implements ProjectInfoBox {
             return null; // nothing to render
         }
 
-        Layout layout = new CssLayout();
-        layout.addStyleName(STYLE_TIMELINE_INFOBOX);
-        layout.setSizeFull();
+        Layout contentLayout = new CssLayout();
+        contentLayout.addStyleName(STYLE_TIMELINE_INFOBOX);
+        contentLayout.setSizeFull();
 
-        Panel panel = new Panel();
-        layout.addStyleName(STYLE_TIMELINE_PANEL);
-        panel.setHeight(INFOBOX_HEIGHT);
-        panel.setWidth("100%"); //$NON-NLS-1$
+        maxFeedEntries = INITAL_MAX_FEED_ENTRIES;
+        HashMap<String, SourceDetails> sourceFilter = new HashMap<String, SourceDetails>();
+        Map<String, String> captions = getCaptions(project, sources);
+        for (String source : sources) {
+            sourceFilter.put(source, new SourceDetails(true, captions.get(source)));
+        }
 
-        Component sourceFilters = getSourceFilters(panel, project, sources);
-        layout.addComponent(sourceFilters);
-        renderPanelContent(panel, project, sources);
-        layout.addComponent(panel);
-        return layout;
+        renderContentPanel(contentLayout, project, sourceFilter);
+        return contentLayout;
+    }
+
+    private void renderContentPanel(Layout layout, Project project, HashMap<String, SourceDetails> sourceFilter) {
+        layout.removeAllComponents();
+        renderSourceFilters(layout, project, sourceFilter);
+        renderTimelineContent(layout, project, sourceFilter);
     }
 
     private List<String> getSources(Project project) {
@@ -149,14 +155,13 @@ public class ExtensionFeedBox extends InfoBox implements ProjectInfoBox {
         return Collections.emptyList();
     }
 
-    private Component getSourceFilters(Panel panel, Project project, List<String> sources) {
-        CssLayout layout = new CssLayout();
-        layout.addStyleName(STYLE_SOURCE_SELECT);
-        Map<String, String> captions = getCaptions(project, sources);
-        for (String source : sources) {
-            addSourceFilter(layout, captions.get(source), sources, source, panel, project);
+    private void renderSourceFilters(Layout parentLayout, Project project, HashMap<String, SourceDetails> sourceFilter) {
+        FloatLayout grid = new FloatLayout();
+        Set<String> keys = sourceFilter.keySet();
+        for (String source : keys) {
+            addSourceFilter(parentLayout, grid, source, sourceFilter, project);
         }
-        return layout;
+        parentLayout.addComponent(grid);
     }
 
     private Map<String, String> getCaptions(Project project, List<String> sources) {
@@ -172,34 +177,66 @@ public class ExtensionFeedBox extends InfoBox implements ProjectInfoBox {
         return captions;
     }
 
-    private void renderPanelContent(Panel panel, Project project, List<String> sources) {
-        panel.removeAllComponents();
-        Component timelineLayout = getTimelineContent(project, sources);
-        panel.getContent().addComponent(timelineLayout);
-    }
-
-    private Component getTimelineContent(Project project, List<String> sources) {
-        CssLayout timelineLayout = new CssLayout();
-        timelineLayout.addStyleName(STYLE_TIMELINE_CONTENT);
-        timelineLayout.setSizeFull();
-        timelineLayout.setMargin(false);
+    private void renderTimelineContent(final Layout layout, final Project project,
+            final HashMap<String, SourceDetails> sourceFilter) {
         try {
-            if (!CollectionUtils.isEmpty(sources)) {
-                List<Entry> entries = feedService.findEntries(project.getUuid(), sources, -1);
-                for (Entry entry : entries) {
-                    addEntry(timelineLayout, entry);
+
+            List<String> selectedSources = getSelecedSources(sourceFilter);
+            if (!CollectionUtils.isEmpty(selectedSources)) {
+
+                List<Entry> entries = feedService.findEntries(project.getUuid(), selectedSources,
+                        maxFeedEntries + 1);
+                createLabel(layout, getEntriesAsHtml(entries, Math.min(entries.size(), maxFeedEntries))
+                        .toString());
+
+                if (entries.size() > maxFeedEntries) {
+                    addMoreButton(layout, project, sourceFilter);
                 }
             }
         } catch (FeedServiceException e) {
             LOG.error(MessageFormat.format("Failed to retrieve feed entries for project {0}", project.getProjectId()),
                     e);
         }
-        return timelineLayout;
     }
 
-    private void addSourceFilter(Layout layout, String caption,
-            final List<String> sources, final String source, final Panel panel, final Project project) {
-        CheckBox cb = new CheckBox(caption, true);
+    @SuppressWarnings({ "deprecation", "serial" })
+    private void addMoreButton(final Layout layout, final Project project,
+            final HashMap<String, SourceDetails> sourceFilter) {
+        final Button moreButton = new Button("more ...");
+        moreButton.setStyle(Button.STYLE_LINK);
+        moreButton.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(ClickEvent event) {
+                maxFeedEntries = maxFeedEntries + 30;
+                renderContentPanel(layout, project, sourceFilter);
+            }
+        });
+        layout.addComponent(moreButton);
+    }
+
+    private HtmlBuilder getEntriesAsHtml(List<Entry> entries, int maxCount) {
+        HtmlBuilder html = new HtmlBuilder();
+        for (int i = 0; i < maxCount; i++) {
+            addEntry(html, entries.get(i));
+        }
+        return html;
+    }
+
+    private List<String> getSelecedSources(HashMap<String, SourceDetails> sourceFilter) {
+        List<String> result = new ArrayList<String>();
+        Set<String> sources = sourceFilter.keySet();
+        for (String source : sources) {
+            if (sourceFilter.get(source).selected) {
+                result.add(source);
+            }
+        }
+        return result;
+    }
+
+    private void addSourceFilter(final Layout parentLayout, FloatLayout layout, final String source,
+            final HashMap<String, SourceDetails> sourceFilter, final Project project) {
+        final SourceDetails value = sourceFilter.get(source);
+        CheckBox cb = new CheckBox(value.caption, value.selected);
         cb.setImmediate(true);
         cb.addListener(new Button.ClickListener() {
             private static final long serialVersionUID = 7364120771141334914L;
@@ -207,51 +244,42 @@ public class ExtensionFeedBox extends InfoBox implements ProjectInfoBox {
             @Override
             public void buttonClick(ClickEvent event) {
                 boolean checked = event.getButton().booleanValue();
-                if (checked && !sources.contains(source)) {
-                    sources.add(source);
-                } else {
-                    sources.remove(source);
-                }
-                renderPanelContent(panel, project, sources);
+                value.selected = checked;
+                renderContentPanel(parentLayout, project, sourceFilter);
             }
         });
-        layout.addComponent(cb);
+        layout.addComponent(cb, "margin-right:10px;");
     }
 
     @SuppressWarnings("nls")
-    private void addEntry(Layout layout, Entry entry) {
-        HtmlBuilder html = new HtmlBuilder();
+    private void addEntry(HtmlBuilder html, Entry entry) {
         html.append("<p class=\"").append(STYLE_TIMELINE_ENTRY).append("\">");
-        String title = entry.getTitle();
+
+        String title = StringUtils.abbreviate(entry.getTitle(), MAX_DISPLAY_LENGTH_TITLE);
+
         String link = null;
         if (entry.getLink() != null) {
             link = entry.getLink().getHref();
         }
         html.appendLink(title, link);
-        html.appendLineBreak();
+
+        html.append("<br />");
 
         String source = entry.getSource();
         if (StringUtils.isNotBlank(source)) {
             html.append(source);
         }
+
         String date = getDate(entry);
         if (StringUtils.isNotBlank(date)) {
             html.append(" - ").append(date);
         }
+
         String author = getAuthor(entry);
         if (StringUtils.isNotBlank(author)) {
             html.append(" - ").append(author);
         }
         html.append("</p>");
-        createLabel(layout, html.toString());
-
-        String details = null;
-        if (entry.getContent() != null) {
-            details = entry.getContent().getValue();
-        }
-        if (StringUtils.isNotBlank(details)) {
-            addDetails(layout, entry, details);
-        }
     }
 
     @SuppressWarnings("nls")
@@ -269,53 +297,26 @@ public class ExtensionFeedBox extends InfoBox implements ProjectInfoBox {
         return date;
     }
 
-    @SuppressWarnings("nls")
     private String getAuthor(Entry entry) {
-        StringBuilder author = new StringBuilder();
+        HtmlBuilder author = new HtmlBuilder();
         if (entry.getAuthor() != null) {
-            if (entry.getAuthor().getName() != null) {
-                author.append(entry.getAuthor().getName());
+            String link = null;
+            String caption = null;
+
+            if (StringUtils.isNotBlank(entry.getAuthor().getName())) {
+                caption = entry.getAuthor().getName();
             }
-            if (entry.getAuthor().getEmail() != null) {
-                if (author.length() > 0) {
-                    author.append(" ");
+
+            if (StringUtils.isNotBlank(entry.getAuthor().getEmail())) {
+                link = entry.getAuthor().getEmail();
+                if (caption == null) {
+                    caption = link;
                 }
-                author.append("(");
-                author.append(entry.getAuthor().getEmail());
-                author.append(")");
             }
+
+            author.appendMailToLink(null, link, caption);
         }
         return author.toString();
-    }
-
-    @SuppressWarnings("deprecation")
-    private void addDetails(Layout layout, Entry entry, String details) {
-        final Label label = new Label(details, Label.CONTENT_XHTML);
-        label.setVisible(false);
-        label.addStyleName(STYLE_DETAILS);
-
-        final Button expandButton = new Button(CAPTION_EXPAND);
-        expandButton.setIcon(ICON_COLLAPSED);
-        expandButton.setStyle(Button.STYLE_LINK);
-        expandButton.addStyleName(STYLE_TOOGLE_BUTTON);
-        expandButton.addListener(new Button.ClickListener() {
-            private static final long serialVersionUID = 303119182831057658L;
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                if (label.isVisible()) {
-                    expandButton.setCaption(CAPTION_EXPAND);
-                    expandButton.setIcon(ICON_COLLAPSED);
-                    label.setVisible(false);
-                } else {
-                    expandButton.setCaption(CAPTION_COLLAPSE);
-                    expandButton.setIcon(ICON_EXPANDED);
-                    label.setVisible(true);
-                }
-            }
-        });
-        layout.addComponent(expandButton);
-        layout.addComponent(label);
     }
 
 }
