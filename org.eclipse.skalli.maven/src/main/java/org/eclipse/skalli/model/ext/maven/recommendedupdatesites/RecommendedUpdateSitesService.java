@@ -17,6 +17,13 @@ public interface RecommendedUpdateSitesService extends EntityService<Recommended
 
     public RecommendedUpdateSites getRecommendedUpdateSites(String shortName);
 
+    /**
+     * Returns a set of update sites for given <code>userId</code> and <code>updateSiteId</code>
+     * or null if no matching record could be found.
+     * @param userId the unique identifier of the user that created the recommendation.
+     * @param updateSiteId the identifier of the recommendation.
+     * @return the recommended update sites or <code>null</code>.
+     */
     public RecommendedUpdateSites getRecommendedUpdateSites(String userId, String updateSiteId);
 
 }
