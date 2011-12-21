@@ -22,5 +22,12 @@
         policy="dynamic"
         bind="bindPersistenceService"
         unbind="unbindPersistenceService"/>
+    <reference
+        name="ProjectService"
+        interface="org.eclipse.skalli.api.java.ProjectService"
+        cardinality="0..1"
+        policy="dynamic"
+        bind="bindProjectService"
+        unbind="unbindProjectService"/>
 </scr:component>
 

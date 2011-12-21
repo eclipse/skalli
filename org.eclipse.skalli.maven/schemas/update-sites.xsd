@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.eclipse.org/skalli/2010/API/Extension-Maven" xmlns="http://www.eclipse.org/skalli/2010/API/Extension-Maven"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+    <xsd:annotation>
+        <xsd:documentation xml:lang="EN">
+            Copyright (c) 2010, 2011 SAP AG and others.
+            All rights reserved. This program
+            and the accompanying materials
+            are made available under the terms of the Eclipse Public License v1.0
+            which accompanies
+            this distribution, and is available at
+            http://www.eclipse.org/legal/epl-v10.html
+
+            Contributors:
+            SAP AG - initial API and
+            implementation
+        </xsd:documentation>
+    </xsd:annotation>
+    <xsd:annotation>
+        <xsd:documentation xml:lang="EN">
+            This XML schema defines the Skalli REST API resource for
+            recommended update
+            sites, i.e. /updatesites/{userId}/{id}
+        </xsd:documentation>
+    </xsd:annotation>
+
+  <!-- BEGIN of common declarations -->
+    <xsd:include schemaLocation="maven-common.xsd" />
+  <!-- END of common declarations -->
+
+    <xsd:element name="updateSites">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="name" type="xsd:string" />
+                <xsd:element name="description" type="xsd:string" minOccurs="0" />
+                <xsd:element name="updateSite" type="UpdateSite" minOccurs="0" maxOccurs="unbounded" />
+            </xsd:sequence>
+            <xsd:attribute name="apiVersion" type="ModelVersion" use="required" />
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="UpdateSite">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="EN">
+                Defines the properties of an update site.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="projectUUID" type="UUID">
+                <xsd:annotation>
+                    <xsd:documentation xml:lang="EN">
+                        Project's unique ID.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="groupId" type="MavenId">
+                <xsd:annotation>
+                    <xsd:documentation xml:lang="EN">
+                        The group id of the update site artifact.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="artifactId" type="MavenId">
+                <xsd:annotation>
+                    <xsd:documentation xml:lang="EN">
+                        The artifact id of the update site artifact.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="name" type="xsd:string" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation xml:lang="EN">
+                        The display name of the update site.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="description" type="xsd:string" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation xml:lang="EN">
+                        Description of the update site.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>
