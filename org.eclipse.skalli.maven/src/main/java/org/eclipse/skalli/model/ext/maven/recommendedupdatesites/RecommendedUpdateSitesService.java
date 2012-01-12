@@ -15,6 +15,8 @@ import org.eclipse.skalli.model.ext.Issuer;
 
 public interface RecommendedUpdateSitesService extends EntityService<RecommendedUpdateSites>, Issuer {
 
+    public RecommendedUpdateSites getRecommendedUpdateSites(String shortName);
+
     public RecommendedUpdateSites getRecommendedUpdateSites(String userId, String updateSiteId);
 
 }

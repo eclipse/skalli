@@ -30,6 +30,7 @@ public class UpdateSitesConverter extends AbstractConverter<RecommendedUpdateSit
         marshalApiVersion(writer);
         writeNode(writer, "name", recommendedUpdateSites.getName());//$NON-NLS-1$
         writeNode(writer, "description", recommendedUpdateSites.getDescription());//$NON-NLS-1$
+        writeNode(writer, "shortName", recommendedUpdateSites.getShortName());//$NON-NLS-1$
         List<UpdateSite> updateSites = recommendedUpdateSites.getUpdateSites();
         for (UpdateSite updateSite : updateSites) {
             writer.startNode("updateSite"); //$NON-NLS-1$
@@ -68,6 +69,8 @@ public class UpdateSitesConverter extends AbstractConverter<RecommendedUpdateSit
                 }
             } else if ("name".equals(field)) { //$NON-NLS-1$
                 updateSites.setName(value);
+            } else if ("shortName".equals(field)) { //$NON-NLS-1$
+                updateSites.setShortName(value);
             } else if ("description".equals(field)) { //$NON-NLS-1$
                 updateSites.setDescription(value);
             }

@@ -32,6 +32,7 @@ public class RecommendedUpdateSitesTest {
         values.put(RecommendedUpdateSites.PROPERTY_ID, "test_updatesite");
         values.put(RecommendedUpdateSites.PROPERTY_USERID, "jon");
         values.put(RecommendedUpdateSites.PROPERTY_NAME, "Test Updatesite");
+        values.put(RecommendedUpdateSites.PROPERTY_SHORT_NAME, "alias");
         values.put(RecommendedUpdateSites.PROPERTY_DESCIPTION, "This test Updatesite ist for test purpose.");
 
 

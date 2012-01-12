@@ -31,11 +31,15 @@ public class RecommendedUpdateSites extends EntityBase {
     public static final String PROPERTY_DESCIPTION = "description"; //$NON-NLS-1$
 
     @PropertyName
+    public static final String PROPERTY_SHORT_NAME = "shortName"; //$NON-NLS-1$
+
+    @PropertyName
     public static final String PROPERTY_UPDATESITES = "updateSites"; //$NON-NLS-1$
 
     private String id = ""; //$NON-NLS-1$
     private String userId = ""; //$NON-NLS-1$
     private String name = ""; //$NON-NLS-1$
+    private String shortName = ""; //$NON-NLS-1$
     private String description = ""; //$NON-NLS-1$
 
     private List<UpdateSite> updateSites = new ArrayList<UpdateSite>();
@@ -73,6 +77,14 @@ public class RecommendedUpdateSites extends EntityBase {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 
     public List<UpdateSite> getUpdateSites() {

@@ -98,6 +98,7 @@ public class RecommendedUpdateSitesServiceImpl extends EntityServiceImpl<Recomme
             issues.addAll(validateMavenArtifactProperty(entity, updateSite.getGroupId(), "groupId"));
             issues.addAll(validateMavenArtifactProperty(entity, updateSite.getArtifactId(), "artifactId"));
             issues.addAll(validateProjectUUID(entity, updateSite));
+            issues.addAll(validateShortName(entity));
         }
         return issues;
     }
@@ -109,6 +110,13 @@ public class RecommendedUpdateSitesServiceImpl extends EntityServiceImpl<Recomme
     public RecommendedUpdateSites getRecommendedUpdateSites(String userId, String updateSiteId) {
         RecommendedUpdateSites sites = getPersistenceService().getEntity(RecommendedUpdateSites.class,
                 new RecommendedUpdateSitesFilter(userId, updateSiteId));
+        return sites;
+    }
+
+    @Override
+    public RecommendedUpdateSites getRecommendedUpdateSites(String shortName) {
+        RecommendedUpdateSites sites = getPersistenceService().getEntity(RecommendedUpdateSites.class,
+                new RecommendedUpdateSitesShortNameFilter(shortName));
         return sites;
     }
 
@@ -124,6 +132,19 @@ public class RecommendedUpdateSitesServiceImpl extends EntityServiceImpl<Recomme
         @Override
         public boolean accept(Class<RecommendedUpdateSites> entityClass, RecommendedUpdateSites entity) {
             return entity.getId().equals(updateSiteId) && entity.getUserId().equals(userId);
+        }
+    }
+
+    protected static class RecommendedUpdateSitesShortNameFilter implements EntityFilter<RecommendedUpdateSites> {
+        private String shortName;
+
+        public RecommendedUpdateSitesShortNameFilter(String shortName) {
+            this.shortName = shortName;
+        }
+
+        @Override
+        public boolean accept(Class<RecommendedUpdateSites> entityClass, RecommendedUpdateSites entity) {
+            return shortName.equals(entity.getShortName());
         }
     }
 
@@ -159,6 +180,21 @@ public class RecommendedUpdateSitesServiceImpl extends EntityServiceImpl<Recomme
                 issues.add(new Issue(Severity.FATAL, RecommendedUpdateSitesService.class, entity.getUuid(),
                         MessageFormat.format("Update site \"{0}\" has invalid project UUID \"{1}\"",
                                 updateSite.getName(), updateSite.getProjectUUID())));
+            }
+        }
+        return issues;
+    }
+
+    private SortedSet<Issue> validateShortName(RecommendedUpdateSites entity) {
+        SortedSet<Issue> issues = new TreeSet<Issue>();
+        String shortName = entity.getShortName();
+        if (StringUtils.isNotBlank(shortName)) {
+            RecommendedUpdateSites existing = getRecommendedUpdateSites(shortName);
+            if (existing != null && !existing.getUuid().equals(entity.getUuid())) {
+                issues.add(new Issue(Severity.FATAL, RecommendedUpdateSitesService.class, entity.getUuid(),
+                        MessageFormat.format(
+                                "Provided short name ''{0}'' is already used by recommendation ''{1}'' of user {2}",
+                                shortName, existing.getId(), existing.getUserId())));
             }
         }
         return issues;

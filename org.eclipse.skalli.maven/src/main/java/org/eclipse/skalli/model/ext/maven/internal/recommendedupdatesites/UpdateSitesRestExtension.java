@@ -17,7 +17,6 @@ public class UpdateSitesRestExtension implements RestExtension {
 
     @Override
     public String getResourcePath() {
-
         return "/updatesites/{userId}/{id}"; //$NON-NLS-1$
     }
 
