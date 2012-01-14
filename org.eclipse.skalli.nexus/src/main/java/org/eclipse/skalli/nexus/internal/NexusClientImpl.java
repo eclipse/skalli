@@ -23,14 +23,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.eclipse.skalli.common.configuration.ConfigurationService;
-import org.eclipse.skalli.common.util.HttpUtils;
-import org.eclipse.skalli.common.util.XMLUtils;
+import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.nexus.NexusClient;
 import org.eclipse.skalli.nexus.NexusClientException;
 import org.eclipse.skalli.nexus.NexusSearchResult;
 import org.eclipse.skalli.nexus.internal.config.NexusConfig;
 import org.eclipse.skalli.nexus.internal.config.NexusResource;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.destination.DestinationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -42,6 +42,7 @@ public class NexusClientImpl implements NexusClient {
     private static final Logger LOG = LoggerFactory.getLogger(NexusClientImpl.class);
 
     private ConfigurationService configService;
+    private DestinationService destinationService;
 
     /* (non-Javadoc)
      * @see org.eclipse.skalli.nexus.NexusClient#searchArtifactVersions(java.lang.String, java.lang.String)
@@ -52,10 +53,13 @@ public class NexusClientImpl implements NexusClient {
         if (configService == null) {
             throw new NexusClientException("No configuration service available");
         }
+        if (destinationService == null) {
+            throw new NexusClientException("No destination service service available");
+        }
 
         NexusConfig nexusConfig = configService.readCustomization(NexusResource.KEY, NexusConfig.class);
         if (nexusConfig == null) {
-            throw new NexusClientException("Nexus configuration not found (key=" + NexusResource.KEY + ")");
+            throw new NexusClientException(MessageFormat.format("Nexus configuration not found (key={0})", NexusResource.KEY));
         }
 
         //hint, count=Integer.MAX_VALUE, does not work. the http request comes back without an error and from the result you cannot find out
@@ -83,7 +87,7 @@ public class NexusClientImpl implements NexusClient {
             int statusCode;
             try {
                 LOG.info("GET " + nexusUrl); //$NON-NLS-1$
-                statusCode = HttpUtils.getClient(nexusUrl).executeMethod(method);
+                statusCode = destinationService.getClient(nexusUrl).executeMethod(method);
                 LOG.info(statusCode + " " + HttpStatus.getStatusText(statusCode)); //$NON-NLS-1$
             } catch (HttpException e) {
                 throw new HttpException(MessageFormat.format("Problems found for {0}: {1}", nexusUrl,
@@ -133,5 +137,16 @@ public class NexusClientImpl implements NexusClient {
     protected void unbindConfigurationService(ConfigurationService configService) {
         LOG.info(MessageFormat.format("unbindConfigurationService({0})", configService)); //$NON-NLS-1$
         this.configService = null;
+    }
+
+    protected void bindDestinationService(DestinationService destinationService) {
+        LOG.info(MessageFormat.format("bindDestinationService({0})", configService)); //$NON-NLS-1$
+        this.destinationService = destinationService;
+
+    }
+
+    protected void unbindDestinationService(DestinationService destinationService) {
+        LOG.info(MessageFormat.format("unbindDestinationService({0})", destinationService)); //$NON-NLS-1$
+        this.destinationService = null;
     }
 }

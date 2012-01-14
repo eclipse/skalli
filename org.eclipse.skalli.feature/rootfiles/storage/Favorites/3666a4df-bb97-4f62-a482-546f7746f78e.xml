@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<org.eclipse.skalli.model.core.Favorites lastModified="2011-11-10T14:16:54.772Z" modifiedBy="guest" version="18">
+<entity-favorites lastModified="2011-11-10T14:16:54.772Z" modifiedBy="guest" version="19">
   <uuid>3666a4df-bb97-4f62-a482-546f7746f78e</uuid>
   <deleted>false</deleted>
   <userId>guest</userId>
   <projects>
     <uuid>9616953c-9d88-4914-b283-2311c2831512</uuid>
   </projects>
-</org.eclipse.skalli.model.core.Favorites>
+</entity-favorites>

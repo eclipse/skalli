@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.common.LinkGroup;
-import org.eclipse.skalli.model.ext.Link;
+import org.eclipse.skalli.commons.Link;
+import org.eclipse.skalli.model.ext.linkgroups.LinkGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

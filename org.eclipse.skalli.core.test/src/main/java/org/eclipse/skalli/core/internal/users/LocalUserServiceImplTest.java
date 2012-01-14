@@ -10,42 +10,34 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.users;
 
-import java.io.File;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
+import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.user.UserService;
+import org.eclipse.skalli.testutil.BundleManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.common.util.CollectionUtils;
-import org.eclipse.skalli.testutil.BundleManager;
-import org.eclipse.skalli.testutil.TestUtils;
+import org.osgi.framework.Constants;
 
 public class LocalUserServiceImplTest {
 
-    private File tmpDir;
-
-    private LocalUserServiceImpl userService;
+    private UserService userService;
     private List<User> users;
+
+    private static final String FILTER =
+            "(&(" + Constants.OBJECTCLASS + "=" + UserService.class.getName() + ")" + "(userService.type=local))";
 
     @Before
     public void setup() throws Exception {
-        new BundleManager(this.getClass()).startBundles();
-
-        userService = new LocalUserServiceImpl();
+        BundleManager.startBundles();
+        userService = Services.getService(UserService.class, FILTER);
+        Assert.assertNotNull("local user service not found", userService);
         users = userService.getUsers();
         Assert.assertEquals(5, users.size());
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        if (tmpDir != null) {
-            FileUtils.forceDelete(tmpDir);
-        }
     }
 
     @Test
@@ -132,16 +124,4 @@ public class LocalUserServiceImplTest {
         findResult = userService.findUser(null);
         Assert.assertEquals(0, findResult.size());
     }
-
-    @Test
-    public void testSaveToFile() throws Exception {
-        tmpDir = TestUtils.createTempDir("LocalUserServiceImplTest");
-        File file = new File(tmpDir, "gh.xml");
-        User expected = userService.getUserById("gh");
-        userService.saveToFile(file, expected);
-        Assert.assertTrue(file.exists());
-        User loaded = userService.loadFromFile(file);
-        Assert.assertEquals(expected, loaded);
-    }
-
 }

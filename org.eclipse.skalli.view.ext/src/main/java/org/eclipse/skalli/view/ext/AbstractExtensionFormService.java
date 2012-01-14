@@ -17,10 +17,10 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectTemplate;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.PropertyName;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.PropertyName;
+import org.eclipse.skalli.services.template.ProjectTemplate;
 
 import com.vaadin.data.Item;
 import com.vaadin.ui.Form;
@@ -53,7 +53,7 @@ public abstract class AbstractExtensionFormService<T extends ExtensionEntityBase
         // Determine which properties are shown, and in which order:
         List<String> visibleItemProperties = new ArrayList<String>();
         for (String propertyId : getVisibleItemProperties()) {
-            if (projectTemplate.isVisible(getExtensionClass().getName(), propertyId, context.isAdministrator())) {
+            if (!projectTemplate.isHidden(getExtensionClass().getName(), propertyId, context.isAdministrator())) {
                 visibleItemProperties.add(propertyId);
             }
         }

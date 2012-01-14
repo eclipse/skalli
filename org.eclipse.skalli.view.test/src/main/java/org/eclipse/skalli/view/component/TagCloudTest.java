@@ -15,23 +15,31 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.UUID;
 
+import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.Taggable;
+import org.eclipse.skalli.model.ext.commons.TaggingUtils;
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.eclipse.skalli.model.ext.Taggable;
 
 @SuppressWarnings("nls")
 public class TagCloudTest {
 
     private static class TestTaggable implements Taggable {
         @Override
-        public Set<String> getTags() {
-            return null;
+        public SortedSet<String> getTags() {
+            return CollectionUtils.emptySortedSet();
         }
 
         @Override
         public void addTag(String tag) {
+        }
+
+        @Override
+        public void addTags(String... tags) {
         }
 
         @Override
@@ -44,38 +52,41 @@ public class TagCloudTest {
         }
     }
 
-    private Map<String, Set<Taggable>> getTestTags() {
-        Map<String, Set<Taggable>> tags = new HashMap<String, Set<Taggable>>();
-        tags.put("a", createTestTaggables(4));
-        tags.put("b", createTestTaggables(14));
-        tags.put("c", createTestTaggables(1));
-        tags.put("d", createTestTaggables(4));
-        tags.put("e", createTestTaggables(7));
-        tags.put("f", createTestTaggables(1));
-        tags.put("g", createTestTaggables(4));
-        tags.put("h", createTestTaggables(25));
-        tags.put("i", createTestTaggables(1));
-        tags.put("j", createTestTaggables(1));
-        tags.put("k", createTestTaggables(2));
-        tags.put("l", createTestTaggables(12));
-        tags.put("m", createTestTaggables(14));
-        tags.put("n", createTestTaggables(1));
-        tags.put("o", createTestTaggables(6));
-        tags.put("p", createTestTaggables(4));
+    private Map<String, Set<Project>> getTestProjects() {
+        Map<String, Set<Project>> tags = new HashMap<String, Set<Project>>();
+        addTestTaggables("a", 4, tags);
+        addTestTaggables("b", 14, tags);
+        addTestTaggables("c", 1, tags);
+        addTestTaggables("d", 4, tags);
+        addTestTaggables("e", 7, tags);
+        addTestTaggables("f", 1, tags);
+        addTestTaggables("g", 4, tags);
+        addTestTaggables("h", 25, tags);
+        addTestTaggables("i", 1, tags);
+        addTestTaggables("j", 1, tags);
+        addTestTaggables("k", 2, tags);
+        addTestTaggables("l", 12, tags);
+        addTestTaggables("m", 14, tags);
+        addTestTaggables("n", 1, tags);
+        addTestTaggables("o", 6, tags);
+        addTestTaggables("p", 4, tags);
         return tags;
     }
 
-    private Set<Taggable> createTestTaggables(int n) {
-        HashSet<Taggable> result = new HashSet<Taggable>(n);
+    private void addTestTaggables(String tag, int n, Map<String, Set<Project>> taggables) {
+        HashSet<Project> set = new HashSet<Project>(n);
         for (int i = 0; i < n; ++i) {
-            result.add(new TestTaggable());
+            Project p = new Project();
+            p.setUuid(UUID.randomUUID());
+            TaggingUtils.addTags(p, tag);
+            set.add(p);
         }
-        return result;
+        taggables.put(tag, set);
     }
 
     @Test
     public void testShow3MostPopular() throws IOException {
-        TagCloud tagCloud = new TagCloud(getTestTags(), 3);
+        TagCloud tagCloud = new TagCloud(getTestProjects(), 3);
         String xhtml = tagCloud.doLayout();
 
         Assert.assertEquals("xhtml",
@@ -88,7 +99,7 @@ public class TagCloudTest {
 
     @Test
     public void testShow25MostPopular() throws IOException {
-        TagCloud tagCloud = new TagCloud(getTestTags(), 25);
+        TagCloud tagCloud = new TagCloud(getTestProjects(), 25);
         String xhtml = tagCloud.doLayout();
 
         Assert.assertEquals("xhtml",
@@ -114,7 +125,7 @@ public class TagCloudTest {
 
     @Test
     public void testShowAllTags() throws IOException {
-        TagCloud tagCloud = new TagCloud(getTestTags(), Integer.MAX_VALUE);
+        TagCloud tagCloud = new TagCloud(getTestProjects(), Integer.MAX_VALUE);
         String xhtml = tagCloud.doLayout();
 
         Assert.assertEquals("xhtml",
@@ -149,7 +160,7 @@ public class TagCloudTest {
 
     @Test
     public void testShow0MostPopular() throws IOException {
-        TagCloud tagCloud = new TagCloud(getTestTags(), 0);
+        TagCloud tagCloud = new TagCloud(getTestProjects(), 0);
         String xhtml = tagCloud.doLayout();
 
         Assert.assertEquals("xhtml",

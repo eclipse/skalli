@@ -21,10 +21,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.common.util.Statistics;
+import org.eclipse.skalli.commons.Statistics;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.view.Consts;
 
 public class StatisticsFilter implements Filter {
 

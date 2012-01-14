@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.users;
 
-import org.eclipse.skalli.common.configuration.ConfigKey;
+import org.eclipse.skalli.services.configuration.ConfigKey;
 
 public enum ConfigKeyLDAP implements ConfigKey {
 

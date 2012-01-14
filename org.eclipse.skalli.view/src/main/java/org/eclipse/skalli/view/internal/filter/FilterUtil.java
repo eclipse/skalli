@@ -18,7 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.eclipse.skalli.common.Consts;
+import org.eclipse.skalli.view.Consts;
 
 public class FilterUtil {
 

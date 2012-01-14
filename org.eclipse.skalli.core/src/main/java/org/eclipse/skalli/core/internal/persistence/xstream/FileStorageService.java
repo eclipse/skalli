@@ -23,15 +23,13 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.skalli.api.java.StorageException;
-import org.eclipse.skalli.api.java.StorageService;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.core.utils.ConfigurationProperties;
+import org.eclipse.skalli.services.configuration.ConfigurationProperties;
+import org.eclipse.skalli.services.persistence.StorageException;
+import org.eclipse.skalli.services.persistence.StorageService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Implementation of a storage service based on a local file system.
@@ -122,7 +120,7 @@ public class FileStorageService implements StorageService {
 
     private final File getDefaultStorageDirectory() {
         File storageDirectory = null;
-        String workdir = ConfigurationProperties.getProperty(Consts.PROPERTY_WORKDIR);
+        String workdir = ConfigurationProperties.getProperty(ConfigurationProperties.PROPERTY_WORKDIR);
         if (workdir != null) {
             File workingDirectory = new File(workdir);
             if (workingDirectory.exists() && workingDirectory.isDirectory()) {

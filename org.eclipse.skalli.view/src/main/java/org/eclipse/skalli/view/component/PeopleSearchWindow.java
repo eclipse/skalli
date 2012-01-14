@@ -14,9 +14,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.common.User;
+import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.view.internal.container.UserContainer;
+
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.terminal.ThemeResource;

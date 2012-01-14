@@ -19,13 +19,13 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.api.java.SearchHit;
-import org.eclipse.skalli.api.java.SearchResult;
-import org.eclipse.skalli.api.java.SearchService;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.search.SearchHit;
+import org.eclipse.skalli.services.search.SearchResult;
+import org.eclipse.skalli.services.search.SearchService;
 
 public class FavoritesFilter extends AbstractSearchFilter {
 

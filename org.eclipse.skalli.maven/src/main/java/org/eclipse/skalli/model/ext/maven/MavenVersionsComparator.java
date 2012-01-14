@@ -43,13 +43,13 @@ class MavenVersionsComparator implements Comparator<String> {
     @Override
     public int compare(String version1, String version2) {
         if (SortOrder.DESCENDING.equals(this.order)) {
-            return -1 * compareLatestAsLowes(version1, version2);
+            return -1 * compareLatestAsLowest(version1, version2);
         } else {
-            return compareLatestAsLowes(version1, version2);
+            return compareLatestAsLowest(version1, version2);
         }
     };
 
-    public int compareLatestAsLowes(String version1, String version2) {
+    public int compareLatestAsLowest(String version1, String version2) {
         if (version1.equals(version2)) {
             return 0;
         }
@@ -63,8 +63,8 @@ class MavenVersionsComparator implements Comparator<String> {
             String str1 = v1Parts[i];
             String str2 = v2Parts[i];
             try {
-                Integer val1 = Integer.valueOf(str1);
-                Integer val2 = Integer.valueOf(str2);
+                int val1 = Integer.valueOf(str1);
+                int val2 = Integer.valueOf(str2);
                 int result = val1 < val2 ? -1 : ((val1 == val2) ? 0 : +1);
                 if (result != 0) {
                     return result;

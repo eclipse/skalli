@@ -18,18 +18,17 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.skalli.testutil.BundleManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.eclipse.skalli.testutil.BundleManager;
 
 @SuppressWarnings("nls")
 public class ResourceServletTest {
 
     @Before
     public void setup() throws Exception {
-        new BundleManager(this.getClass()).startBundles();
+        BundleManager.startBundles();
     }
 
     boolean written = false;

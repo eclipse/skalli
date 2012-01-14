@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.recommendedupdatesites;
 
-import org.eclipse.skalli.api.java.EntityService;
-import org.eclipse.skalli.model.ext.Issuer;
+import org.eclipse.skalli.model.Issuer;
+import org.eclipse.skalli.services.entity.EntityService;
 
 public interface RecommendedUpdateSitesService extends EntityService<RecommendedUpdateSites>, Issuer {
 

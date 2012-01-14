@@ -24,14 +24,13 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectMember;
-import org.eclipse.skalli.model.ext.people.PeopleProjectExt;
+import org.eclipse.skalli.model.Member;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.model.ext.commons.PeopleExtension;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.internal.filter.FilterException;
 import org.eclipse.skalli.view.internal.filter.FilterUtil;
 
@@ -112,13 +111,13 @@ public class P4Filter implements Filter {
 
     private String getCommitters(Project project) {
         StringBuffer sb = new StringBuffer();
-        PeopleProjectExt peopleExt = project.getExtension(PeopleProjectExt.class);
+        PeopleExtension peopleExt = project.getExtension(PeopleExtension.class);
         if (peopleExt != null) {
             Set<String> committers = new TreeSet<String>();
-            for (ProjectMember lead : peopleExt.getLeads()) {
+            for (Member lead : peopleExt.getLeads()) {
                 committers.add(lead.getUserID());
             }
-            for (ProjectMember comitter : peopleExt.getMembers()) {
+            for (Member comitter : peopleExt.getMembers()) {
                 committers.add(comitter.getUserID());
             }
             for (String comitter : committers) {

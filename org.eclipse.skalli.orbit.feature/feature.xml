@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.skalli.orbit.feature"
       label="Skalli Orbit Feature (Incubation)"
-      version="0.1.0.qualifier">
+      version="0.2.0.qualifier">
 
    <description url="http://www.eclipse.org/skalli">
       A new generation project management tool accessible and usable by the Eclipse community and other open source projects.

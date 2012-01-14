@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext;
 
-import org.eclipse.skalli.model.core.ProjectTemplate;
+import org.eclipse.skalli.services.template.ProjectTemplate;
 
 public interface ProjectEditContext {
 

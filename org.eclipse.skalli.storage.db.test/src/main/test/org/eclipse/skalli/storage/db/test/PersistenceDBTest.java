@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
-import org.eclipse.skalli.api.java.StorageService;
+import org.eclipse.skalli.services.persistence.StorageService;
 import org.eclipse.skalli.storage.db.PersistenceDB;
 import org.eclipse.skalli.storage.db.entities.HistoryStorageItem;
 import org.eclipse.skalli.testutil.AbstractStorageServiceTest;

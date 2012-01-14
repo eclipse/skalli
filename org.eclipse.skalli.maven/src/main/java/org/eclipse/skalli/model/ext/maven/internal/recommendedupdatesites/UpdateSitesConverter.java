@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.eclipse.skalli.common.util.UUIDUtils;
-import org.eclipse.skalli.model.ext.AbstractConverter;
+import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpdateSites;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.UpdateSite;
+import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-public class UpdateSitesConverter extends AbstractConverter<RecommendedUpdateSites> {
+public class UpdateSitesConverter extends RestConverterBase<RecommendedUpdateSites> {
 
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-Maven"; //$NON-NLS-1$

@@ -19,8 +19,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
-import org.eclipse.skalli.api.java.EntityFilter;
-import org.eclipse.skalli.model.ext.EntityBase;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.services.persistence.EntityFilter;
 
 /**
  * Most trivial implementation of an in-memory storage of our humble data model.

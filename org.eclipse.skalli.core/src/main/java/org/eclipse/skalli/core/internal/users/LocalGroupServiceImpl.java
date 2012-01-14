@@ -12,16 +12,19 @@ package org.eclipse.skalli.core.internal.users;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.eclipse.skalli.api.java.EntityFilter;
-import org.eclipse.skalli.api.java.EntityServiceImpl;
-import org.eclipse.skalli.api.java.GroupService;
-import org.eclipse.skalli.common.Group;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Severity;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.model.Group;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.services.entity.EntityServiceBase;
+import org.eclipse.skalli.services.extension.DataMigration;
+import org.eclipse.skalli.services.group.GroupService;
+import org.eclipse.skalli.services.persistence.EntityFilter;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -33,26 +36,46 @@ import org.slf4j.LoggerFactory;
  * <tt>&lt;groupId&gt.xml</tt> in the <tt>$workdir/storage/Group</tt>
  * directory.
  */
-public class LocalGroupServiceImpl extends EntityServiceImpl<Group> implements GroupService {
+public class LocalGroupServiceImpl extends EntityServiceBase<Group> implements GroupService {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalGroupServiceImpl.class);
 
-    /** Unique identifier of the portal admiminstrators group */
-    private static final String ADMIN_GROUP = "administrators"; //$NON-NLS-1$
+    private static final int CURRENT_MODEL_VERISON = 20;
 
+    @Override
     protected void activate(ComponentContext context) {
-        LOG.info(MessageFormat.format("[GroupService] {0} : activated",
+        LOG.info(MessageFormat.format("[GroupService][type=local] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
+    @Override
     protected void deactivate(ComponentContext context) {
-        LOG.info(MessageFormat.format("[GroupService] {0} : deactivated",
+        LOG.info(MessageFormat.format("[GroupService][type=local] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
     @Override
     public Class<Group> getEntityClass() {
         return Group.class;
+    }
+
+    @Override
+    public int getModelVersion() {
+        return CURRENT_MODEL_VERISON;
+    }
+
+    @Override
+    public Map<String, Class<?>> getAliases() {
+        Map<String, Class<?>> aliases = super.getAliases();
+        aliases.put("entity-group", Group.class); //$NON-NLS-1$
+        return aliases;
+    }
+
+    @Override
+    public Set<DataMigration> getMigrations() {
+        Set<DataMigration> migrations = super.getMigrations();
+        migrations.add(new LocalGroupDataMigration19());
+        return migrations;
     }
 
     @Override

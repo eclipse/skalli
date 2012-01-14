@@ -10,11 +10,11 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.misc.internal;
 
-import org.eclipse.skalli.model.ext.AbstractIndexer;
 import org.eclipse.skalli.model.ext.misc.ReviewEntry;
 import org.eclipse.skalli.model.ext.misc.ReviewProjectExt;
+import org.eclipse.skalli.services.extension.IndexerBase;
 
-public class ReviewIndexer extends AbstractIndexer<ReviewProjectExt> {
+public class ReviewIndexer extends IndexerBase<ReviewProjectExt> {
 
     @Override
     protected void indexFields(ReviewProjectExt entity) {

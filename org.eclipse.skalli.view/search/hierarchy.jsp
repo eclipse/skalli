@@ -11,20 +11,22 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
-<%@ page import="org.eclipse.skalli.model.ext.Severity" %>
-<%@ page import="org.eclipse.skalli.model.ext.Issues" %>
-<%@ page import="org.eclipse.skalli.api.java.authentication.LoginUtil" %>
-<%@ page import="org.eclipse.skalli.api.java.authentication.UserUtil" %>
+<%@ page import="org.eclipse.skalli.model.Severity" %>
+<%@ page import="org.eclipse.skalli.model.Issue" %>
+<%@ page import="org.eclipse.skalli.services.issues.Issues" %>
+<%@ page import="org.eclipse.skalli.services.user.LoginUtils" %>
+<%@ page import="org.eclipse.skalli.services.group.GroupUtils" %>
 <%@ page import="java.util.LinkedList" %>
 <%@ page import="java.util.Comparator" %>
 <%@ page import="java.io.IOException" %>
-<%@ page import="org.eclipse.skalli.model.core.Project" %>
-<%@ page import="org.eclipse.skalli.api.java.ProjectNode" %>
+<%@ page import="org.eclipse.skalli.model.Project" %>
+<%@ page import="org.eclipse.skalli.services.project.ProjectNode" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.eclipse.skalli.api.java.ProjectService" %>
-<%@ page import="org.eclipse.skalli.api.java.IssuesService" %>
-<%@ page import="org.eclipse.skalli.common.Services" %>
-<%@ page import="org.eclipse.skalli.common.Consts" %>
+<%@ page import="org.eclipse.skalli.services.project.ProjectService" %>
+<%@ page import="org.eclipse.skalli.services.project.ProjectUtils" %>
+<%@ page import="org.eclipse.skalli.services.issues.IssuesService" %>
+<%@ page import="org.eclipse.skalli.services.Services" %>
+<%@ page import="org.eclipse.skalli.view.Consts" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -96,13 +98,13 @@ function collapseAll() {
       out.append("<br>");
       String userId = (String) request.getAttribute("userId");
       if (request.getAttribute(ATTRIBUTE_USERID) == null) {
-        LoginUtil loginUtil = new LoginUtil(request);
+        LoginUtils loginUtil = new LoginUtils(request);
         userId = loginUtil.getLoggedInUserId();
         request.setAttribute(ATTRIBUTE_USERID, userId);
       }
       for (ProjectNode rootNode : nodes) {
         boolean showIssues = false;
-        if (userId!=null && (UserUtil.isAdministrator(userId) || UserUtil.isProjectAdmin(userId, rootNode.getProject())))
+        if (userId!=null && (GroupUtils.isAdministrator(userId) || ProjectUtils.isProjectAdmin(userId, rootNode.getProject())))
           showIssues = true;
         traverseSubProjects(request, out, rootNode, 0, showIssues);
       }
@@ -129,7 +131,7 @@ function collapseAll() {
     if (showIssues && issuesService!=null) {
       Issues issues = issuesService.getByUUID(projectNode.getProject().getUuid());
       if (issues!=null && issues.getIssues().size()>0) {
-        String tooltip = Issues.getMessage("The following issues were found ", issues.getIssues());
+        String tooltip = Issue.getMessage("The following issues were found ", issues.getIssues());
         //tooltip = tooltip.replaceAll("- ", "\n ");
         out.append(" <img class='issueicon' src=\"");
         if (issues.getIssues(Severity.FATAL).size()>0) {
@@ -157,7 +159,7 @@ function collapseAll() {
       for (ProjectNode subNode : projectNode.getSubProjects()) {
         String userId = (String) request.getAttribute(ATTRIBUTE_USERID);
         boolean showIssuesChild = showIssues;
-        if (showIssuesChild==false && userId!=null && UserUtil.isProjectAdmin(userId, subNode.getProject())) {
+        if (showIssuesChild==false && userId!=null && ProjectUtils.isProjectAdmin(userId, subNode.getProject())) {
           showIssuesChild = true;
         }
         traverseSubProjects(request, out, subNode, tab+1, showIssuesChild);

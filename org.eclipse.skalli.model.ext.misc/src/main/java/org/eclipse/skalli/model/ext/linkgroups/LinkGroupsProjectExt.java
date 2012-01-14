@@ -12,10 +12,8 @@ package org.eclipse.skalli.model.ext.linkgroups;
 
 import java.util.Collection;
 
-import org.eclipse.skalli.common.LinkGroup;
-import org.eclipse.skalli.common.OrderableGroup;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.PropertyName;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.PropertyName;
 
 public class LinkGroupsProjectExt extends ExtensionEntityBase {
 

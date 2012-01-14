@@ -23,15 +23,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.api.java.SearchService;
-import org.eclipse.skalli.api.java.authentication.LoginUtil;
-import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.common.configuration.ConfigurationService;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.group.GroupUtils;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.search.SearchService;
+import org.eclipse.skalli.services.user.LoginUtils;
+import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.internal.config.NewsConfig;
 import org.eclipse.skalli.view.internal.config.NewsResource;
 
@@ -68,7 +68,7 @@ public class Servlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String requestURI = request.getRequestURI();
-        User user = new LoginUtil(request).getLoggedInUser();
+        User user = new LoginUtils(request).getLoggedInUser();
 
         if (requestURI.endsWith(Consts.URL_NEWS)) {
             ConfigurationService confService = Services.getRequiredService(ConfigurationService.class);
@@ -82,7 +82,7 @@ public class Servlet extends HttpServlet {
             // else - do nothing, news is not configured or configuration service not available,
             // welcome page should be rendered in this case
         } else if (requestURI.endsWith(Consts.URL_REINDEX)) {
-            if (UserUtil.isAdministrator(user)) {
+            if (GroupUtils.isAdministrator(user)) {
                 reindex();
                 redirect(Consts.URL_WELCOME, response);
                 return;

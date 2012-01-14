@@ -28,13 +28,16 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.easymock.EasyMock;
-import org.eclipse.skalli.api.java.StorageService;
-import org.eclipse.skalli.common.util.XMLUtils;
-import org.eclipse.skalli.model.ext.DataMigration;
+import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.commons.XMLUtils;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.services.extension.DataMigration;
+import org.eclipse.skalli.services.persistence.StorageService;
 import org.eclipse.skalli.testutil.HashMapStorageService;
 import org.eclipse.skalli.testutil.HashMapStorageService.Key;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
 import org.eclipse.skalli.testutil.TestExtensibleEntityBase;
+import org.eclipse.skalli.testutil.TestExtensibleEntityEntityService;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.eclipse.skalli.testutil.TestExtension1;
 import org.junit.Test;
@@ -42,6 +45,8 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+
+import com.thoughtworks.xstream.converters.Converter;
 
 @SuppressWarnings("nls")
 public class XStreamPersistenceTest {
@@ -89,6 +94,10 @@ public class XStreamPersistenceTest {
         return aliases;
     }
 
+    private static <T extends EntityBase> Set<Converter> getConverters() {
+        return CollectionUtils.asSet(new NoopConverter(), new UUIDListConverter(), new ExtensionsMapConverter());
+    }
+
     private static Map<String, Class<?>> getNotMatchingAliases() {
         Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
         aliases.put("notext1", TestExtension.class);
@@ -117,34 +126,22 @@ public class XStreamPersistenceTest {
 
     private static class TestXStreamPersistence extends XStreamPersistence {
 
-        private int currentVersion;
-
-        public TestXStreamPersistence(int currentVersion) {
-            super(new HashMapStorageService());
-            this.currentVersion = currentVersion;
-        }
-
         public TestXStreamPersistence() {
-            this(CURRENT_XSTREAM_PERSISTENCE_VERSION);
-        }
-
-        @Override
-        public int getCurrentVersion() {
-            return currentVersion;
+            super(new HashMapStorageService());
         }
 
         private HashMapStorageService getHashMapStorageService() {
             return (HashMapStorageService) super.getStorageService();
         }
 
-        private static Key getHashMapKeyForEntiry(TestExtensibleEntityBase entity)
+        private static Key getHashMapKeyForEntry(TestExtensibleEntityBase entity)
         {
             return new HashMapStorageService.Key(TestExtensibleEntityBase.class.getSimpleName(),
                     entity.getUuid().toString());
         }
 
         private byte[] getContentFromHashMap(TestExtensibleEntityBase entityKey) {
-            return getHashMapStorageService().getBlobStore().get(getHashMapKeyForEntiry(entityKey));
+            return getHashMapStorageService().getBlobStore().get(getHashMapKeyForEntry(entityKey));
         }
 
         private Document getDocumentFromHashMap(TestExtensibleEntityBase entityKey) throws Exception {
@@ -153,26 +150,29 @@ public class XStreamPersistenceTest {
 
     }
 
-    private static final int CURRENT_XSTREAM_PERSISTENCE_VERSION = 43;
+    private static final int CURRENT_MODEL_VERSION = 43;
 
     @Test
     public void testSaveLoadCycle() throws Exception {
 
         TestExtensibleEntityBase entity = getExtensibleEntity();
+        TestExtensibleEntityEntityService entityService =
+                new TestExtensibleEntityEntityService(CURRENT_MODEL_VERSION);
         TestExtension ext1 = entity.getExtension(TestExtension.class);
         ext1.setStr(TEXT1);
         ext1.setBool(false);
 
         Map<String, Class<?>> aliases = getAliases();
+        Set<Converter> converters = getConverters();
 
-        TestXStreamPersistence xp = new TestXStreamPersistence(CURRENT_XSTREAM_PERSISTENCE_VERSION);
+        TestXStreamPersistence xp = new TestXStreamPersistence();
 
         //saveEntity
         Calendar beforeSaveDate = Calendar.getInstance();
-        xp.saveEntity(entity, USER0, aliases);
+        xp.saveEntity(entityService, entity, USER0, aliases, converters);
         Calendar afterSaveDate = Calendar.getInstance();
 
-        //test that entiy is now in the HashMap available and lastModified is set.
+        //test that entity is now in the HashMap available and lastModified is set.
         Document savedHashMapDoc = xp.getDocumentFromHashMap(entity);
         String lastModified = xp.getLastModifiedAttribute(savedHashMapDoc.getDocumentElement());
         assertNotNull(lastModified);
@@ -181,7 +181,7 @@ public class XStreamPersistenceTest {
         assertTrue(beforeSaveDate.compareTo(lastModifiedDate) <= 0);
         assertTrue(lastModifiedDate.compareTo(afterSaveDate) <= 0);
 
-        //test that lastModifieddate is set for extensions as well
+        //test that lastModifiedDate is set for extensions as well
         SortedMap<String, Element> extensions = xp.getExtensionsByAlias(savedHashMapDoc, aliases);
         assertEquals(2, extensions.size());
         String lastModifiedExt1 = xp.getLastModifiedAttribute(extensions.get(ALIAS_EXT1));
@@ -191,43 +191,43 @@ public class XStreamPersistenceTest {
 
         //loadEntity again
         Set<ClassLoader> entityClassLoaders = getTestExtensibleEntityBaseClassLodades();
-        TestExtensibleEntityBase loadedEntity = xp.loadEntity(entity.getClass(), entity.getUuid(), entityClassLoaders,
-                null, aliases);
-        assertLoadeEntityIsExpectedOne(loadedEntity, USER0, USER0, USER0, lastModified, lastModifiedExt1,
+        TestExtensibleEntityBase loadedEntity = xp.loadEntity(entityService, entity.getUuid().toString(),
+                entityClassLoaders, null, aliases, converters);
+        assertLoadedEntityIsExpectedOne(loadedEntity, USER0, USER0, USER0, lastModified, lastModifiedExt1,
                 lastModifiedExt2, TEXT1, false);
 
         // and check that loadEntities can read it
-        List<? extends TestExtensibleEntityBase> loadedEndities = xp.loadEntities(entity.getClass(),
-                entityClassLoaders, null, aliases);
-        assertEquals(1, loadedEndities.size());
-        assertLoadeEntityIsExpectedOne(loadedEndities.get(0), USER0, USER0, USER0, lastModified, lastModifiedExt1,
+        List<? extends TestExtensibleEntityBase> loadedEntities = xp.loadEntities(entityService,
+                entityClassLoaders, null, aliases, converters);
+        assertEquals(1, loadedEntities.size());
+        assertLoadedEntityIsExpectedOne(loadedEntities.get(0), USER0, USER0, USER0, lastModified, lastModifiedExt1,
                 lastModifiedExt2, TEXT1,
                 false);
 
-        //change the enity and save  again
+        //change the entity and save  again
         ext1 = entity.getExtension(TestExtension.class);
         ext1.setStr(TEXT1 + " is now updated");
-        xp.saveEntity(entity, USER1, aliases);
+        xp.saveEntity(entityService, entity, USER1, aliases, converters);
 
-        TestExtensibleEntityBase updatedEntity = xp.loadEntity(entity.getClass(), entity.getUuid(), entityClassLoaders,
-                null, aliases);
+        TestExtensibleEntityBase updatedEntity = xp.loadEntity(entityService, entity.getUuid().toString(), entityClassLoaders,
+                null, aliases, converters);
         Document updatedHashMapDoc = xp.getDocumentFromHashMap(entity);
         lastModified = xp.getLastModifiedAttribute(updatedHashMapDoc.getDocumentElement());
         SortedMap<String, Element> updatedExtensions = xp.getExtensionsByAlias(updatedHashMapDoc,
                 aliases);
         lastModifiedExt1 = xp.getLastModifiedAttribute(updatedExtensions.get(ALIAS_EXT1));
-        assertLoadeEntityIsExpectedOne(updatedEntity, USER1, USER1, USER0, lastModified, lastModifiedExt1,
+        assertLoadedEntityIsExpectedOne(updatedEntity, USER1, USER1, USER0, lastModified, lastModifiedExt1,
                 lastModifiedExt2, TEXT1
                         + " is now updated",
                 false);
 
     }
 
-    private void assertLoadeEntityIsExpectedOne(TestExtensibleEntityBase loadedEntity, String user, String userExt1,
+    private void assertLoadedEntityIsExpectedOne(TestExtensibleEntityBase loadedEntity, String user, String userExt1,
             String userExt2, String lastModified,
             String lastModifiedExt1,
             String lastModifiedExt2, String ext1Text, boolean ext1boolean) {
-         //the length, up to times should be the same
+        //the length, up to times should be the same
         assertNotNull(loadedEntity);
         assertLastModifiedDate(loadedEntity.getLastModified(), lastModified);
         assertEquals(user, loadedEntity.getLastModifiedBy());
@@ -259,11 +259,11 @@ public class XStreamPersistenceTest {
 
     @Test
     public void testPreProcessXML() throws Exception {
-        XStreamPersistence xp = new TestXStreamPersistence(CURRENT_XSTREAM_PERSISTENCE_VERSION);
+        XStreamPersistence xp = new TestXStreamPersistence();
         DataMigration mockMigration = getMigrationMock();
         EasyMock.replay(mockMigration);
         Document doc = XMLUtils.documentFromString(XML_WITH_VERSION);
-        xp.preProcessXML(doc, Collections.singleton(mockMigration), null);
+        xp.preProcessXML(doc, Collections.singleton(mockMigration), null, CURRENT_MODEL_VERSION);
         String res = XMLUtils.documentToString(doc);
 
         // TODO: Insnt there something wrong here?
@@ -298,7 +298,7 @@ public class XStreamPersistenceTest {
         Document oldDoc = XMLUtils.documentFromString(XML_WITH_EXTENSIONS);
         Document newDoc = XMLUtils.documentFromString(XML_WITH_EXTENSIONS_MODIFIED);
         Map<String, Class<?>> aliases = getAliases();
-        xp.postProcessXML(newDoc, oldDoc, aliases, USER0);
+        xp.postProcessXML(newDoc, oldDoc, aliases, USER0, CURRENT_MODEL_VERSION);
         Element documentElement = newDoc.getDocumentElement();
         assertIsXsdDateTime(xp.getLastModifiedAttribute(documentElement));
         assertEquals(USER0, xp.getLastModifiedByAttribute(documentElement));
@@ -309,7 +309,7 @@ public class XStreamPersistenceTest {
         Element ext2 = extensions.get(ALIAS_EXT2);
         assertNull(xp.getLastModifiedAttribute(ext2));
         assertNull(xp.getLastModifiedByAttribute(ext2));
-        assertEquals(xp.getCurrentVersion(), xp.getVersionAttribute(newDoc));
+        assertEquals(CURRENT_MODEL_VERSION, xp.getVersionAttribute(newDoc));
     }
 
     @Test
@@ -317,7 +317,7 @@ public class XStreamPersistenceTest {
         XStreamPersistence xp = new TestXStreamPersistence();
         Document doc = XMLUtils.documentFromString(XML_WITH_EXTENSIONS);
         Map<String, Class<?>> aliases = getAliases();
-        xp.postProcessXML(doc, doc, aliases, USER0);
+        xp.postProcessXML(doc, doc, aliases, USER0, CURRENT_MODEL_VERSION);
         Element documentElement = doc.getDocumentElement();
         assertNull(xp.getLastModifiedAttribute(documentElement));
         assertNull(xp.getLastModifiedByAttribute(documentElement));
@@ -326,7 +326,7 @@ public class XStreamPersistenceTest {
             assertNull(xp.getLastModifiedAttribute(element));
             assertNull(xp.getLastModifiedByAttribute(element));
         }
-        assertEquals(xp.getCurrentVersion(), xp.getVersionAttribute(doc));
+        assertEquals(CURRENT_MODEL_VERSION, xp.getVersionAttribute(doc));
     }
 
     @Test
@@ -384,8 +384,8 @@ public class XStreamPersistenceTest {
     public void testSetVersionAttribute() throws Exception {
         XStreamPersistence xp = new TestXStreamPersistence();
         Document doc = XMLUtils.documentFromString(XML_WITHOUT_VERSION);
-        xp.setVersionAttribute(doc);
-        assertEquals(xp.getCurrentVersion(), xp.getVersionAttribute(doc));
+        xp.setVersionAttribute(doc, CURRENT_MODEL_VERSION);
+        assertEquals(CURRENT_MODEL_VERSION, xp.getVersionAttribute(doc));
     }
 
     @Test
@@ -403,9 +403,9 @@ public class XStreamPersistenceTest {
     public void testCallSetVersionAttributeTwice() throws Exception {
         XStreamPersistence xp = new TestXStreamPersistence();
         Document doc = XMLUtils.documentFromString(XML_WITHOUT_VERSION);
-        xp.setVersionAttribute(doc);
+        xp.setVersionAttribute(doc, CURRENT_MODEL_VERSION);
         try {
-            xp.setVersionAttribute(doc);
+            xp.setVersionAttribute(doc, CURRENT_MODEL_VERSION);
         } catch (RuntimeException e) {
             assertTrue(e.getMessage().contains("element already has a 'version' attribute"));
         }

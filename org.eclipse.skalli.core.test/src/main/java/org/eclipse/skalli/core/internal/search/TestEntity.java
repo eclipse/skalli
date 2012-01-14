@@ -12,7 +12,7 @@ package org.eclipse.skalli.core.internal.search;
 
 import java.util.UUID;
 
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
+import org.eclipse.skalli.model.ExtensionEntityBase;
 
 class TestEntity extends ExtensionEntityBase {
     private String value;

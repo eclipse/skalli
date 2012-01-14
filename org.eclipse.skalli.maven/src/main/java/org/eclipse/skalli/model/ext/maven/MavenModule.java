@@ -17,7 +17,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.common.util.ComparatorUtils;
+import org.eclipse.skalli.commons.ComparatorUtils;
 
 public class MavenModule extends MavenCoordinate implements Comparable<MavenModule> {
 

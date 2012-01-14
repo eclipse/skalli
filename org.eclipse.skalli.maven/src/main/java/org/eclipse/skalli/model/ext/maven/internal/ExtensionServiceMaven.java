@@ -10,20 +10,22 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.skalli.common.util.CollectionUtils;
-import org.eclipse.skalli.common.util.HostReachableValidator;
-import org.eclipse.skalli.common.util.URLValidator;
-import org.eclipse.skalli.model.ext.AliasedConverter;
-import org.eclipse.skalli.model.ext.DataMigration;
-import org.eclipse.skalli.model.ext.ExtensionService;
-import org.eclipse.skalli.model.ext.ExtensionServiceBase;
-import org.eclipse.skalli.model.ext.PropertyValidator;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
+import org.eclipse.skalli.services.extension.DataMigration;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServiceBase;
+import org.eclipse.skalli.services.extension.PropertyValidator;
+import org.eclipse.skalli.services.extension.rest.RestConverter;
+import org.eclipse.skalli.services.extension.validators.HostReachableValidator;
+import org.eclipse.skalli.services.extension.validators.URLValidator;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +91,7 @@ public class ExtensionServiceMaven
     }
 
     @Override
-    public AliasedConverter getConverter(String host) {
+    public RestConverter getRestConverter(String host) {
         return new MavenConverter(host);
     }
 
@@ -119,9 +121,9 @@ public class ExtensionServiceMaven
     }
 
     @Override
-    public Set<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
+    public List<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
         caption = getCaption(propertyName, caption);
-        Set<PropertyValidator> validators = new HashSet<PropertyValidator>();
+        List<PropertyValidator> validators = new ArrayList<PropertyValidator>();
         if (MavenProjectExt.PROPERTY_GROUPID.equals(propertyName)) {
             validators.add(new MavenIdValidator(Severity.ERROR, getExtensionClass(), propertyName, caption));
         }

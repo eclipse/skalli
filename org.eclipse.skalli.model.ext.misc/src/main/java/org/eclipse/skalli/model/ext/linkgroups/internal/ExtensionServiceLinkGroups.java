@@ -10,16 +10,19 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.linkgroups.internal;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import org.eclipse.skalli.model.ext.AbstractIndexer;
-import org.eclipse.skalli.model.ext.AliasedConverter;
-import org.eclipse.skalli.model.ext.ExtensionService;
-import org.eclipse.skalli.model.ext.ExtensionServiceBase;
-import org.eclipse.skalli.model.ext.PropertyValidator;
+import org.eclipse.skalli.commons.Link;
+import org.eclipse.skalli.model.ext.linkgroups.LinkGroup;
 import org.eclipse.skalli.model.ext.linkgroups.LinkGroupValidator;
 import org.eclipse.skalli.model.ext.linkgroups.LinkGroupsProjectExt;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServiceBase;
+import org.eclipse.skalli.services.extension.Indexer;
+import org.eclipse.skalli.services.extension.PropertyValidator;
+import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,8 +65,18 @@ public class ExtensionServiceLinkGroups
         return DESCRIPTION;
     }
 
+
+
     @Override
-    public AliasedConverter getConverter(String host) {
+    public Map<String, Class<?>> getAliases() {
+        Map<String, Class<?>> aliases = super.getAliases();
+        aliases.put("linkgroup", LinkGroup.class); //$NON-NLS-1$
+        aliases.put("link", Link.class); //$NON-NLS-1$
+        return aliases;
+    }
+
+    @Override
+    public RestConverter getRestConverter(String host) {
         return new LinkGroupsConverter(host);
     }
 
@@ -83,14 +96,13 @@ public class ExtensionServiceLinkGroups
     }
 
     @Override
-    public AbstractIndexer<LinkGroupsProjectExt> getIndexer() {
+    public Indexer<LinkGroupsProjectExt> getIndexer() {
         return new LinkGroupsIndexer();
     }
 
     @Override
-    public Set<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
-        caption = getCaption(propertyName, caption);
-        Set<PropertyValidator> validators = new HashSet<PropertyValidator>();
+    public List<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
+        List<PropertyValidator> validators = new ArrayList<PropertyValidator>();
         if (LinkGroupsProjectExt.PROPERTY_LINKGROUPS.equals(propertyName)) {
             validators.add(new LinkGroupValidator(getExtensionClass(), propertyName));
         }

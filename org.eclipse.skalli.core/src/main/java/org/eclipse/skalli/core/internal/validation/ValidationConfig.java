@@ -11,8 +11,8 @@
 package org.eclipse.skalli.core.internal.validation;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.tasks.Schedule;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.services.scheduler.Schedule;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 

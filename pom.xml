@@ -5,7 +5,7 @@
     <parent>
         <artifactId>org.eclipse.skalli.parent</artifactId>
         <groupId>org.eclipse.skalli</groupId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.2.0-SNAPSHOT</version>
         <relativePath>org.eclipse.skalli.parent</relativePath>
     </parent>
 
@@ -15,40 +15,32 @@
     <name>Skalli (Incubation)</name>
 
     <modules>
-        <module>org.eclipse.skalli.gerrit</module>
         <module>org.eclipse.skalli.target</module>
         <module>org.eclipse.skalli.parent</module>
-        <module>org.eclipse.skalli.api.java</module>
-        <module>org.eclipse.skalli.api.rest</module>
+        <module>org.eclipse.skalli.api</module>
         <module>org.eclipse.skalli.core</module>
-        <module>org.eclipse.skalli.model.core</module>
-        <module>org.eclipse.skalli.common</module>
+        <module>org.eclipse.skalli.storage.db</module>
+        <module>org.eclipse.skalli.storage.db.entities</module>
         <module>org.eclipse.skalli.commands</module>
         <module>org.eclipse.skalli.model.ext.misc</module>
+        <module>org.eclipse.skalli.feed.db</module>
+        <module>org.eclipse.skalli.feed.db.entities</module>
         <module>org.eclipse.skalli.view</module>
         <module>org.eclipse.skalli.view.ext</module>
         <module>org.eclipse.skalli.view.ext.impl</module>
         <module>org.eclipse.skalli.view.theme</module>
+        <module>org.eclipse.skalli.gerrit</module>
         <module>org.eclipse.skalli.maven</module>
         <module>org.eclipse.skalli.nexus</module>
-        <module>org.eclipse.skalli.nexus.test</module>
         <module>org.eclipse.skalli.testutil</module>
+        <module>org.eclipse.skalli.api.test</module>
         <module>org.eclipse.skalli.core.test</module>
-        <module>org.eclipse.skalli.model.core.test</module>
+        <module>org.eclipse.skalli.commands.test</module>
         <module>org.eclipse.skalli.model.ext.misc.test</module>
         <module>org.eclipse.skalli.view.test</module>
-        <module>org.eclipse.skalli.api.java.test</module>
-        <module>org.eclipse.skalli.api.rest.test</module>
-        <module>org.eclipse.skalli.common.test</module>
-        <module>org.eclipse.skalli.commands.test</module>
         <module>org.eclipse.skalli.view.ext.impl.test</module>
         <module>org.eclipse.skalli.maven.test</module>
-        <module>org.eclipse.skalli.storage.db</module>
-        <module>org.eclipse.skalli.storage.db.entities</module>
-        <module>org.eclipse.skalli.feed</module>
-        <module>org.eclipse.skalli.feed.test</module>
-        <module>org.eclipse.skalli.feed.db</module>
-        <module>org.eclipse.skalli.feed.db.entities</module>
+        <module>org.eclipse.skalli.nexus.test</module>
         <module>org.eclipse.skalli.examples</module>
         <!-- modules building the update site:-->
         <module>org.eclipse.skalli.feature</module>

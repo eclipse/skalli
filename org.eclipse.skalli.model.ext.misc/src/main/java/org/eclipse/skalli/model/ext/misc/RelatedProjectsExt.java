@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.misc;
 
-import org.eclipse.skalli.common.util.UUIDList;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.PropertyName;
+import org.eclipse.skalli.commons.UUIDList;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.PropertyName;
 
 public class RelatedProjectsExt extends ExtensionEntityBase {
     public static final String MODEL_VERSION = "1.0"; //$NON-NLS-1$

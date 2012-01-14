@@ -48,19 +48,19 @@ import org.apache.lucene.search.similar.MoreLikeThis;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
-import org.eclipse.skalli.api.java.EntityService;
-import org.eclipse.skalli.api.java.FacetedSearchResult;
-import org.eclipse.skalli.api.java.PagingInfo;
-import org.eclipse.skalli.api.java.QueryParseException;
-import org.eclipse.skalli.api.java.SearchHit;
-import org.eclipse.skalli.api.java.SearchResult;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.util.Statistics;
-import org.eclipse.skalli.model.ext.AbstractIndexer;
-import org.eclipse.skalli.model.ext.EntityBase;
-import org.eclipse.skalli.model.ext.ExtensibleEntityBase;
-import org.eclipse.skalli.model.ext.ExtensionService;
-import org.eclipse.skalli.model.ext.IndexEntry;
+import org.eclipse.skalli.commons.Statistics;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.ExtensibleEntityBase;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityService;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.Indexer;
+import org.eclipse.skalli.services.search.FacetedSearchResult;
+import org.eclipse.skalli.services.search.IndexEntry;
+import org.eclipse.skalli.services.search.PagingInfo;
+import org.eclipse.skalli.services.search.QueryParseException;
+import org.eclipse.skalli.services.search.SearchHit;
+import org.eclipse.skalli.services.search.SearchResult;
 
 public class LuceneIndex<T extends EntityBase> {
 
@@ -97,7 +97,7 @@ public class LuceneIndex<T extends EntityBase> {
 
             for (ExtensionService<?> ext : getExtensionServices()) {
                 if (currentEntity.getClass().equals(ext.getExtensionClass())) {
-                    AbstractIndexer<?> indexer = ext.getIndexer();
+                    Indexer<?> indexer = ext.getIndexer();
                     if (indexer != null) {
                         indexer.indexEntity(fields, currentEntity);
                     }

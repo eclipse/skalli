@@ -13,8 +13,16 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.user.local">
     <implementation class="org.eclipse.skalli.core.internal.users.LocalUserServiceImpl"/>
     <service>
-        <provide interface="org.eclipse.skalli.common.UserService"/>
+       <provide interface="org.eclipse.skalli.services.entity.EntityService"/>
+       <provide interface="org.eclipse.skalli.services.user.UserService"/>
     </service>
+    <reference
+        name="PersistenceService"
+        interface="org.eclipse.skalli.services.persistence.PersistenceService"
+        cardinality="1..1"
+        policy="dynamic"
+        bind="bindPersistenceService"
+        unbind="unbindPersistenceService"/>
     <property name="userService.type" type="String" value="local"/>
 </scr:component>
 

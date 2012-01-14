@@ -14,5 +14,11 @@
    <service>
       <provide interface="org.eclipse.skalli.gerrit.client.GerritService"/>
    </service>
-   <reference bind="bindConfigurationService" cardinality="1..1" interface="org.eclipse.skalli.common.configuration.ConfigurationService" name="ConfigurationService" policy="dynamic" unbind="unbindConfigurationService"/>
+    <reference
+        name="ConfigurationService"
+        interface="org.eclipse.skalli.services.configuration.ConfigurationService"
+        cardinality="0..1"
+        policy="dynamic"
+        bind="bindConfigurationService"
+        unbind="unbindConfigurationService"/>
 </scr:component>

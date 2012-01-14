@@ -14,11 +14,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.api.java.ProjectTemplateService;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectNature;
-import org.eclipse.skalli.model.core.ProjectTemplate;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ProjectNature;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.template.ProjectTemplate;
+import org.eclipse.skalli.services.template.ProjectTemplateService;
 import org.eclipse.skalli.view.component.SubprojectComparator;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;

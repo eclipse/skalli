@@ -14,9 +14,9 @@ import java.util.Calendar;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.skalli.api.java.tasks.RunnableSchedule;
-import org.eclipse.skalli.api.java.tasks.Schedule;
-import org.eclipse.skalli.api.java.tasks.Task;
+import org.eclipse.skalli.services.scheduler.RunnableSchedule;
+import org.eclipse.skalli.services.scheduler.Schedule;
+import org.eclipse.skalli.services.scheduler.Task;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

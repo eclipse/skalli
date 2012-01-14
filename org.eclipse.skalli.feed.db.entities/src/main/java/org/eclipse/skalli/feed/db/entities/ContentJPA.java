@@ -14,7 +14,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Lob;
 
-import org.eclipse.skalli.api.java.feeds.Content;
+import org.eclipse.skalli.services.feed.Content;
 
 @Embeddable
 public class ContentJPA implements Content {
@@ -43,6 +43,7 @@ public class ContentJPA implements Content {
         return type;
     }
 
+    @Override
     public void setType(String type) {
         this.type = type;
     }
@@ -52,6 +53,7 @@ public class ContentJPA implements Content {
         return value;
     }
 
+    @Override
     public void setValue(String value) {
         this.value = value;
     }

@@ -11,32 +11,32 @@
 package org.eclipse.skalli.testutil;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.model.Derived;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.services.extension.rest.RestConverter;
 
-import org.eclipse.skalli.model.ext.AliasedConverter;
-import org.eclipse.skalli.model.ext.Derived;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-public class ConverterWrapper implements AliasedConverter {
+public class ConverterWrapper implements RestConverter {
 
     private static final String XSI_INSTANCE_NS = "http://www.w3.org/2001/XMLSchema-instance"; //$NON-NLS-1$
     private static final String URL_SCHEMAS = "/schemas/"; //$NON-NLS-1$
 
-    private AliasedConverter converter;
+    private RestConverter converter;
     private String nodeName;
     private boolean isInherited;
     private boolean omitInheritedAttribute;
 
-    public ConverterWrapper(AliasedConverter converter, String nodeName) {
+    public ConverterWrapper(RestConverter converter, String nodeName) {
         this.converter = converter;
         this.nodeName = nodeName;
         this.omitInheritedAttribute = true;
     }
 
-    public ConverterWrapper(AliasedConverter converter, String nodeName, boolean isInherited) {
+    public ConverterWrapper(RestConverter converter, String nodeName, boolean isInherited) {
         this.converter = converter;
         this.nodeName = nodeName;
         this.isInherited = isInherited;

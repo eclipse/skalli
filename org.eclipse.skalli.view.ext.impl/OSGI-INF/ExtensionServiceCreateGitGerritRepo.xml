@@ -9,7 +9,7 @@
         SAP AG - initial API and implementation
  -->
 
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.view.ext.impl.internal.links.createGitGerritRepo">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.ui.links.git">
    <implementation class="org.eclipse.skalli.view.ext.impl.internal.links.CreateGitGerritRepo"/>
    <service>
       <provide interface="org.eclipse.skalli.view.ext.ProjectContextLink"/>

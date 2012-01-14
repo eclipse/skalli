@@ -19,12 +19,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.api.java.FavoritesService;
-import org.eclipse.skalli.api.java.authentication.LoginUtil;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.model.core.Favorites;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.favorites.Favorites;
+import org.eclipse.skalli.services.favorites.FavoritesService;
+import org.eclipse.skalli.services.user.LoginUtils;
 
 public class FavoritesServlet extends HttpServlet {
 
@@ -54,7 +53,7 @@ public class FavoritesServlet extends HttpServlet {
                     }
                 }
                 if (action != null && project != null) {
-                    LoginUtil login = new LoginUtil(request);
+                    LoginUtils login = new LoginUtils(request);
                     String userId = login.getLoggedInUserId();
                     FavoritesService favService = Services.getService(FavoritesService.class);
                     boolean isFavorite = false;

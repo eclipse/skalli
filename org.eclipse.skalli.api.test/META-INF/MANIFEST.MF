@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Skalli API Tests (Incubation)
+Bundle-SymbolicName: org.eclipse.skalli.api.test
+Bundle-Version: 0.2.0.qualifier
+Bundle-Vendor: Eclipse Skalli
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Fragment-Host: org.eclipse.skalli.api
+Import-Package: org.eclipse.skalli.testutil,
+ org.easymock,
+ org.junit,
+ org.osgi.framework
+Require-Bundle: org.eclipse.skalli.core

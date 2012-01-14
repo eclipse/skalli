@@ -13,18 +13,18 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.eclipse.skalli.view.component.TagCloud" %>
-<%@ page import="org.eclipse.skalli.common.User" %>
+<%@ page import="org.eclipse.skalli.model.User" %>
 <%@ page import="org.osgi.framework.Version" %>
 <%@ page import="org.eclipse.skalli.view.internal.ViewBundleUtil" %>
-<%@ page import="org.eclipse.skalli.common.Consts" %>
-<%@ page import="org.eclipse.skalli.api.java.authentication.LoginUtil" %>
+<%@ page import="org.eclipse.skalli.view.Consts" %>
+<%@ page import="org.eclipse.skalli.services.user.LoginUtils" %>
 
 <div class="mainheader">
 <%
-    LoginUtil util = new LoginUtil(request);
+    LoginUtils util = new LoginUtils(request);
     User user = util.getLoggedInUser();
     TagCloud tagCloud = TagCloud.getInstance(25);
-    Version version = ViewBundleUtil.getVersion();
+    Version version = ViewBundleUtil.getBundleVersion();
     if (version!=null) {
         request.setAttribute("version", version);
     }

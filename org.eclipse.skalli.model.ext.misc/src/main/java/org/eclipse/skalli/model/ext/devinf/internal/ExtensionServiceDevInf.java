@@ -10,20 +10,20 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.devinf.internal;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.eclipse.skalli.common.util.CollectionUtils;
-import org.eclipse.skalli.common.util.HostReachableValidator;
-import org.eclipse.skalli.common.util.URLValidator;
-import org.eclipse.skalli.model.ext.AbstractIndexer;
-import org.eclipse.skalli.model.ext.AliasedConverter;
-import org.eclipse.skalli.model.ext.ExtensionService;
-import org.eclipse.skalli.model.ext.ExtensionServiceBase;
-import org.eclipse.skalli.model.ext.PropertyValidator;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServiceBase;
+import org.eclipse.skalli.services.extension.Indexer;
+import org.eclipse.skalli.services.extension.PropertyValidator;
+import org.eclipse.skalli.services.extension.rest.RestConverter;
+import org.eclipse.skalli.services.extension.validators.HostReachableValidator;
+import org.eclipse.skalli.services.extension.validators.URLValidator;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +106,7 @@ public class ExtensionServiceDevInf
     }
 
     @Override
-    public AliasedConverter getConverter(String host) {
+    public RestConverter getRestConverter(String host) {
         return new DevInfConverter(host);
     }
 
@@ -126,7 +126,7 @@ public class ExtensionServiceDevInf
     }
 
     @Override
-    public AbstractIndexer<DevInfProjectExt> getIndexer() {
+    public Indexer<DevInfProjectExt> getIndexer() {
         return new DevInfIndexer();
     }
 
@@ -146,9 +146,9 @@ public class ExtensionServiceDevInf
     }
 
     @Override
-    public Set<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
+    public List<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
         caption = getCaption(propertyName, caption);
-        Set<PropertyValidator> validators = new HashSet<PropertyValidator>();
+        List<PropertyValidator> validators = new ArrayList<PropertyValidator>();
         if (DevInfProjectExt.PROPERTY_SCM_URL.equals(propertyName)) {
             validators.add(new URLValidator(Severity.FATAL, getExtensionClass(), propertyName, caption));
             validators.add(new HostReachableValidator(getExtensionClass(), propertyName));

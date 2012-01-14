@@ -15,13 +15,13 @@ import java.text.MessageFormat;
 import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.util.MinMaxOccurrencesPropertyValidator;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectTemplate;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.ExtensionService;
-import org.eclipse.skalli.model.ext.PropertyValidator;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServices;
+import org.eclipse.skalli.services.extension.PropertyValidator;
+import org.eclipse.skalli.services.extension.validators.MinMaxOccurrencesPropertyValidator;
+import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ public abstract class DefaultProjectFieldFactory<T extends ExtensionEntityBase> 
     public DefaultProjectFieldFactory(Project project, Class<T> extensionClass, ProjectEditContext context) {
         this.project = project;
         this.extensionClassName = extensionClass.getName();
-        this.extensionService = Services.getExtensionService(extensionClass);
+        this.extensionService = ExtensionServices.getExtensionService(extensionClass);
         this.projectTemplate = context.getProjectTemplate();
         this.isAdmin = context.isAdministrator();
         this.mode = context.getProjectEditMode();
@@ -123,7 +123,7 @@ public abstract class DefaultProjectFieldFactory<T extends ExtensionEntityBase> 
             field.setReadOnly(true);
         }
 
-        if (!projectTemplate.isEnabled(extensionClassName, propertyId, isAdmin)) {
+        if (projectTemplate.isDisabled(extensionClassName, propertyId, isAdmin)) {
             field.setEnabled(false);
         }
 

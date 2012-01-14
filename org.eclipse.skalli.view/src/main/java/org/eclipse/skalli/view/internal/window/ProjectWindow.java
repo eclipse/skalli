@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.internal.window;
 
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.view.ext.Navigator;
 import org.eclipse.skalli.view.ext.ProjectEditMode;
 import org.eclipse.skalli.view.internal.application.ProjectApplication;

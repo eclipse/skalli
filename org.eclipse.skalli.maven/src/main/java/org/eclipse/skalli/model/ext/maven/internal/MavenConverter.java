@@ -10,15 +10,15 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal;
 
-import org.eclipse.skalli.model.ext.AbstractConverter;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
+import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-class MavenConverter extends AbstractConverter<MavenProjectExt> {
+class MavenConverter extends RestConverterBase<MavenProjectExt> {
 
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-Maven"; //$NON-NLS-1$

@@ -30,11 +30,10 @@ import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.common.User;
+import org.eclipse.skalli.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//TODO the current implementation of this service is infrastructure specific
 public class LDAPClient {
 
     private final static Logger LOG = LoggerFactory.getLogger(LDAPClient.class);
@@ -82,7 +81,7 @@ public class LDAPClient {
             try {
                 ldap = getConnection();
             } catch (AuthException e1) {
-                LOG.warn("Could not authenticate to LDAP", e1);
+                LOG.debug("Could not authenticate to LDAP");
                 return User.createUserWithoutDetails(userId);
             }
             try {
@@ -109,7 +108,7 @@ public class LDAPClient {
             try {
                 ldap = getConnection();
             } catch (AuthException e1) {
-                LOG.warn("Could not authenticate to LDAP", e1);
+                LOG.debug("Could not authenticate to LDAP");
                 return ret;
             }
             try {

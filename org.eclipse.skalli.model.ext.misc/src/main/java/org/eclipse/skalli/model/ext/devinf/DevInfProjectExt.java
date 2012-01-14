@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.PropertyName;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.PropertyName;
 
 public class DevInfProjectExt extends ExtensionEntityBase {
 

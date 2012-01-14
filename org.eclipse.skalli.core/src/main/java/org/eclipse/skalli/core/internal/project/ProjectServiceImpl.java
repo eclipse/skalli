@@ -25,69 +25,94 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.EntityServiceImpl;
-import org.eclipse.skalli.api.java.InvalidParentChainException;
-import org.eclipse.skalli.api.java.NoSuchTemplateException;
-import org.eclipse.skalli.api.java.PersistenceService;
-import org.eclipse.skalli.api.java.ProjectNode;
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.api.java.ProjectTemplateService;
-import org.eclipse.skalli.api.java.SearchService;
-import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.util.ProjectDescriptionValidator;
-import org.eclipse.skalli.model.core.PeopleProvider;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectMember;
-import org.eclipse.skalli.model.core.ProjectNature;
-import org.eclipse.skalli.model.core.ProjectTemplate;
-import org.eclipse.skalli.model.ext.ExtensibleEntityBase;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.ExtensionService;
-import org.eclipse.skalli.model.ext.ExtensionValidator;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.PropertyValidator;
-import org.eclipse.skalli.model.ext.Severity;
-import org.eclipse.skalli.model.ext.ValidationException;
-import org.eclipse.skalli.model.ext.people.PeopleProjectExt;
+import org.eclipse.skalli.model.ExtensibleEntityBase;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Member;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ProjectNature;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.model.ext.commons.PeopleExtension;
+import org.eclipse.skalli.services.entity.EntityServiceBase;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServices;
+import org.eclipse.skalli.services.extension.ExtensionValidator;
+import org.eclipse.skalli.services.extension.PropertyValidator;
+import org.eclipse.skalli.services.persistence.PersistenceService;
+import org.eclipse.skalli.services.project.InvalidParentChainException;
+import org.eclipse.skalli.services.project.ProjectNode;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.role.RoleService;
+import org.eclipse.skalli.services.search.SearchService;
+import org.eclipse.skalli.services.template.NoSuchTemplateException;
+import org.eclipse.skalli.services.template.ProjectTemplate;
+import org.eclipse.skalli.services.template.ProjectTemplateService;
+import org.eclipse.skalli.services.user.UserUtils;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProjectServiceImpl extends EntityServiceImpl<Project> implements ProjectService {
+public class ProjectServiceImpl extends EntityServiceBase<Project> implements ProjectService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProjectServiceImpl.class);
+
+    // TODO "central" versioning together with extensibility sucks!
+    /*
+     * Alternative idea: Instead of a version number just use unique IDs. A
+     * migration then defines a set of other migration's ids which have to be
+     * applied as a prerequisite. The Migrator then first collects all registered
+     * migrations an then sorts them by their prerequisites. Hypothetis: A
+     * migration logically cannot depend on another migration if the unique id of
+     * that migration is not known. Open issues: - What should be used as a
+     * "version" information in the persisted xml? => Maybe something like a
+     * checksum (must be stable with respect to the order of calculation)
+     */
+    private static final int CURRENT_MODEL_VERISON = 20;
+
+
     private ProjectTemplateService projectTemplateService;
+    private Set<RoleService> roleServices = new HashSet<RoleService>();
 
-    protected SearchService getSearchService() {
-        return Services.getService(SearchService.class);
-    }
-
+    @Override
     protected void activate(ComponentContext context) {
+        super.activate(context);
         LOG.info(MessageFormat.format("[ProjectService] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
+    @Override
     protected void deactivate(ComponentContext context) {
+        super.deactivate(context);
         LOG.info(MessageFormat.format("[ProjectService] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
-    /**
-     * Binds the required project template service.
-     */
-    protected void bindProjectTemplateService(ProjectTemplateService srvc) {
-        this.projectTemplateService = srvc;
+    protected void bindProjectTemplateService(ProjectTemplateService projectTemplateService) {
+        this.projectTemplateService = projectTemplateService;
     }
 
-    protected void unbindProjectTemplateService(ProjectTemplateService srvc) {
+    protected void unbindProjectTemplateService(ProjectTemplateService projectTemplateService) {
         this.projectTemplateService = null;
+    }
+
+    protected void bindRoleService(RoleService roleService) {
+        roleServices.add(roleService);
+    }
+
+    protected void unbindRoleService(RoleService roleService) {
+        roleServices.remove(roleService);
     }
 
     @Override
     public Class<Project> getEntityClass() {
         return Project.class;
+    }
+
+    @Override
+    public int getModelVersion() {
+        return CURRENT_MODEL_VERISON;
     }
 
     @Override
@@ -203,17 +228,6 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
     }
 
     @Override
-    public List<Project> getProjectsForTag(String tag) {
-        List<Project> result = new ArrayList<Project>();
-        for (Project p : getAll()) {
-            if (p.hasTag(tag)) {
-                result.add(p);
-            }
-        }
-        return result;
-    }
-
-    @Override
     public List<Project> getDeletedProjects() {
         return getPersistenceService().getDeletedEntities(Project.class);
     }
@@ -261,8 +275,7 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
     * Checks basic data like project ID, template, project lead etc.
     * Furthermore, validates the project with the default property/extension validators provided by
     * <code>ExtensionServiceCore</code> and the extension services of the assigned extensions and
-    * with the custom validators provided by the
-    * {@link org.eclipse.skalli.model.core.ProjectTemplate project template}.
+    * with the custom validators provided by the {@link ProjectTemplate project template}.
      */
     @Override
     protected SortedSet<Issue> validateEntity(Project project, Severity minSeverity) {
@@ -299,14 +312,14 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
     private SortedSet<Issue> validatePeopleExtension(Project project) {
         // ensure that the project has a PeopleProjectExt and a project lead
         SortedSet<Issue> issues = new TreeSet<Issue>();
-        PeopleProjectExt peopleExtension = project.getExtension(PeopleProjectExt.class);
+        PeopleExtension peopleExtension = project.getExtension(PeopleExtension.class);
         if (peopleExtension == null) {
             issues.add(new Issue(Severity.FATAL, ProjectService.class, project.getUuid(),
-                    PeopleProjectExt.class, null,
+                    PeopleExtension.class, null,
                     "Project must have a Project Members extension or inherit it from a parent"));
         } else if (peopleExtension.getLeads().isEmpty()) {
             issues.add(new Issue(Severity.FATAL, ProjectService.class, project.getUuid(),
-                    PeopleProjectExt.class, PeopleProjectExt.PROPERTY_LEADS,
+                    PeopleExtension.class, PeopleExtension.PROPERTY_LEADS,
                     "Project must have a least one Project Lead"));
         }
         return issues;
@@ -364,7 +377,7 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
 
     private ExtensionService<?> validateExtensionService(UUID projectUUID, ExtensionEntityBase ext, Set<Issue> issues) {
         Class<? extends ExtensionEntityBase> extensionClass = ext.getClass();
-        ExtensionService<?> extensionService = Services.getExtensionService(extensionClass);
+        ExtensionService<?> extensionService = ExtensionServices.getExtensionService(extensionClass);
         if (extensionService == null) {
             issues.add(new Issue(Severity.FATAL, ProjectService.class, projectUUID,
                     MessageFormat.format("Project references model extension ''{0}'' but there is no " +
@@ -421,8 +434,8 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
             if (caption != null) {
                 captions.put(propertyName, caption);
             }
-            Set<PropertyValidator> propertyValidators = new HashSet<PropertyValidator>();
-            Set<PropertyValidator> defaultValidators = extensionService.getPropertyValidators(propertyName, caption);
+            List<PropertyValidator> propertyValidators = new ArrayList<PropertyValidator>();
+            List<PropertyValidator> defaultValidators = extensionService.getPropertyValidators(propertyName, caption);
             if (defaultValidators == null) {
                 LOG.warn(MessageFormat.format(
                         "{0}#getPropertyValidators({1}) returned null, but is expected to return an empty set",
@@ -430,7 +443,7 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
             } else {
                 propertyValidators.addAll(defaultValidators);
             }
-            Set<PropertyValidator> customValidators = projectTemplate.getPropertyValidators(extensionClassName,
+            List<PropertyValidator> customValidators = projectTemplate.getPropertyValidators(extensionClassName,
                     propertyName);
             if (customValidators == null) {
                 LOG.warn(MessageFormat.format(
@@ -466,7 +479,7 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
             Map<String, String> captions) {
         Set<Issue> issues = new TreeSet<Issue>();
 
-        Set<? extends ExtensionValidator<?>> extensionValidators = extensionService.getExtensionValidators(captions);
+        List<? extends ExtensionValidator<?>> extensionValidators = extensionService.getExtensionValidators(captions);
         if (extensionValidators == null) {
             LOG.warn(MessageFormat.format(
                     "{0}#getExtensionValidators() returned null, but is expected to return an empty set",
@@ -487,7 +500,7 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
     private Set<Issue> validateProjectTemplateExtensionValidators(UUID uuid, ExtensionEntityBase ext,
             ProjectTemplate projectTemplate, Severity minSeverity) {
         Set<Issue> issues = new TreeSet<Issue>();
-        Set<ExtensionValidator<?>> extentionValidators = projectTemplate.getExtensionValidators(ext.getClass()
+        List<ExtensionValidator<?>> extentionValidators = projectTemplate.getExtensionValidators(ext.getClass()
                 .getName());
         if (extentionValidators == null) {
             LOG.warn(MessageFormat.format(
@@ -508,7 +521,7 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
 
     @Override
     protected void updateSearchIndex(Project project) {
-        SearchService searchService = getSearchService();
+        SearchService searchService = getService(SearchService.class, "SearchService"); //$NON-NLS-1$
         if (searchService != null) {
             searchService.update(project);
             LOG.debug(MessageFormat.format("project {0} updated in search index", project.getProjectId()));
@@ -519,21 +532,28 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
     }
 
     @Override
-    public Set<ProjectMember> getAllPeople(Project project) {
-        Set<ProjectMember> ret = new TreeSet<ProjectMember>();
-        for (PeopleProvider pp : Services.getServices(PeopleProvider.class)) {
-            for (Set<ProjectMember> people : pp.getPeople(project).values()) {
-                ret.addAll(people);
-            }
+    public SortedSet<Member> getMembers(Project project) {
+        TreeSet<Member> ret = new TreeSet<Member>();
+        for (RoleService roleService : roleServices) {
+            ret.addAll(roleService.getMembers(project));
         }
         return ret;
     }
 
     @Override
-    public Map<String, Set<ProjectMember>> getAllPeopleByRole(Project project) {
-        Map<String, Set<ProjectMember>> ret = new HashMap<String, Set<ProjectMember>>();
-        for (PeopleProvider pp : Services.getServices(PeopleProvider.class)) {
-            ret.putAll(pp.getPeople(project));
+    public SortedSet<Member> getMembers(Project project, String... roles) {
+        TreeSet<Member> ret = new TreeSet<Member>();
+        for (RoleService roleService : roleServices) {
+            ret.addAll(roleService.getMembers(project, roles));
+        }
+        return ret;
+    }
+
+    @Override
+    public Map<String, SortedSet<Member>> getMembersByRole(Project project) {
+        Map<String, SortedSet<Member>> ret = new HashMap<String, SortedSet<Member>>();
+        for (RoleService roleService : roleServices) {
+            ret.putAll(roleService.getMembersByRole(project));
         }
         return ret;
     }
@@ -543,9 +563,9 @@ public class ProjectServiceImpl extends EntityServiceImpl<Project> implements Pr
         final Project project = (StringUtils.isNotBlank(templateId)) ? new Project(templateId) : new Project();
         project.setUuid(UUID.randomUUID());
 
-        if (StringUtils.isNotBlank(userId) && UserUtil.getUser(userId) != null) {
-            final PeopleProjectExt peopleExt = new PeopleProjectExt();
-            peopleExt.getLeads().add(new ProjectMember(userId));
+        if (StringUtils.isNotBlank(userId) && UserUtils.getUser(userId) != null) {
+            PeopleExtension peopleExt = new PeopleExtension();
+            peopleExt.getLeads().add(new Member(userId));
             project.addExtension(peopleExt);
         }
 

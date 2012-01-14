@@ -11,94 +11,57 @@
 package org.eclipse.skalli.view.internal;
 
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
+import org.eclipse.skalli.services.BundleFilter;
+import org.eclipse.skalli.services.FilterMode;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.view.ext.ProjectInfoBox;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.Version;
-
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.model.ext.ExtensionService;
-import org.eclipse.skalli.view.ext.ProjectInfoBox;
 
 public class ViewBundleUtil {
 
     private static final String BUNDLE_VAADIN = "com.vaadin"; //$NON-NLS-1$
 
-    public static ViewBundleUtil getDefault() {
-        return new ViewBundleUtil();
+    private ViewBundleUtil() {
     }
 
     /**
-     * Scans all bundles providing an {@link ExtensionService} for resources
+     * Scans the Vaadin bundle, the o.e.s.view bundle (including its fragments)
+     * all extensions providing a {@link ProjectInfoBox}, all extensions providing
+     * a {@link ExtensionServic} and finally all bundles for theme resources
      * matching the given <code>path</code> and <code>pattern</code>.
-     * @return a list of matching resources (which may be empty).
-     * @see Bundle#findEntries(String, String, boolean)
+     *
+     * @param path  the path name in which to look.
+     * @param pattern the  pattern for selecting entries in the
+     *        specified path.
+     * @param recursive  if <code>true</code>, recurse into subdirectories.
+     * @param mode  determines whether the method should collect all resources from
+     *              all bundles, or whether it should stop when at least one matching
+     *              resource has been found.
+     * @see Services#findResources(String, String, boolean, FilterMode, BundleFilter...)
      */
-    @SuppressWarnings("unchecked")
-    public static List<URL> findExtensionResources(String path, String pattern, boolean recursive) {
-        List<URL> ret = new LinkedList<URL>();
-        Set<Bundle> bundles = Services.getBundlesProvidingService(ExtensionService.class);
-        for (Bundle bundle : bundles) {
-            ret.addAll(getURLs(bundle.findEntries(path, pattern, recursive)));
+    public static List<URL> findThemeResources(String path, String pattern, boolean recursive, FilterMode mode) {
+        if (FilterMode.ALL.equals(mode)) {
+            return Services.findResources(path, pattern, recursive, mode,  new BundleFilter.AcceptAll());
         }
-        return ret;
+        return Services.findResources(path, pattern, recursive, mode,
+                // try Vaadin bundle
+                new BundleFilter.AcceptMatching(BUNDLE_VAADIN),
+                // try the o.e.s.view bundle
+                new BundleFilter.AcceptMatching(FrameworkUtil.getBundle(ViewBundleUtil.class).getLocation()),
+                // try view extension bundle
+                new BundleFilter.AcceptService(ProjectInfoBox.class),
+                // try extension bundles
+                new BundleFilter.AcceptService(ExtensionService.class),
+                // and finally all bundles
+                new BundleFilter.AcceptAll()
+         );
     }
 
-    /**
-     * Scans the Vaadin bundle, the view core bundle and all extensions
-     * providing a {@link ProjectInfoBox} for theme resources
-     * matching the given <code>path</code> and <code>pattern</code>.
-     * @see Bundle#findEntries(String, String, boolean)
-     */
-    @SuppressWarnings("unchecked")
-    public static List<URL> findThemeResources(String path, String pattern, boolean recursive) {
-        BundleContext context = FrameworkUtil.getBundle(ViewBundleUtil.class).getBundleContext();
-        Bundle vaadinBundle = null;
-        if (vaadinBundle == null) {
-            for (Bundle bundle : context.getBundles()) {
-                // TODO hack - find better way to recognize the vaadin bundle (if not dump it at all)
-                if (bundle.getSymbolicName().endsWith(BUNDLE_VAADIN)) {
-                    vaadinBundle = bundle;
-                }
-            }
-        }
-
-        List<URL> ret = new LinkedList<URL>();
-
-        // try vaadin bundle first
-        ret.addAll(getURLs(vaadinBundle.findEntries(path, pattern, recursive)));
-
-        // try view core bundle
-        ret.addAll(getURLs(context.getBundle().findEntries(path, pattern, recursive)));
-
-        // try view extension bundle(s)
-        for (Bundle viewExtBundle : Services.getBundlesProvidingService(ProjectInfoBox.class)) {
-            if (viewExtBundle != null) {
-                ret.addAll(getURLs(viewExtBundle.findEntries(path, pattern, recursive)));
-            }
-        }
-
-        return ret;
-    }
-
-    public static Version getVersion() {
+    public static Version getBundleVersion() {
         return FrameworkUtil.getBundle(ViewBundleUtil.class).getVersion();
     }
-
-    private static List<URL> getURLs(Enumeration<URL> u) {
-        List<URL> ret = new LinkedList<URL>();
-        if (u != null) {
-            while (u.hasMoreElements()) {
-                URL url = u.nextElement();
-                ret.add(url);
-            }
-        }
-        return ret;
-    }
-
 }

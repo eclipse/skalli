@@ -10,9 +10,10 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.internal.application;
 
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.view.Consts;
+
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Window;
 

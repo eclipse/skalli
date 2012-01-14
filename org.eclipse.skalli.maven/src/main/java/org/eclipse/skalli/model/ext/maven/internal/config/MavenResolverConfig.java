@@ -10,7 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal.config;
 
-import org.eclipse.skalli.api.java.tasks.Schedule;
+import org.eclipse.skalli.services.scheduler.Schedule;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("mavenResolver")

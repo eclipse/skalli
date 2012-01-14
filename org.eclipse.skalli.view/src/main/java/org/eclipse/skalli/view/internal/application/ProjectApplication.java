@@ -17,13 +17,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.api.java.authentication.LoginUtil;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.common.util.UUIDUtils;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.commons.UUIDUtils;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.user.LoginUtils;
+import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.internal.window.ProjectWindow;
 
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
@@ -100,7 +100,7 @@ public class ProjectApplication extends com.vaadin.Application implements HttpSe
 
     @Override
     public void onRequestStart(HttpServletRequest request, HttpServletResponse response) {
-        LoginUtil util = new LoginUtil(request);
+        LoginUtils util = new LoginUtils(request);
         userId = util.getLoggedInUserId();
 
         String windowName = request.getParameter(Consts.ATTRIBUTE_WINDOWNAME);

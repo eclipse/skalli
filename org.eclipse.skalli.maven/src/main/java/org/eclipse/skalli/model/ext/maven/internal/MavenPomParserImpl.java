@@ -15,7 +15,7 @@ import java.io.InputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.skalli.common.util.XMLUtils;
+import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

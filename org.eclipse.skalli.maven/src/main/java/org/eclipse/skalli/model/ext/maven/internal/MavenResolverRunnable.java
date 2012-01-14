@@ -16,21 +16,22 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.configuration.ConfigurationService;
-import org.eclipse.skalli.common.util.ComparatorUtils;
-import org.eclipse.skalli.common.util.MapperUtil;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.commons.ComparatorUtils;
+import org.eclipse.skalli.ext.mapping.MapperUtil;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
-import org.eclipse.skalli.model.ext.devinf.ScmLocationMapper;
-import org.eclipse.skalli.model.ext.devinf.ScmLocationMappingConfig;
 import org.eclipse.skalli.model.ext.maven.MavenPathResolver;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
 import org.eclipse.skalli.nexus.NexusClient;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.destination.DestinationService;
+import org.eclipse.skalli.services.project.ProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,7 @@ public class MavenResolverRunnable implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(MavenResolverRunnable.class);
 
     private ConfigurationService configService;
+    private DestinationService destinationService;
     private NexusClient nexusClient;
     private String userId;
 
@@ -47,8 +49,10 @@ public class MavenResolverRunnable implements Runnable {
      * @param nexusClient - if set versions are calculated via nexusClinet. If nexusClient is null the versions cant be calculated.
      * @param userId
      */
-    public MavenResolverRunnable(ConfigurationService configService, NexusClient nexusClient, String userId) {
+    public MavenResolverRunnable(ConfigurationService configService, DestinationService destinationService,
+            NexusClient nexusClient, String userId) {
         this.configService = configService;
+        this.destinationService = destinationService;
         this.userId = userId;
         this.nexusClient = nexusClient;
     }
@@ -214,7 +218,13 @@ public class MavenResolverRunnable implements Runnable {
     MavenPathResolver getMavenPathResolver(ConfigurationService configService, String scmLocation) {
         if (configService == null) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("no scm mappings available: configService==null");
+                LOG.debug("no configuration service available");
+            }
+            return null;
+        }
+        if (destinationService == null) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("no destination service available");
             }
             return null;
         }
@@ -244,7 +254,7 @@ public class MavenResolverRunnable implements Runnable {
 
     // package protected for testing purposes
     MavenResolver getMavenResolver(UUID entityId, MavenPathResolver pathResolver) {
-        return new MavenResolver(entityId, pathResolver);
+        return new MavenResolver(entityId, pathResolver, destinationService);
     }
 
     // package protected for testing purposes

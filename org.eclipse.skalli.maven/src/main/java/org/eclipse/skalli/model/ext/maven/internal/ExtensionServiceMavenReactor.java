@@ -13,12 +13,12 @@ package org.eclipse.skalli.model.ext.maven.internal;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.eclipse.skalli.model.ext.AbstractIndexer;
-import org.eclipse.skalli.model.ext.AliasedConverter;
-import org.eclipse.skalli.model.ext.DataMigration;
-import org.eclipse.skalli.model.ext.ExtensionService;
-import org.eclipse.skalli.model.ext.ExtensionServiceBase;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
+import org.eclipse.skalli.services.extension.DataMigration;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServiceBase;
+import org.eclipse.skalli.services.extension.Indexer;
+import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,7 @@ public class ExtensionServiceMavenReactor
     }
 
     @Override
-    public AliasedConverter getConverter(String host) {
+    public RestConverter getRestConverter(String host) {
         return new MavenReactorConverter(host);
     }
 
@@ -82,7 +82,7 @@ public class ExtensionServiceMavenReactor
     }
 
     @Override
-    public AbstractIndexer<MavenReactorProjectExt> getIndexer() {
+    public Indexer<MavenReactorProjectExt> getIndexer() {
         return new MavenReactorIndexer();
     }
 

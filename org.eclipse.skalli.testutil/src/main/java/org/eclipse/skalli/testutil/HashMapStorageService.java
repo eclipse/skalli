@@ -20,13 +20,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.skalli.api.java.StorageException;
-import org.eclipse.skalli.api.java.StorageService;
+import org.eclipse.skalli.services.persistence.StorageException;
+import org.eclipse.skalli.services.persistence.StorageService;
 
 /**
  * Simple implementation of a storage service based on a hash map
  * for testing purposes.
  */
+@SuppressWarnings("nls")
 public class HashMapStorageService implements StorageService {
 
     public static class Key {

@@ -19,14 +19,14 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.eclipse.skalli.api.java.feeds.Content;
-import org.eclipse.skalli.api.java.feeds.Entry;
-import org.eclipse.skalli.api.java.feeds.FeedEntry;
-import org.eclipse.skalli.api.java.feeds.FeedPersistenceService;
-import org.eclipse.skalli.api.java.feeds.FeedService;
-import org.eclipse.skalli.api.java.feeds.FeedServiceException;
-import org.eclipse.skalli.api.java.feeds.Link;
-import org.eclipse.skalli.api.java.feeds.Person;
+import org.eclipse.skalli.services.feed.Content;
+import org.eclipse.skalli.services.feed.Entry;
+import org.eclipse.skalli.services.feed.FeedEntry;
+import org.eclipse.skalli.services.feed.FeedPersistenceService;
+import org.eclipse.skalli.services.feed.FeedService;
+import org.eclipse.skalli.services.feed.FeedServiceException;
+import org.eclipse.skalli.services.feed.Link;
+import org.eclipse.skalli.services.feed.Person;
 
 /**
  * A simple HashMap Service implementing FeedService and FeedPersistenceService.

@@ -10,12 +10,12 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.scrum;
 
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.eclipse.skalli.model.core.ProjectMember;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.PropertyName;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.Member;
+import org.eclipse.skalli.model.PropertyName;
 
 public class ScrumProjectExt extends ExtensionEntityBase {
 
@@ -31,53 +31,53 @@ public class ScrumProjectExt extends ExtensionEntityBase {
     @PropertyName(position = 2)
     public static final String PROPERTY_BACKLOG_URL = "backlogUrl"; //$NON-NLS-1$
 
-    private TreeSet<ProjectMember> scrumMasters = new TreeSet<ProjectMember>();
-    private TreeSet<ProjectMember> productOwners = new TreeSet<ProjectMember>();
+    private TreeSet<Member> scrumMasters = new TreeSet<Member>();
+    private TreeSet<Member> productOwners = new TreeSet<Member>();
     private String backlogUrl = ""; //$NON-NLS-1$
 
-    public synchronized Set<ProjectMember> getScrumMasters() {
+    public synchronized SortedSet<Member> getScrumMasters() {
         if (scrumMasters == null) {
-            scrumMasters = new TreeSet<ProjectMember>();
+            scrumMasters = new TreeSet<Member>();
         }
         return scrumMasters;
     }
 
-    public void addScrumMaster(ProjectMember person) {
+    public void addScrumMaster(Member person) {
         if (person != null) {
             getScrumMasters().add(person);
         }
     }
 
-    public void removeScrumMaster(ProjectMember person) {
+    public void removeScrumMaster(Member person) {
         if (person != null) {
             getScrumMasters().remove(person);
         }
     }
 
-    public boolean hasScrumMaster(ProjectMember person) {
+    public boolean hasScrumMaster(Member person) {
         return getScrumMasters().contains(person);
     }
 
-    public synchronized Set<ProjectMember> getProductOwners() {
+    public synchronized SortedSet<Member> getProductOwners() {
         if (productOwners == null) {
-            productOwners = new TreeSet<ProjectMember>();
+            productOwners = new TreeSet<Member>();
         }
         return productOwners;
     }
 
-    public void addProductOwner(ProjectMember person) {
+    public void addProductOwner(Member person) {
         if (person != null) {
             getProductOwners().add(person);
         }
     }
 
-    public void removeProductOwner(ProjectMember person) {
+    public void removeProductOwner(Member person) {
         if (person != null) {
             getProductOwners().remove(person);
         }
     }
 
-    public boolean hasProductOwner(ProjectMember person) {
+    public boolean hasProductOwner(Member person) {
         return getProductOwners().contains(person);
     }
 

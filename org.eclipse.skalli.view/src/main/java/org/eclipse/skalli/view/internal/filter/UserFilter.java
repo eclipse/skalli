@@ -18,13 +18,13 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.api.java.authentication.LoginUtil;
-import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.User;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.services.user.LoginUtils;
+import org.eclipse.skalli.services.user.UserUtils;
+import org.eclipse.skalli.view.Consts;
 
 /**
  * This filter tries to fetch the current user from servlet request and
@@ -43,11 +43,11 @@ public class UserFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
 
-        LoginUtil loginUtil = new LoginUtil(request);
+        LoginUtils loginUtil = new LoginUtils((HttpServletRequest)request);
         String userId = loginUtil.getLoggedInUserId();
         if (StringUtils.isNotBlank(userId)) {
             request.setAttribute(Consts.ATTRIBUTE_USERID, userId);
-            User user = UserUtil.getUser(userId);
+            User user = UserUtils.getUser(userId);
             if (user != null) {
                 request.setAttribute(Consts.ATTRIBUTE_USER, user);
             }

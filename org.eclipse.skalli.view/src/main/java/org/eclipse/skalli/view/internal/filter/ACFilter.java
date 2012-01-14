@@ -23,10 +23,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.group.GroupUtils;
+import org.eclipse.skalli.services.project.ProjectUtils;
+import org.eclipse.skalli.view.Consts;
 
 public class ACFilter implements Filter {
 
@@ -52,7 +52,7 @@ public class ACFilter implements Filter {
             String actionValue = request.getParameter(Consts.PARAM_ACTION);
             if (project != null && Consts.PARAM_VALUE_EDIT.equals(actionValue)) {
                 // handles 'Consts.URL_PROJECTS/{projectId}?Consts.PARAM_ACTION=Consts.PARAM_VALUE_EDIT'
-                if (!(UserUtil.isAdministrator(userId) || UserUtil.isProjectAdmin(userId, project))) {
+                if (!(GroupUtils.isAdministrator(userId) || ProjectUtils.isProjectAdmin(userId, project))) {
                     AccessControlException e = new AccessControlException(MessageFormat.format(
                             "User {0} is not authorized to call this page for project {1}.", userId,
                             project.getProjectId()));
@@ -86,7 +86,7 @@ public class ACFilter implements Filter {
                             "project instance is null, servletPath is {0}.",
                             servletPath));
                     FilterUtil.handleException(request, response, e);
-                } else if (!UserUtil.isAdministrator(userId) && !UserUtil.isProjectAdmin(userId, project)) {
+                } else if (!GroupUtils.isAdministrator(userId) && !ProjectUtils.isProjectAdmin(userId, project)) {
                     AccessControlException e = new AccessControlException("User is not authorized to call this page.");
                     FilterUtil.handleACException(request, response, e);
                 }

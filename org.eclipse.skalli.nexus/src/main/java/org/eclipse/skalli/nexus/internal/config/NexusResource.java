@@ -10,7 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.nexus.internal.config;
 
-import org.eclipse.skalli.api.rest.config.CustomizingResource;
+import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+
 
 public class NexusResource extends CustomizingResource<NexusConfig> {
 

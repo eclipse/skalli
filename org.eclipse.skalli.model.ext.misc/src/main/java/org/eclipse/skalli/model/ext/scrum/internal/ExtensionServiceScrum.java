@@ -10,20 +10,21 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.scrum.internal;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.eclipse.skalli.common.util.CollectionUtils;
-import org.eclipse.skalli.common.util.HostReachableValidator;
-import org.eclipse.skalli.common.util.URLValidator;
-import org.eclipse.skalli.model.ext.AbstractIndexer;
-import org.eclipse.skalli.model.ext.AliasedConverter;
-import org.eclipse.skalli.model.ext.ExtensionService;
-import org.eclipse.skalli.model.ext.ExtensionServiceBase;
-import org.eclipse.skalli.model.ext.PropertyValidator;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.model.Member;
+import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ext.scrum.ScrumProjectExt;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServiceBase;
+import org.eclipse.skalli.services.extension.Indexer;
+import org.eclipse.skalli.services.extension.PropertyValidator;
+import org.eclipse.skalli.services.extension.rest.RestConverter;
+import org.eclipse.skalli.services.extension.validators.HostReachableValidator;
+import org.eclipse.skalli.services.extension.validators.URLValidator;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,8 @@ public class ExtensionServiceScrum
     private static final Map<String, String> INPUT_PROMPTS = CollectionUtils.asMap(new String[][] {
             { ScrumProjectExt.PROPERTY_BACKLOG_URL, URL_INPUT_PROMPT } });
 
+    private static final String ALIAS_MEMBER = "member"; //$NON-NLS-1$
+
     @Override
     public Class<ScrumProjectExt> getExtensionClass() {
         return ScrumProjectExt.class;
@@ -83,7 +86,14 @@ public class ExtensionServiceScrum
     }
 
     @Override
-    public AliasedConverter getConverter(String host) {
+    public Map<String, Class<?>> getAliases() {
+        Map<String, Class<?>> aliases = super.getAliases();
+        aliases.put(ALIAS_MEMBER, Member.class);
+        return aliases;
+    }
+
+    @Override
+    public RestConverter getRestConverter(String host) {
         return new ScrumConverter(host);
     }
 
@@ -103,7 +113,7 @@ public class ExtensionServiceScrum
     }
 
     @Override
-    public AbstractIndexer<ScrumProjectExt> getIndexer() {
+    public Indexer<ScrumProjectExt> getIndexer() {
         return new ScrumIndexer();
     }
 
@@ -123,9 +133,9 @@ public class ExtensionServiceScrum
     }
 
     @Override
-    public Set<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
+    public List<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
         caption = getCaption(propertyName, caption);
-        Set<PropertyValidator> validators = new HashSet<PropertyValidator>();
+        List<PropertyValidator> validators = new ArrayList<PropertyValidator>();
         if (ScrumProjectExt.PROPERTY_BACKLOG_URL.equals(propertyName)) {
             validators.add(new URLValidator(Severity.FATAL, getExtensionClass(), propertyName, caption));
             validators.add(new HostReachableValidator(getExtensionClass(), propertyName));

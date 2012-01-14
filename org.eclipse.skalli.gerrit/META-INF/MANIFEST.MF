@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Skalli Gerrit Integration (Incubation)
 Bundle-SymbolicName: org.eclipse.skalli.gerrit
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.jcraft.jsch,
@@ -15,10 +15,8 @@ Import-Package: com.jcraft.jsch,
  com.thoughtworks.xstream.io,
  org.apache.commons.io,
  org.apache.commons.lang,
- org.eclipse.skalli.api.java.authentication,
- org.eclipse.skalli.api.rest.config,
- org.eclipse.skalli.common,
- org.eclipse.skalli.common.configuration,
+ org.eclipse.skalli.services.configuration,
+ org.eclipse.skalli.services.configuration.rest,
  org.json,
  org.restlet,
  org.restlet.data,

@@ -12,11 +12,11 @@ package org.eclipse.skalli.view.component;
 
 import java.util.Comparator;
 
-import org.eclipse.skalli.api.java.NoSuchTemplateException;
-import org.eclipse.skalli.api.java.ProjectTemplateService;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectNature;
-import org.eclipse.skalli.model.core.ProjectTemplate;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ProjectNature;
+import org.eclipse.skalli.services.template.NoSuchTemplateException;
+import org.eclipse.skalli.services.template.ProjectTemplate;
+import org.eclipse.skalli.services.template.ProjectTemplateService;
 
 public class SubprojectComparator implements Comparator<Project> {
 

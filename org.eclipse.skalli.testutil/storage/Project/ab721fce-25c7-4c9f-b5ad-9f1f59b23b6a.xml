@@ -23,9 +23,9 @@
       <deleted>false</deleted>
       <leads>
         <no-comparator/>
-        <org.eclipse.skalli.model.core.ProjectMember>
+        <member>
           <userID>unittest</userID>
-        </org.eclipse.skalli.model.core.ProjectMember>
+        </member>
       </leads>
       <members>
         <no-comparator/>

@@ -14,7 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.common.util.ComparatorUtils;
+import org.eclipse.skalli.commons.ComparatorUtils;
 
 public class MavenCoordinate {
 

@@ -13,7 +13,7 @@ package org.eclipse.skalli.core.internal.validation;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.skalli.api.rest.config.CustomizingResource;
+import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
 
 public class ValidationsResource extends CustomizingResource<ValidationsConfig> {
 

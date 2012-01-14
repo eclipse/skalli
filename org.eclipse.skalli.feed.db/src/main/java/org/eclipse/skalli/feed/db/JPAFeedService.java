@@ -23,14 +23,14 @@ import javax.persistence.Query;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.feeds.Entry;
-import org.eclipse.skalli.api.java.feeds.FeedService;
-import org.eclipse.skalli.api.java.feeds.FeedServiceException;
 import org.eclipse.skalli.feed.db.entities.EntryJPA;
+import org.eclipse.skalli.services.feed.Entry;
+import org.eclipse.skalli.services.feed.FeedService;
+import org.eclipse.skalli.services.feed.FeedServiceException;
 
 public class JPAFeedService implements FeedService {
 
-    private static EntityManagerFactory emf;
+    private EntityManagerFactory emf;
 
     public JPAFeedService() {
     }

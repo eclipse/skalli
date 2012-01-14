@@ -13,11 +13,11 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.user.ldap">
     <implementation class="org.eclipse.skalli.core.internal.users.LDAPUserServiceImpl"/>
     <service>
-        <provide interface="org.eclipse.skalli.common.UserService"/>
+        <provide interface="org.eclipse.skalli.services.user.UserService"/>
     </service>
     <reference
         name="EventService"
-        interface="org.eclipse.skalli.api.java.EventService"
+        interface="org.eclipse.skalli.services.event.EventService"
         cardinality="0..1"
         policy="dynamic"
         bind="bindEventService"

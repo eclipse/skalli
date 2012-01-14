@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,17 +32,15 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.math.RandomUtils;
+import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import org.eclipse.skalli.view.internal.ViewBundleUtil;
 
 public class StaticContentServlet extends HttpServlet {
 
@@ -84,7 +81,7 @@ public class StaticContentServlet extends HttpServlet {
             }
         } else if (requestURI.startsWith("/schemas/")) {
             // otherwise check the bundles for a matching schema resource
-            URL schema = getSchemaResource(FilenameUtils.getName(requestURI));
+            URL schema = RestUtils.findSchemaResource(requestURI);
             if (schema != null) {
                 response.setContentType(getContentType(requestURI));
                 InputStream in = schema.openStream();
@@ -100,21 +97,6 @@ public class StaticContentServlet extends HttpServlet {
             }
         }
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
-    }
-
-    /**
-     * Retrieves the schema file with the given name (e.g. <tt>project.xsd</tt>)
-     * from a model extension (or model core). Schema resources must be stored
-     * in the <tt>/schemas</tt> directory of a model bundle.
-     * @param resourceName  the file name (without path) of the schema resource
-     * to retrieve.
-     * @return the URL of the schema resource, or <code>null</code> if no
-     * matching schema resource exists.
-     * @see ViewBundleUtil#findExtensionResources(String, String, boolean)
-     */
-    private URL getSchemaResource(String resourceName) {
-        List<URL> urls = ViewBundleUtil.findExtensionResources("/schemas", resourceName, false);
-        return urls.size() == 1 ? urls.get(0) : null;
     }
 
     /**
@@ -150,8 +132,7 @@ public class StaticContentServlet extends HttpServlet {
                     // try to find an XSD resource in all model extensions matching
                     // the given schemaLocation attribute -> if found, replace the include tag
                     // with the DOM of the include (without the root tag, of course!)
-                    String resourceName = FilenameUtils.getName(schemaLocation.getTextContent());
-                    URL includeFile = getSchemaResource(resourceName);
+                    URL includeFile = RestUtils.findSchemaResource(schemaLocation.getTextContent());
                     if (includeFile != null) {
                         Document includeDOM = dbf.newDocumentBuilder().parse(new InputSource(includeFile.openStream()));
                         NodeList includeNodes = includeDOM.getDocumentElement().getChildNodes();

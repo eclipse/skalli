@@ -15,12 +15,11 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.eclipse.skalli.common.LinkGroup;
-import org.eclipse.skalli.common.util.HostReachableValidator;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Link;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.commons.Link;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.services.extension.validators.HostReachableValidator;
 
 public class LinkGroupValidator extends HostReachableValidator {
 

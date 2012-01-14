@@ -19,15 +19,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.UUID;
 
-import org.eclipse.skalli.api.java.PersistenceService;
-import org.eclipse.skalli.api.java.ProjectTemplateService;
-import org.eclipse.skalli.model.core.DefaultProjectTemplate;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectMember;
-import org.eclipse.skalli.model.core.ProjectNature;
-import org.eclipse.skalli.model.ext.people.PeopleProjectExt;
+import org.eclipse.skalli.core.internal.templates.DefaultProjectTemplate;
+import org.eclipse.skalli.model.Member;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ProjectNature;
+import org.eclipse.skalli.model.ext.commons.PeopleExtension;
+import org.eclipse.skalli.model.ext.commons.TagsExtension;
+import org.eclipse.skalli.model.ext.people.internal.CoreRoleService;
+import org.eclipse.skalli.services.persistence.PersistenceService;
+import org.eclipse.skalli.services.template.ProjectTemplateService;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.junit.Assert;
 import org.junit.Before;
@@ -82,10 +85,10 @@ public class ProjectServiceImplTest {
     protected PersistenceService mockIPS;
     protected ProjectTemplateService mockTS;
     private ProjectServiceImpl ps;
-    private ProjectMember m1;
-    private ProjectMember m2;
-    private ProjectMember l1;
-    private ProjectMember l2;
+    private Member m1;
+    private Member m2;
+    private Member l1;
+    private Member l2;
 
     private Project createProject(UUID uuid, String projectId, Project parent, String[] tags) {
         Project ret = new Project();
@@ -95,9 +98,11 @@ public class ProjectServiceImplTest {
             ret.setParentEntity(parent);
         }
         if (tags != null) {
+            TagsExtension tagsExt = new TagsExtension();
             for (String tag : tags) {
-                ret.addTag(tag);
+                tagsExt.addTag(tag);
             }
+            ret.addExtension(tagsExt);
         }
         return ret;
     }
@@ -110,7 +115,7 @@ public class ProjectServiceImplTest {
 
     @Before
     public void setup() throws BundleException {
-        new BundleManager(this.getClass()).startBundles();
+        BundleManager.startBundles();
 
         for (int i = 0; i < uuids.length; ++i) {
             uuids[i] = UUID.randomUUID();
@@ -139,15 +144,16 @@ public class ProjectServiceImplTest {
         ps = new ProjectServiceImpl();
         ps.bindPersistenceService(mockIPS);
         ps.bindProjectTemplateService(mockTS);
+        ps.bindRoleService(new CoreRoleService());
 
         reset(mocks);
         recordMocks();
         replay(mocks);
 
-        m1 = new ProjectMember("M1");
-        m2 = new ProjectMember("M2");
-        l1 = new ProjectMember("L1");
-        l2 = new ProjectMember("L2");
+        m1 = new Member("M1");
+        m2 = new Member("M2");
+        l1 = new Member("L1");
+        l2 = new Member("L2");
     }
 
     protected void recordMocks() {
@@ -369,29 +375,6 @@ public class ProjectServiceImplTest {
     }
 
     @Test
-    public void getProjectsForTag() {
-        List<Project> res1 = ps.getProjectsForTag("tagBoth"); //$NON-NLS-1$
-        Assert.assertNotNull(res1);
-        Assert.assertEquals(2, res1.size());
-
-        List<Project> res2 = ps.getProjectsForTag("tag2"); //$NON-NLS-1$
-        Assert.assertNotNull(res2);
-        Assert.assertEquals(1, res2.size());
-        Assert.assertEquals(uuids[2], res2.toArray(new Project[1])[0].getUuid());
-
-        List<Project> res3 = ps.getProjectsForTag("tagNonExisting"); //$NON-NLS-1$
-        Assert.assertNotNull(res3);
-        Assert.assertEquals(0, res3.size());
-
-        // tags exists, but project is deleted
-        List<Project> res4 = ps.getProjectsForTag("tag4"); //$NON-NLS-1$
-        Assert.assertNotNull(res4);
-        Assert.assertEquals(0, res4.size());
-
-        verify(mocks);
-    }
-
-    @Test
     public void testGetDeletedProjects() {
         List<Project> res = ps.getDeletedProjects();
         Assert.assertNotNull(res);
@@ -419,7 +402,7 @@ public class ProjectServiceImplTest {
     @Test
     public void testGetAllPeople() {
         Project p = new Project();
-        PeopleProjectExt ext = new PeopleProjectExt();
+        PeopleExtension ext = new PeopleExtension();
         ext.addMember(m1);
         ext.addMember(m2);
         ext.addMember(l1);
@@ -427,7 +410,7 @@ public class ProjectServiceImplTest {
         ext.addLead(l2);
         p.addExtension(ext);
 
-        Set<ProjectMember> res1 = ps.getAllPeople(p);
+        Set<Member> res1 = ps.getMembers(p);
         Assert.assertEquals(4, res1.size());
         Assert.assertTrue(res1.contains(m1));
         Assert.assertTrue(res1.contains(m2));
@@ -439,7 +422,7 @@ public class ProjectServiceImplTest {
     @Test
     public void testGetAllPeopleByRole() {
         Project p = new Project();
-        PeopleProjectExt ext = new PeopleProjectExt();
+        PeopleExtension ext = new PeopleExtension();
         ext.addMember(m1);
         ext.addMember(m2);
         ext.addMember(l1);
@@ -447,17 +430,17 @@ public class ProjectServiceImplTest {
         ext.addLead(l2);
         p.addExtension(ext);
 
-        Map<String, Set<ProjectMember>> res2 = ps.getAllPeopleByRole(p);
+        Map<String, SortedSet<Member>> res2 = ps.getMembersByRole(p);
         Assert.assertEquals(2, res2.size());
 
-        Set<ProjectMember> res2members = res2.get("projectmember");
+        Set<Member> res2members = res2.get("projectmember");
         Assert.assertNotNull(res2members);
         Assert.assertTrue(res2members.contains(m1));
         Assert.assertTrue(res2members.contains(m2));
         Assert.assertTrue(res2members.contains(l1));
         Assert.assertFalse(res2members.contains(l2));
 
-        Set<ProjectMember> res2leads = res2.get("projectlead");
+        Set<Member> res2leads = res2.get("projectlead");
         Assert.assertNotNull(res2leads);
         Assert.assertFalse(res2leads.contains(m1));
         Assert.assertFalse(res2leads.contains(m2));

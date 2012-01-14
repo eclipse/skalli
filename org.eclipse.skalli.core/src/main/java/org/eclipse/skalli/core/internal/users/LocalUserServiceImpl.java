@@ -10,32 +10,30 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.users;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.common.UserService;
-import org.eclipse.skalli.core.internal.persistence.xstream.IgnoreUnknownElementsXStream;
-import org.eclipse.skalli.core.internal.persistence.xstream.NoopConverter;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Issuer;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.services.entity.EntityServiceBase;
+import org.eclipse.skalli.services.extension.DataMigration;
+import org.eclipse.skalli.services.user.UserService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * Implementation of {@link UserService} based on XStream-serialized
@@ -47,106 +45,68 @@ import com.thoughtworks.xstream.XStream;
  * in the OSGi shell (<tt>enable</tt> command, LDAP user service should
  * be disabled before that).
  */
-public class LocalUserServiceImpl implements UserService {
+public class LocalUserServiceImpl extends EntityServiceBase<User> implements UserService, Issuer {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalUserServiceImpl.class);
-    private static final String STORAGE_BASE = "storage" + IOUtils.DIR_SEPARATOR; //$NON-NLS-1$
-    private File storageDirectory;
 
-    private final Map<String, User> cache = new HashMap<String, User>();
+    private static final int CURRENT_MODEL_VERISON = 20;
 
-    public LocalUserServiceImpl() {
-        initializeStorage();
-        loadUsers();
-    }
+    private Map<String, User> cache;
 
+    @Override
     protected void activate(ComponentContext context) {
-        LOG.info(MessageFormat.format("[UserService] {0} : activated",
+        LOG.info(MessageFormat.format("[UserService][type=local] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
-    }
-
-    protected void deactivate(ComponentContext context) {
-        LOG.info(MessageFormat.format("[UserService] {0} : deactivated",
-                (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
-    }
-
-    private void initializeStorage() {
-        if (storageDirectory == null) {
-            String workdir = System.getProperty("workdir");
-            if (workdir != null) {
-                File workingDirectory = new File(workdir);
-                if (workingDirectory.exists() && workingDirectory.isDirectory()) {
-                    storageDirectory = new File(workingDirectory, STORAGE_BASE + "User");
-                } else {
-                    LOG.warn("Working directory " + workingDirectory.getAbsolutePath()
-                            + "not found - falling back to current directory");
-                }
-            }
-            if (storageDirectory == null) {
-                storageDirectory = new File(STORAGE_BASE + "User");
-            }
-            if (!storageDirectory.exists()) {
-                storageDirectory.mkdirs();
-            }
-        }
-    }
-
-    private void loadUsers() {
-        @SuppressWarnings("unchecked")
-        Iterator<File> files = FileUtils.iterateFiles(storageDirectory, new String[] { "xml" }, true); //$NON-NLS-1$
-        while (files.hasNext()) {
-            File file = files.next();
-            LOG.info("  Loading " + file.getAbsolutePath()); //$NON-NLS-1$
-            User user = loadFromFile(file);
-            cache.put(user.getUserId(), user);
-        }
-    }
-
-    private XStream getXStreamInstance() {
-        return IgnoreUnknownElementsXStream.getXStreamInstance(
-                Collections.singleton(new NoopConverter()),
-                Collections.singleton(User.class.getClassLoader()),
-                null);
-    }
-
-    File saveToFile(File file, User user) {
-        if (file == null) {
-            file = new File(storageDirectory, user.getUserId() + ".xml");
-        }
-        XStream xstream = getXStreamInstance();
-        String xml = xstream.toXML(user);
-        try {
-            FileUtils.writeStringToFile(file, xml, "UTF-8");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return file;
-    }
-
-    User loadFromFile(File file) {
-        String xml = null;
-        try {
-            xml = FileUtils.readFileToString(file, "UTF-8");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        XStream xstreamValidation = getXStreamInstance();
-        User user = (User) xstreamValidation.fromXML(xml);
-        if (user == null) {
-            throw new RuntimeException("Could not load user from file " + file.getAbsolutePath());
-        }
-        LOG.info("Loaded user " + user.getUserId() + " from " + file.getAbsolutePath());
-        return user;
     }
 
     @Override
-    public List<User> getUsers() {
-        return new ArrayList<User>(cache.values());
+    protected void deactivate(ComponentContext context) {
+        LOG.info(MessageFormat.format("[UserService][type=local] {0} : deactivated",
+                (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
+    }
+
+    @Override
+    public Class<User> getEntityClass() {
+        return User.class;
+    }
+
+    @Override
+    public int getModelVersion() {
+        return CURRENT_MODEL_VERISON;
+    }
+
+    @Override
+    public Map<String, Class<?>> getAliases() {
+        Map<String, Class<?>> aliases = super.getAliases();
+        aliases.put("entity-user", User.class); //$NON-NLS-1$
+        return aliases;
+    }
+
+    @Override
+    public Set<DataMigration> getMigrations() {
+        Set<DataMigration> migrations = super.getMigrations();
+        migrations.add(new LocalUserDataMigration19());
+        return migrations;
+    }
+
+    private synchronized Map<String, User> getCache() {
+        if (cache == null) {
+            cache = new HashMap<String, User>();
+            for (User user: getAll()) {
+                cache.put(user.getUserId(), user);
+            }
+        }
+        return cache;
+    }
+
+    @Override
+    public synchronized List<User> getUsers() {
+        return getAll();
     }
 
     @Override
     public User getUserById(String userId) {
-        User user = cache.get(userId);
+        User user = getCache().get(userId);
         return user != null ? user : User.createUserWithoutDetails(userId);
     }
 
@@ -160,7 +120,7 @@ public class LocalUserServiceImpl implements UserService {
                 patterns[i] = Pattern.compile(parts[i] + ".*", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
             }
 
-            for (User user : cache.values()) {
+            for (User user : getAll()) {
                 if (parts.length == 1) {
                     match(user, patterns[0], result);
                 }
@@ -192,7 +152,7 @@ public class LocalUserServiceImpl implements UserService {
                 }
             }
             if (result.isEmpty()) {
-                for (User user : cache.values()) {
+                for (User user : getAll()) {
                     // try to match each part individually
                     for (int i = 0; i < parts.length; ++i) {
                         match(user, patterns[i], result);
@@ -242,7 +202,7 @@ public class LocalUserServiceImpl implements UserService {
         Set<User> result = new HashSet<User>();
         if (userIds != null) {
             for (String userId : userIds) {
-                User user = cache.get(userId);
+                User user = getCache().get(userId);
                 if (user != null) {
                     result.add(user);
                 } else {
@@ -251,6 +211,25 @@ public class LocalUserServiceImpl implements UserService {
             }
         }
         return result;
+    }
+
+    @Override
+    protected void validateEntity(User entity) throws ValidationException {
+        SortedSet<Issue> issues = validate(entity, Severity.FATAL);
+        if (issues.size() > 0) {
+            throw new ValidationException("User could not be saved due to the following reasons:", issues);
+        }
+    }
+
+    @Override
+    protected SortedSet<Issue> validateEntity(User entity, Severity minSeverity) {
+        TreeSet<Issue> issues = new TreeSet<Issue>();
+        String userId = entity.getUserId();
+        if (StringUtils.isBlank(userId)) {
+            issues.add(new Issue(Severity.FATAL, LocalUserServiceImpl.class, entity.getUuid(),
+                    "Users must have a unique user identifier which is not blank"));
+        }
+        return issues;
     }
 
 }

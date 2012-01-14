@@ -15,19 +15,21 @@ import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.IconProvider;
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.api.java.ProjectTemplateService;
-import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.common.ServiceFilter;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectTemplate;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.services.ServiceFilter;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.group.GroupUtils;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.project.ProjectUtils;
+import org.eclipse.skalli.services.template.ProjectTemplate;
+import org.eclipse.skalli.services.template.ProjectTemplateService;
+import org.eclipse.skalli.services.user.UserUtils;
 import org.eclipse.skalli.view.component.InformationBox;
 import org.eclipse.skalli.view.ext.ExtensionStreamSource;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
+import org.eclipse.skalli.view.ext.IconProvider;
 import org.eclipse.skalli.view.ext.Navigator;
 import org.eclipse.skalli.view.ext.ProjectInfoBox;
 import org.eclipse.skalli.view.internal.application.ProjectApplication;
@@ -184,18 +186,18 @@ public class ProjectViewPanel extends CssLayout {
 
         @Override
         public boolean isUserAdmin() {
-            return UserUtil.isAdministrator(getLoggedInUser());
+            return GroupUtils.isAdministrator(getLoggedInUser());
         }
 
         @Override
         public boolean isUserProjectAdmin(Project project) {
-            return UserUtil.isProjectAdmin(getLoggedInUser(), project)
-                    || UserUtil.isAdministrator(getLoggedInUser());
+            return ProjectUtils.isProjectAdmin(getLoggedInUser(), project)
+                    || GroupUtils.isAdministrator(getLoggedInUser());
         }
 
         @Override
         public User getLoggedInUser() {
-            return UserUtil.getUser(application.getLoggedInUser());
+            return UserUtils.getUser(application.getLoggedInUser());
         }
 
         @Override

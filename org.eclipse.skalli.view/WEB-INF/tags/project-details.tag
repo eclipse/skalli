@@ -11,7 +11,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<%@ attribute name="project" type="org.eclipse.skalli.api.java.SearchHit" required="true" rtexprvalue="true" %>
+<%@ attribute name="project" type="org.eclipse.skalli.services.search.SearchHit" required="true" rtexprvalue="true" %>
 <%@ attribute name="parentChain" type="java.util.List" required="false" rtexprvalue="true" %>
 <%@ attribute name="style" required="true" rtexprvalue="true" %>
 

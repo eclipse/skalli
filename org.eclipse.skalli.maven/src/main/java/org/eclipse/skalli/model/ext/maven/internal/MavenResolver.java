@@ -23,37 +23,39 @@ import java.util.UUID;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.FilenameUtils;
-import org.eclipse.skalli.common.util.HttpUtils;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Issuer;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Issuer;
+import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenPathResolver;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
+import org.eclipse.skalli.services.destination.DestinationService;
 
 public class MavenResolver implements Issuer {
 
     protected final UUID project;
     protected final MavenPomParser parser;
     protected final MavenPathResolver pathResolver;
+    protected final  DestinationService destinationService;
 
     /**
      * Creates a resolver for a given project.
      * @param project  the unique identifier of the project for which reactor information is to be calculated.
      * @param pathResolver  the path resolver to use to convert resource paths to download URLs.
      */
-    public MavenResolver(UUID project, MavenPathResolver pathResolver) {
-        this(project, new MavenPomParserImpl(), pathResolver);
+    public MavenResolver(UUID project, MavenPathResolver pathResolver, DestinationService destinationService) {
+        this(project, new MavenPomParserImpl(), pathResolver, destinationService);
     }
 
     // package protected for testing purposes
-    MavenResolver(UUID project, MavenPomParser parser, MavenPathResolver pathResolver) {
+    MavenResolver(UUID project, MavenPomParser parser, MavenPathResolver pathResolver, DestinationService destinationService) {
         this.project = project;
         this.parser = parser;
         this.pathResolver = pathResolver;
+        this.destinationService = destinationService;
     }
 
     /**
@@ -77,6 +79,9 @@ public class MavenResolver implements Issuer {
      */
     public MavenReactor resolve(String scmLocation, String reactorPomPath)
             throws IOException, MavenValidationException {
+        if (destinationService == null) {
+            throw new IllegalArgumentException("destination service not available");
+        }
         if (!pathResolver.canResolve(scmLocation)) {
             throw new IllegalArgumentException(MessageFormat.format(
                     "path resolver {0} is not applicable to scmLocation={1}", pathResolver.getClass(), scmLocation));
@@ -160,7 +165,7 @@ public class MavenResolver implements Issuer {
                     e.getMessage()));
         }
         try {
-            int statusCode = HttpUtils.getClient(url).executeMethod(method);
+            int statusCode = destinationService.getClient(url).executeMethod(method);
             if (statusCode == HttpStatus.SC_OK) {
                 InputStream in = method.getResponseBodyAsStream();
                 mavenPom = parser.parse(in);

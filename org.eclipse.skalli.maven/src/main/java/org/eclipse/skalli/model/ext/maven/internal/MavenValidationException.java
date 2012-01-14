@@ -13,10 +13,10 @@ package org.eclipse.skalli.model.ext.maven.internal;
 import java.util.Collection;
 import java.util.UUID;
 
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Issuer;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Issuer;
+import org.eclipse.skalli.model.ValidationException;
 
 /**
  * Validation exception to report Maven related issues, e.g. during the

@@ -12,12 +12,12 @@ package org.eclipse.skalli.model.ext.misc.internal;
 
 import java.util.Map;
 
-import org.eclipse.skalli.common.util.CollectionUtils;
-import org.eclipse.skalli.model.ext.AbstractIndexer;
-import org.eclipse.skalli.model.ext.AliasedConverter;
-import org.eclipse.skalli.model.ext.ExtensionService;
-import org.eclipse.skalli.model.ext.ExtensionServiceBase;
+import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.ext.misc.ReviewProjectExt;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServiceBase;
+import org.eclipse.skalli.services.extension.Indexer;
+import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +72,7 @@ public class ExtensionServiceReview
     }
 
     @Override
-    public AliasedConverter getConverter(String host) {
+    public RestConverter getRestConverter(String host) {
         return new ReviewConverter(host);
     }
 
@@ -92,7 +92,7 @@ public class ExtensionServiceReview
     }
 
     @Override
-    public AbstractIndexer<ReviewProjectExt> getIndexer() {
+    public Indexer<ReviewProjectExt> getIndexer() {
         return new ReviewIndexer();
     }
 

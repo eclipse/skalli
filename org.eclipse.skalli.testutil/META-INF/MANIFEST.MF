@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Skalli Test Utilities (Incubation)
 Bundle-SymbolicName: org.eclipse.skalli.testutil
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.thoughtworks.xstream.converters,
@@ -18,12 +18,18 @@ Import-Package: com.thoughtworks.xstream.converters,
  org.apache.commons.io,
  org.apache.commons.lang,
  org.custommonkey.xmlunit,
- org.eclipse.skalli.api.java,
- org.eclipse.skalli.api.java.feeds,
- org.eclipse.skalli.common,
- org.eclipse.skalli.model.ext,
+ org.eclipse.skalli.model,
+ org.eclipse.skalli.services,
+ org.eclipse.skalli.services.entity,
+ org.eclipse.skalli.services.extension,
+ org.eclipse.skalli.services.extension.rest,
+ org.eclipse.skalli.services.feed,
+ org.eclipse.skalli.services.persistence,
+ org.eclipse.skalli.services.project,
  org.junit,
  org.osgi.framework,
+ org.osgi.service.component,
+ org.slf4j,
  org.w3c.dom,
  org.xml.sax
 Export-Package: org.eclipse.skalli.testutil,

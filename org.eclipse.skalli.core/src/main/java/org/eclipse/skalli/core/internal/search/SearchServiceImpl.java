@@ -17,16 +17,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.skalli.api.java.PagingInfo;
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.api.java.QueryParseException;
-import org.eclipse.skalli.api.java.SearchHit;
-import org.eclipse.skalli.api.java.SearchResult;
-import org.eclipse.skalli.api.java.SearchService;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.AbstractIndexer;
-import org.eclipse.skalli.model.ext.ExtensionService;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.Taggable;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.Indexer;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.search.PagingInfo;
+import org.eclipse.skalli.services.search.QueryParseException;
+import org.eclipse.skalli.services.search.SearchHit;
+import org.eclipse.skalli.services.search.SearchResult;
+import org.eclipse.skalli.services.search.SearchService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -37,22 +38,6 @@ public class SearchServiceImpl implements SearchService {
     private static final Logger LOG = LoggerFactory.getLogger(SearchServiceImpl.class);
     private LuceneIndex<Project> luceneIndex;
 
-    protected void bindProjectService(ProjectService srvc) {
-        LOG.info("Project service injected into search service"); //$NON-NLS-1$
-        try {
-            luceneIndex = new LuceneIndex<Project>(srvc);
-            luceneIndex.initialize();
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
-    protected void unbindProjectService(ProjectService srvc) {
-        LOG.info("Project service removed from search service"); //$NON-NLS-1$
-        luceneIndex = null;
-    }
-
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[SearchService] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
@@ -61,6 +46,21 @@ public class SearchServiceImpl implements SearchService {
     protected void deactivate(ComponentContext context) {
         LOG.info(MessageFormat.format("[SearchService] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
+    }
+
+    protected void bindProjectService(ProjectService srvc) {
+        LOG.info("Project service injected into search service"); //$NON-NLS-1$
+        try {
+            luceneIndex = new LuceneIndex<Project>(srvc);
+            luceneIndex.initialize();
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to initialize Lucene index", e);
+        }
+    }
+
+    protected void unbindProjectService(ProjectService srvc) {
+        LOG.info("Project service removed from search service"); //$NON-NLS-1$
+        luceneIndex = null;
     }
 
     @Override
@@ -83,7 +83,7 @@ public class SearchServiceImpl implements SearchService {
             throws QueryParseException {
         Set<String> fieldSet = new HashSet<String>();
         for (ExtensionService<?> ext : Services.getServices(ExtensionService.class)) {
-            AbstractIndexer<?> indexer = ext.getIndexer();
+            Indexer<?> indexer = ext.getIndexer();
             if (indexer != null) {
                 Set<String> fields = indexer.getDefaultSearchFields();
                 if (fields != null) {
@@ -104,13 +104,13 @@ public class SearchServiceImpl implements SearchService {
     @Override
     public SearchResult<Project> findProjectsByTag(String queryString, PagingInfo pagingInfo)
             throws QueryParseException {
-        String[] fields = new String[] { Project.PROPERTY_TAGS };
+        String[] fields = new String[] { Taggable.PROPERTY_TAGS };
         return luceneIndex.search(fields, queryString, pagingInfo);
     }
 
     @Override
     public SearchResult<Project> getRelatedProjects(Project project, int count) {
-        String[] fields = new String[] { Project.PROPERTY_NAME, Project.PROPERTY_DESCRIPTION, Project.PROPERTY_TAGS };
+        String[] fields = new String[] { Project.PROPERTY_NAME, Project.PROPERTY_DESCRIPTION, Taggable.PROPERTY_TAGS };
         return luceneIndex.moreLikeThis(project, fields, count);
     }
 

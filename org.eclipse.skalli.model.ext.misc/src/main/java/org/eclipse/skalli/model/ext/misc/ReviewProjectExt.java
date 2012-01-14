@@ -13,8 +13,8 @@ package org.eclipse.skalli.model.ext.misc;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.PropertyName;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.PropertyName;
 
 public class ReviewProjectExt extends ExtensionEntityBase {
 

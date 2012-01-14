@@ -23,10 +23,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-
+import org.eclipse.skalli.services.FilterMode;
 import org.eclipse.skalli.view.internal.ViewBundleUtil;
 
 public class ResourceServlet extends HttpServlet {
+
     private static final long serialVersionUID = 9116962436984160014L;
     private static final String RESOURCE_PATH_IN_VAADIN_BUNDLE = "/VAADIN"; // Vaadin expects resources to reside in a VAADIN folder... //$NON-NLS-1$
 
@@ -36,7 +37,7 @@ public class ResourceServlet extends HttpServlet {
         String resourcePath = RESOURCE_PATH_IN_VAADIN_BUNDLE + path;
 
         List<URL> urls = ViewBundleUtil.findThemeResources(FilenameUtils.getPath(resourcePath),
-                FilenameUtils.getName(resourcePath), false);
+                FilenameUtils.getName(resourcePath), false, FilterMode.SHORT_CIRCUIT);
         if (urls.size() == 0) {
             // requested resource not found in any view related bundles
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);

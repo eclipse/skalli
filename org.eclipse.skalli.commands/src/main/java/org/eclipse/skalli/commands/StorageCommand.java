@@ -15,11 +15,11 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.osgi.framework.console.CommandInterpreter;
-import org.eclipse.skalli.api.java.PersistenceService;
-import org.eclipse.skalli.api.java.StorageException;
-import org.eclipse.skalli.api.java.StorageService;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.util.UUIDUtils;
+import org.eclipse.skalli.commons.UUIDUtils;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.persistence.PersistenceService;
+import org.eclipse.skalli.services.persistence.StorageException;
+import org.eclipse.skalli.services.persistence.StorageService;
 import org.osgi.framework.Constants;
 
 public class StorageCommand {

@@ -13,9 +13,9 @@ package org.eclipse.skalli.core.internal.users;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.skalli.api.rest.config.ConfigResource;
-import org.eclipse.skalli.common.ConfigKeyUserStore;
-import org.eclipse.skalli.common.configuration.ConfigKey;
+import org.eclipse.skalli.services.configuration.ConfigKey;
+import org.eclipse.skalli.services.configuration.rest.ConfigResource;
+import org.eclipse.skalli.services.user.ConfigKeyUserStore;
 
 public class UserStoreResource extends ConfigResource<ConfigKeyUserStore, UserStoreConfig> {
 

@@ -10,24 +10,22 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.persistence.xstream;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.io.FileUtils;
-import org.eclipse.skalli.common.util.XMLUtils;
-import org.eclipse.skalli.model.ext.EntityBase;
-import org.eclipse.skalli.model.ext.ExtensibleEntityBase;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
+import org.eclipse.skalli.commons.XMLUtils;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.ExtensibleEntityBase;
+import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.testutil.HashMapStorageService;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
 import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.eclipse.skalli.testutil.TestExtensibleEntityBase;
+import org.eclipse.skalli.testutil.TestExtensibleEntityEntityService;
+import org.eclipse.skalli.testutil.TestExtensibleEntityExtensionService;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.eclipse.skalli.testutil.TestExtension1;
-import org.eclipse.skalli.testutil.TestUtils;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,55 +37,45 @@ import org.w3c.dom.NodeList;
 @SuppressWarnings("nls")
 public class PersistenceServiceXStreamTest {
 
-    private File tempdir;
+    private PersistenceServiceXStreamMock persistenceService;
+    private HashMapStorageService hashMapStorageService;
 
     @Before
     public void setup() throws Exception {
-        tempdir = TestUtils.createTempDir("test");
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        if (tempdir != null) {
-            FileUtils.forceDelete(tempdir);
-        }
+        hashMapStorageService = new HashMapStorageService();
+        persistenceService = new PersistenceServiceXStreamMock(hashMapStorageService,
+                new TestExtensibleEntityEntityService(0), new TestExtensibleEntityExtensionService());
     }
 
     @Test
     public void testPersistAndLoad() throws Exception {
-        HashMapStorageService hashMapStorageService = new HashMapStorageService();
-
-        // create a new instance for persistence of test entities
-        PersistenceServiceXStreamMock p = new PersistenceServiceXStreamMock(hashMapStorageService, new ExtensibleEntityExtensionService());
-
         // create and persist test entities
         List<TestExtensibleEntityBase> expectedEntities = createTestEntityHierarchy();
         for (ExtensibleEntityBase entity : expectedEntities) {
-            p.persist(entity, "anyonomous");
+            persistenceService.persist(entity, "anyonomous");
         }
 
         // read the persisted files as DOM and do some asserts
         for (TestExtensibleEntityBase entity : expectedEntities) {
             Assert.assertNotNull(entity);
 
-            byte[] blob = hashMapStorageService.getBlobStore().get(new HashMapStorageService.Key(entity.getClass().getSimpleName(), entity.getUuid().toString()));
+            byte[] blob = hashMapStorageService.getBlobStore().get(
+                    new HashMapStorageService.Key(entity.getClass().getSimpleName(), entity.getUuid().toString()));
             Document doc = XMLUtils.documentFromString(new String(blob));
-            Element root = (Element) doc.getElementsByTagName(TestExtensibleEntityBase.class.getName()).item(0);
-            Assert.assertNotNull(root);
-            Assert.assertNull(doc.getElementsByTagName(TestExtensibleEntityBase.class.getName()).item(1));
 
-            NodeList nodes = root.getChildNodes();
+            // check that the extensible entity has been persisted with its default alias
+            // and check some nodes (uuid, extensions etc.)
+            NodeList nodes = doc.getElementsByTagName("entity-foobar");
+            Assert.assertEquals(1, nodes.getLength());
+            nodes = ((Element)nodes.item(0)).getChildNodes();
             for (int i = 0; i < nodes.getLength(); ++i) {
                 assertNode(nodes.item(i), entity);
             }
         }
 
         // create a new instance for loading of persisted entities
-        p = new PersistenceServiceXStreamMock(hashMapStorageService,new ExtensibleEntityExtensionService());
-
-
-        List<TestExtensibleEntityBase> actualEntities = p.getEntities(TestExtensibleEntityBase.class);
-        List<TestExtensibleEntityBase> actualDeletedEntities = p.getDeletedEntities(TestExtensibleEntityBase.class);
+        List<TestExtensibleEntityBase> actualEntities = persistenceService.getEntities(TestExtensibleEntityBase.class);
+        List<TestExtensibleEntityBase> actualDeletedEntities = persistenceService.getDeletedEntities(TestExtensibleEntityBase.class);
         Assert.assertEquals(3, actualEntities.size());
         Assert.assertEquals(2, actualDeletedEntities.size());
 
@@ -110,15 +98,8 @@ public class PersistenceServiceXStreamTest {
 
     @Test(expected = RuntimeException.class)
     public void testPersist_withUnknownParent() throws Exception {
-
-
-        // create a new instance for persistence of test entities
-        PersistenceServiceXStreamMock p = new PersistenceServiceXStreamMock(new HashMapStorageService(), new ExtensibleEntityExtensionService());
-
-        // create and persist test entities
         List<TestExtensibleEntityBase> expectedEntities = createTestEntityHierarchy();
-
-        p.persist(expectedEntities.get(1), "anonymous");
+        persistenceService.persist(expectedEntities.get(1), "anonymous");
     }
 
     @Test

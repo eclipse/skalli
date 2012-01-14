@@ -13,10 +13,10 @@ package org.eclipse.skalli.model.ext.linkgroups.internal;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.skalli.model.ext.AbstractIndexer;
 import org.eclipse.skalli.model.ext.linkgroups.LinkGroupsProjectExt;
+import org.eclipse.skalli.services.extension.IndexerBase;
 
-public class LinkGroupsIndexer extends AbstractIndexer<LinkGroupsProjectExt> {
+public class LinkGroupsIndexer extends IndexerBase<LinkGroupsProjectExt> {
 
     @Override
     protected void indexFields(LinkGroupsProjectExt linkGroupsExt) {

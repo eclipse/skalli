@@ -12,18 +12,18 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.configuration">
     <implementation class="org.eclipse.skalli.core.internal.configuration.ConfigurationComponent"/>
     <service>
-        <provide interface="org.eclipse.skalli.common.configuration.ConfigurationService"/>
+        <provide interface="org.eclipse.skalli.services.configuration.ConfigurationService"/>
     </service>
     <reference
         name="EventService"
-        interface="org.eclipse.skalli.api.java.EventService"
+        interface="org.eclipse.skalli.services.event.EventService"
         cardinality="0..1"
         policy="dynamic"
         bind="bindEventService"
         unbind="unbindEventService"/>
     <reference
         name="StorageService"
-        interface="org.eclipse.skalli.api.java.StorageService"
+        interface="org.eclipse.skalli.services.persistence.StorageService"
         cardinality="1..n"
         policy="dynamic"
         bind="bindStorageService"

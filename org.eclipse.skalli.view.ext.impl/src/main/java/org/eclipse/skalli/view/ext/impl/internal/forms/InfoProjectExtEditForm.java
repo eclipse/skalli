@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext.impl.internal.forms;
 
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.info.InfoProjectExt;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ext.commons.InfoExtension;
 import org.eclipse.skalli.view.component.MultiTextField;
 import org.eclipse.skalli.view.ext.AbstractExtensionFormService;
 import org.eclipse.skalli.view.ext.DefaultProjectFieldFactory;
@@ -22,7 +22,7 @@ import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.FormFieldFactory;
 
-public class InfoProjectExtEditForm extends AbstractExtensionFormService<InfoProjectExt> {
+public class InfoProjectExtEditForm extends AbstractExtensionFormService<InfoExtension> {
 
     @Override
     public String getIconPath() {
@@ -39,20 +39,20 @@ public class InfoProjectExtEditForm extends AbstractExtensionFormService<InfoPro
         return new FieldFactory(project, context);
     }
 
-    private class FieldFactory extends DefaultProjectFieldFactory<InfoProjectExt> {
+    private class FieldFactory extends DefaultProjectFieldFactory<InfoExtension> {
 
         private static final long serialVersionUID = 812653604052021444L;
-        private InfoProjectExt extension;
+        private InfoExtension extension;
 
         public FieldFactory(Project project, ProjectEditContext context) {
-            super(project, InfoProjectExt.class, context);
+            super(project, InfoExtension.class, context);
             this.extension = getExtension(project);
         }
 
         @Override
         protected Field createField(Object propertyId, String caption) {
             Field field = null;
-            if (InfoProjectExt.PROPERTY_MAILING_LIST.equals(propertyId)) {
+            if (InfoExtension.PROPERTY_MAILING_LIST.equals(propertyId)) {
                 field = new MultiTextField(caption, extension.getMailingLists());
             }
 
@@ -62,17 +62,17 @@ public class InfoProjectExtEditForm extends AbstractExtensionFormService<InfoPro
 
     @Override
     protected Item getItemDataSource(Project project) {
-        return new BeanItem<InfoProjectExt>(getExtension(project));
+        return new BeanItem<InfoExtension>(getExtension(project));
     }
 
     @Override
-    public Class<InfoProjectExt> getExtensionClass() {
-        return InfoProjectExt.class;
+    public Class<InfoExtension> getExtensionClass() {
+        return InfoExtension.class;
     }
 
     @Override
-    public InfoProjectExt newExtensionInstance() {
-        return new InfoProjectExt();
+    public InfoExtension newExtensionInstance() {
+        return new InfoExtension();
     }
 
 }

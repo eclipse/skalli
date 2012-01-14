@@ -221,7 +221,7 @@ public abstract class CustomField extends CustomComponent implements Field {
 
     @Override
     public String getRequiredError() {
-        return getRequiredError();
+        return abstractField.getRequiredError();
     }
 
     @Override

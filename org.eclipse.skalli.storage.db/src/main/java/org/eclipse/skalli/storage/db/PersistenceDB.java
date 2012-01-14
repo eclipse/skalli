@@ -22,8 +22,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.skalli.api.java.StorageException;
-import org.eclipse.skalli.api.java.StorageService;
+import org.eclipse.skalli.services.persistence.StorageException;
+import org.eclipse.skalli.services.persistence.StorageService;
 import org.eclipse.skalli.storage.db.entities.HistoryStorageItem;
 import org.eclipse.skalli.storage.db.entities.StorageId;
 import org.eclipse.skalli.storage.db.entities.StorageItem;
@@ -33,7 +33,7 @@ public class PersistenceDB implements StorageService {
     public PersistenceDB() {
     }
 
-    private static EntityManagerFactory emf;
+    private EntityManagerFactory emf;
 
     @Override
     public void write(String category, String id, InputStream blob) throws StorageException {

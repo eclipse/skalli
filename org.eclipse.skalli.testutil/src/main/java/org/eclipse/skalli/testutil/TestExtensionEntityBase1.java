@@ -12,7 +12,7 @@ package org.eclipse.skalli.testutil;
 
 import java.util.UUID;
 
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
+import org.eclipse.skalli.model.ExtensionEntityBase;
 
 public class TestExtensionEntityBase1 extends ExtensionEntityBase {
     public TestExtensionEntityBase1() {

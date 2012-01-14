@@ -17,21 +17,19 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.favorites.Favorites;
+import org.eclipse.skalli.services.favorites.FavoritesService;
+import org.eclipse.skalli.testutil.BundleManager;
+import org.eclipse.skalli.view.Consts;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import org.eclipse.skalli.api.java.FavoritesService;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.model.core.Favorites;
-import org.eclipse.skalli.model.ext.ValidationException;
-import org.eclipse.skalli.testutil.BundleManager;
 
 @SuppressWarnings("nls")
 public class FavoritesFilterTest {
@@ -48,7 +46,7 @@ public class FavoritesFilterTest {
 
     @Before
     public void setup() throws Exception {
-        new BundleManager(this.getClass()).startBundles();
+        BundleManager.startBundles();
 
         persistFavorites();
 
@@ -97,7 +95,7 @@ public class FavoritesFilterTest {
 
     private class FavoritesFilterWrapper extends FavoritesFilter {
         @Override
-        protected User getUser(ServletRequest request) {
+        protected User getUser(HttpServletRequest request) {
             return USER;
         }
     }

@@ -11,7 +11,7 @@
 package org.eclipse.skalli.view.ext;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.common.util.HtmlBuilder;
+import org.eclipse.skalli.commons.HtmlBuilder;
 
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.terminal.Resource;

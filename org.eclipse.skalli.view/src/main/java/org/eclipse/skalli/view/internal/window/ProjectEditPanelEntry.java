@@ -15,13 +15,12 @@ import java.util.SortedSet;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.EntityBase;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.ExtensionService;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Issues;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.view.ext.ExtensionFormService;
 import org.eclipse.skalli.view.ext.ExtensionStreamSource;
 import org.eclipse.skalli.view.ext.ProjectEditContext;
@@ -124,7 +123,7 @@ class ProjectEditPanelEntry extends CustomComponent {
         if (!project.isInherited(extensionClass)) {
             extension = project.getExtension(extensionClass);
         }
-        extensionService = Services.getExtensionService(extensionClass);
+        extensionService = ExtensionServices.getExtensionService(extensionClass);
         if (extensionService == null) {
             throw new IllegalStateException(MessageFormat.format(
                     "ExtensionFormService{0} has no corresponding ExtensionService", formService.getClass()));
@@ -242,7 +241,7 @@ class ProjectEditPanelEntry extends CustomComponent {
                 collapse();
             }
         } else {
-            issueLabel.setValue(Issues.asHTMLList(null, issues));
+            issueLabel.setValue(Issue.asHTMLList(null, issues));
             issueLabel.setVisible(true);
             expand();
         }

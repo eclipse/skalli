@@ -13,7 +13,7 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.scheduler">
     <implementation class="org.eclipse.skalli.core.internal.tasks.SchedulerServiceImpl"/>
     <service>
-        <provide interface="org.eclipse.skalli.api.java.tasks.SchedulerService"/>
+        <provide interface="org.eclipse.skalli.services.scheduler.SchedulerService"/>
     </service>
 </scr:component>
 

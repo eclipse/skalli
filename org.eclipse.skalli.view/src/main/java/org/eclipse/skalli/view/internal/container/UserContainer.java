@@ -19,12 +19,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.common.UserService;
-import org.eclipse.skalli.common.UserServiceUtil;
-import org.eclipse.skalli.model.core.ProjectMember;
-import org.eclipse.skalli.model.ext.PropertyName;
+import org.eclipse.skalli.model.Member;
+import org.eclipse.skalli.model.PropertyName;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.services.user.UserService;
+import org.eclipse.skalli.services.user.UserServices;
+import org.eclipse.skalli.services.user.UserUtils;
+
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
@@ -67,7 +68,7 @@ public class UserContainer extends IndexedContainer implements Serializable {
 
     public static synchronized UserContainer createWithData() {
         if (container == null) {
-            UserService userService = UserServiceUtil.getUserService();
+            UserService userService = UserServices.getUserService();
             container = new UserContainer(userService.getUsers());
         }
         return container;
@@ -89,8 +90,8 @@ public class UserContainer extends IndexedContainer implements Serializable {
             }
             item = searchAndAddUser(value.toString());
         }
-        else if (userId instanceof ProjectMember) {
-            item = searchAndAddUser(((ProjectMember) userId).getUserID());
+        else if (userId instanceof Member) {
+            item = searchAndAddUser(((Member) userId).getUserID());
         }
         else {
             item = searchAndAddUser(userId.toString());
@@ -119,7 +120,7 @@ public class UserContainer extends IndexedContainer implements Serializable {
         UserContainer container = UserContainer.createWithData();
         Item item = container.getItem(userId);
         if (item == null) {
-            User user = UserUtil.getUser(userId.toString());
+            User user = UserUtils.getUser(userId.toString());
             if (user != null) {
                 item = container.addItem(user);
             }
@@ -129,7 +130,7 @@ public class UserContainer extends IndexedContainer implements Serializable {
 
     private static List<Item> findAndAddUser(String searchText) {
         List<Item> items = new ArrayList<Item>();
-        UserService userService = UserServiceUtil.getUserService();
+        UserService userService = UserServices.getUserService();
         List<User> users = userService.findUser(searchText);
         if (users != null) {
             for (User user : users) {
@@ -142,11 +143,11 @@ public class UserContainer extends IndexedContainer implements Serializable {
         return items;
     }
 
-    public static Set<User> getUsers(Set<ProjectMember> members) {
+    public static Set<User> getUsers(Set<Member> members) {
         UserContainer container = UserContainer.createWithData();
         Set<User> users = new TreeSet<User>();
         Set<String> userIds = new HashSet<String>();
-        for (ProjectMember member : members) {
+        for (Member member : members) {
             Item item = container.getItem(member.getUserID());
             if (item != null) {
                 User user = (User) item.getItemProperty(PROPERTY_USER).getValue();
@@ -156,7 +157,7 @@ public class UserContainer extends IndexedContainer implements Serializable {
             }
         }
         if (userIds.size() > 0) {
-            UserService userService = UserServiceUtil.getUserService();
+            UserService userService = UserServices.getUserService();
             Set<User> fetchedUsers = userService.getUsersById(userIds);
             for (User user : fetchedUsers) {
                 container.addItem(user);

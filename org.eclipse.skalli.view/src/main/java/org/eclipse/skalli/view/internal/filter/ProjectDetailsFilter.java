@@ -26,19 +26,20 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.FavoritesService;
-import org.eclipse.skalli.api.java.IssuesService;
-import org.eclipse.skalli.api.java.ProjectTemplateService;
-import org.eclipse.skalli.api.java.ValidationService;
-import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.ServiceFilter;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.model.core.Favorites;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectTemplate;
-import org.eclipse.skalli.model.ext.Issues;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.services.ServiceFilter;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.favorites.Favorites;
+import org.eclipse.skalli.services.favorites.FavoritesService;
+import org.eclipse.skalli.services.group.GroupUtils;
+import org.eclipse.skalli.services.issues.Issues;
+import org.eclipse.skalli.services.issues.IssuesService;
+import org.eclipse.skalli.services.project.ProjectUtils;
+import org.eclipse.skalli.services.template.ProjectTemplate;
+import org.eclipse.skalli.services.template.ProjectTemplateService;
+import org.eclipse.skalli.services.validation.ValidationService;
+import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.ext.ProjectContextLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,10 +96,10 @@ public class ProjectDetailsFilter implements Filter {
                 }
                 request.setAttribute(Consts.ATTRIBUTE_FAVORITES, favorites.asMap());
 
-                boolean isProjectAdmin = UserUtil.isAdministrator(userId) || UserUtil.isProjectAdmin(userId, project);
+                boolean isProjectAdmin = GroupUtils.isAdministrator(userId) || ProjectUtils.isProjectAdmin(userId, project);
                 request.setAttribute(Consts.ATTRIBUTE_PROJECTADMIN, isProjectAdmin);
 
-                boolean showIssues = isProjectAdmin || UserUtil.isProjectAdminInParentChain(userId, project);
+                boolean showIssues = isProjectAdmin || ProjectUtils.isProjectAdminInParentChain(userId, project);
                 request.setAttribute(Consts.ATTRIBUTE_SHOW_ISSUES, isProjectAdmin);
 
                 IssuesService issuesService = Services.getService(IssuesService.class);

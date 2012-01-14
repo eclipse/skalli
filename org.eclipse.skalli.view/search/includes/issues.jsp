@@ -11,8 +11,8 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
-<%@ page import="org.eclipse.skalli.model.ext.Issues" %>
-<%@ page import="org.eclipse.skalli.common.Consts" %>
+<%@ page import="org.eclipse.skalli.services.issues.Issues" %>
+<%@ page import="org.eclipse.skalli.view.Consts" %>
 
 <c:if test="${editmode==false && issues!=null && issues.stale==false}">
     <div class="issuesarea">

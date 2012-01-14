@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.ByteArrayInputStream;
 
 import org.eclipse.osgi.framework.console.CommandInterpreter;
-import org.eclipse.skalli.api.java.StorageException;
+import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.testutil.HashMapStorageService;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
 import org.junit.Test;

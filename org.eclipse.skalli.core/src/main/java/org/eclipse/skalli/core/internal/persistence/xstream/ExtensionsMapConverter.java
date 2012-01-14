@@ -12,8 +12,9 @@ package org.eclipse.skalli.core.internal.persistence.xstream;
 
 import java.util.TreeSet;
 
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.ExtensionsMap;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.ExtensionsMap;
+
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;

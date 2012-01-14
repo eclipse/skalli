@@ -1,15 +1,15 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Helloworld
+Bundle-Name: Helloworld Example (Incubation)
 Bundle-SymbolicName: org.example.skalli.ext.helloworld
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Import-Package: com.thoughtworks.xstream.converters,
  com.thoughtworks.xstream.io,
- org.eclipse.skalli.api.java,
- org.eclipse.skalli.common,
- org.eclipse.skalli.common.util,
- org.eclipse.skalli.model.core,
- org.eclipse.skalli.model.ext,
+ org.eclipse.skalli.commons,
+ org.eclipse.skalli.model,
+ org.eclipse.skalli.services.extension,
+ org.eclipse.skalli.services.extension.rest,
+ org.eclipse.skalli.services.extension.validators,
  org.eclipse.skalli.view.component,
  org.eclipse.skalli.view.ext,
  org.slf4j
@@ -17,5 +17,5 @@ Service-Component: OSGI-INF/ExtensionServiceHelloWorld.xml,
  OSGI-INF/ExtensionServiceHelloWorldProjectExtEditForm.xml,
  OSGI-INF/ExtensionServiceProjectHelloWorldBox.xml
 Bundle-ActivationPolicy: lazy
-Require-Bundle: com.vaadin;bundle-version="6.5.3"
+Require-Bundle: com.vaadin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

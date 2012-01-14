@@ -15,7 +15,7 @@ import static org.easymock.EasyMock.*;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,7 +36,7 @@ public class MailTemplateUtilTest {
 
     @Before
     public void setup() throws Exception {
-        new BundleManager(this.getClass()).startBundles();
+        BundleManager.startBundles();
 
         projectUuid = UUID.randomUUID();
         project = new Project();

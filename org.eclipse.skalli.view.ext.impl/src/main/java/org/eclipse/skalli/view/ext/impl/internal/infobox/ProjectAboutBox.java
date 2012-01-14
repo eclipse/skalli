@@ -14,10 +14,10 @@ import java.text.MessageFormat;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.TaggingService;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.info.InfoProjectExt;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ext.commons.InfoExtension;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.tagging.TaggingService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;
 import org.eclipse.skalli.view.ext.ProjectInfoBox;
@@ -60,7 +60,7 @@ public class ProjectAboutBox extends InfoBox implements ProjectInfoBox {
         }
         createLabel(layout, description, STYLE_ABOUT);
 
-        InfoProjectExt ext = project.getExtension(InfoProjectExt.class);
+        InfoExtension ext = project.getExtension(InfoExtension.class);
         if (ext != null && StringUtils.isNotBlank(ext.getPageUrl())) {
             createLink(layout, "Project Homepage", ext.getPageUrl(), DEFAULT_TARGET, STYLE_HOMEPAGE);
         }
@@ -71,7 +71,7 @@ public class ProjectAboutBox extends InfoBox implements ProjectInfoBox {
             layout.addComponent(tagComponent);
         }
 
-        if (util.getProjectTemplate().isVisible(Project.class.getName(), Project.PROPERTY_PHASE,
+        if (!util.getProjectTemplate().isHidden(Project.class.getName(), Project.PROPERTY_PHASE,
                 util.isUserProjectAdmin(project))) {
             createLabel(layout,
                     MessageFormat.format("This project is in the <b>{0}</b> phase.", project.getPhase()),

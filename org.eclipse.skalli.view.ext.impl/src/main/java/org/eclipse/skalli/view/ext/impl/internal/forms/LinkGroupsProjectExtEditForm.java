@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext.impl.internal.forms;
 
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.linkgroups.LinkGroupsProjectExt;
 import org.eclipse.skalli.view.component.MultiLinkField;
 import org.eclipse.skalli.view.ext.AbstractExtensionFormService;

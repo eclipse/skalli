@@ -10,8 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext;
 
-import org.eclipse.skalli.api.java.IconProvider;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
 
 import com.vaadin.ui.Component;
 

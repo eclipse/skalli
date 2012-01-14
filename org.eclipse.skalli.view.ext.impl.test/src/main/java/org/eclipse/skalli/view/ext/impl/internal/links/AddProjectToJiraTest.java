@@ -10,12 +10,12 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext.impl.internal.links;
 
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.testutil.PropertyHelperUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
-
+@SuppressWarnings("nls")
 public class AddProjectToJiraTest {
 
     @Test

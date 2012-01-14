@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true"  name="org.example.skalli.ext.ExtensionServiceHelloWorld">
+  <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true"  name="org.example.skalli.ext.helloworld">
     <implementation class="org.example.skalli.ext.helloworld.internal.ExtensionServiceHelloWorld"/>
       <service>
-        <provide interface="org.eclipse.skalli.model.ext.ExtensionService"/>
+        <provide interface="org.eclipse.skalli.services.extension.ExtensionService"/>
     </service>
   </scr:component>

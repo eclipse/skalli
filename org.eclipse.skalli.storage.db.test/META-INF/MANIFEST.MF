@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Test
+Bundle-Name: Skalli Database Storage Service Tests (Incubation)
 Bundle-SymbolicName: org.eclipse.skalli.storage.db.test
-Bundle-Version: 0.1.0.qualifier
-Fragment-Host: org.eclipse.skalli.storage.db;bundle-version="0.1.0"
+Bundle-Version: 0.2.0.qualifier
+Fragment-Host: org.eclipse.skalli.storage.db
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.junit,
  org.eclipse.skalli.testutil

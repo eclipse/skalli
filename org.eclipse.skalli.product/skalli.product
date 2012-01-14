@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="Skalli (Incubation)" uid="Skalli" application="org.eclipse.ui.ide.workbench" version="0.1.0" useFeatures="true" includeLaunchers="true">
+<product name="Skalli (Incubation)" uid="Skalli" application="org.eclipse.ui.ide.workbench" version="0.2.0" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/org.eclipse.skalli.view.theme/VAADIN/themes/simple/images/logo_large.png"/>
@@ -41,9 +41,9 @@
    </plugins>
 
    <features>
-      <feature id="org.eclipse.skalli.orbit.feature" version="0.1.0.qualifier"/>
-      <feature id="org.eclipse.skalli.eclipse.feature" version="0.1.0.qualifier"/>
-      <feature id="org.eclipse.skalli.feature" version="0.1.0.qualifier"/>
+      <feature id="org.eclipse.skalli.orbit.feature" version="0.2.0.qualifier"/>
+      <feature id="org.eclipse.skalli.eclipse.feature" version="0.2.0.qualifier"/>
+      <feature id="org.eclipse.skalli.feature" version="0.2.0.qualifier"/>
       <feature id="org.eclipse.jetty.all" version="7.5.1.201109140245"/>
    </features>
 

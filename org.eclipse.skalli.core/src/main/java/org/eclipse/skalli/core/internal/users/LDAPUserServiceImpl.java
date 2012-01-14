@@ -16,19 +16,18 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.EventListener;
-import org.eclipse.skalli.api.java.EventService;
-import org.eclipse.skalli.api.java.events.EventConfigUpdate;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.common.UserService;
-import org.eclipse.skalli.common.configuration.ConfigurationService;
 import org.eclipse.skalli.core.internal.cache.Cache;
 import org.eclipse.skalli.core.internal.cache.GroundhogCache;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.event.EventConfigUpdate;
+import org.eclipse.skalli.services.event.EventListener;
+import org.eclipse.skalli.services.event.EventService;
+import org.eclipse.skalli.services.user.UserService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Implementation of {@link UserService} accessing an LDAP server.

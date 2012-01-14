@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.misc;
 
-import org.eclipse.skalli.model.ext.EntityBase;
-import org.eclipse.skalli.model.ext.PropertyName;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.PropertyName;
 
 public class ReviewEntry extends EntityBase {
 

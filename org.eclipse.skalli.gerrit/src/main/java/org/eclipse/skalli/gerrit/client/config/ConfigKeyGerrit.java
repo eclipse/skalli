@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.gerrit.client.config;
 
-import org.eclipse.skalli.common.configuration.ConfigKey;
+import org.eclipse.skalli.services.configuration.ConfigKey;
 
 @SuppressWarnings("nls")
 public enum ConfigKeyGerrit implements ConfigKey {

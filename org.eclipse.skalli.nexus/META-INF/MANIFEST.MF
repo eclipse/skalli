@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Skalli Nexus Extension (Incubation)
 Bundle-SymbolicName: org.eclipse.skalli.nexus
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
@@ -11,9 +11,11 @@ Import-Package: com.thoughtworks.xstream.annotations,
  org.apache.commons.httpclient,
  org.apache.commons.httpclient.methods,
  org.apache.commons.lang,
- org.eclipse.skalli.api.rest.config,
- org.eclipse.skalli.common.configuration,
- org.eclipse.skalli.common.util,
+ org.eclipse.skalli.commons,
+ org.eclipse.skalli.services,
+ org.eclipse.skalli.services.configuration,
+ org.eclipse.skalli.services.configuration.rest,
+ org.eclipse.skalli.services.destination,
  org.restlet.resource,
  org.slf4j,
  org.w3c.dom,

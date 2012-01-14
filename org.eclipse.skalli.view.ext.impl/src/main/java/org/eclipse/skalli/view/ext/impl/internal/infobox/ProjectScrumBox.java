@@ -11,8 +11,8 @@
 package org.eclipse.skalli.view.ext.impl.internal.infobox;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.common.util.CollectionUtils;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.scrum.ScrumProjectExt;
 import org.eclipse.skalli.view.component.PeopleComponent;
 import org.eclipse.skalli.view.ext.ExtensionUtil;

@@ -16,7 +16,7 @@ import java.util.Properties;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
 
 public class MailTemplateUtil {
 

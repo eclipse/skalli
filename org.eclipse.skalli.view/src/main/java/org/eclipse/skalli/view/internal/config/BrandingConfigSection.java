@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.internal.config;
 
-import org.eclipse.skalli.api.rest.config.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSection;
 import org.restlet.resource.ServerResource;
 
 public class BrandingConfigSection implements ConfigSection{

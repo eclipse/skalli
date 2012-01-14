@@ -25,11 +25,11 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.eclipse.skalli.api.java.feeds.Content;
-import org.eclipse.skalli.api.java.feeds.FeedEntry;
-import org.eclipse.skalli.api.java.feeds.Link;
-import org.eclipse.skalli.api.java.feeds.Person;
-import org.eclipse.skalli.common.util.UUIDUtils;
+import org.eclipse.skalli.commons.UUIDUtils;
+import org.eclipse.skalli.services.feed.Content;
+import org.eclipse.skalli.services.feed.FeedEntry;
+import org.eclipse.skalli.services.feed.Link;
+import org.eclipse.skalli.services.feed.Person;
 
 @Table(name = "Entry")
 @NamedQueries({

@@ -14,14 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ext.misc.ProjectRating;
 import org.eclipse.skalli.model.ext.misc.ProjectRatingStyle;
 import org.eclipse.skalli.model.ext.misc.ReviewEntry;
 import org.eclipse.skalli.model.ext.misc.ReviewProjectExt;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
+
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;

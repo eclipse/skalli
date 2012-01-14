@@ -16,15 +16,16 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.EntityFilter;
-import org.eclipse.skalli.api.java.PersistenceService;
-import org.eclipse.skalli.api.java.StorageException;
-import org.eclipse.skalli.api.java.StorageService;
-import org.eclipse.skalli.core.internal.persistence.AbstractPersistenceService;
-import org.eclipse.skalli.core.utils.ConfigurationProperties;
-import org.eclipse.skalli.model.ext.EntityBase;
-import org.eclipse.skalli.model.ext.ExtensionService;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.core.internal.persistence.PersistenceServiceBase;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.services.configuration.ConfigurationProperties;
+import org.eclipse.skalli.services.entity.EntityService;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.MigrationException;
+import org.eclipse.skalli.services.persistence.EntityFilter;
+import org.eclipse.skalli.services.persistence.PersistenceService;
+import org.eclipse.skalli.services.persistence.StorageException;
+import org.eclipse.skalli.services.persistence.StorageService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of {@link PersistenceService} based on XStream.
  */
-public class PersistenceServiceXStream extends AbstractPersistenceService implements PersistenceService {
+public class PersistenceServiceXStream extends PersistenceServiceBase implements PersistenceService {
 
     private static final Logger LOG = LoggerFactory.getLogger(PersistenceServiceXStream.class);
 
@@ -48,7 +49,8 @@ public class PersistenceServiceXStream extends AbstractPersistenceService implem
      * Creates a new, uninitialized <code>PersistenceServiceXStream</code>.
      */
     public PersistenceServiceXStream() {
-        storageServiceClassName = ConfigurationProperties.getConfiguredStorageService();
+        storageServiceClassName = ConfigurationProperties.getProperty(ConfigurationProperties.PROPERTY_STORAGE_SERVICE,
+                FileStorageService.class.getName());
     }
 
     /**
@@ -60,15 +62,19 @@ public class PersistenceServiceXStream extends AbstractPersistenceService implem
         this.xstreamPersistence = xstreamPersistence;
     }
 
+    @Override
     protected void activate(ComponentContext context) {
+        super.activate(context);
         LOG.info(MessageFormat.format("[PersistenceService] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
+    @Override
     protected void deactivate(ComponentContext context) {
         xstreamPersistence = null;
         cache.clearAll();
         deleted.clearAll();
+        super.deactivate(context);
         LOG.info(MessageFormat.format("[PersistenceService] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
@@ -85,6 +91,20 @@ public class PersistenceServiceXStream extends AbstractPersistenceService implem
         super.unbindExtensionService(extensionService);
         cache.clearAll();
         deleted.clearAll();
+    }
+
+    @Override
+    protected void bindEntityService(EntityService<?> entityService) {
+        super.bindEntityService(entityService);
+        cache.clearAll(entityService.getEntityClass());
+        deleted.clearAll(entityService.getEntityClass());
+    }
+
+    @Override
+    protected void unbindEntityService(EntityService<?> entityService) {
+        super.unbindEntityService(entityService);
+        cache.clearAll(entityService.getEntityClass());
+        deleted.clearAll(entityService.getEntityClass());
     }
 
     protected void bindStorageService(StorageService storageService) {
@@ -119,16 +139,23 @@ public class PersistenceServiceXStream extends AbstractPersistenceService implem
             return;
         }
         if (xstreamPersistence == null) {
-            LOG.warn("Cannot load entities of type " + entityClass + ": StorageService not available");
+            LOG.warn(MessageFormat.format("Cannot load entities of type {0}: StorageService not available", entityClass));
             return;
         }
+        EntityService<T> entityService = getEntityService(entityClass);
+        if (entityService == null) {
+            LOG.warn(MessageFormat.format("No entity service registered for entities of type {0}", entityClass.getName()));
+            return;
+        }
+
         List<T> loadedEntities;
         try {
-            loadedEntities = xstreamPersistence.loadEntities(entityClass,
-                    getEntityClassLoaders(), getMigrations(), getAliases());
+            loadedEntities = xstreamPersistence.loadEntities(entityService,
+                    getClassLoaders(entityClass), getMigrations(entityClass),
+                    getAliases(entityClass), getConverters(entityClass));
         } catch (StorageException e) {
             throw new RuntimeException(e);
-        } catch (ValidationException e) {
+        } catch (MigrationException e) {
             throw new RuntimeException(e);
         }
         updateCache(loadedEntities);
@@ -149,12 +176,15 @@ public class PersistenceServiceXStream extends AbstractPersistenceService implem
         if (StringUtils.isBlank(userId)) {
             throw new IllegalArgumentException("argument 'userId' must not be null or an empty string");
         }
+
+        Class<? extends EntityBase> entityClass = entity.getClass();
         if (xstreamPersistence == null) {
-            throw new IllegalStateException("StorageService not available");
+            LOG.warn(MessageFormat.format("Cannot persist entity {0}: StorageService not available", entity));
+            return;
         }
 
         // load all project models
-        loadModel(entity.getClass());
+        loadModel(entityClass);
 
         // generate unique id
         if (entity.getUuid() == null) {
@@ -165,17 +195,25 @@ public class PersistenceServiceXStream extends AbstractPersistenceService implem
         // TODO should be in EntitySeriviceImpl#validate
         if (entity.getParentEntityId() != null) {
             UUID parentUUID = entity.getParentEntityId();
-            EntityBase parent = getParentEntity(entity.getClass(), entity);
+            EntityBase parent = getParentEntity(entityClass, entity);
             if (parent == null) {
-                throw new RuntimeException("Parent entity " + parentUUID + " does not exist");
+                throw new RuntimeException(MessageFormat.format("Parent entity {0} does not exist", parentUUID));
             }
         }
 
+        EntityService<?> entityService = getEntityService(entityClass);
+        if (entityService == null) {
+            LOG.warn(MessageFormat.format(
+                    "Cannot persist entity {0}:  No entity service registered for entities of type {1}",
+                    entity.getUuid(), entityClass.getName()));
+            return;
+        }
         try {
-            xstreamPersistence.saveEntity(entity, userId, getAliases());
+            xstreamPersistence.saveEntity(entityService, entity, userId,
+                    getAliases(entityClass), getConverters(entityClass));
         } catch (StorageException e) {
             throw new RuntimeException(e);
-        } catch (ValidationException e) {
+        } catch (MigrationException e) {
             throw new RuntimeException(e);
         }
         reloadAndUpdateCache(entity);
@@ -185,9 +223,10 @@ public class PersistenceServiceXStream extends AbstractPersistenceService implem
         EntityBase savedEntity = loadEntity(entity.getClass(), entity.getUuid());
         if (savedEntity != null) {
             updateCache(savedEntity);
-            LOG.debug("entity '" + savedEntity + "' successfully saved");
+            LOG.debug(MessageFormat.format("entity {0} successfully saved", savedEntity));
         } else {
-            throw new RuntimeException("Failed to save entity " + entity + " of type " + entity.getClass().getName()+".");
+            throw new RuntimeException(MessageFormat.format("Failed to save entity {0} of type {1}",
+                    entity, entity.getClass().getName()));
         }
     }
 
@@ -231,13 +270,15 @@ public class PersistenceServiceXStream extends AbstractPersistenceService implem
             if (parentId != null) {
                 T parentEntity = getParentEntity(entityClass, entity);
                 if (parentEntity == null) {
-                    LOG.warn("Entity " + entity.getUuid() + " references entity " + parentId
-                            + " as parent entity - but there is no such entity");
+                    LOG.warn(MessageFormat.format(
+                            "Entity {0} references entity {1} as parent entity - but there is no such entity",
+                            entity.getUuid(), parentId));
                     continue;
                 }
                 if (parentEntity.isDeleted() && !entity.isDeleted()) {
-                    LOG.warn("Entity " + entity.getUuid() + " cannot reference deleted entity "
-                            + parentId + " as parent entity");
+                    LOG.warn(MessageFormat.format(
+                            "Entity {0} cannot reference deleted entity {1} as parent entity",
+                            entity.getUuid(), parentId));
                     continue;
                 }
                 entity.setParentEntity(parentEntity);
@@ -276,18 +317,24 @@ public class PersistenceServiceXStream extends AbstractPersistenceService implem
     @Override
     public <T extends EntityBase> T loadEntity(Class<T> entityClass, UUID uuid) {
         if (xstreamPersistence == null) {
-            LOG.warn("Cannot load entity " + entityClass + "/" + uuid + ": StorageService not available");
+            LOG.warn(MessageFormat.format("Cannot load entity {0}/{1}: StorageService not available", entityClass, uuid));
+            return null;
+        }
+        EntityService<T> entityService = getEntityService(entityClass);
+        if (entityService == null) {
+            LOG.warn(MessageFormat.format("No entity service registered for entities of type {0}", entityClass.getName()));
             return null;
         }
         T entity = null;
         try {
-            entity = xstreamPersistence.loadEntity((Class<T>) entityClass, uuid,
-                    getEntityClassLoaders(),
-                    getMigrations(), getAliases());
+            entity = xstreamPersistence.loadEntity(entityService, uuid.toString(), getClassLoaders(entityClass),
+                    getMigrations(entityClass), getAliases(entityClass), getConverters(entityClass));
         } catch (StorageException e) {
-            LOG.warn("Cannot load entity " + entityClass + "/" + uuid + " of type " + entityClass.getName() + "):", e);
-        } catch (ValidationException e) {
-            LOG.warn("Cannot load entity " + entityClass + "/" + uuid + " of type " + entityClass.getName() + "):", e);
+            LOG.warn(MessageFormat.format("Cannot load entity {0}/{1} of type {2}):",
+                    entityClass, uuid, entityClass.getName()), e);
+        } catch (MigrationException e) {
+            LOG.warn(MessageFormat.format("Cannot load entity {0}/{1} of type {2}):",
+                    entityClass, uuid, entityClass.getName()), e);
         }
 
         if (entity == null) {
@@ -301,7 +348,6 @@ public class PersistenceServiceXStream extends AbstractPersistenceService implem
     }
 
     private <T extends EntityBase> void updateParentEntityInCache(Class<T> entityClass, UUID uuid, T entity) {
-        // update the parentEntity of all direct children
         for (T childEntity : cache.getEntities(entityClass)) {
             if (uuid.equals(childEntity.getParentEntityId())) {
                 childEntity.setParentEntity(entity);

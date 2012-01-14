@@ -13,17 +13,17 @@ package org.eclipse.skalli.model.ext.maven.internal;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.model.ext.AbstractConverter;
 import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
+import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-class MavenReactorConverter extends AbstractConverter<MavenReactorProjectExt> {
+class MavenReactorConverter extends RestConverterBase<MavenReactorProjectExt> {
 
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-MavenReactor"; //$NON-NLS-1$

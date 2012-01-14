@@ -27,12 +27,12 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.MailService;
-import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectMember;
-import org.eclipse.skalli.model.ext.people.PeopleProjectExt;
+import org.eclipse.skalli.model.Member;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.model.ext.commons.PeopleExtension;
+import org.eclipse.skalli.services.mail.MailService;
+import org.eclipse.skalli.services.user.UserUtils;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -68,7 +68,7 @@ public class MailServiceImpl implements MailService {
 
     @Override
     public List<Address> getToAddresses(Project project) {
-        PeopleProjectExt ext = project.getExtension(PeopleProjectExt.class);
+        PeopleExtension ext = project.getExtension(PeopleExtension.class);
         if (ext == null) {
             return Collections.emptyList();
         }
@@ -77,7 +77,7 @@ public class MailServiceImpl implements MailService {
 
     @Override
     public List<Address> getCCAddresses(Project project) {
-        PeopleProjectExt ext = project.getExtension(PeopleProjectExt.class);
+        PeopleExtension ext = project.getExtension(PeopleExtension.class);
         if (ext == null) {
             return Collections.emptyList();
         }
@@ -88,10 +88,10 @@ public class MailServiceImpl implements MailService {
      * internal methods
      ******************/
 
-    private List<Address> getAdresses(Set<ProjectMember> projectMembers) {
+    private List<Address> getAdresses(Set<Member> members) {
         List<Address> addressList = new ArrayList<Address>();
-        for (ProjectMember projectMember : projectMembers) {
-            User user = UserUtil.getUser(projectMember.getUserID());
+        for (Member member : members) {
+            User user = UserUtils.getUser(member.getUserID());
             if (StringUtils.isNotBlank(user.getEmail())) {
                 try {
                     Address address = new InternetAddress(user.getEmail());

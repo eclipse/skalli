@@ -18,7 +18,7 @@ import org.custommonkey.xmlunit.DifferenceConstants;
 import org.custommonkey.xmlunit.DifferenceEngine;
 import org.custommonkey.xmlunit.DifferenceListener;
 import org.custommonkey.xmlunit.ElementNameQualifier;
-import org.eclipse.skalli.common.util.CollectionUtils;
+import org.eclipse.skalli.commons.CollectionUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 

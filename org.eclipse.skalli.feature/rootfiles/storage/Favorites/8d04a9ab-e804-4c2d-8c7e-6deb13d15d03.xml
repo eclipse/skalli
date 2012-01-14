@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<org.eclipse.skalli.model.core.Favorites lastModified="2011-12-15T15:28:50.107Z" modifiedBy="ad" version="18">
+<entity-favorites lastModified="2011-12-15T15:28:50.107Z" modifiedBy="ad" version="19">
   <uuid>8d04a9ab-e804-4c2d-8c7e-6deb13d15d03</uuid>
   <deleted>false</deleted>
   <userId>ad</userId>
@@ -8,4 +8,4 @@
     <uuid>1d21af33-76ef-462c-8f87-44b4b9504bb2</uuid>
     <uuid>2776b394-1ae9-4f8b-a714-c43e2b23077f</uuid>
   </projects>
-</org.eclipse.skalli.model.core.Favorites>
+</entity-favorites>

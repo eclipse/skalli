@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.project.ProjectService;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.CheckBox;

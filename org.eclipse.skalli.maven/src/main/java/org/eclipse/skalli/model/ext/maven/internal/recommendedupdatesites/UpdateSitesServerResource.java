@@ -12,14 +12,14 @@ package org.eclipse.skalli.model.ext.maven.internal.recommendedupdatesites;
 
 import java.io.IOException;
 
-import org.eclipse.skalli.api.java.authentication.LoginUtil;
-import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.api.rest.AbstractServerResource;
-import org.eclipse.skalli.api.rest.ResourceRepresentation;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpdateSites;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpdateSitesService;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.extension.rest.ResourceBase;
+import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
+import org.eclipse.skalli.services.group.GroupUtils;
+import org.eclipse.skalli.services.user.LoginUtils;
 import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
@@ -29,7 +29,7 @@ import org.restlet.resource.Put;
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.mapper.CannotResolveClassException;
 
-public class UpdateSitesServerResource extends AbstractServerResource {
+public class UpdateSitesServerResource extends ResourceBase {
 
     @Get
     public Representation retrieve() {
@@ -40,7 +40,7 @@ public class UpdateSitesServerResource extends AbstractServerResource {
         RecommendedUpdateSites updateSites = service.getRecommendedUpdateSites(userId, id);
 
         if (updateSites == null) {
-            return createError(Status.CLIENT_ERROR_NOT_FOUND, "Recommended update sites \"{0}\" for user \"{1}\" not found.", id, userId); //$NON-NLS-1$
+            return createStatusMessage(Status.CLIENT_ERROR_NOT_FOUND, "Recommended update sites \"{0}\" for user \"{1}\" not found.", id, userId); //$NON-NLS-1$
         }
 
         ResourceRepresentation<RecommendedUpdateSites> representation = new ResourceRepresentation<RecommendedUpdateSites>(
@@ -63,12 +63,12 @@ public class UpdateSitesServerResource extends AbstractServerResource {
             String userId = (String) getRequestAttributes().get("userId");//$NON-NLS-1$
             updateSites.setUserId(userId);
 
-            LoginUtil loginUtil = new LoginUtil(ServletUtils.getRequest(getRequest()));
+            LoginUtils loginUtil = new LoginUtils(ServletUtils.getRequest(getRequest()));
             String loggedInUser = loginUtil.getLoggedInUserId();
 
-            if (UserUtil.isAdministrator(loggedInUser)) {
+            if (GroupUtils.isAdministrator(loggedInUser)) {
                 if (!loggedInUser.equals(userId)) {
-                    return createError(Status.CLIENT_ERROR_BAD_REQUEST,
+                    return createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST,
                             "You are not allowed to create recommended update sites for another user");
                 }
                 RecommendedUpdateSitesService service = Services
@@ -80,19 +80,19 @@ public class UpdateSitesServerResource extends AbstractServerResource {
                 }
                 service.persist(updateSites, loggedInUser);
             } else {
-                return createError(Status.CLIENT_ERROR_FORBIDDEN, "Access denied.", new Object[] {});
+                return createStatusMessage(Status.CLIENT_ERROR_FORBIDDEN, "Access denied.", new Object[] {});
             }
         } catch (IOException e) {
-            createError(Status.SERVER_ERROR_INTERNAL,
+            createStatusMessage(Status.SERVER_ERROR_INTERNAL,
                     "Failed to read recommended update sites entity: " + e.getMessage());
         } catch (ValidationException e) {
-            createError(Status.CLIENT_ERROR_BAD_REQUEST,
+            createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST,
                     "Validating resource with id \"{0}\" failed: " + e.getMessage(), updateSites.getId());
         } catch (CannotResolveClassException e) {
-            createError(Status.CLIENT_ERROR_BAD_REQUEST,
+            createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST,
                     "Failed to parse the request body: " + e.getMessage());
         } catch (ConversionException e) {
-            createError(Status.CLIENT_ERROR_BAD_REQUEST,
+            createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST,
                     "Failed to parse the request body: " + e.getMessage());
         }
         return null;

@@ -11,31 +11,38 @@
 package org.eclipse.skalli.core.internal.favorites;
 
 import java.text.MessageFormat;
+import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.eclipse.skalli.api.java.EntityFilter;
-import org.eclipse.skalli.api.java.EntityServiceImpl;
-import org.eclipse.skalli.api.java.FavoritesService;
-import org.eclipse.skalli.model.core.Favorites;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Severity;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.services.entity.EntityServiceBase;
+import org.eclipse.skalli.services.extension.DataMigration;
+import org.eclipse.skalli.services.favorites.Favorites;
+import org.eclipse.skalli.services.favorites.FavoritesService;
+import org.eclipse.skalli.services.persistence.EntityFilter;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FavoritesServiceImpl extends EntityServiceImpl<Favorites> implements FavoritesService {
+public class FavoritesServiceImpl extends EntityServiceBase<Favorites> implements FavoritesService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FavoritesServiceImpl.class);
 
+    private static final int CURRENT_MODEL_VERISON = 20;
+
+    @Override
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[FavoritesService] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
+    @Override
     protected void deactivate(ComponentContext context) {
         LOG.info(MessageFormat.format("[FavoritesService] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
@@ -44,6 +51,26 @@ public class FavoritesServiceImpl extends EntityServiceImpl<Favorites> implement
     @Override
     public Class<Favorites> getEntityClass() {
         return Favorites.class;
+    }
+
+
+    @Override
+    public int getModelVersion() {
+        return CURRENT_MODEL_VERISON;
+    }
+
+    @Override
+    public Map<String, Class<?>> getAliases() {
+        Map<String, Class<?>> aliases = super.getAliases();
+        aliases.put("entity-favorites", Favorites.class); //$NON-NLS-1$
+        return aliases;
+    }
+
+    @Override
+    public Set<DataMigration> getMigrations() {
+        Set<DataMigration> migrations = super.getMigrations();
+        migrations.add(new FavoritesDataMigration19());
+        return migrations;
     }
 
     @Override

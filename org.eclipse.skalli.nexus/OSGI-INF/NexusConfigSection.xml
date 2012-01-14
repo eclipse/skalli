@@ -11,6 +11,6 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.ext.nexus.config">
    <implementation class="org.eclipse.skalli.nexus.internal.config.NexusConfigSection"/>
    <service>
-      <provide interface="org.eclipse.skalli.api.rest.config.ConfigSection"/>
+      <provide interface="org.eclipse.skalli.services.configuration.rest.ConfigSection"/>
    </service>
 </scr:component>

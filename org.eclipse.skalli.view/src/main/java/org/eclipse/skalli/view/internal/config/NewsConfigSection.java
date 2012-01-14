@@ -10,9 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.internal.config;
 
+import org.eclipse.skalli.services.configuration.rest.ConfigSection;
 import org.restlet.resource.ServerResource;
-
-import org.eclipse.skalli.api.rest.config.ConfigSection;
 
 public class NewsConfigSection implements ConfigSection {
 

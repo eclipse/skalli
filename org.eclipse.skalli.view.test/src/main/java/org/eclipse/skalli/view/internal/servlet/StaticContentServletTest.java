@@ -28,7 +28,7 @@ public class StaticContentServletTest {
 
     @Before
     public void setup() throws Exception {
-        new BundleManager(this.getClass()).startBundles();
+        BundleManager.startBundles();
         sb = new StringBuilder();
     }
 

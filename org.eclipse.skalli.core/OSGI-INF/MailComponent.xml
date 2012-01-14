@@ -13,7 +13,7 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.mail">
     <implementation class="org.eclipse.skalli.core.internal.mail.MailServiceImpl"/>
     <service>
-        <provide interface="org.eclipse.skalli.api.java.MailService"/>
+        <provide interface="org.eclipse.skalli.services.mail.MailService"/>
     </service>
 </scr:component>
 

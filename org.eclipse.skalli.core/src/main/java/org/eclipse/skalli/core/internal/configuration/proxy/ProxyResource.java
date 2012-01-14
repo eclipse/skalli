@@ -13,9 +13,9 @@ package org.eclipse.skalli.core.internal.configuration.proxy;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.skalli.api.rest.config.ConfigResource;
-import org.eclipse.skalli.common.configuration.ConfigKey;
-import org.eclipse.skalli.common.configuration.proxy.ConfigKeyProxy;
+import org.eclipse.skalli.services.configuration.ConfigKey;
+import org.eclipse.skalli.services.configuration.rest.ConfigResource;
+import org.eclipse.skalli.services.destination.ConfigKeyProxy;
 
 public class ProxyResource extends ConfigResource<ConfigKeyProxy, ProxyConfig> {
 

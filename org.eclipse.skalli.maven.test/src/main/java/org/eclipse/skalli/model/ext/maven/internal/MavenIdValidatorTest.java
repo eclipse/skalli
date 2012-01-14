@@ -10,11 +10,10 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal;
 
-import org.junit.Test;
-
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.testutil.ValidatorUtils;
+import org.junit.Test;
 
 @SuppressWarnings("nls")
 public class MavenIdValidatorTest {

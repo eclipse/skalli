@@ -11,7 +11,7 @@
 
 package org.example.skalli.ext.helloworld.ui;
 
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.view.component.MultiTextField;
 import org.eclipse.skalli.view.ext.AbstractExtensionFormService;
 import org.eclipse.skalli.view.ext.DefaultProjectFieldFactory;

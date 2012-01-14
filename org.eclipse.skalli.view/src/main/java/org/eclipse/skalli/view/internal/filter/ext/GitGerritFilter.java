@@ -33,22 +33,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.common.configuration.ConfigurationService;
-import org.eclipse.skalli.common.util.CollectionUtils;
+import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritService;
 import org.eclipse.skalli.gerrit.client.config.ConfigKeyGerrit;
 import org.eclipse.skalli.gerrit.client.exception.CommandException;
 import org.eclipse.skalli.gerrit.client.exception.ConnectionException;
 import org.eclipse.skalli.gerrit.client.exception.GerritClientException;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectMember;
+import org.eclipse.skalli.model.Member;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.model.ext.commons.PeopleExtension;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
-import org.eclipse.skalli.model.ext.people.PeopleProjectExt;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.internal.filter.FilterException;
 import org.eclipse.skalli.view.internal.filter.FilterUtil;
 import org.slf4j.Logger;
@@ -283,18 +283,18 @@ public class GitGerritFilter implements Filter {
      */
     private Set<String> getKnownGerritAccountsForProject(final GerritClient client, final Project project)
             throws GerritClientException {
-        PeopleProjectExt peopleExt = project.getExtension(PeopleProjectExt.class);
+        PeopleExtension peopleExt = project.getExtension(PeopleExtension.class);
 
         if (peopleExt == null) {
             return Collections.emptySet();
         }
 
-        Set<ProjectMember> projectMembers = new HashSet<ProjectMember>();
+        Set<Member> projectMembers = new HashSet<Member>();
         projectMembers.addAll(peopleExt.getLeads());
         projectMembers.addAll(peopleExt.getMembers());
 
         Set<String> accountIds = new HashSet<String>();
-        for (ProjectMember projectMember : projectMembers) {
+        for (Member projectMember : projectMembers) {
             accountIds.add(projectMember.getUserID());
         }
         return client.getKnownAccounts(accountIds);

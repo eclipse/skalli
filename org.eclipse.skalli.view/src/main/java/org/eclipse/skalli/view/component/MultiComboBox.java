@@ -17,11 +17,11 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.util.UUIDList;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.PropertyName;
+import org.eclipse.skalli.commons.UUIDList;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.PropertyName;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.project.ProjectService;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Validator.InvalidValueException;

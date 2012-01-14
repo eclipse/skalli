@@ -18,13 +18,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.eclipse.skalli.api.java.PersistenceService;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.Taggable;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ext.commons.TagsExtension;
+import org.eclipse.skalli.services.persistence.PersistenceService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("nls")
 public class TaggingServiceImplTest {
 
     private List<Project> projects;
@@ -43,9 +44,11 @@ public class TaggingServiceImplTest {
             ret.setParentEntity(parent);
         }
         if (tags != null) {
+            TagsExtension ext = new TagsExtension();
             for (String tag : tags) {
-                ret.addTag(tag);
+                ext.addTag(tag);
             }
+            ret.addExtension(ext);
         }
         return ret;
     }
@@ -70,19 +73,43 @@ public class TaggingServiceImplTest {
     }
 
     @Test
-    public void testGetAvailableTags() {
-        Set<String> res = ts.getAvailableTags();
+    public void testGetAllTags() {
+        Set<String> res = ts.getAllTags(Project.class);
         Assert.assertNotNull(res);
         Assert.assertEquals(3, res.size());
     }
 
     @Test
     public void testGetTaggables() {
-        Map<String, Set<Taggable>> res = ts.getTaggables();
+        Map<String, Set<Project>> res = ts.getTaggables(Project.class);
         Assert.assertNotNull(res);
         Assert.assertEquals(2, res.get("tagBoth").size());
         Assert.assertEquals(1, res.get("tag2").size());
         Assert.assertEquals(1, res.get("tag3").size());
+    }
+
+
+    @Test
+    public void getProjectsForTag() {
+        Set<Project> res1 = ts.getTaggables(Project.class, "tagBoth"); //$NON-NLS-1$
+        Assert.assertNotNull(res1);
+        Assert.assertEquals(2, res1.size());
+
+        Set<Project> res2 = ts.getTaggables(Project.class, "tag2"); //$NON-NLS-1$
+        Assert.assertNotNull(res2);
+        Assert.assertEquals(1, res2.size());
+        Assert.assertEquals(uuid2, res2.toArray(new Project[1])[0].getUuid());
+
+        Set<Project> res3 = ts.getTaggables(Project.class, "tagNonExisting"); //$NON-NLS-1$
+        Assert.assertNotNull(res3);
+        Assert.assertEquals(0, res3.size());
+
+        // tags exists, but project is deleted
+        Set<Project> res4 = ts.getTaggables(Project.class, "tag4"); //$NON-NLS-1$
+        Assert.assertNotNull(res4);
+        Assert.assertEquals(0, res4.size());
+
+        verify(mocks);
     }
 
 }

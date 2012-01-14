@@ -39,10 +39,11 @@ public class IgnoreUnknownElementsXStream extends XStream {
         return wrapper;
     }
 
-    static public XStream getXStreamInstance(Set<? extends Converter> converters, Set<ClassLoader> entityClassLoaders, Map<String, Class<?>> aliases) {
+    static public XStream getXStreamInstance(Set<? extends Converter> converters, Set<ClassLoader> entityClassLoaders,
+            Map<String, Class<?>> aliases) {
         XStream xstream = new IgnoreUnknownElementsXStream();
         if (converters != null) {
-            for(Converter converter: converters) {
+            for (Converter converter : converters) {
                 xstream.registerConverter(converter);
             }
         }

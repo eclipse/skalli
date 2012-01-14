@@ -13,7 +13,7 @@ package org.eclipse.skalli.feed.db.entities;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
-import org.eclipse.skalli.api.java.feeds.Person;
+import org.eclipse.skalli.services.feed.Person;
 
 @Embeddable
 public class PersonJPA implements Person {

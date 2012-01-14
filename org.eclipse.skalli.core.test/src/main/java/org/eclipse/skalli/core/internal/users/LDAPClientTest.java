@@ -18,11 +18,10 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
 import org.easymock.EasyMock;
+import org.eclipse.skalli.model.User;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.eclipse.skalli.common.User;
 
 @SuppressWarnings("nls")
 public class LDAPClientTest {

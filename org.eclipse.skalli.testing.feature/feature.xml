@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.skalli.testing.feature"
       label="Skalli Test Support Feature (Incubation)"
-      version="0.1.0.qualifier"
+      version="0.2.0.qualifier"
       provider-name="Eclipse Skalli">
 
    <description url="http://www.eclipse.org/skalli">

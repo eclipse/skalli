@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<org.eclipse.skalli.model.ext.Issues lastModified="2011-12-15T16:33:31.243Z" modifiedBy="admin" version="18">
+<entity-issues lastModified="2011-12-15T16:33:31.243Z" modifiedBy="admin" version="19">
   <uuid>b5aa7c94-1726-43a2-87b7-4b9689887217</uuid>
   <deleted>false</deleted>
   <issues>
     <no-comparator/>
-    <org.eclipse.skalli.model.ext.Issue>
+    <issue>
       <severity>ERROR</severity>
-      <issuer>org.eclipse.skalli.common.util.HostReachableValidator</issuer>
+      <issuer>org.eclipse.skalli.services.extension.validators.HostReachableValidator</issuer>
       <entityId reference="../../../uuid"/>
-      <extension>org.eclipse.skalli.model.ext.info.InfoProjectExt</extension>
+      <extension>org.eclipse.skalli.model.ext.commons.InfoExtension</extension>
       <propertyId class="string">pageUrl</propertyId>
       <item>0</item>
       <message>'http://www.eclipse.org/modeling/enf/' not found due to a permanent problem with the request (404 Not Found).</message>
       <timestamp>1323966811240</timestamp>
-    </org.eclipse.skalli.model.ext.Issue>
+    </issue>
   </issues>
   <stale>false</stale>
-</org.eclipse.skalli.model.ext.Issues>
+</entity-issues>

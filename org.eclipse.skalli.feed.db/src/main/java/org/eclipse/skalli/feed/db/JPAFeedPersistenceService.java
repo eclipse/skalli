@@ -16,14 +16,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 
-import org.eclipse.skalli.api.java.feeds.FeedEntry;
-import org.eclipse.skalli.api.java.feeds.FeedPersistenceService;
-import org.eclipse.skalli.api.java.feeds.FeedServiceException;
 import org.eclipse.skalli.feed.db.entities.EntryJPA;
+import org.eclipse.skalli.services.feed.FeedEntry;
+import org.eclipse.skalli.services.feed.FeedPersistenceService;
+import org.eclipse.skalli.services.feed.FeedServiceException;
 
 public class JPAFeedPersistenceService implements FeedPersistenceService {
 
-    private static EntityManagerFactory emf;
+    private EntityManagerFactory emf;
 
     @Override
     public void merge(Collection<FeedEntry> entries) throws FeedServiceException {

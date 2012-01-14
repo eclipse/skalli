@@ -12,7 +12,8 @@ package org.eclipse.skalli.core.internal.persistence.xstream;
 
 import java.util.UUID;
 
-import org.eclipse.skalli.common.util.UUIDList;
+import org.eclipse.skalli.commons.UUIDList;
+
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;

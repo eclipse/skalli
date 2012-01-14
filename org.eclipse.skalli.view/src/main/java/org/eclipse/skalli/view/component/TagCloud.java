@@ -19,10 +19,10 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.eclipse.skalli.api.java.TaggingService;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.model.ext.Taggable;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.tagging.TaggingService;
+import org.eclipse.skalli.view.Consts;
 
 public class TagCloud {
 
@@ -35,7 +35,7 @@ public class TagCloud {
     private int thresholdMin = 1;
     private int thresholdMax = 1;
 
-    private final Map<String, Set<Taggable>> tags;
+    private final Map<String, Set<Project>> tags;
 
     /**
      * Set of most popular tags sorted alphanumerically.
@@ -52,14 +52,14 @@ public class TagCloud {
         TagCloud tagCloud = null;
         TaggingService service = Services.getService(TaggingService.class);
         if (service != null) {
-            tagCloud = new TagCloud(service.getTaggables(), maxTags);
+            tagCloud = new TagCloud(service.getTaggables(Project.class), maxTags);
         }
         return tagCloud;
     }
 
-    TagCloud(Map<String, Set<Taggable>> tags, int viewMax) {
+    TagCloud(Map<String, Set<Project>> tags, int viewMax) {
         if (tags == null) {
-            tags = new HashMap<String, Set<Taggable>>(0);
+            tags = new HashMap<String, Set<Project>>(0);
         }
         this.tags = tags;
         this.viewMax = Math.min(tags.size(), viewMax);
@@ -70,7 +70,7 @@ public class TagCloud {
      * Sorts tags by their frequency (most frequent tags at the beginning).
      * Determines the thresholds for the font size calculation.
      */
-    private void determineMostPopular(final Map<String, Set<Taggable>> tags) {
+    private void determineMostPopular(final Map<String, Set<Project>> tags) {
         // sort all tags by frequency
         LinkedList<String> sortedByFrequency = new LinkedList<String>(tags.keySet());
         Collections.sort(sortedByFrequency, new Comparator<String>() {

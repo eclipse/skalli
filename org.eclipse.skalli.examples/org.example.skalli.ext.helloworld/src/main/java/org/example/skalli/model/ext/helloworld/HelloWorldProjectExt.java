@@ -14,8 +14,8 @@ package org.example.skalli.model.ext.helloworld;
 import java.util.Collection;
 import java.util.TreeSet;
 
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.PropertyName;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.PropertyName;
 
 public class HelloWorldProjectExt extends ExtensionEntityBase {
 

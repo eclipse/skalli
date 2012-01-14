@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+    Copyright (c) 2010, 2011 SAP AG and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        SAP AG - initial API and implementation
+ -->
+
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.ui.infobox.subprojects">
+   <implementation class="org.eclipse.skalli.view.ext.impl.internal.infobox.SubprojectsInfoBox"/>
+   <service>
+      <provide interface="org.eclipse.skalli.view.ext.ProjectInfoBox"/>
+   </service>
+    <reference
+        name="ProjectService"
+        interface="org.eclipse.skalli.services.project.ProjectService"
+        cardinality="1..1"
+        policy="dynamic"
+        bind="bindProjectService"
+        unbind="unbindProjectService"/>   
+    <reference
+        name="ProjectTemplateService"
+        interface="org.eclipse.skalli.services.template.ProjectTemplateService"
+        cardinality="1..1"
+        policy="dynamic"
+        bind="bindProjectTemplateService"
+        unbind="unbindProjectTemplateService"/>
+</scr:component>
+

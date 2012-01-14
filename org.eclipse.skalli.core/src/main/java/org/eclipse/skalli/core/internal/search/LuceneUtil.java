@@ -14,8 +14,7 @@ import java.util.List;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-
-import org.eclipse.skalli.model.ext.IndexEntry;
+import org.eclipse.skalli.services.search.IndexEntry;
 
 public class LuceneUtil {
 

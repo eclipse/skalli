@@ -22,14 +22,16 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenPathResolver;
 import org.eclipse.skalli.model.ext.maven.MavenPomUtility;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.destination.DestinationService;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.HttpServerMock;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
@@ -47,8 +49,8 @@ public class MavenResolverTest {
 
         private HashMap<String, InputStream> testContent = new HashMap<String, InputStream>();
 
-        public MavenResolverMock(MavenPomParser parser, MavenPathResolver pathResolver) {
-            super(PropertyHelperUtils.TEST_UUIDS[0], parser, pathResolver);
+        public MavenResolverMock(MavenPomParser parser, MavenPathResolver pathResolver, DestinationService destinationService) {
+            super(PropertyHelperUtils.TEST_UUIDS[0], parser, pathResolver, destinationService);
         }
 
         @Override
@@ -73,12 +75,14 @@ public class MavenResolverTest {
     private MavenPom reactorPom;
     private String reactorPath;
     private static HttpServerMock mmus;
+    private static DestinationService destinationService;
 
     @BeforeClass
     public static void setUpOnce() throws Exception {
-        new BundleManager(MavenResolverTest.class).startBundles();
+        BundleManager.startBundles();
         mmus = new HttpServerMock();
         mmus.start();
+        destinationService = Services.getRequiredService(DestinationService.class);
     }
 
     @AfterClass
@@ -100,7 +104,7 @@ public class MavenResolverTest {
 
     @Test
     public void testPomNoParent() throws Exception {
-        MavenResolverMock mavenResolver = new MavenResolverMock(parserMock, pathResolver);
+        MavenResolverMock mavenResolver = new MavenResolverMock(parserMock, pathResolver, destinationService);
         InputStream in = mavenResolver.getStream(reactorPath);
         reactorPom.setSelf(TEST_PARENT_COORD);
         expect(parserMock.parse(in)).andReturn(reactorPom);
@@ -111,7 +115,7 @@ public class MavenResolverTest {
 
     @Test
     public void testPomWithParent() throws Exception {
-        MavenResolverMock mavenResolver = new MavenResolverMock(parserMock, pathResolver);
+        MavenResolverMock mavenResolver = new MavenResolverMock(parserMock, pathResolver, destinationService);
         InputStream in = mavenResolver.getStream(reactorPath);
         reactorPom.setSelf(new MavenModule(null, PARENT_ARTIFACT, PARENT_PACKAGING));
         reactorPom.setParent(getParentCoordinates());
@@ -123,7 +127,7 @@ public class MavenResolverTest {
 
     @Test
     public void testPomWithModules() throws Exception {
-        MavenResolverMock mavenResolver = new MavenResolverMock(parserMock, pathResolver);
+        MavenResolverMock mavenResolver = new MavenResolverMock(parserMock, pathResolver, destinationService);
         InputStream parentPom = mavenResolver.getStream(reactorPath);
         InputStream modulePom1 = mavenResolver.getStream(MODULE1);
         InputStream modulePom2 = mavenResolver.getStream(MODULE2);
@@ -145,7 +149,7 @@ public class MavenResolverTest {
     @Test
     public void testPomWithModulesContainingModules() throws Exception {
         String module2Path = MODULE1 + "/" + MODULE2;
-        MavenResolverMock mavenResolver = new MavenResolverMock(parserMock, pathResolver);
+        MavenResolverMock mavenResolver = new MavenResolverMock(parserMock, pathResolver, destinationService);
         InputStream reactorPomStream = mavenResolver.getStream(reactorPath);
         InputStream modulePomStream1 = mavenResolver.getStream(MODULE1);
         InputStream modulePomStream2 = mavenResolver.getStream(module2Path);
@@ -173,7 +177,7 @@ public class MavenResolverTest {
     public void testGetMavenPom() throws Exception {
         mmus.addContent("testGetMaven", MavenPomUtility.getPomWithParentAndModules());
         URL url = new URL("http://" + mmus.getHost() + ":" + mmus.getPort() + "/testGetMaven/" + SC_OK);
-        MavenResolverMock mavenResolver = new MavenResolverMock(new MavenPomParserImpl(), pathResolver);
+        MavenResolverMock mavenResolver = new MavenResolverMock(new MavenPomParserImpl(), pathResolver, destinationService);
 
         MavenPom expectedPom = new MavenPom();
         expectedPom.setSelf(getCoordinatesWithoutGroupId());
@@ -195,7 +199,7 @@ public class MavenResolverTest {
     private void assertIssues(int... expectedResponseCodes) throws Exception {
         for (int expectedResponseCode : expectedResponseCodes) {
             URL url = new URL("http://" + mmus.getHost() + ":" + mmus.getPort() + "/" + expectedResponseCode);
-            MavenResolverMock mavenResolver = new MavenResolverMock(parserMock, pathResolver);
+            MavenResolverMock mavenResolver = new MavenResolverMock(parserMock, pathResolver, destinationService);
             try {
                 mavenResolver.getMavenPom(url);
             } catch (MavenValidationException e) {

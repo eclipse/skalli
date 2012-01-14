@@ -10,9 +10,10 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.search;
 
-import org.eclipse.skalli.model.ext.AbstractIndexer;
+import org.eclipse.skalli.services.extension.IndexerBase;
 
-class TestEntityIndexer extends AbstractIndexer<TestEntity> {
+
+class TestEntityIndexer extends IndexerBase<TestEntity> {
 
     @Override
     protected void indexFields(TestEntity entity) {

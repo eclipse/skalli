@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.scrum.internal;
 
-import org.eclipse.skalli.model.ext.AbstractIndexer;
 import org.eclipse.skalli.model.ext.scrum.ScrumProjectExt;
+import org.eclipse.skalli.services.extension.IndexerBase;
 
-public class ScrumIndexer extends AbstractIndexer<ScrumProjectExt> {
+public class ScrumIndexer extends IndexerBase<ScrumProjectExt> {
 
     @Override
     protected void indexFields(ScrumProjectExt scrum) {

@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.search;
 
-import org.eclipse.skalli.model.ext.AbstractIndexer;
-import org.eclipse.skalli.model.ext.ExtensionServiceBase;
+import org.eclipse.skalli.services.extension.ExtensionServiceBase;
+import org.eclipse.skalli.services.extension.Indexer;
 
 public class TestExtensionService extends ExtensionServiceBase<TestEntity> {
 
@@ -51,7 +51,7 @@ public class TestExtensionService extends ExtensionServiceBase<TestEntity> {
     }
 
     @Override
-    public AbstractIndexer<TestEntity> getIndexer() {
+    public Indexer<TestEntity> getIndexer() {
         return new TestEntityIndexer();
     }
 }

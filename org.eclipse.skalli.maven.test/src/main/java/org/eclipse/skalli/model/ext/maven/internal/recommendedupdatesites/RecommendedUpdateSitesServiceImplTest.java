@@ -17,10 +17,10 @@ import static org.junit.Assert.assertThat;
 
 import java.util.UUID;
 
-import org.eclipse.skalli.api.java.PersistenceService;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpdateSites;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.UpdateSite;
+import org.eclipse.skalli.services.persistence.PersistenceService;
 import org.eclipse.skalli.testutil.HashMapStorageService;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
 import org.junit.Before;

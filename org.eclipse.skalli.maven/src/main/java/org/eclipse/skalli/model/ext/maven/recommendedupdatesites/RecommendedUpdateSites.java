@@ -13,8 +13,8 @@ package org.eclipse.skalli.model.ext.maven.recommendedupdatesites;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.skalli.model.ext.EntityBase;
-import org.eclipse.skalli.model.ext.PropertyName;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.PropertyName;
 
 public class RecommendedUpdateSites extends EntityBase {
 

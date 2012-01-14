@@ -19,7 +19,7 @@ import java.net.URL;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.skalli.common.util.XMLUtils;
+import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.nexus.NexusClientException;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -27,9 +27,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-/**
- *
- */
+@SuppressWarnings("nls")
 public class NexusResponseParserTest {
 
     private Element getElement(String xml) throws SAXException, IOException, ParserConfigurationException {

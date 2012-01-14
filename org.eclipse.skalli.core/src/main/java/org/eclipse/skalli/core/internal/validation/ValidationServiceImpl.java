@@ -24,25 +24,25 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.EntityService;
-import org.eclipse.skalli.api.java.EventListener;
-import org.eclipse.skalli.api.java.EventService;
-import org.eclipse.skalli.api.java.IssuesService;
-import org.eclipse.skalli.api.java.Validation;
-import org.eclipse.skalli.api.java.ValidationService;
-import org.eclipse.skalli.api.java.events.EventCustomizingUpdate;
-import org.eclipse.skalli.api.java.tasks.RunnableSchedule;
-import org.eclipse.skalli.api.java.tasks.SchedulerService;
-import org.eclipse.skalli.api.java.tasks.Task;
 import org.eclipse.skalli.api.rest.monitor.Monitorable;
-import org.eclipse.skalli.common.configuration.ConfigurationService;
-import org.eclipse.skalli.common.util.CollectionUtils;
-import org.eclipse.skalli.common.util.FormatUtils;
-import org.eclipse.skalli.model.ext.EntityBase;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Issues;
-import org.eclipse.skalli.model.ext.Severity;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.commons.FormatUtils;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.entity.EntityService;
+import org.eclipse.skalli.services.event.EventCustomizingUpdate;
+import org.eclipse.skalli.services.event.EventListener;
+import org.eclipse.skalli.services.event.EventService;
+import org.eclipse.skalli.services.issues.Issues;
+import org.eclipse.skalli.services.issues.IssuesService;
+import org.eclipse.skalli.services.scheduler.RunnableSchedule;
+import org.eclipse.skalli.services.scheduler.SchedulerService;
+import org.eclipse.skalli.services.scheduler.Task;
+import org.eclipse.skalli.services.validation.Validation;
+import org.eclipse.skalli.services.validation.ValidationService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.restlet.resource.ServerResource;
@@ -270,12 +270,12 @@ public class ValidationServiceImpl implements ValidationService, EventListener<E
                 issuesService.persist(entity.getUuid(), issues, userId);
                 SortedSet<Issue> fatalIssues = Issues.getIssues(issues, Severity.FATAL);
                 if (fatalIssues.size() > 0) {
-                    LOG.warn(Issues.getMessage(
+                    LOG.warn(Issue.getMessage(
                             MessageFormat.format("Entity {0} has {1} FATAL issues", entity.getUuid(),
                                     fatalIssues.size()),
                             fatalIssues));
                 } else if (LOG.isInfoEnabled()) {
-                    LOG.info(Issues.getMessage(
+                    LOG.info(Issue.getMessage(
                             MessageFormat.format("Entity {0}: validated ({1} issues found)", entity.getUuid(),
                                     issues.size()),
                             issues));

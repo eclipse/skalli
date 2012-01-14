@@ -13,8 +13,8 @@ package org.eclipse.skalli.testutil;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.PropertyName;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.PropertyName;
 
 @SuppressWarnings("nls")
 public class TestExtension extends ExtensionEntityBase {

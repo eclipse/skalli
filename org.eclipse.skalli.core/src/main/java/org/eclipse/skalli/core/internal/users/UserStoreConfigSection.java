@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.users;
 
-import org.eclipse.skalli.api.rest.config.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSection;
 import org.osgi.service.component.ComponentContext;
 import org.restlet.resource.ServerResource;
 import org.slf4j.Logger;

@@ -13,7 +13,7 @@ package org.eclipse.skalli.model.ext.maven;
 import java.util.Collection;
 import java.util.TreeSet;
 
-import org.eclipse.skalli.model.ext.Derived;
+import org.eclipse.skalli.model.Derived;
 
 public class MavenReactor {
 

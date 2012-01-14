@@ -11,7 +11,7 @@
 
 package org.example.skalli.ext.helloworld.ui;
 
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.ProjectInfoBox;
 import org.example.skalli.model.ext.helloworld.HelloWorldProjectExt;

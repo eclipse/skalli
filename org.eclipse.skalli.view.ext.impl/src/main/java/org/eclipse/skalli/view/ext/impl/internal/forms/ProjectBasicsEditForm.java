@@ -13,15 +13,14 @@ package org.eclipse.skalli.view.ext.impl.internal.forms;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.skalli.api.java.NoSuchTemplateException;
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.api.java.ProjectTemplateService;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.model.core.DefaultProjectTemplate;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectTemplate;
-import org.eclipse.skalli.model.ext.EntityBase;
-import org.eclipse.skalli.model.ext.PropertyName;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.PropertyName;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.template.NoSuchTemplateException;
+import org.eclipse.skalli.services.template.ProjectTemplate;
+import org.eclipse.skalli.services.template.ProjectTemplateService;
 import org.eclipse.skalli.view.component.PhaseSelect;
 import org.eclipse.skalli.view.ext.AbstractExtensionFormService;
 import org.eclipse.skalli.view.ext.DefaultProjectFieldFactory;
@@ -108,7 +107,7 @@ public class ProjectBasicsEditForm extends AbstractExtensionFormService<Project>
                 cb.setFilteringMode(Filtering.FILTERINGMODE_CONTAINS);
                 cb.setNewItemsAllowed(false);
                 cb.setNullSelectionAllowed(true);
-                cb.setNullSelectionItemId(DefaultProjectTemplate.ID);
+                cb.setNullSelectionItemId(ProjectTemplate.DEFAULT_ID);
                 cb.select(project.getProjectTemplateId());
             } else if (Project.PROPERTY_PARENT_ENTITY.equals(propertyId)) {
                 final ComboBox cb = (ComboBox) field;
@@ -246,7 +245,7 @@ public class ProjectBasicsEditForm extends AbstractExtensionFormService<Project>
             }
             if (item != null) {
                 item.getItemProperty(PROPERTY_ISDEFAULT).setValue(
-                        DefaultProjectTemplate.ID.equals(projectTemplate.getId()));
+                        ProjectTemplate.DEFAULT_ID.equals(projectTemplate.getId()));
                 item.getItemProperty(PROPERTY_DISPLAYNAME).setValue(projectTemplate.getDisplayName());
             }
             return item;

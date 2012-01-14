@@ -16,9 +16,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import org.eclipse.skalli.api.java.ProjectNode;
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.project.ProjectNode;
+import org.eclipse.skalli.services.project.ProjectService;
 
 public class ProjectNodeImpl implements ProjectNode {
 

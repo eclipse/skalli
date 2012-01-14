@@ -17,13 +17,13 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.PagingInfo;
-import org.eclipse.skalli.api.java.SearchResult;
-import org.eclipse.skalli.api.java.SearchService;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.search.PagingInfo;
+import org.eclipse.skalli.services.search.SearchResult;
+import org.eclipse.skalli.services.search.SearchService;
+import org.eclipse.skalli.view.Consts;
 
 public class SearchFilter extends AbstractSearchFilter {
 

@@ -12,14 +12,13 @@ package org.eclipse.skalli.model.ext.devinf;
 
 import java.util.List;
 
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.testutil.BundleManager;
+import org.eclipse.skalli.testutil.SchemaValidationUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.testutil.ProjectServiceUtils;
-import org.eclipse.skalli.testutil.RestUtils;
 
 public class DevInfRestAPITest {
 
@@ -28,13 +27,13 @@ public class DevInfRestAPITest {
 
     @Before
     public void setup() throws Exception {
-        projectService = ProjectServiceUtils.getProjectService();
+        projectService = BundleManager.getRequiredService(ProjectService.class);
         projects = projectService.getAll();
         Assert.assertTrue("projects.size() > 0", projects.size() > 0);
     }
 
     @Test
     public void testValidate() throws Exception {
-        RestUtils.validate(projects, DevInfProjectExt.class, "extension-devinf.xsd");
+        SchemaValidationUtils.validate(projects, DevInfProjectExt.class, "extension-devinf.xsd");
     }
 }

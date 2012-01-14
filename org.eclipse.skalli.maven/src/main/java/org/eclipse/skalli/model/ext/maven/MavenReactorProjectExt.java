@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven;
 
-import org.eclipse.skalli.model.ext.Derived;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
+import org.eclipse.skalli.model.Derived;
+import org.eclipse.skalli.model.ExtensionEntityBase;
 
 @Derived
 public class MavenReactorProjectExt extends ExtensionEntityBase {

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal.config;
 
-import org.eclipse.skalli.api.rest.config.CustomizingResource;
+import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
 
 public class MavenResolverResource extends CustomizingResource<MavenResolverConfig> {
 

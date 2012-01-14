@@ -10,7 +10,7 @@
   *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal.recommendedupdatesites;
 
-import org.eclipse.skalli.api.rest.RestExtension;
+import org.eclipse.skalli.services.extension.rest.RestExtension;
 import org.restlet.resource.ServerResource;
 
 public class UpdateSitesRestExtension implements RestExtension {

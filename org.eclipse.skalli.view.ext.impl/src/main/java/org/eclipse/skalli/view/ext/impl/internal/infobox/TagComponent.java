@@ -13,9 +13,11 @@ package org.eclipse.skalli.view.ext.impl.internal.infobox;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
 
-import org.eclipse.skalli.api.java.TaggingService;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ext.commons.TaggingUtils;
+import org.eclipse.skalli.services.tagging.TaggingService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -36,7 +38,7 @@ public class TagComponent extends CustomComponent {
 
     private static final long serialVersionUID = 2926468032572843890L;
 
-    private static final String STYLE_TAG_COMPONENT = "tag-component";
+    private static final String STYLE_TAG_COMPONENT = "tag-component"; //$NON-NLS-1$
 
     private final Project project;
     private final TaggingService taggingService;
@@ -75,7 +77,7 @@ public class TagComponent extends CustomComponent {
     private void paintTagView() {
         layout.removeAllComponents();
 
-        Set<String> tags = project.getTags();
+        Set<String> tags = TaggingUtils.getTags(project);
         if (tags != null && tags.size() > 0)
         {
             Layout tagListLayout = new CssLayout() {
@@ -161,53 +163,53 @@ public class TagComponent extends CustomComponent {
     @SuppressWarnings({ "deprecation", "serial" })
     private void paintEditTagList() {
         tagListLayout.removeAllComponents();
-        tagListLayout.setWidth("100%");
+        tagListLayout.setWidth("100%"); //$NON-NLS-1$
 
         Label tagLabel = new Label("Tags:");
         tagLabel.setSizeUndefined();
         tagListLayout.addComponent(tagLabel);
 
-        Set<String> tags = project.getTags();
-        if (tags != null) {
-            for (String tag : tags) {
-                Layout l = new CssLayout() {
-                    @Override
-                    protected String getCss(Component c) {
-                        if (c instanceof Label) {
-                            return "float: left; line-height: 18px; padding-right: 3px";
-                        } else {
-                            return "float: left; line-height: 18px; padding-right: 5px";
-                        }
+        SortedSet<String> tags = TaggingUtils.getTags(project);
+        for (String tag : tags) {
+            Layout l = new CssLayout() {
+                @Override
+                protected String getCss(Component c) {
+                    if (c instanceof Label) {
+                        return "float: left; line-height: 18px; padding-right: 3px"; //$NON-NLS-1$
+                    } else {
+                        return "float: left; line-height: 18px; padding-right: 5px"; //$NON-NLS-1$
                     }
-                };
-                Label label = new Label(tag);
-                label.setSizeUndefined();
-                l.addComponent(label);
+                }
+            };
+            Label label = new Label(tag);
+            label.setSizeUndefined();
+            l.addComponent(label);
 
-                Button removeButton = new Button("(remove)", new ClickListener() {
-                    @Override
-                    public void buttonClick(ClickEvent event) {
-                        String tag = (String) event.getButton().getData();
-                        project.removeTag(tag);
-                        util.persist(project);
-                        paintTagEdit();
-                    }
-                });
-                removeButton.setStyleName(Button.STYLE_LINK);
-                removeButton.setData(tag);
-                removeButton.setSizeUndefined();
-                l.addComponent(removeButton);
-                tagListLayout.addComponent(l);
-            }
+            Button removeButton = new Button("(remove)", new ClickListener() {
+                @Override
+                public void buttonClick(ClickEvent event) {
+                    String tag = (String) event.getButton().getData();
+                    TaggingUtils.removeTag(project, tag);
+                    util.persist(project);
+                    paintTagEdit();
+                }
+            });
+            removeButton.setStyleName(Button.STYLE_LINK);
+            removeButton.setData(tag);
+            removeButton.setSizeUndefined();
+            l.addComponent(removeButton);
+            tagListLayout.addComponent(l);
         }
     }
+
+
 
     @SuppressWarnings("serial")
     private void paintTagComboBoxLayout() {
         tagComboBoxLayout.removeAllComponents();
         // add tag input field
         final ComboBox tagComboBox = new ComboBox();
-        Set<String> availableTags = taggingService.getAvailableTags();
+        Set<String> availableTags = taggingService.getAllTags(Project.class);
         for (String tag : availableTags) {
             tagComboBox.addItem(tag);
         }
@@ -227,7 +229,7 @@ public class TagComponent extends CustomComponent {
                     }
                 }
                 if (!tagComboBox.containsId(newItemCaption)) {
-                    project.addTag(newItemCaption);
+                    TaggingUtils.addTags(project, newItemCaption);
                     util.persist(project);
                     paintTagEdit(); // TODO performance?
                 }
@@ -236,8 +238,8 @@ public class TagComponent extends CustomComponent {
         tagComboBox.addListener(new ValueChangeListener() {
             @Override
             public void valueChange(ValueChangeEvent event) {
-                if (!project.hasTag(event.getProperty().getValue().toString())) {
-                    project.addTag(event.getProperty().getValue().toString());
+                if (!TaggingUtils.hasTag(project, event.getProperty().getValue().toString())) {
+                    TaggingUtils.addTags(project, event.getProperty().getValue().toString());
                     util.persist(project);
                     paintTagEdit(); // TODO performance?
                 }

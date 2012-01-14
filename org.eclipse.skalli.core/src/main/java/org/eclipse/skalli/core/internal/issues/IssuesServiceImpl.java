@@ -12,30 +12,37 @@ package org.eclipse.skalli.core.internal.issues;
 
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.eclipse.skalli.api.java.EntityServiceImpl;
-import org.eclipse.skalli.api.java.IssuesService;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Issues;
-import org.eclipse.skalli.model.ext.Severity;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.services.entity.EntityServiceBase;
+import org.eclipse.skalli.services.extension.DataMigration;
+import org.eclipse.skalli.services.issues.Issues;
+import org.eclipse.skalli.services.issues.IssuesService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IssuesServiceImpl extends EntityServiceImpl<Issues> implements IssuesService {
+public class IssuesServiceImpl extends EntityServiceBase<Issues> implements IssuesService {
 
     private static final Logger LOG = LoggerFactory.getLogger(IssuesServiceImpl.class);
 
+    private static final int CURRENT_MODEL_VERISON = 20;
+
+    @Override
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[IssuesService] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
+    @Override
     protected void deactivate(ComponentContext context) {
         LOG.info(MessageFormat.format("[IssuesService] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
@@ -44,6 +51,26 @@ public class IssuesServiceImpl extends EntityServiceImpl<Issues> implements Issu
     @Override
     public Class<Issues> getEntityClass() {
         return Issues.class;
+    }
+
+    @Override
+    public int getModelVersion() {
+        return CURRENT_MODEL_VERISON;
+    }
+
+    @Override
+    public Map<String, Class<?>> getAliases() {
+        Map<String, Class<?>> aliases = super.getAliases();
+        aliases.put("entity-issues", Issues.class); //$NON-NLS-1$
+        aliases.put("issue", Issue.class); //$NON-NLS-1$
+        return aliases;
+    }
+
+    @Override
+    public Set<DataMigration> getMigrations() {
+        Set<DataMigration> migrations = super.getMigrations();
+        migrations.add(new IssuesDataMigration19());
+        return migrations;
     }
 
     @Override

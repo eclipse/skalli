@@ -13,9 +13,9 @@ package org.eclipse.skalli.feed.db;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.skalli.api.java.feeds.Entry;
-import org.eclipse.skalli.api.java.feeds.FeedServiceException;
 import org.eclipse.skalli.feed.db.entities.EntryJPA;
+import org.eclipse.skalli.services.feed.Entry;
+import org.eclipse.skalli.services.feed.FeedServiceException;
 import org.junit.Test;
 
 public class JPAFeedPersistenceServiceTest {

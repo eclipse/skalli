@@ -55,7 +55,7 @@ public class CssCachingFilter implements Filter {
 
         String queryString = httpServletRequest.getQueryString();
         if (StringUtils.isBlank(queryString)) {
-            httpServletResponse.sendRedirect(httpServletRequest.getRequestURI() + "?" + ViewBundleUtil.getVersion());
+            httpServletResponse.sendRedirect(httpServletRequest.getRequestURI() + "?" + ViewBundleUtil.getBundleVersion());
         } else {
             chain.doFilter(request, response);
         }

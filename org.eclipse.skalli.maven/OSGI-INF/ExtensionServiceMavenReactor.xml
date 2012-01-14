@@ -9,10 +9,10 @@
         SAP AG - initial API and implementation
  -->
 
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.model.ext.mavenReactor">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.model.ext.mavenreactor">
    <implementation class="org.eclipse.skalli.model.ext.maven.internal.ExtensionServiceMavenReactor"/>
    <service>
-      <provide interface="org.eclipse.skalli.model.ext.ExtensionService"/>
+      <provide interface="org.eclipse.skalli.services.extension.ExtensionService"/>
    </service>
 </scr:component>
 

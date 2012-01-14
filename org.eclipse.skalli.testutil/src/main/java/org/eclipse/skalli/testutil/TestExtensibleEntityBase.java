@@ -13,8 +13,8 @@ package org.eclipse.skalli.testutil;
 import java.util.Iterator;
 import java.util.UUID;
 
-import org.eclipse.skalli.model.ext.ExtensibleEntityBase;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
+import org.eclipse.skalli.model.ExtensibleEntityBase;
+import org.eclipse.skalli.model.ExtensionEntityBase;
 
 public class TestExtensibleEntityBase extends ExtensibleEntityBase {
 

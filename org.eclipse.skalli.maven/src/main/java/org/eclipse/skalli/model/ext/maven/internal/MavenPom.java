@@ -13,7 +13,7 @@ package org.eclipse.skalli.model.ext.maven.internal;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.eclipse.skalli.common.util.ComparatorUtils;
+import org.eclipse.skalli.commons.ComparatorUtils;
 import org.eclipse.skalli.model.ext.maven.MavenModule;
 
 public class MavenPom {

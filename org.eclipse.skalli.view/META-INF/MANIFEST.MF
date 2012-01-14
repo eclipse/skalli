@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Skalli Core UI (Incubation)
 Bundle-SymbolicName: org.eclipse.skalli.view;singleton:=true
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.thoughtworks.xstream.annotations,
@@ -19,21 +19,30 @@ Import-Package: com.thoughtworks.xstream.annotations,
  org.apache.commons.io,
  org.apache.commons.lang,
  org.apache.commons.lang.math,
- org.eclipse.skalli.api.java,
- org.eclipse.skalli.api.java.authentication,
- org.eclipse.skalli.api.rest.config,
- org.eclipse.skalli.common,
- org.eclipse.skalli.common.configuration,
- org.eclipse.skalli.common.util,
+ org.eclipse.skalli.commons,
  org.eclipse.skalli.gerrit.client,
  org.eclipse.skalli.gerrit.client.config,
  org.eclipse.skalli.gerrit.client.exception,
- org.eclipse.skalli.model.core,
- org.eclipse.skalli.model.ext,
+ org.eclipse.skalli.model,
+ org.eclipse.skalli.model.ext.commons,
  org.eclipse.skalli.model.ext.devinf,
- org.eclipse.skalli.model.ext.maven,
- org.eclipse.skalli.model.ext.people,
+ org.eclipse.skalli.model.ext.linkgroups,
  org.eclipse.skalli.model.ext.scrum,
+ org.eclipse.skalli.services,
+ org.eclipse.skalli.services.configuration,
+ org.eclipse.skalli.services.configuration.rest,
+ org.eclipse.skalli.services.entity,
+ org.eclipse.skalli.services.extension,
+ org.eclipse.skalli.services.extension.rest,
+ org.eclipse.skalli.services.favorites,
+ org.eclipse.skalli.services.group,
+ org.eclipse.skalli.services.issues,
+ org.eclipse.skalli.services.project,
+ org.eclipse.skalli.services.search,
+ org.eclipse.skalli.services.tagging,
+ org.eclipse.skalli.services.template,
+ org.eclipse.skalli.services.user,
+ org.eclipse.skalli.services.validation,
  org.eclipse.skalli.view.ext,
  org.osgi.framework,
  org.osgi.service.http,
@@ -50,8 +59,9 @@ Service-Component: OSGI-INF/FeedbackConfigSection.xml,
  OSGI-INF/BrandingConfigSection.xml
 Web-ContextPath: /
 Webapp-Context: /
-Export-Package: org.eclipse.skalli.view.component
+Export-Package: org.eclipse.skalli.view,
+ org.eclipse.skalli.view.component
 Bundle-ClassPath: .
-Require-Bundle: com.vaadin;bundle-version="6.4.0"
+Require-Bundle: com.vaadin
 Bundle-ActivationPolicy: lazy
 

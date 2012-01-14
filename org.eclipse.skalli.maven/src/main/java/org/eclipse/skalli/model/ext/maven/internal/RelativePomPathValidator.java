@@ -16,12 +16,11 @@ import java.text.MessageFormat;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.common.util.AbstractPropertyValidator;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
+import org.eclipse.skalli.services.extension.PropertyValidatorBase;
 
-public class RelativePomPathValidator extends AbstractPropertyValidator {
+public class RelativePomPathValidator extends PropertyValidatorBase {
     private static final long serialVersionUID = 1L;
 
     public RelativePomPathValidator(Severity severity, String caption) {

@@ -10,16 +10,16 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal;
 
-import org.w3c.dom.Document;
-
-import org.eclipse.skalli.common.util.XMLUtils;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.AbstractDataMigration;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
+import org.eclipse.skalli.services.extension.DataMigrationBase;
+import org.eclipse.skalli.services.extension.MigrationException;
+import org.eclipse.skalli.services.extension.MigrationUtils;
+import org.w3c.dom.Document;
 
-public class DataMigration2 extends AbstractDataMigration {
+public class DataMigration2 extends DataMigrationBase {
 
     private static final String TAG_NAME = "mavenReactor"; //$NON-NLS-1$
 
@@ -28,10 +28,17 @@ public class DataMigration2 extends AbstractDataMigration {
     }
 
     @Override
-    public void migrate(Document doc) throws ValidationException {
+    public void migrate(Document doc) throws MigrationException {
         String sourceExtClassName = MavenProjectExt.class.getName();
         String targetExtClassName = MavenReactorProjectExt.class.getName();
-        XMLUtils.moveTagToExtension(doc, sourceExtClassName, targetExtClassName, TAG_NAME, TAG_NAME);
+        MigrationUtils.moveTagToExtension(doc, sourceExtClassName, targetExtClassName, TAG_NAME, TAG_NAME);
     }
 
+    // before the "grand" refactoring, Group was in package org.eclipse.skalli.common!
+    @SuppressWarnings("nls")
+    @Override
+    public boolean handlesType(String entityClassName) {
+        return super.handlesType(entityClassName) ||
+                StringUtils.equals(entityClassName, "org.eclipse.skalli.model.core.Project");
+    }
 }

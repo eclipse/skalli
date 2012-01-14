@@ -12,11 +12,10 @@ package org.eclipse.skalli.testutil;
 
 import java.util.SortedSet;
 
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.services.extension.PropertyValidator;
 import org.junit.Assert;
-
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.PropertyValidator;
-import org.eclipse.skalli.model.ext.Severity;
 
 public class ValidatorUtils {
     public static void assertIsValid(PropertyValidator validator, Object value) {

@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.MessageFormat;
 
-import org.eclipse.skalli.api.java.IconProvider;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.slf4j.Logger;

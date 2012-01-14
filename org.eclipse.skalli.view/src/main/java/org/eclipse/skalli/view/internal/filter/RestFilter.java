@@ -22,8 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.common.Consts;
+import org.eclipse.skalli.view.Consts;
 
 public class RestFilter implements Filter {
 

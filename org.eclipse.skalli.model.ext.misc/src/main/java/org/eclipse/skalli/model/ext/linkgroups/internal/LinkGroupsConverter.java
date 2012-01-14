@@ -12,17 +12,17 @@ package org.eclipse.skalli.model.ext.linkgroups.internal;
 
 import java.util.Collection;
 
-import org.eclipse.skalli.common.LinkGroup;
-import org.eclipse.skalli.model.ext.AbstractConverter;
-import org.eclipse.skalli.model.ext.Link;
+import org.eclipse.skalli.commons.Link;
+import org.eclipse.skalli.model.ext.linkgroups.LinkGroup;
 import org.eclipse.skalli.model.ext.linkgroups.LinkGroupsProjectExt;
+import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-class LinkGroupsConverter extends AbstractConverter<LinkGroupsProjectExt> {
+class LinkGroupsConverter extends RestConverterBase<LinkGroupsProjectExt> {
 
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-LinkGroups"; //$NON-NLS-1$

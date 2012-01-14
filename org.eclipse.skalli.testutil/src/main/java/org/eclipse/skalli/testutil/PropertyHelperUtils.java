@@ -19,7 +19,7 @@ import java.util.UUID;
 
 import javax.xml.bind.DatatypeConverter;
 
-import org.eclipse.skalli.model.ext.EntityBase;
+import org.eclipse.skalli.model.EntityBase;
 
 public class PropertyHelperUtils {
 

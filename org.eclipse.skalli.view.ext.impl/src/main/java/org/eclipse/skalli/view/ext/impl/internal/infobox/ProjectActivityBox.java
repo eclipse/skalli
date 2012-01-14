@@ -13,11 +13,11 @@ package org.eclipse.skalli.view.ext.impl.internal.infobox;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.common.configuration.ConfigurationService;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.Link;
+import org.eclipse.skalli.commons.Link;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
-import org.eclipse.skalli.model.ext.devinf.ScmLocationMapper;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.ProjectInfoBox;
 

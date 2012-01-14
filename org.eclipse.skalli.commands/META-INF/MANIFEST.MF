@@ -2,16 +2,18 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Skalli OSGi Console Commands (Incubation)
 Bundle-SymbolicName: org.eclipse.skalli.commands
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.apache.commons.io,
  org.apache.commons.lang,
  org.eclipse.osgi.framework.console,
- org.eclipse.skalli.api.java,
- org.eclipse.skalli.common,
- org.eclipse.skalli.common.util,
- org.eclipse.skalli.model.ext,
+ org.eclipse.skalli.commons,
+ org.eclipse.skalli.model,
+ org.eclipse.skalli.services,
+ org.eclipse.skalli.services.entity,
+ org.eclipse.skalli.services.group,
+ org.eclipse.skalli.services.persistence,
  org.osgi.framework
 Service-Component: OSGI-INF/CommandProvider.xml
 Bundle-ActivationPolicy: lazy

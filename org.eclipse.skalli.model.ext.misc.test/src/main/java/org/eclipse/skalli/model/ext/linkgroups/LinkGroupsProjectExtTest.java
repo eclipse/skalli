@@ -13,12 +13,10 @@ package org.eclipse.skalli.model.ext.linkgroups;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
-import org.junit.Test;
-
-import org.eclipse.skalli.common.LinkGroup;
-import org.eclipse.skalli.model.ext.Link;
+import org.eclipse.skalli.commons.Link;
 import org.eclipse.skalli.testutil.PropertyHelper;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.junit.Test;
 
 @SuppressWarnings("nls")
 public class LinkGroupsProjectExtTest {

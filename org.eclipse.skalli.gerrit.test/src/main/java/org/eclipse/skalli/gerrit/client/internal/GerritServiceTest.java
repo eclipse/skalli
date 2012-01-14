@@ -14,8 +14,8 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.eclipse.skalli.common.configuration.ConfigurationService;
 import org.eclipse.skalli.gerrit.client.config.ConfigKeyGerrit;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.junit.Test;
 
 

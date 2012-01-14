@@ -1,0 +1,9 @@
+<tomcat-users>
+  <user username="d038928" password="abc123" roles="admin,Everyone"/>
+  <user username="d049863" password="abc123" roles="admin,Everyone"/>
+  <user username="d032916" password="abc123" roles="admin,Everyone"/>
+  <user username="d044774" password="abc123" roles="admin,Everyone"/>
+  <user username="d041655" password="abc123" roles="admin,Everyone"/>
+  <user username="admin" password="admin" roles="admin,Everyone"/>
+  <user username="guest" password="guest" roles="Everyone"/>
+</tomcat-users>

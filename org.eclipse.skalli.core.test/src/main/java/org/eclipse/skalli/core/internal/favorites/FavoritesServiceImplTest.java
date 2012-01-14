@@ -13,10 +13,10 @@ package org.eclipse.skalli.core.internal.favorites;
 import static org.easymock.EasyMock.*;
 
 import org.easymock.IAnswer;
-import org.eclipse.skalli.api.java.FavoritesService;
-import org.eclipse.skalli.api.java.PersistenceService;
 import org.eclipse.skalli.core.internal.project.ProjectServiceImplTest;
-import org.eclipse.skalli.model.core.Favorites;
+import org.eclipse.skalli.services.favorites.Favorites;
+import org.eclipse.skalli.services.favorites.FavoritesService;
+import org.eclipse.skalli.services.persistence.PersistenceService;
 import org.eclipse.skalli.testutil.AssertUtils;
 import org.junit.Before;
 import org.junit.Test;

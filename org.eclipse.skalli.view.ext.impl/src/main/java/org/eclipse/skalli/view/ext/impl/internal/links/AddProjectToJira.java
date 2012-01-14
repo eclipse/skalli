@@ -13,7 +13,7 @@ package org.eclipse.skalli.view.ext.impl.internal.links;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.view.ext.ProjectContextLink;
 
 public class AddProjectToJira implements ProjectContextLink {

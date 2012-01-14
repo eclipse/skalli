@@ -4,11 +4,11 @@
     are made available under the terms of the Eclipse Public License v1.0
     which accompanies this distribution, and is available at
     http://www.eclipse.org/legal/epl-v10.html
-   
+
     Contributors:
         SAP AG - initial API and implementation
  -->
-<org.eclipse.skalli.common.Group>
+<entity-group>
   <uuid>a210dcde-7923-44e3-a4ab-aa9b9bad88de</uuid>
   <groupId>doctors</groupId>
   <groupMembers>
@@ -16,4 +16,4 @@
     <string>gh</string>
     <string>jw</string>
   </groupMembers>
-</org.eclipse.skalli.common.Group>
+</entity-group>

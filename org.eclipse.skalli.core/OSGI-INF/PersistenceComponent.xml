@@ -13,20 +13,25 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.persistence">
     <implementation class="org.eclipse.skalli.core.internal.persistence.xstream.PersistenceServiceXStream"/>
     <service>
-        <provide interface="org.eclipse.skalli.api.java.PersistenceService"/>
+        <provide interface="org.eclipse.skalli.services.persistence.PersistenceService"/>
     </service>
     <reference
-        name="ExtensionService"
-        interface="org.eclipse.skalli.model.ext.ExtensionService"
-        cardinality="0..n"
-        policy="dynamic"
-        bind="bindExtensionService"
-        unbind="unbindExtensionService"/>
-    <reference
         name="StorageService"
-        interface="org.eclipse.skalli.api.java.StorageService"
+        interface="org.eclipse.skalli.services.persistence.StorageService"
         cardinality="1..n"
         policy="dynamic"
         bind="bindStorageService"
-        unbind="unbindStorageService"/>
+        unbind="unbindStorageService" />
+    <reference
+        name="ExtensionService"
+        interface="org.eclipse.skalli.services.extension.ExtensionService"
+        cardinality="0..n"
+        policy="dynamic"
+        bind="bindExtensionService"
+        unbind="unbindExtensionService" />
+    <reference
+        name="EntityService"
+        interface="org.eclipse.skalli.services.entity.EntityService"
+        cardinality="0..n"
+        policy="dynamic" />
 </scr:component>

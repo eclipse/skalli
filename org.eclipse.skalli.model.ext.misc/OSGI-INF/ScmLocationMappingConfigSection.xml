@@ -4,15 +4,15 @@
     are made available under the terms of the Eclipse Public License v1.0
     which accompanies this distribution, and is available at
     http://www.eclipse.org/legal/epl-v10.html
-   
+
     Contributors:
         SAP AG - initial API and implementation
  -->
 
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.model.ext.misc.ScmLocationMappingConfigSection">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.ext.config.scmmapping">
    <implementation class="org.eclipse.skalli.model.ext.devinf.internal.config.ScmLocationMappingConfigSection"/>
    <service>
-      <provide interface="org.eclipse.skalli.api.rest.config.ConfigSection"/>
+      <provide interface="org.eclipse.skalli.services.configuration.rest.ConfigSection"/>
    </service>
 </scr:component>
 

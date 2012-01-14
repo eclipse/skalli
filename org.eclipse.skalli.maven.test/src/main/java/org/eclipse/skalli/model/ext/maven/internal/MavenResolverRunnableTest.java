@@ -18,15 +18,15 @@ import java.util.Collections;
 import java.util.UUID;
 
 import org.easymock.Capture;
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.common.configuration.ConfigurationService;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenCoordinateUtil;
 import org.eclipse.skalli.model.ext.maven.MavenPathResolver;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class MavenResolverRunnableTest {
         private MavenResolverMock resolverMock;
 
         public MavenResolverRunnableMock(MavenResolverMock resolverMock) {
-            super(null, null, USERID);
+            super(null, null, null, USERID);
             this.resolverMock = resolverMock;
         }
 
@@ -77,7 +77,7 @@ public class MavenResolverRunnableTest {
         private MavenReactor mavenReactor;
 
         public MavenResolverMock(MavenPathResolver pathResolver) {
-            super(PropertyHelperUtils.TEST_UUIDS[0], pathResolver);
+            super(PropertyHelperUtils.TEST_UUIDS[0], pathResolver, null);
         }
 
         @Override

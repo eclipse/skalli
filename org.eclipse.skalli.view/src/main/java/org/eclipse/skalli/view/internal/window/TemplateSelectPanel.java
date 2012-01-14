@@ -13,11 +13,11 @@ package org.eclipse.skalli.view.internal.window;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.api.java.ProjectTemplateService;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectTemplate;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.template.ProjectTemplate;
+import org.eclipse.skalli.services.template.ProjectTemplateService;
 import org.eclipse.skalli.view.component.RadioSelect;
 import org.eclipse.skalli.view.ext.Navigator;
 import org.eclipse.skalli.view.ext.ProjectEditMode;

@@ -16,14 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.search.FacetedSearchResult;
+import org.eclipse.skalli.services.search.PagingInfo;
+import org.eclipse.skalli.services.search.SearchResult;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.eclipse.skalli.api.java.FacetedSearchResult;
-import org.eclipse.skalli.api.java.PagingInfo;
-import org.eclipse.skalli.api.java.SearchResult;
-import org.eclipse.skalli.model.ext.ExtensionService;
 
 public class LuceneIndexTest {
 

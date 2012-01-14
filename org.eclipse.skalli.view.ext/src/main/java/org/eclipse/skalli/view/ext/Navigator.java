@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext;
 
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
 
 public interface Navigator {
 

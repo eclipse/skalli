@@ -25,12 +25,11 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.eclipse.skalli.model.ExtensibleEntityBase;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.testutil.AssertUtils;
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.eclipse.skalli.model.ext.ExtensibleEntityBase;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.testutil.AssertUtils;
 
 @SuppressWarnings("nls")
 public class EntityHelperTest {

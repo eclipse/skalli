@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.skalli.common.util.XMLUtils;
-import org.eclipse.skalli.model.ext.DataMigration;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.services.extension.DataMigration;
+import org.eclipse.skalli.services.extension.MigrationException;
+import org.eclipse.skalli.services.extension.MigrationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -44,7 +44,7 @@ public class DataMigrator {
         }
     }
 
-    public void migrate(Document doc, int fromVersion, int toVersion) throws ValidationException {
+    public void migrate(Document doc, int fromVersion, int toVersion) throws MigrationException {
         if (migrations == null) {
             return;
         }
@@ -59,9 +59,9 @@ public class DataMigrator {
         for (int i = fromVersion; i < toVersion; i++) {
             for (DataMigration migration : migrations) {
                 if (migration.getFromVersion() == i && migration.handlesType(className)) {
-                    LOG.info(MessageFormat.format("Migrating {0} with {1}", XMLUtils.getUuid(doc), migration
-                            .getClass().getName()));
                     migration.migrate(doc);
+                    LOG.info(MessageFormat.format("Migrated entity {0} with {1}", MigrationUtils.getUuid(doc),
+                            migration.getClass().getName()));
                 }
             }
         }

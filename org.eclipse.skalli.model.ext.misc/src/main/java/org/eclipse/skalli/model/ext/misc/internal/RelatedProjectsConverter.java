@@ -13,22 +13,22 @@ package org.eclipse.skalli.model.ext.misc.internal;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.SearchHit;
-import org.eclipse.skalli.api.java.SearchResult;
-import org.eclipse.skalli.api.java.SearchService;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.util.UUIDList;
-import org.eclipse.skalli.common.util.UUIDUtils;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.AbstractConverter;
+import org.eclipse.skalli.commons.UUIDList;
+import org.eclipse.skalli.commons.UUIDUtils;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.misc.RelatedProjectsExt;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.eclipse.skalli.services.search.SearchHit;
+import org.eclipse.skalli.services.search.SearchResult;
+import org.eclipse.skalli.services.search.SearchService;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-public class RelatedProjectsConverter extends AbstractConverter<RelatedProjectsExt> {
+public class RelatedProjectsConverter extends RestConverterBase<RelatedProjectsExt> {
 
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-RelatedProjects"; //$NON-NLS-1$

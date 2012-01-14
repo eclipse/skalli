@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.skalli.source.feature"
       label="Skalli Sources (Incubation)"
-      version="0.1.0.qualifier">
+      version="0.2.0.qualifier">
 
    <description url="http://www.eclipse.org/skalli">
         The sources for Skalli.
@@ -24,7 +24,7 @@
    </license>
 
    <plugin
-         id="org.eclipse.skalli.api.java.source"
+         id="org.eclipse.skalli.api.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -38,7 +38,21 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.skalli.model.core.source"
+         id="org.eclipse.skalli.storage.db.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.skalli.storage.db.entities.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.skalli.commands.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -46,6 +60,20 @@
 
    <plugin
          id="org.eclipse.skalli.model.ext.misc.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.skalli.feed.db.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.skalli.feed.db.entities.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -73,21 +101,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.skalli.api.rest.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.skalli.common.source"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.skalli.commands.source"
+         id="org.eclipse.skalli.gerrit.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -95,6 +109,20 @@
 
    <plugin
          id="org.eclipse.skalli.maven.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.skalli.nexus.source"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.skalli.testutil.source"
          download-size="0"
          install-size="0"
          version="0.0.0"

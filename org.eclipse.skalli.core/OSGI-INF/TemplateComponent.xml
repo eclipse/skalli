@@ -13,7 +13,7 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.template">
     <implementation class="org.eclipse.skalli.core.internal.templates.ProjectTemplateServiceImpl"/>
     <service>
-        <provide interface="org.eclipse.skalli.api.java.ProjectTemplateService"/>
+        <provide interface="org.eclipse.skalli.services.template.ProjectTemplateService"/>
     </service>
 </scr:component>
 

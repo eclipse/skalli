@@ -12,6 +12,7 @@ package org.eclipse.skalli.model.ext.maven.internal.recommendedupdatesites;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -19,22 +20,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.EntityFilter;
-import org.eclipse.skalli.api.java.EntityServiceImpl;
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Severity;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpdateSites;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpdateSitesService;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.UpdateSite;
+import org.eclipse.skalli.services.entity.EntityServiceBase;
+import org.eclipse.skalli.services.persistence.EntityFilter;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.user.UserUtils;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RecommendedUpdateSitesServiceImpl extends EntityServiceImpl<RecommendedUpdateSites> implements
+public class RecommendedUpdateSitesServiceImpl extends EntityServiceBase<RecommendedUpdateSites> implements
         RecommendedUpdateSitesService {
 
     private static final Logger LOG = LoggerFactory.getLogger(RecommendedUpdateSitesServiceImpl.class);
@@ -43,11 +44,13 @@ public class RecommendedUpdateSitesServiceImpl extends EntityServiceImpl<Recomme
 
     private ProjectService projectService;
 
+    @Override
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[RecommendedUpdateSitesService] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
+    @Override
     protected void deactivate(ComponentContext context) {
         LOG.info(MessageFormat.format("[RecommendedUpdateSitesService] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
@@ -69,6 +72,20 @@ public class RecommendedUpdateSitesServiceImpl extends EntityServiceImpl<Recomme
     @Override
     public Class<RecommendedUpdateSites> getEntityClass() {
         return RecommendedUpdateSites.class;
+    }
+
+
+    @Override
+    public int getModelVersion() {
+        return 0;
+    }
+
+    @Override
+    public Map<String, Class<?>> getAliases() {
+        Map<String, Class<?>> aliases = super.getAliases();
+        aliases.put("entity-recommendedupdatesites", RecommendedUpdateSites.class); //$NON-NLS-1$
+        aliases.put("updatesite", UpdateSite.class); //$NON-NLS-1$
+        return aliases;
     }
 
     /* (non-Javadoc)
@@ -206,11 +223,10 @@ public class RecommendedUpdateSitesServiceImpl extends EntityServiceImpl<Recomme
         if (StringUtils.isBlank(userId)) {
             issues.add(new Issue(Severity.FATAL, RecommendedUpdateSitesService.class, entity.getUuid(),
                     "Recommended update sites must have a user ID"));
-        } else if (UserUtil.getUser(userId) == null) {
+        } else if (UserUtils.getUser(userId) == null) {
             issues.add(new Issue(Severity.FATAL, RecommendedUpdateSitesService.class, entity.getUuid(),
                     MessageFormat.format("Provided userId: {0} is invalid", userId)));
         }
         return issues;
     }
-
 }

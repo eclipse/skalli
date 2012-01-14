@@ -13,40 +13,40 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.validation">
     <implementation class="org.eclipse.skalli.core.internal.validation.ValidationServiceImpl"/>
     <service>
-        <provide interface="org.eclipse.skalli.api.java.ValidationService"/>
+        <provide interface="org.eclipse.skalli.services.validation.ValidationService"/>
         <provide interface="org.eclipse.skalli.api.rest.monitor.Monitorable"/>
     </service>
     <reference
         name="ConfigurationService"
-        interface="org.eclipse.skalli.common.configuration.ConfigurationService"
+        interface="org.eclipse.skalli.services.configuration.ConfigurationService"
         cardinality="0..1"
         policy="dynamic"
         bind="bindConfigurationService"
         unbind="unbindConfigurationService"/>
     <reference
         name="EventService"
-        interface="org.eclipse.skalli.api.java.EventService"
+        interface="org.eclipse.skalli.services.event.EventService"
         cardinality="0..1"
         policy="dynamic"
         bind="bindEventService"
         unbind="unbindEventService"/>
     <reference
         name="IssuesService"
-        interface="org.eclipse.skalli.api.java.IssuesService"
+        interface="org.eclipse.skalli.services.issues.IssuesService"
         cardinality="0..1"
         policy="dynamic"
         bind="bindIssuesService"
         unbind="unbindIssuesService"/>
     <reference
         name="EntityService"
-        interface="org.eclipse.skalli.api.java.EntityService"
+        interface="org.eclipse.skalli.services.entity.EntityService"
         cardinality="0..n"
         policy="dynamic"
         bind="bindEntityService"
         unbind="unbindEntityService"/>
     <reference
         name="SchedulerService"
-        interface="org.eclipse.skalli.api.java.tasks.SchedulerService"
+        interface="org.eclipse.skalli.services.scheduler.SchedulerService"
         cardinality="0..1"
         policy="dynamic"
         bind="bindSchedulerService"

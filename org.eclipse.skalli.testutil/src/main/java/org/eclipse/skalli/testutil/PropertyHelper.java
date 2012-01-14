@@ -22,10 +22,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.model.Derived;
+import org.eclipse.skalli.model.PropertyName;
 import org.junit.Assert;
-
-import org.eclipse.skalli.model.ext.Derived;
-import org.eclipse.skalli.model.ext.PropertyName;
 
 @SuppressWarnings("nls")
 public class PropertyHelper {

@@ -10,16 +10,16 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal;
 
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
+import org.eclipse.skalli.services.extension.DataMigrationBase;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.AbstractDataMigration;
-import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
-
-public class DataMigration1 extends AbstractDataMigration {
+public class DataMigration1 extends DataMigrationBase {
 
     public DataMigration1() {
         super(Project.class, 1);
@@ -45,6 +45,14 @@ public class DataMigration1 extends AbstractDataMigration {
     @Override
     public void migrate(Document doc) {
         removeGAVs(doc.getElementsByTagName(MavenProjectExt.class.getName()));
+    }
+
+    // before the "grand" refactoring, Group was in package org.eclipse.skalli.common!
+    @SuppressWarnings("nls")
+    @Override
+    public boolean handlesType(String entityClassName) {
+        return super.handlesType(entityClassName) ||
+                StringUtils.equals(entityClassName, "org.eclipse.skalli.model.core.Project");
     }
 
 }

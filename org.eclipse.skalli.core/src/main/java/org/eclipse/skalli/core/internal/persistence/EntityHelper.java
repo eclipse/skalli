@@ -27,10 +27,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.model.ext.EntityBase;
-import org.eclipse.skalli.model.ext.ExtensibleEntityBase;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.ExtensibleEntityBase;
+import org.eclipse.skalli.model.ExtensionEntityBase;
 
 public final class EntityHelper {
 
@@ -56,8 +55,7 @@ public final class EntityHelper {
      * instantiated has either a constructor with a single integer argument (specifying the initial capacity
      * of the collection), or a parameterless constructor. The former is preferred.<br>
      * This method iterates the entity and, in case the entity is an instance
-     * of {@link org.eclipse.skalli.model.ext.ExtensibleEntityBase},
-     * all extensions of that entity, too.
+     * of {@link ExtensibleEntityBase}, all extensions of that entity, too.
      */
     public static void normalize(EntityBase entity) {
         doNormalize(entity);

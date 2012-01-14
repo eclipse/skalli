@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext.impl.internal.infobox;
 
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.people.PeopleProjectExt;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ext.commons.PeopleExtension;
 import org.eclipse.skalli.view.component.InformationBox;
 import org.eclipse.skalli.view.component.PeopleComponent;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
@@ -43,7 +43,7 @@ public class ProjectTeamBox extends InfoBox implements ProjectInfoBox {
         Layout layout = new CssLayout();
         layout.addStyleName(STYLE_TEAM_INFOBOX);
         layout.setSizeFull();
-        PeopleProjectExt ext = project.getExtension(PeopleProjectExt.class);
+        PeopleExtension ext = project.getExtension(PeopleExtension.class);
         if (ext != null) {
             if (ext.getLeads().size() > 0) {
                 Label projectLeadHeaderLabel = new Label("Project Lead");
@@ -79,7 +79,7 @@ public class ProjectTeamBox extends InfoBox implements ProjectInfoBox {
 
     @Override
     public boolean isVisible(Project project, String loggedInUserId) {
-        PeopleProjectExt ext = project.getExtension(PeopleProjectExt.class);
+        PeopleExtension ext = project.getExtension(PeopleExtension.class);
         if (ext == null || ext.getMembers().isEmpty() && ext.getLeads().isEmpty()) {
             return false;
         } else {

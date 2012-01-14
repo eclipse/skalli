@@ -24,9 +24,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.skalli.api.java.tasks.RunnableSchedule;
-import org.eclipse.skalli.api.java.tasks.SchedulerService;
-import org.eclipse.skalli.api.java.tasks.Task;
+import org.eclipse.skalli.services.scheduler.RunnableSchedule;
+import org.eclipse.skalli.services.scheduler.SchedulerService;
+import org.eclipse.skalli.services.scheduler.Task;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;

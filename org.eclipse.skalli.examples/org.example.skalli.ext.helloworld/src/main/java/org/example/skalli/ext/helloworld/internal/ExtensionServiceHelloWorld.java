@@ -11,16 +11,16 @@
 
 package org.example.skalli.ext.helloworld.internal;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.eclipse.skalli.common.util.CollectionUtils;
-import org.eclipse.skalli.common.util.StringLengthValidator;
-import org.eclipse.skalli.model.ext.AliasedConverter;
-import org.eclipse.skalli.model.ext.ExtensionServiceBase;
-import org.eclipse.skalli.model.ext.PropertyValidator;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.services.extension.ExtensionServiceBase;
+import org.eclipse.skalli.services.extension.PropertyValidator;
+import org.eclipse.skalli.services.extension.rest.RestConverter;
+import org.eclipse.skalli.services.extension.validators.StringLengthValidator;
 import org.example.skalli.model.ext.helloworld.HelloWorldProjectExt;
 
 public class ExtensionServiceHelloWorld extends ExtensionServiceBase<HelloWorldProjectExt> {
@@ -74,7 +74,7 @@ public class ExtensionServiceHelloWorld extends ExtensionServiceBase<HelloWorldP
     }
 
     @Override
-    public Set<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
+    public List<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
         if (HelloWorldProjectExt.PROPERTY_NAME.equals(propertyName)) {
             return getNameValidators(caption);
         } else {
@@ -82,8 +82,8 @@ public class ExtensionServiceHelloWorld extends ExtensionServiceBase<HelloWorldP
         }
     }
 
-    private Set<PropertyValidator> getNameValidators(String caption) {
-        Set<PropertyValidator> validators = new HashSet<PropertyValidator>();
+    private List<PropertyValidator> getNameValidators(String caption) {
+        List<PropertyValidator> validators = new ArrayList<PropertyValidator>();
         validators.add(getLengthValidator(caption));
         return validators;
     }
@@ -97,7 +97,7 @@ public class ExtensionServiceHelloWorld extends ExtensionServiceBase<HelloWorldP
     }
 
     @Override
-    public AliasedConverter getConverter(String host) {
+    public RestConverter getRestConverter(String host) {
         return new HelloWorldConverter(host);
     }
 

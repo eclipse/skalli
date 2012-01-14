@@ -13,8 +13,8 @@ package org.eclipse.skalli.model.ext.maven.internal;
 import java.io.File;
 import java.io.IOException;
 
-import org.eclipse.skalli.model.ext.PropertyValidator;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.services.extension.PropertyValidator;
 import org.eclipse.skalli.testutil.ValidatorUtils;
 import org.junit.Test;
 

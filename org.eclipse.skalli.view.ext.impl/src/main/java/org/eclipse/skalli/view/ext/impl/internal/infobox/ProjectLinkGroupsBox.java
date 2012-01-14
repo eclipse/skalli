@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext.impl.internal.infobox;
 
-import org.eclipse.skalli.common.LinkGroup;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.Link;
+import org.eclipse.skalli.commons.Link;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ext.linkgroups.LinkGroup;
 import org.eclipse.skalli.model.ext.linkgroups.LinkGroupsProjectExt;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;

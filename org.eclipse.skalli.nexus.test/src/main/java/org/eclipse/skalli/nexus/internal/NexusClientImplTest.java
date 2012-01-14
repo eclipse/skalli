@@ -20,20 +20,26 @@ import java.net.URL;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.skalli.common.configuration.ConfigKey;
-import org.eclipse.skalli.common.configuration.ConfigTransaction;
-import org.eclipse.skalli.common.configuration.ConfigurationService;
-import org.eclipse.skalli.common.util.XMLUtils;
+import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.nexus.NexusClientException;
 import org.eclipse.skalli.nexus.NexusSearchResult;
 import org.eclipse.skalli.nexus.internal.config.NexusConfig;
 import org.eclipse.skalli.nexus.internal.config.NexusResource;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.configuration.ConfigKey;
+import org.eclipse.skalli.services.configuration.ConfigTransaction;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.destination.DestinationService;
+import org.eclipse.skalli.testutil.BundleManager;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+@SuppressWarnings("nls")
 public class NexusClientImplTest {
 
     private static final String artifactId = "org.eclipse.skalli.core";
@@ -68,6 +74,14 @@ public class NexusClientImplTest {
 
     private Element rootElement;
     private NexusConfig nexusConfig;
+    private static DestinationService destinationService;
+
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        BundleManager.startBundles();
+        destinationService = Services.getService(DestinationService.class);
+        Assert.assertNotNull(destinationService);
+    }
 
     @Before
     public void Before() throws SAXException, IOException, ParserConfigurationException {
@@ -149,6 +163,7 @@ public class NexusClientImplTest {
         };
 
         nexusClientImpl.bindConfigurationService(configService);
+        nexusClientImpl.bindDestinationService(destinationService);
 
         NexusSearchResult nexusSearchResult = nexusClientImpl.searchArtifactVersions(groupId, artifactId);
         assertNexusSearchResult(nexusSearchResult);
@@ -221,6 +236,7 @@ public class NexusClientImplTest {
         };
 
         nexusClientImpl.bindConfigurationService(configService);
+        nexusClientImpl.bindDestinationService(destinationService);
 
         try {
             nexusClientImpl.searchArtifactVersions(groupId, artifactId);

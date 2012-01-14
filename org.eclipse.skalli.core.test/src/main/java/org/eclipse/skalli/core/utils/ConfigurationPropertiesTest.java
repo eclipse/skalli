@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.utils;
 
-import org.eclipse.skalli.core.internal.persistence.xstream.FileStorageService;
+import org.eclipse.skalli.services.configuration.ConfigurationProperties;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,12 +38,6 @@ public class ConfigurationPropertiesTest {
         // known property with explicit default
         anotherProperty = ConfigurationProperties.getProperty("anotherProperty", "default");
         Assert.assertEquals("value", anotherProperty);
-    }
-
-    @Test
-    public void testConfiguredStorageService() throws Exception {
-        String storageService = ConfigurationProperties.getConfiguredStorageService();
-        Assert.assertEquals(FileStorageService.class.getName(), storageService);
     }
 
 }

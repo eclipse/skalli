@@ -2,14 +2,10 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Simplehelloworld
 Bundle-SymbolicName: org.example.skali.ext.simplehelloworld
-Bundle-Version: 0.1.0.qualifier
-Import-Package: org.eclipse.skalli.api.java,
- org.eclipse.skalli.common,
- org.eclipse.skalli.common.util,
- org.eclipse.skalli.model.core,
- org.eclipse.skalli.model.ext,
+Bundle-Version: 0.2.0.qualifier
+Import-Package: org.eclipse.skalli.model,
  org.eclipse.skalli.view.component,
  org.eclipse.skalli.view.ext
 Service-Component: OSGI-INF/ExtensionServiceProjectHelloWorldBox.xml
-Require-Bundle: com.vaadin;bundle-version="6.5.3"
+Require-Bundle: com.vaadin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

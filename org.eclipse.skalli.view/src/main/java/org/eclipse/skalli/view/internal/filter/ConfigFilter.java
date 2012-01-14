@@ -20,9 +20,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.configuration.ConfigurationService;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.internal.config.BrandingConfig;
 import org.eclipse.skalli.view.internal.config.BrandingResource;
 import org.eclipse.skalli.view.internal.config.FeedbackConfig;

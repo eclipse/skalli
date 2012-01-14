@@ -13,13 +13,13 @@ package org.eclipse.skalli.view.ext.impl.internal.infobox;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.skalli.common.configuration.ConfigurationService;
-import org.eclipse.skalli.common.util.HtmlBuilder;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.Link;
-import org.eclipse.skalli.model.ext.LinkMapper;
-import org.eclipse.skalli.model.ext.info.InfoProjectExt;
-import org.eclipse.skalli.model.ext.info.MailingListMapper;
+import org.eclipse.skalli.commons.HtmlBuilder;
+import org.eclipse.skalli.commons.Link;
+import org.eclipse.skalli.ext.mapping.LinkMapper;
+import org.eclipse.skalli.ext.mapping.mail.MailingListMapper;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ext.commons.InfoExtension;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;
 import org.eclipse.skalli.view.ext.ProjectInfoBox;
@@ -60,7 +60,7 @@ public class ProjectMailingListBox extends InfoBox implements ProjectInfoBox {
         layout.setSizeFull();
 
         HtmlBuilder html = new HtmlBuilder();
-        InfoProjectExt ext = project.getExtension(InfoProjectExt.class);
+        InfoExtension ext = project.getExtension(InfoExtension.class);
         if (ext != null) {
             Set<String> mailingLists = ext.getMailingLists();
             if (mailingLists.size() > 0) {
@@ -101,7 +101,7 @@ public class ProjectMailingListBox extends InfoBox implements ProjectInfoBox {
 
     @Override
     public boolean isVisible(Project project, String loggedInUserId) {
-        InfoProjectExt ext = project.getExtension(InfoProjectExt.class);
+        InfoExtension ext = project.getExtension(InfoExtension.class);
         return ext != null && !ext.getMailingLists().isEmpty();
     }
 

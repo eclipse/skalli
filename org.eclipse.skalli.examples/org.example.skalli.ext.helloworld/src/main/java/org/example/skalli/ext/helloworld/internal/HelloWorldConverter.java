@@ -11,7 +11,7 @@
 
 package org.example.skalli.ext.helloworld.internal;
 
-import org.eclipse.skalli.model.ext.AbstractConverter;
+import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 import org.example.skalli.model.ext.helloworld.HelloWorldProjectExt;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -19,7 +19,7 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-class HelloWorldConverter extends AbstractConverter<HelloWorldProjectExt> {
+class HelloWorldConverter extends RestConverterBase<HelloWorldProjectExt> {
 
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-HelloWorld"; //$NON-NLS-1$

@@ -12,7 +12,7 @@ package org.eclipse.skalli.view.ext;
 
 import java.net.URI;
 
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.model.Project;
 
 /**
  * Extension point for project related links and actions on the project details page.

@@ -18,24 +18,24 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.UUID;
 
-import org.eclipse.skalli.api.java.EntityService;
-import org.eclipse.skalli.api.java.IssuesService;
-import org.eclipse.skalli.api.java.Validation;
-import org.eclipse.skalli.api.java.tasks.RunnableSchedule;
-import org.eclipse.skalli.api.java.tasks.Schedule;
-import org.eclipse.skalli.api.java.tasks.SchedulerService;
-import org.eclipse.skalli.api.java.tasks.Task;
-import org.eclipse.skalli.common.configuration.ConfigurationService;
-import org.eclipse.skalli.common.util.CollectionUtils;
+import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.core.internal.validation.ValidationServiceImpl.QueueAllRunnable;
 import org.eclipse.skalli.core.internal.validation.ValidationServiceImpl.QueueRunnable;
 import org.eclipse.skalli.core.internal.validation.ValidationServiceImpl.ValidateAllRunnable;
 import org.eclipse.skalli.core.internal.validation.ValidationServiceImpl.ValidateRunnable;
-import org.eclipse.skalli.model.ext.EntityBase;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Issuer;
-import org.eclipse.skalli.model.ext.Issues;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Issuer;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.entity.EntityService;
+import org.eclipse.skalli.services.issues.Issues;
+import org.eclipse.skalli.services.issues.IssuesService;
+import org.eclipse.skalli.services.scheduler.RunnableSchedule;
+import org.eclipse.skalli.services.scheduler.Schedule;
+import org.eclipse.skalli.services.scheduler.SchedulerService;
+import org.eclipse.skalli.services.scheduler.Task;
+import org.eclipse.skalli.services.validation.Validation;
 import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
@@ -112,7 +112,7 @@ public class ValidationServiceImplTest {
 
     @Before
     public void setup() throws Exception {
-        new BundleManager(this.getClass()).startBundles();
+        BundleManager.startBundles();
 
         entities1 = new ArrayList<TestEntityBase1>();
         issues1 = new ArrayList<Issues>();

@@ -10,25 +10,19 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.users;
 
-import java.io.File;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.After;
+import org.eclipse.skalli.model.Group;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.group.GroupService;
+import org.eclipse.skalli.testutil.BundleManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Constants;
 
-import org.eclipse.skalli.api.java.GroupService;
-import org.eclipse.skalli.common.Group;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.testutil.BundleManager;
-
 @SuppressWarnings("nls")
 public class LocalGroupServiceImplTest {
-
-    private File tmpDir;
 
     private GroupService groupService;
     private List<Group> groups;
@@ -38,20 +32,11 @@ public class LocalGroupServiceImplTest {
 
     @Before
     public void setup() throws Exception {
-        new BundleManager(this.getClass()).startBundles();
+        BundleManager.startBundles();
         groupService = Services.getService(GroupService.class, FILTER);
-        if (groupService == null) {
-            Assert.fail("local group service not found.");
-        }
+        Assert.assertNotNull("local group service not found", groupService);
         groups = groupService.getGroups();
         Assert.assertEquals(2, groups.size());
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        if (tmpDir != null) {
-            FileUtils.forceDelete(tmpDir);
-        }
     }
 
     @Test

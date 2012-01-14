@@ -1,7 +1,7 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.storage.db.persistencedb">
   <implementation class="org.eclipse.skalli.storage.db.PersistenceDB"/>
   <service>
-    <provide interface="org.eclipse.skalli.api.java.StorageService"/>
+    <provide interface="org.eclipse.skalli.services.persistence.StorageService"/>
   </service>
   <property name="storageService.type" type="String" value="db"/>
   <reference

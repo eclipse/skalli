@@ -11,11 +11,10 @@
 package org.eclipse.skalli.commands;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.api.java.GroupService;
-import org.eclipse.skalli.common.Group;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.model.Group;
+import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.group.GroupService;
 
 public class AdminCommand {
 

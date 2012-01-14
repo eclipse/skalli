@@ -11,13 +11,13 @@
 package org.eclipse.skalli.core.internal.validation;
 
 import org.eclipse.skalli.api.rest.monitor.MonitorResource;
-import org.eclipse.skalli.model.ext.AliasedConverter;
+import org.eclipse.skalli.services.extension.rest.RestConverter;
 
 public class QueueMonitorResource extends MonitorResource {
     public static final String RESOURCE_NAME = "queue"; //$NON-NLS-1$
 
     @Override
-    protected AliasedConverter getConverter(String host) {
+    protected RestConverter getConverter(String host) {
         return new QueueConverter(ValidationServiceImpl.SERVICE_COMPONENT_NAME, RESOURCE_NAME, host);
     }
 }

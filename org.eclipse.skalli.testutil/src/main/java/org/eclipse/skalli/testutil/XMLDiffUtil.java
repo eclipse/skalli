@@ -26,7 +26,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.eclipse.skalli.model.ext.DataMigration;
+import org.eclipse.skalli.services.extension.DataMigration;
 import org.junit.Assert;
 import org.w3c.dom.Document;
 

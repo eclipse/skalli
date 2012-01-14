@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext.impl.internal.forms;
 
-import org.eclipse.skalli.common.util.UUIDList;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.commons.UUIDList;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.misc.RelatedProjectsExt;
 import org.eclipse.skalli.view.component.MultiComboBox;
 import org.eclipse.skalli.view.ext.AbstractExtensionFormService;

@@ -14,8 +14,9 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Locale;
 
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.model.ext.PropertyName;
+import org.eclipse.skalli.model.PropertyName;
+import org.eclipse.skalli.model.User;
+
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 

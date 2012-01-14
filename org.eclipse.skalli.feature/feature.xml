@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.skalli.feature"
       label="Skalli Feature (Incubation)"
-      version="0.1.0.qualifier"
+      version="0.2.0.qualifier"
       provider-name="Eclipse Skalli">
 
    <description url="http://www.eclipse.org/skalli">
@@ -25,7 +25,7 @@
    </license>
 
    <plugin
-         id="org.eclipse.skalli.api.java"
+         id="org.eclipse.skalli.api"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -33,13 +33,6 @@
 
    <plugin
          id="org.eclipse.skalli.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.skalli.model.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -68,20 +61,6 @@
 
    <plugin
          id="org.eclipse.skalli.view.ext.impl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.skalli.api.rest"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.skalli.common"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -132,13 +111,6 @@
 
    <plugin
          id="org.eclipse.skalli.gerrit"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.skalli.feed"
          download-size="0"
          install-size="0"
          version="0.0.0"

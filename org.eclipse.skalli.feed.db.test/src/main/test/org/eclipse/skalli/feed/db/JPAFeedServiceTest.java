@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.eclipse.skalli.api.java.feeds.Entry;
-import org.eclipse.skalli.api.java.feeds.FeedEntry;
-import org.eclipse.skalli.api.java.feeds.FeedPersistenceService;
-import org.eclipse.skalli.api.java.feeds.FeedService;
-import org.eclipse.skalli.api.java.feeds.FeedServiceException;
 import org.eclipse.skalli.feed.db.entities.EntryJPA;
+import org.eclipse.skalli.services.feed.Entry;
+import org.eclipse.skalli.services.feed.FeedEntry;
+import org.eclipse.skalli.services.feed.FeedPersistenceService;
+import org.eclipse.skalli.services.feed.FeedService;
+import org.eclipse.skalli.services.feed.FeedServiceException;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
 import org.junit.Test;
 

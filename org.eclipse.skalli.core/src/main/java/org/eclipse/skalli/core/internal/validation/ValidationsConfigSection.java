@@ -12,7 +12,7 @@ package org.eclipse.skalli.core.internal.validation;
 
 import org.restlet.resource.ServerResource;
 
-import org.eclipse.skalli.api.rest.config.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSection;
 
 public class ValidationsConfigSection implements ConfigSection {
 

@@ -13,7 +13,7 @@ package org.eclipse.skalli.core.internal.persistence.xstream;
 import java.util.List;
 import java.util.UUID;
 
-import org.eclipse.skalli.model.ext.EntityBase;
+import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.junit.Assert;
 import org.junit.Test;

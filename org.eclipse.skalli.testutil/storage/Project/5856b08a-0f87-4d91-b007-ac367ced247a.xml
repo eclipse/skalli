@@ -40,36 +40,36 @@
       <deleted>false</deleted>
       <leads>
         <no-comparator/>
-        <org.eclipse.skalli.model.core.ProjectMember>
+        <member>
           <userID>bigboss</userID>
-        </org.eclipse.skalli.model.core.ProjectMember>
+        </member>
       </leads>
       <members>
         <no-comparator/>
-        <org.eclipse.skalli.model.core.ProjectMember>
+        <member>
           <userID>commit1</userID>
-        </org.eclipse.skalli.model.core.ProjectMember>
-        <org.eclipse.skalli.model.core.ProjectMember>
+        </member>
+        <member>
           <userID>commit2</userID>
-        </org.eclipse.skalli.model.core.ProjectMember>
-        <org.eclipse.skalli.model.core.ProjectMember>
+        </member>
+        <member>
           <userID>commit3</userID>
-        </org.eclipse.skalli.model.core.ProjectMember>
+        </member>
       </members>
     </entity-people>
     <entity-scrum>
       <deleted>false</deleted>
       <scrumMasters>
         <no-comparator/>
-        <org.eclipse.skalli.model.core.ProjectMember>
+        <member>
           <userID>scrumMaster</userID>
-        </org.eclipse.skalli.model.core.ProjectMember>
+        </member>
       </scrumMasters>
       <productOwners>
         <no-comparator/>
-        <org.eclipse.skalli.model.core.ProjectMember>
+        <member>
           <userID>productOwner</userID>
-        </org.eclipse.skalli.model.core.ProjectMember>
+        </member>
       </productOwners>
       <backlogUrl>http://backlog.example.org/skalli</backlogUrl>
     </entity-scrum>

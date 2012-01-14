@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JPA-based FeedPersistenceService
 Bundle-SymbolicName: org.eclipse.skalli.feed.db
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Service-Component: OSGI-INF/JPAFeedPersistenceService.xml,
   OSGI-INF/JPAFeedService.xml
@@ -10,6 +10,6 @@ Bundle-ActivationPolicy: lazy
 Import-Package: javax.persistence,
  org.apache.commons.collections,
  org.apache.commons.lang,
- org.eclipse.skalli.api.java.feeds,
+ org.eclipse.skalli.services.feed,
  org.eclipse.skalli.feed.db.entities
 

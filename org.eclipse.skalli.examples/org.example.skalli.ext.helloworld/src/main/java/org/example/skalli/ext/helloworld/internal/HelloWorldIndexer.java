@@ -11,10 +11,10 @@
 
 package org.example.skalli.ext.helloworld.internal;
 
-import org.eclipse.skalli.model.ext.AbstractIndexer;
+import org.eclipse.skalli.services.extension.IndexerBase;
 import org.example.skalli.model.ext.helloworld.HelloWorldProjectExt;
 
-class HelloWorldIndexer extends AbstractIndexer<HelloWorldProjectExt> {
+class HelloWorldIndexer extends IndexerBase<HelloWorldProjectExt> {
 
     @Override
     protected void indexFields(HelloWorldProjectExt entity) {

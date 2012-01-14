@@ -12,9 +12,9 @@ package org.eclipse.skalli.core.internal.validation;
 
 import java.util.Queue;
 
-import org.eclipse.skalli.api.java.ValidationService;
 import org.eclipse.skalli.api.rest.monitor.AbstractMonitorConverter;
-import org.eclipse.skalli.model.ext.EntityBase;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.services.validation.ValidationService;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;

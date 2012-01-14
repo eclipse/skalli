@@ -23,22 +23,24 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.IssuesService;
-import org.eclipse.skalli.api.java.ProjectNode;
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.api.java.ProjectTemplateService;
-import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectTemplate;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.ExtensionService;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Issuer;
-import org.eclipse.skalli.model.ext.Issues;
-import org.eclipse.skalli.model.ext.Severity;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Issuer;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServices;
+import org.eclipse.skalli.services.group.GroupUtils;
+import org.eclipse.skalli.services.issues.Issues;
+import org.eclipse.skalli.services.issues.IssuesService;
+import org.eclipse.skalli.services.project.ProjectNode;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.template.ProjectTemplate;
+import org.eclipse.skalli.services.template.ProjectTemplateService;
+import org.eclipse.skalli.services.user.UserUtils;
 import org.eclipse.skalli.view.ext.ExtensionFormService;
 import org.eclipse.skalli.view.ext.Navigator;
 import org.eclipse.skalli.view.ext.ProjectEditContext;
@@ -278,7 +280,7 @@ public class ProjectEditPanel extends Panel implements Issuer {
     }
 
     private void setMessage(SortedSet<Issue> issues, Map<String, String> displayNames) {
-        String message = Issues.asHTMLList(null, issues, displayNames);
+        String message = Issue.asHTMLList(null, issues, displayNames);
         setMessage(headerLabel, message);
         setMessage(footerLabel, message);
     }
@@ -676,11 +678,11 @@ public class ProjectEditPanel extends Panel implements Issuer {
         }
 
         private List<String> getConfirmationWarnings() {
-            User modifier = UserUtil.getUser(application.getLoggedInUser());
+            User modifier = UserUtils.getUser(application.getLoggedInUser());
             List<String> warnings = new ArrayList<String>();
             for (ExtensionEntityBase extension : project.getAllExtensions()) {
                 Class<? extends ExtensionEntityBase> extensionClass = extension.getClass();
-                ExtensionService<?> extensionService = Services.getExtensionService(extensionClass);
+                ExtensionService<?> extensionService = ExtensionServices.getExtensionService(extensionClass);
                 if (extensionService != null) {
                     warnings.addAll(extensionService.getConfirmationWarnings(project, modifiedProject, modifier));
                 }
@@ -783,7 +785,7 @@ public class ProjectEditPanel extends Panel implements Issuer {
 
         @Override
         public boolean isAdministrator() {
-            return UserUtil.isAdministrator(application.getLoggedInUser());
+            return GroupUtils.isAdministrator(application.getLoggedInUser());
         }
 
         @Override

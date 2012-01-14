@@ -13,7 +13,7 @@ package org.eclipse.skalli.core.internal.persistence.xstream;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.skalli.api.java.StorageService;
+import org.eclipse.skalli.services.persistence.StorageService;
 import org.eclipse.skalli.testutil.AbstractStorageServiceTest;
 import org.eclipse.skalli.testutil.TestUtils;
 

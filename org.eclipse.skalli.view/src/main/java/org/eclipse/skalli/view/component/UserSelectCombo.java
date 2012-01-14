@@ -10,8 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.component;
 
-import org.eclipse.skalli.common.User;
+import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.view.internal.container.UserContainer;
+
 import com.vaadin.ui.ComboBox;
 
 public class UserSelectCombo extends ComboBox {

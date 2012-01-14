@@ -9,7 +9,8 @@
         SAP AG - initial API and implementation
  -->
 
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" enabled="true" immediate="true" name="org.eclipse.skalli.ext.maven.resolver">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" enabled="true" immediate="true"
+    name="org.eclipse.skalli.ext.maven.component.resolver">
    <implementation class="org.eclipse.skalli.model.ext.maven.internal.MavenResolverServiceImpl"/>
    <service>
       <provide interface="org.eclipse.skalli.model.ext.maven.internal.MavenResolverService"/>
@@ -17,21 +18,21 @@
    <reference
       bind="bindConfigurationService"
       unbind="unbindConfigurationService"
-      interface="org.eclipse.skalli.common.configuration.ConfigurationService"
+      interface="org.eclipse.skalli.services.configuration.ConfigurationService"
       name="ConfigurationService"
       cardinality="0..1"
       policy="dynamic"/>
    <reference
       bind="bindEventService"
       unbind="unbindEventService"
-      interface="org.eclipse.skalli.api.java.EventService"
+      interface="org.eclipse.skalli.services.event.EventService"
       name="EventService"
       cardinality="0..1"
       policy="dynamic"/>
    <reference
       bind="bindSchedulerService"
       unbind="unbindSchedulerService"
-      interface="org.eclipse.skalli.api.java.tasks.SchedulerService"
+      interface="org.eclipse.skalli.services.scheduler.SchedulerService"
       name="SchedulerService"
       cardinality="0..1"
       policy="dynamic"/>
@@ -40,6 +41,13 @@
       unbind="unbindNexusClient"
       interface="org.eclipse.skalli.nexus.NexusClient"
       name="NexusClient"
+      cardinality="1..1"
+      policy="dynamic"/>
+   <reference
+      bind="bindDestinationService"
+      unbind="unbindDestinationService"
+      interface="org.eclipse.skalli.services.destination.DestinationService"
+      name="DestinationService"
       cardinality="1..1"
       policy="dynamic"/>
 </scr:component>

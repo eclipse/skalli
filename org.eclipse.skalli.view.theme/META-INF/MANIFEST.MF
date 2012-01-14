@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Skalli Default UI Theme
+Bundle-Name: Skalli Default UI Theme (Incubation)
 Bundle-SymbolicName: org.eclipse.skalli.view.theme
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
 Fragment-Host: org.eclipse.skalli.view
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

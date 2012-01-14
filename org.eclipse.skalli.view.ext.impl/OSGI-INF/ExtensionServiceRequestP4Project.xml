@@ -9,7 +9,7 @@
         SAP AG - initial API and implementation
  -->
 
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.view.ext.impl.internal.links.requestP4Project">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.ui.links.p4">
    <implementation class="org.eclipse.skalli.view.ext.impl.internal.links.RequestP4Project"/>
    <service>
       <provide interface="org.eclipse.skalli.view.ext.ProjectContextLink"/>

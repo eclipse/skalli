@@ -13,13 +13,14 @@ package org.eclipse.skalli.view.ext.impl.internal.infobox;
 import java.util.SortedSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.IssuesService;
-import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Issues;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.group.GroupUtils;
+import org.eclipse.skalli.services.issues.Issues;
+import org.eclipse.skalli.services.issues.IssuesService;
+import org.eclipse.skalli.services.project.ProjectUtils;
+import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;
 import org.eclipse.skalli.view.ext.ProjectInfoBox;
@@ -60,7 +61,7 @@ public class ProjectIssuesBox extends InfoBox implements ProjectInfoBox {
                 } else {
                     SortedSet<Issue> issueSet = issues.getIssues();
                     if (!issueSet.isEmpty()) {
-                        sb.append(Issues.asHTMLList(null, issueSet));
+                        sb.append(Issue.asHTMLList(null, issueSet));
                         if (util.isUserProjectAdmin(project)) {
                             sb.append("<p>Click <a href=\"").append(Consts.URL_PROJECTS).append("/")
                                     .append(project.getProjectId()).append("?").append(Consts.PARAM_ACTION).append("=")
@@ -98,8 +99,8 @@ public class ProjectIssuesBox extends InfoBox implements ProjectInfoBox {
             return false;
         }
 
-        boolean showIssues = UserUtil.isAdministrator(loggedInUserId)
-                || UserUtil.isProjectAdminInParentChain(loggedInUserId, project);
+        boolean showIssues = GroupUtils.isAdministrator(loggedInUserId)
+                || ProjectUtils.isProjectAdminInParentChain(loggedInUserId, project);
         if (!showIssues) {
             return false;
         }

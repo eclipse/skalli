@@ -19,13 +19,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.skalli.api.java.StorageException;
-import org.eclipse.skalli.api.java.StorageService;
+import org.eclipse.skalli.services.persistence.StorageException;
+import org.eclipse.skalli.services.persistence.StorageService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("nls")
 public abstract class AbstractStorageServiceTest {
+
     protected static final String TEST_ID = "test_id";
     protected static final String TEST_NONEXISTING_ID = "some_non_existing_id";
     protected static final String TEST_NONEXISTING_CATEGORY = "some_non_existing_category";

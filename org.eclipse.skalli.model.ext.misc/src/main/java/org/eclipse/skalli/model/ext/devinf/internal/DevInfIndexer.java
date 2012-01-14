@@ -13,10 +13,10 @@ package org.eclipse.skalli.model.ext.devinf.internal;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.skalli.model.ext.AbstractIndexer;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
+import org.eclipse.skalli.services.extension.IndexerBase;
 
-public class DevInfIndexer extends AbstractIndexer<DevInfProjectExt> {
+public class DevInfIndexer extends IndexerBase<DevInfProjectExt> {
 
     @Override
     protected void indexFields(DevInfProjectExt devInf) {

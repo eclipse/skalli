@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext.impl.internal.forms;
 
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.people.PeopleProjectExt;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ext.commons.PeopleExtension;
 import org.eclipse.skalli.view.component.UsersPicker;
 import org.eclipse.skalli.view.ext.AbstractExtensionFormService;
 import org.eclipse.skalli.view.ext.DefaultProjectFieldFactory;
@@ -22,7 +22,7 @@ import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.FormFieldFactory;
 
-public class PeopleProjectExtEditForm extends AbstractExtensionFormService<PeopleProjectExt> {
+public class PeopleProjectExtEditForm extends AbstractExtensionFormService<PeopleExtension> {
 
     @Override
     public String getIconPath() {
@@ -35,18 +35,18 @@ public class PeopleProjectExtEditForm extends AbstractExtensionFormService<Peopl
     }
 
     @Override
-    public Class<PeopleProjectExt> getExtensionClass() {
-        return PeopleProjectExt.class;
+    public Class<PeopleExtension> getExtensionClass() {
+        return PeopleExtension.class;
     }
 
     @Override
-    public PeopleProjectExt newExtensionInstance() {
-        return new PeopleProjectExt();
+    public PeopleExtension newExtensionInstance() {
+        return new PeopleExtension();
     }
 
     @Override
     protected Item getItemDataSource(Project project) {
-        return new BeanItem<PeopleProjectExt>(getExtension(project));
+        return new BeanItem<PeopleExtension>(getExtension(project));
     }
 
     @Override
@@ -54,21 +54,21 @@ public class PeopleProjectExtEditForm extends AbstractExtensionFormService<Peopl
         return new FieldFactory(project, context);
     }
 
-    private class FieldFactory extends DefaultProjectFieldFactory<PeopleProjectExt> {
+    private class FieldFactory extends DefaultProjectFieldFactory<PeopleExtension> {
         private static final long serialVersionUID = 7304032586747249586L;
-        private PeopleProjectExt extension;
+        private PeopleExtension extension;
 
         public FieldFactory(Project project, ProjectEditContext context) {
-            super(project, PeopleProjectExt.class, context);
+            super(project, PeopleExtension.class, context);
             this.extension = getExtension(project);
         }
 
         @Override
         protected Field createField(Object propertyId, String caption) {
             Field field = null;
-            if (PeopleProjectExt.PROPERTY_MEMBERS.equals(propertyId)) {
+            if (PeopleExtension.PROPERTY_MEMBERS.equals(propertyId)) {
                 field = new UsersPicker(caption, extension.getMembers());
-            } else if (PeopleProjectExt.PROPERTY_LEADS.equals(propertyId)) {
+            } else if (PeopleExtension.PROPERTY_LEADS.equals(propertyId)) {
                 field = new UsersPicker(caption, extension.getLeads());
             }
             return field;

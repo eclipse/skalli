@@ -25,11 +25,11 @@ public class MavenCoordinateUtil {
     public static final String PARENT_GROUPID = "org.example.test";
     public static final String PARENT_RELATIVE_PATH = "../parentpath";
 
-    public static MavenModule TEST_COORD = new MavenModule(GROUPID, ARTIFACT, PACKAGING);
-    public static MavenModule TEST_PARENT_COORD = new MavenModule(PARENT_GROUPID, PARENT_ARTIFACT,
+    public static final MavenModule TEST_COORD = new MavenModule(GROUPID, ARTIFACT, PACKAGING);
+    public static final MavenModule TEST_PARENT_COORD = new MavenModule(PARENT_GROUPID, PARENT_ARTIFACT,
             PARENT_PACKAGING);
 
-    public static List<MavenModule> TEST_MODULES = Arrays.asList(
+    public static final List<MavenModule> TEST_MODULES = Arrays.asList(
             new MavenModule("a.b.c", "art1", "jar"),
             new MavenModule("a.b.c", "art2", "jar"),
             new MavenModule("a.b.c", "art3", "war"),

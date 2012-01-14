@@ -11,10 +11,10 @@
 package org.eclipse.skalli.gerrit.client.internal;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.common.configuration.ConfigurationService;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritService;
 import org.eclipse.skalli.gerrit.client.config.ConfigKeyGerrit;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

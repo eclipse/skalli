@@ -2,12 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Skalli Nexus Extension Tests (Incubation)
 Bundle-SymbolicName: org.eclipse.skalli.nexus.test
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Fragment-Host: org.eclipse.skalli.nexus
 Import-Package: org.easymock,
- org.eclipse.skalli.common.util,
+ org.eclipse.skalli.commons,
  org.eclipse.skalli.testutil,
  org.junit
-Require-Bundle: org.hamcrest
+Require-Bundle: org.hamcrest,
+ org.eclipse.skalli.core

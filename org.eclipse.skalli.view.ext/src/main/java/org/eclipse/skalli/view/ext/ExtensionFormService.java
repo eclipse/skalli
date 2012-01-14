@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext;
 
-import org.eclipse.skalli.api.java.IconProvider;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.Project;
+
 import com.vaadin.ui.Form;
 
 /**

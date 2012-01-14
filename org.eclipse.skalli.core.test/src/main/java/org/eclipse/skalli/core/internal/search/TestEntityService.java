@@ -15,11 +15,12 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.eclipse.skalli.api.java.EntityService;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.services.entity.EntityServiceBase;
 
-public class TestEntityService implements EntityService<TestEntity> {
+public class TestEntityService extends EntityServiceBase<TestEntity> {
 
     private final List<TestEntity> entities;
 
@@ -51,15 +52,6 @@ public class TestEntityService implements EntityService<TestEntity> {
         return null;
     }
 
-    @Override
-    public SortedSet<Issue> validate(TestEntity entity, Severity minSeverity) {
-        return new TreeSet<Issue>();
-    }
-
-    @Override
-    public SortedSet<Issue> validateAll(Severity minSeverity) {
-        return new TreeSet<Issue>();
-    }
 
     @Override
     public Class<TestEntity> getEntityClass() {
@@ -67,7 +59,21 @@ public class TestEntityService implements EntityService<TestEntity> {
     }
 
     @Override
+    public int getModelVersion() {
+        return 0;
+    }
+
+    @Override
     public int size() {
         return entities.size();
+    }
+
+    @Override
+    protected void validateEntity(TestEntity entity) throws ValidationException {
+    }
+
+    @Override
+    protected SortedSet<Issue> validateEntity(TestEntity entity, Severity minSeverity) {
+        return new TreeSet<Issue>();
     }
 }

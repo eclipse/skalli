@@ -12,13 +12,13 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Comparator" %>
-<%@ page import="org.eclipse.skalli.common.User" %>
-<%@ page import="org.eclipse.skalli.model.core.Project" %>
-<%@ page import="org.eclipse.skalli.common.Consts" %>
-<%@ page import="org.eclipse.skalli.api.java.authentication.LoginUtil" %>
-<%@ page import="org.eclipse.skalli.api.java.authentication.UserUtil" %>
-<%@ page import="org.eclipse.skalli.api.java.ProjectService" %>
-<%@ page import="org.eclipse.skalli.common.Services" %>
+<%@ page import="org.eclipse.skalli.model.User" %>
+<%@ page import="org.eclipse.skalli.model.Project" %>
+<%@ page import="org.eclipse.skalli.view.Consts" %>
+<%@ page import="org.eclipse.skalli.services.user.LoginUtils" %>
+<%@ page import="org.eclipse.skalli.services.group.GroupUtils" %>
+<%@ page import="org.eclipse.skalli.services.project.ProjectService" %>
+<%@ page import="org.eclipse.skalli.services.Services" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -40,9 +40,9 @@
 
 <%-- deleted projects --%>
 <%
-    LoginUtil util = new LoginUtil(request);
+    LoginUtils util = new LoginUtils(request);
     User user = util.getLoggedInUser();
-    if (UserUtil.isAdministrator(user)) {
+    if (GroupUtils.isAdministrator(user)) {
         ProjectService projectService = Services.getRequiredService(ProjectService.class);
         List<Project> deletedProjects = projectService.getDeletedProjects(new Comparator<Project>() {
             public int compare(Project p1, Project p2) {

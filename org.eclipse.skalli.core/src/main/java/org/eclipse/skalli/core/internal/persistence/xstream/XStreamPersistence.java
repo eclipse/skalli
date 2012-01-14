@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.persistence.xstream;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -23,35 +22,31 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeMap;
-import java.util.UUID;
 
 import javax.xml.bind.DatatypeConverter;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.StorageException;
-import org.eclipse.skalli.api.java.StorageService;
-import org.eclipse.skalli.common.util.CollectionUtils;
-import org.eclipse.skalli.common.util.UUIDUtils;
-import org.eclipse.skalli.common.util.XMLUtils;
+import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.core.internal.persistence.EntityHelper;
-import org.eclipse.skalli.model.ext.DataMigration;
-import org.eclipse.skalli.model.ext.EntityBase;
-import org.eclipse.skalli.model.ext.ExtensibleEntityBase;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.Historized;
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Issuer;
-import org.eclipse.skalli.model.ext.Severity;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.ExtensibleEntityBase;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.Historized;
+import org.eclipse.skalli.model.Issuer;
+import org.eclipse.skalli.services.entity.EntityService;
+import org.eclipse.skalli.services.extension.DataMigration;
+import org.eclipse.skalli.services.extension.MigrationException;
+import org.eclipse.skalli.services.extension.MigrationUtils;
+import org.eclipse.skalli.services.persistence.StorageException;
+import org.eclipse.skalli.services.persistence.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.Converter;
 
 /**
@@ -72,29 +67,12 @@ public class XStreamPersistence implements Issuer {
         this.storageService = storageService;
     }
 
-    // TODO "central" versioning together with extensibility sucks!
-    /*
-     * Alternative idea: Instead of a version number just use unique IDs. A
-     * migration then defines a set of other migration's ids which have to be
-     * applied as a prerequisite. The Migrator then first collects all registered
-     * migrations an then sorts them by their prerequisites. Hypothetis: A
-     * migration logically cannot depend on another migration if the unique id of
-     * that migration is not known. Open issues: - What should be used as a
-     * "version" information in the persisted xml? => Maybe something like a
-     * checksum (must be stable with respect to the order of calculation)
-     */
-    private static final int CURRENT_VERISON = 19;
-
-    int getCurrentVersion() {
-        return CURRENT_VERISON;
-    }
-
     StorageService getStorageService() {
         return storageService;
     }
 
-    void postProcessXML(Document newDoc, Document oldDoc, Map<String, Class<?>> aliases, String userId)
-            throws ValidationException {
+    void postProcessXML(Document newDoc, Document oldDoc, Map<String, Class<?>> aliases, String userId, int modelVersion)
+            throws MigrationException {
         Element newDocElement = newDoc.getDocumentElement();
         Element oldDocElement = oldDoc != null ? oldDoc.getDocumentElement() : null;
         if (!XMLDiff.identical(newDocElement, oldDocElement)) {
@@ -114,19 +92,20 @@ public class XStreamPersistence implements Issuer {
                 }
             }
         }
-        setVersionAttribute(newDoc);
+        setVersionAttribute(newDoc, modelVersion);
     }
 
-    void preProcessXML(Document doc, Set<DataMigration> migrations, Map<String, Class<?>> aliases) throws ValidationException {
+    void preProcessXML(Document doc, Set<DataMigration> migrations, Map<String, Class<?>> aliases, int modelVersion)
+            throws MigrationException {
         int version = getVersionAttribute(doc);
         if (migrations != null) {
             DataMigrator migrator = new DataMigrator(migrations, aliases);
-            migrator.migrate(doc, version, getCurrentVersion());
+            migrator.migrate(doc, version, modelVersion);
         }
     }
 
     void postProcessEntity(Document doc, EntityBase entity, Map<String, Class<?>> aliases)
-            throws ValidationException {
+            throws MigrationException {
         EntityHelper.normalize(entity);
         Element docElement = doc.getDocumentElement();
         entity.setLastModified(getLastModifiedAttribute(docElement));
@@ -183,16 +162,15 @@ public class XStreamPersistence implements Issuer {
     }
 
     SortedMap<String, Element> getExtensionsByAlias(Document doc, Map<String, Class<?>> aliases)
-            throws ValidationException {
+            throws MigrationException {
         return getExtensions(doc, aliases, false);
     }
 
-    SortedMap<String, Element> getExtensions(Document doc, Map<String, Class<?>> aliases,
-            boolean byClassName)
-            throws ValidationException {
+    SortedMap<String, Element> getExtensions(Document doc, Map<String, Class<?>> aliases, boolean byClassName)
+            throws MigrationException {
         TreeMap<String, Element> result = new TreeMap<String, Element>();
         if (aliases != null && aliases.size() > 0) {
-            List<Element> extensionElements = XMLUtils.getExtensions(doc, aliases.keySet());
+            List<Element> extensionElements = MigrationUtils.getExtensions(doc, aliases.keySet());
             for (Element extensionElement : extensionElements) {
                 String name = extensionElement.getNodeName();
                 if (byClassName) {
@@ -208,10 +186,6 @@ public class XStreamPersistence implements Issuer {
         return result;
     }
 
-    void setVersionAttribute(Document doc) {
-        setVersionAttribute(doc, getCurrentVersion());
-    }
-
     void setVersionAttribute(Document doc, int version) {
         Element documentElement = doc.getDocumentElement();
         if (doc.getDocumentElement().hasAttribute(TAG_VERSION)) {
@@ -222,7 +196,7 @@ public class XStreamPersistence implements Issuer {
     }
 
     SortedMap<String, Element> getExtensionsByClassName(Document doc, Map<String, Class<?>> aliases)
-            throws ValidationException {
+            throws MigrationException {
         return getExtensions(doc, aliases, true);
     }
 
@@ -235,10 +209,10 @@ public class XStreamPersistence implements Issuer {
         return version;
     }
 
-    void saveEntity(EntityBase entity, String userId, Map<String, Class<?>> aliases)
-            throws StorageException, ValidationException {
+    void saveEntity(EntityService<?> entityService, EntityBase entity, String userId,
+            Map<String, Class<?>> aliases, Set<Converter> converters) throws StorageException, MigrationException {
 
-        Class<?> entityClass = entity.getClass();
+        Class<? extends EntityBase> entityClass = entity.getClass();
         String category = entityClass.getSimpleName();
         String key = entity.getUuid().toString();
 
@@ -246,122 +220,103 @@ public class XStreamPersistence implements Issuer {
             storageService.archive(category, key);
         }
 
-        Document newDoc = entityToDom(entity, aliases);
-        Document oldDoc = readEntityAsDom(entity.getClass(), entity.getUuid());
-        try {
-            postProcessXML(newDoc, oldDoc, aliases, userId);
-        } catch (ValidationException e) {
-            throw new ValidationException(new Issue(Severity.FATAL, getClass(), entity.getUuid(), e.getMessage()));
-        }
+        Document newDoc = entityToDom(entity, aliases, converters);
+        Document oldDoc = readEntityAsDom(entityClass, entity.getUuid().toString());
+        postProcessXML(newDoc, oldDoc, aliases, userId, entityService.getModelVersion());
 
         InputStream is;
         try {
             is = XMLUtils.documentToStream(newDoc);
         } catch (TransformerException e) {
-            throw new StorageException("Failed to transform entity " + entity + " to XML", e);
+            throw new StorageException(MessageFormat.format("Failed to transform entity {0} to XML", entity), e);
         }
 
         storageService.write(category, key, is);
     }
 
-    private Set<Converter> getConverters() {
-        return CollectionUtils.asSet(new NoopConverter(), new UUIDListConverter(), new ExtensionsMapConverter());
-    }
-
-    private Document entityToDom(EntityBase entity, Map<String, Class<?>> aliases) throws StorageException {
+    private Document entityToDom(EntityBase entity, Map<String, Class<?>> aliases, Set<Converter> converters)
+            throws StorageException {
         Document newDoc = null;
         try {
-            XStream xstream = IgnoreUnknownElementsXStream.getXStreamInstance(getConverters(), null, aliases);
+            XStream xstream = IgnoreUnknownElementsXStream.getXStreamInstance(converters, null, aliases);
             String xml = xstream.toXML(entity);
             newDoc = XMLUtils.documentFromString(xml);
-        } catch (SAXException e) {
-            throw new StorageException("Failed to transform entity " + entity + " to XML", e);
-        } catch (IOException e) {
-            throw new StorageException("Failed to transform entity " + entity + " to XML", e);
-        } catch (ParserConfigurationException e) {
-            throw new StorageException("Failed to transform entity " + entity + " to XML", e);
+        } catch (Exception e) {
+            throw new StorageException(MessageFormat.format("Failed to transform entity {0} to XML", entity), e);
         }
         return newDoc;
     }
 
-    private EntityBase domToEntity(Set<ClassLoader> entityClassLoaders, Map<String, Class<?>> aliases, Document doc)
-            throws StorageException {
-
+    private EntityBase domToEntity(Set<ClassLoader> entityClassLoaders, Map<String, Class<?>> aliases,
+            Set<Converter> converters, Document doc) throws StorageException {
         String xml = null;
         try {
             xml = XMLUtils.documentToString(doc);
         } catch (TransformerException e) {
             throw new StorageException("Failed to transform XML to entity", e);
         }
-        XStream xstream = IgnoreUnknownElementsXStream.getXStreamInstance(getConverters(), entityClassLoaders, aliases);
-        EntityBase entity = (EntityBase) xstream.fromXML(xml);
+        XStream xstream = IgnoreUnknownElementsXStream.getXStreamInstance(converters, entityClassLoaders, aliases);
+        EntityBase entity = null;
+        try {
+             entity = (EntityBase) xstream.fromXML(xml);
+        } catch (ConversionException e) {
+            LOG.warn(MessageFormat.format("Failed to convert XML document to entity: {0}", xml), e);
+        }
         return entity;
     }
 
-    <T extends EntityBase> T loadEntity(Class<T> entityClass, UUID uuid,
-            Set<ClassLoader> entityClassLoaders,
-            Set<DataMigration> migrations, Map<String, Class<?>> aliases) throws StorageException, ValidationException {
-
-        Document doc = readEntityAsDom(entityClass, uuid);
+    <T extends EntityBase> T loadEntity(EntityService<T> entityService, String key, Set<ClassLoader> classLoaders,
+            Set<DataMigration> migrations, Map<String, Class<?>> aliases, Set<Converter> converters)
+            throws StorageException, MigrationException {
+        if (entityService == null) {
+            throw new StorageException(MessageFormat.format(
+                    "Could not load entity {0}: No corresponding entity service available", key));
+        }
+        Class<T> entityClass = entityService.getEntityClass();
+        LOG.info(MessageFormat.format("Loading entity {0} of type {1}", key, entityClass));
+        Document doc = readEntityAsDom(entityClass, key);
         if (doc == null) {
             return null;
         }
 
-        try {
-            preProcessXML(doc, migrations, aliases);
-        } catch (ValidationException e) {
-            throw new ValidationException(new Issue(Severity.FATAL, getClass(), uuid, e.getMessage()));
-        }
-
-        EntityBase entity = domToEntity(entityClassLoaders, aliases, doc);
+        preProcessXML(doc, migrations, aliases, entityService.getModelVersion());
+        EntityBase entity = domToEntity(classLoaders, aliases, converters, doc);
         if (entity == null) {
-            throw new StorageException("Could not load entity " + uuid + " of type " + entityClass);
+            return null;
         }
-
-        try {
-            postProcessEntity(doc, entity, aliases);
-        } catch (ValidationException e) {
-            throw new ValidationException(new Issue(Severity.FATAL, getClass(), uuid, e.getMessage()));
-        }
-
+        postProcessEntity(doc, entity, aliases);
         LOG.info(MessageFormat.format("Loaded entity {0}", entity.getUuid()));
 
-        EntityBase loadedEntityBase = entity;
-        return entityClass.cast(loadedEntityBase);
+        return entityClass.cast(entity);
     }
 
-    private Document readEntityAsDom(Class<? extends EntityBase> entityClass, UUID uuid) throws StorageException {
-        InputStream stream = storageService.read(entityClass.getSimpleName(), uuid.toString());
+    private Document readEntityAsDom(Class<? extends EntityBase> entityClass, String key) throws StorageException {
+        InputStream stream = storageService.read(entityClass.getSimpleName(), key);
         if (stream == null) {
-            // no entity available
+            LOG.warn(MessageFormat.format("Storage services has no entity with key {0}", key));
             return null;
         }
 
         Document doc;
         try {
             doc = XMLUtils.documentFromStream(stream);
-        } catch (SAXException e) {
-            throw new StorageException("Failed to convert stream to dom for entity " + uuid + " of type " + entityClass, e);
-        } catch (IOException e) {
-            throw new StorageException("Failed to convert stream to dom for entity " + uuid + " of type " + entityClass, e);
-        } catch (ParserConfigurationException e) {
-            throw new StorageException("Failed to convert stream to dom for entity " + uuid + " of type " + entityClass, e);
+        } catch (Exception e) {
+            throw new StorageException(MessageFormat.format(
+                    "Failed to convert stream to dom for entity {0} of type {1}", key, entityClass), e);
         }
         return doc;
     }
 
-    <T extends EntityBase> List<T> loadEntities(Class<T> entityClass, Set<ClassLoader> entityClassLoaders,
-            Set<DataMigration> migrations, Map<String, Class<?>> aliases) throws StorageException, ValidationException {
-
+    <T extends EntityBase> List<T> loadEntities(EntityService<T> entityService, Set<ClassLoader> entityClassLoaders,
+            Set<DataMigration> migrations, Map<String, Class<?>> aliases, Set<Converter> converters)
+            throws StorageException, MigrationException {
         List<T> loadEntities = new ArrayList<T>();
-        List<String> keys = storageService.keys(entityClass.getSimpleName());
+        List<String> keys = storageService.keys(entityService.getEntityClass().getSimpleName());
         for (String key : keys) {
-            if (!UUIDUtils.isUUID(key)) {
-                throw new StorageException(key + " is not a valid UUID");
+            T entity = loadEntity(entityService, key, entityClassLoaders, migrations, aliases, converters);
+            if (entity != null) {
+                loadEntities.add(entity);
             }
-            UUID uuid = UUID.fromString(key);
-            LOG.info("  Loading entity " + uuid + " of type " + entityClass); //$NON-NLS-1$
-            loadEntities.add(loadEntity(entityClass, uuid, entityClassLoaders, migrations, aliases));
         }
         return loadEntities;
     }

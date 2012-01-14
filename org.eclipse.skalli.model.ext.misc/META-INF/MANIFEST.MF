@@ -1,36 +1,50 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Skalli Miscellaneous Extensions (Incubation)
+Bundle-Name: Skalli Common Extensions (Incubation)
 Bundle-SymbolicName: org.eclipse.skalli.model.ext.misc
-Bundle-Version: 0.1.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: com.thoughtworks.xstream,
+Import-Package: com.sun.syndication.feed.synd,
+ com.sun.syndication.io,
+ com.thoughtworks.xstream,
  com.thoughtworks.xstream.annotations,
  com.thoughtworks.xstream.converters,
  com.thoughtworks.xstream.io,
+ org.apache.commons.httpclient,
+ org.apache.commons.httpclient.methods,
+ org.apache.commons.io,
  org.apache.commons.lang,
- org.eclipse.skalli.api.java,
- org.eclipse.skalli.api.rest.config,
- org.eclipse.skalli.common,
- org.eclipse.skalli.common.configuration,
- org.eclipse.skalli.common.util,
- org.eclipse.skalli.model.core,
- org.eclipse.skalli.model.ext,
+ org.eclipse.skalli.commons,
+ org.eclipse.skalli.model,
+ org.eclipse.skalli.services,
+ org.eclipse.skalli.services.configuration,
+ org.eclipse.skalli.services.configuration.rest,
+ org.eclipse.skalli.services.destination,
+ org.eclipse.skalli.services.extension,
+ org.eclipse.skalli.services.extension.rest,
+ org.eclipse.skalli.services.extension.validators,
+ org.eclipse.skalli.services.feed,
+ org.eclipse.skalli.services.role,
+ org.eclipse.skalli.services.search,
+ org.jdom,
  org.osgi.service.component,
  org.restlet.resource,
  org.slf4j
 Service-Component: OSGI-INF/ExtensionServiceReview.xml, 
  OSGI-INF/ExtensionServiceScrum.xml,
  OSGI-INF/ExtensionServiceDevInf.xml,
- OSGI-INF/ExtensionServiceInfo.xml,
  OSGI-INF/ExtensionServiceLinkGroups.xml,
  OSGI-INF/MailingListMappingConfigSection.xml,
  OSGI-INF/ScmLocationMappingConfigSection.xml,
- OSGI-INF/ScrumPeopleProvider.xml,
- OSGI-INF/ExtensionServiceRelatedProjects.xml
-Export-Package: org.eclipse.skalli.model.ext.devinf,
- org.eclipse.skalli.model.ext.info,
+ OSGI-INF/ScrumRoleComponent.xml,
+ OSGI-INF/ExtensionServiceRelatedProjects.xml,
+ OSGI-INF/GitWebFeedProvider.xml,
+ OSGI-INF/JenkinsFeedProvider.xml 
+Export-Package: org.eclipse.skalli.ext.mapping,
+ org.eclipse.skalli.ext.mapping.mail,
+ org.eclipse.skalli.ext.mapping.scm,
+ org.eclipse.skalli.model.ext.devinf,
  org.eclipse.skalli.model.ext.linkgroups,
  org.eclipse.skalli.model.ext.misc,
  org.eclipse.skalli.model.ext.scrum

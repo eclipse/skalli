@@ -15,13 +15,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.model.ext.AbstractIndexer;
 import org.eclipse.skalli.model.ext.maven.MavenCoordinate;
 import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
+import org.eclipse.skalli.services.extension.IndexerBase;
 
-public class MavenReactorIndexer extends AbstractIndexer<MavenReactorProjectExt> {
+public class MavenReactorIndexer extends IndexerBase<MavenReactorProjectExt> {
 
     private static final String MAVEN_PREFIX = "maven.";
     private static final String MAVEN_MODULE_PREFIX = "maven.module.";

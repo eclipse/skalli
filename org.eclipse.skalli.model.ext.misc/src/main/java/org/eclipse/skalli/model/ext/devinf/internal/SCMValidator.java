@@ -18,12 +18,11 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.model.ext.Issue;
-import org.eclipse.skalli.model.ext.Issuer;
-import org.eclipse.skalli.model.ext.PropertyValidator;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Issuer;
+import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
+import org.eclipse.skalli.services.extension.PropertyValidator;
 
 public class SCMValidator implements PropertyValidator, Issuer {
 

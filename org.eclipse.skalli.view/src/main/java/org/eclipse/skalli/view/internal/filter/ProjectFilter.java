@@ -22,11 +22,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.util.UUIDUtils;
-import org.eclipse.skalli.model.core.Project;
+import org.eclipse.skalli.commons.UUIDUtils;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.view.Consts;
 
 /**
  * This filter sets the following attributes if the request specifies a project:

@@ -11,10 +11,10 @@
 package org.eclipse.skalli.core.internal.configuration;
 
 import org.easymock.EasyMock;
-import org.eclipse.skalli.api.java.EventService;
-import org.eclipse.skalli.api.java.events.EventCustomizingUpdate;
-import org.eclipse.skalli.common.configuration.ConfigKey;
-import org.eclipse.skalli.common.configuration.ConfigTransaction;
+import org.eclipse.skalli.services.configuration.ConfigKey;
+import org.eclipse.skalli.services.configuration.ConfigTransaction;
+import org.eclipse.skalli.services.event.EventCustomizingUpdate;
+import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.testutil.HashMapStorageService;
 import org.junit.Assert;
 import org.junit.Before;

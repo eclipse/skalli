@@ -13,9 +13,9 @@ package org.eclipse.skalli.view.component;
 import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.common.LinkGroup;
-import org.eclipse.skalli.common.OrderableGroup;
-import org.eclipse.skalli.model.ext.Link;
+import org.eclipse.skalli.commons.Link;
+import org.eclipse.skalli.model.ext.linkgroups.LinkGroup;
+import org.eclipse.skalli.model.ext.linkgroups.OrderableGroup;
 import org.eclipse.skalli.view.component.LinkWindow.ILinkAddedHandler;
 import org.eclipse.skalli.view.component.LinkWindow.ILinkModifiedHandler;
 

@@ -12,7 +12,7 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" enabled="true" immediate="true" name="org.eclipse.skalli.feed.db.JPAFeedPersistenceService">
   <implementation class="org.eclipse.skalli.feed.db.JPAFeedPersistenceService"/>
   <service>
-    <provide interface="org.eclipse.skalli.api.java.feeds.FeedPersistenceService"/>
+    <provide interface="org.eclipse.skalli.services.feed.FeedPersistenceService"/>
   </service>
   <property name="feedService.type" type="String" value="db"/>
   <reference

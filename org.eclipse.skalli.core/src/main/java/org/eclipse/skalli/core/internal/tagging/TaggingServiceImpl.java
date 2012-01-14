@@ -17,10 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.skalli.api.java.PersistenceService;
-import org.eclipse.skalli.api.java.TaggingService;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.Taggable;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.ExtensibleEntityBase;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.Taggable;
+import org.eclipse.skalli.services.persistence.PersistenceService;
+import org.eclipse.skalli.services.tagging.TaggingService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -51,17 +53,52 @@ public class TaggingServiceImpl implements TaggingService {
     }
 
     @Override
-    public Set<String> getAvailableTags() {
+    public <T extends EntityBase> Set<String> getAllTags(Class<T> entityClass) {
         Set<String> result = new HashSet<String>();
-        List<Project> entities = persistenceService.getEntities(Project.class);
-        for (Project entityBase : entities) {
-            if (entityBase instanceof Taggable) {
-                Taggable taggable = (Taggable) entityBase;
-                Set<String> tags = taggable.getTags();
-                if (tags != null) {
-                    for (String tag : tags) {
-                        if (!result.contains(tag)) {
-                            result.add(tag);
+        List<T> entities = persistenceService.getEntities(entityClass);
+        for (T entity : entities) {
+            if (entity instanceof Taggable) {
+                appendTags((Taggable)entity, result);
+            } else if (entity instanceof ExtensibleEntityBase) {
+                appendTagsFromExtensions((ExtensibleEntityBase)entity, result);
+            }
+        }
+        return result;
+    }
+
+    private void appendTags(Taggable taggable, Set<String> result) {
+        Set<String> tags = taggable.getTags();
+        if (tags != null) {
+            for (String tag : tags) {
+                if (!result.contains(tag)) {
+                    result.add(tag);
+                }
+            }
+        }
+    }
+
+    private void appendTagsFromExtensions(ExtensibleEntityBase entity, Set<String> result) {
+        for (ExtensionEntityBase ext: entity.getAllExtensions()) {
+            if (ext instanceof Taggable) {
+                appendTags((Taggable)ext, result);
+            }
+        }
+    }
+
+    @Override
+    public <T extends EntityBase> Set<T> getTaggables(Class<T> entityClass, String tag) {
+        Set<T> result = new HashSet<T>();
+        List<T> entities = persistenceService.getEntities(entityClass);
+        for (T entity : entities) {
+            if (entity instanceof Taggable) {
+                if (((Taggable)entity).hasTag(tag)) {
+                    result.add(entity);
+                }
+            } else if (entity instanceof ExtensibleEntityBase) {
+                for (ExtensionEntityBase ext: ((ExtensibleEntityBase)entity).getAllExtensions()) {
+                    if (ext instanceof Taggable) {
+                        if (((Taggable)ext).hasTag(tag)) {
+                            result.add(entity);
                         }
                     }
                 }
@@ -71,28 +108,12 @@ public class TaggingServiceImpl implements TaggingService {
     }
 
     @Override
-    public Set<Taggable> getTaggables(String tag) {
-        Set<Taggable> result = new HashSet<Taggable>();
-        List<Project> entities = persistenceService.getEntities(Project.class);
-        for (Project entityBase : entities) {
-            if (entityBase instanceof Taggable) {
-                Taggable taggable = (Taggable) entityBase;
-                if (taggable.hasTag(tag)) {
-                    result.add(taggable);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public Map<String, Set<Taggable>> getTaggables() {
-        Map<String, Set<Taggable>> result = new HashMap<String, Set<Taggable>>();
-        for (String tag : getAvailableTags()) {
-            Set<Taggable> taggables = getTaggables(tag);
+    public <T extends EntityBase> Map<String, Set<T>> getTaggables(Class<T> entityClass) {
+        Map<String, Set<T>> result = new HashMap<String, Set<T>>();
+        for (String tag : getAllTags(entityClass)) {
+            Set<T> taggables = getTaggables(entityClass, tag);
             result.put(tag, taggables);
         }
         return result;
     }
-
 }

@@ -16,11 +16,12 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 
-import org.eclipse.skalli.api.java.authentication.UserUtil;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.model.core.ProjectMember;
+import org.eclipse.skalli.model.Member;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.services.user.UserUtils;
 import org.eclipse.skalli.view.component.PeopleSearchWindow.IPeopleSelectHandler;
 import org.eclipse.skalli.view.internal.container.UserContainer;
+
 import com.vaadin.data.Item;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Button;
@@ -40,13 +41,13 @@ public class UsersPicker extends CustomField implements IPeopleSelectHandler {
 
     private final VerticalLayout layout;
     private final UsersPickerContainer tableDateSource;
-    private final Collection<ProjectMember> members;
+    private final Collection<Member> members;
     private boolean modified;
     private boolean readOnly;
 
     private Table table;
 
-    public UsersPicker(String caption, Collection<ProjectMember> members) {
+    public UsersPicker(String caption, Collection<Member> members) {
         modified = false;
         this.members = members;
 
@@ -62,7 +63,7 @@ public class UsersPicker extends CustomField implements IPeopleSelectHandler {
 
     private void initializeTableDataSource() {
         if (members != null) {
-            for (ProjectMember member : members) {
+            for (Member member : members) {
                 User user = UserContainer.getUser(member);
                 if (user != null) {
                     tableDateSource.addItem(user);
@@ -82,7 +83,7 @@ public class UsersPicker extends CustomField implements IPeopleSelectHandler {
             @Override
             public Component generateCell(Table source, Object itemId, Object columnId) {
                 String userId = itemId.toString();
-                User user = UserUtil.getUser(userId);
+                User user = UserUtils.getUser(userId);
                 PeopleComponent peopleComponent = new PeopleComponent(user);
                 return peopleComponent;
             }
@@ -172,23 +173,23 @@ public class UsersPicker extends CustomField implements IPeopleSelectHandler {
         // add all existing
         for (Object itemId : tableDateSource.getItemIds()) {
             String userId = (String) itemId;
-            ProjectMember member = null;
-            for (ProjectMember m : members) {
+            Member member = null;
+            for (Member m : members) {
                 if (m.getUserID().equalsIgnoreCase(userId)) {
                     member = m;
                     break;
                 }
             }
             if (member == null) {
-                member = new ProjectMember((String) itemId);
+                member = new Member((String) itemId);
             }
             members.add(member);
         }
 
         // remove all nonexisting
-        Iterator<ProjectMember> iterator = members.iterator();
+        Iterator<Member> iterator = members.iterator();
         while (iterator.hasNext()) {
-            ProjectMember member = iterator.next();
+            Member member = iterator.next();
             Item item = tableDateSource.getItem(member.getUserID().toLowerCase(Locale.ENGLISH));
             if (item == null) {
                 iterator.remove();

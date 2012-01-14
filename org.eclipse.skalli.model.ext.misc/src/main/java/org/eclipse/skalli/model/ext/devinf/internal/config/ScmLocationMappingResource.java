@@ -13,9 +13,9 @@ package org.eclipse.skalli.model.ext.devinf.internal.config;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.skalli.api.rest.config.CustomizingResource;
-import org.eclipse.skalli.model.ext.devinf.ScmLocationMappingConfig;
-import org.eclipse.skalli.model.ext.devinf.ScmLocationMappingsConfig;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingsConfig;
+import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
 
 public class ScmLocationMappingResource extends CustomizingResource<ScmLocationMappingsConfig> {
 

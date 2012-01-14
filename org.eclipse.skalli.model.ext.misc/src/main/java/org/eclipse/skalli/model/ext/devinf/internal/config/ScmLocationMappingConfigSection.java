@@ -10,9 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.devinf.internal.config;
 
+import org.eclipse.skalli.services.configuration.rest.ConfigSection;
 import org.restlet.resource.ServerResource;
-
-import org.eclipse.skalli.api.rest.config.ConfigSection;
 
 public class ScmLocationMappingConfigSection implements ConfigSection {
 

@@ -13,16 +13,16 @@ package org.eclipse.skalli.core.internal.persistence;
 import java.util.List;
 import java.util.UUID;
 
-import org.eclipse.skalli.api.java.EntityFilter;
-import org.eclipse.skalli.model.ext.EntityBase;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.ExtensionServiceBase;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.services.extension.ExtensionServiceBase;
+import org.eclipse.skalli.services.persistence.EntityFilter;
 import org.junit.Test;
 
 // test for AbstractPersistenceService
 public class PersistenceServiceTest {
 
-    private static class TestAbstractPersistenceService extends AbstractPersistenceService {
+    private static class TestAbstractPersistenceService extends PersistenceServiceBase {
         @Override
         public void persist(EntityBase objToPersist, String userId) {
         }

@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.validation;
 
-import org.eclipse.skalli.api.java.Validation;
-import org.eclipse.skalli.common.util.FormatUtils;
-import org.eclipse.skalli.model.ext.EntityBase;
+import org.eclipse.skalli.commons.FormatUtils;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.services.validation.Validation;
 
 class QueuedEntity<T extends EntityBase> extends Validation<T> implements Comparable<QueuedEntity<T>> {
     private long queuedAt = -1L;

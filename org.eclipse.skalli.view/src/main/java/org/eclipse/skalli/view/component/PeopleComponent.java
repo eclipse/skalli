@@ -10,17 +10,12 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.component;
 
-import java.util.IllegalFormatConversionException;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.common.configuration.ConfigurationService;
-import org.eclipse.skalli.model.core.ProjectMember;
-import org.eclipse.skalli.view.internal.config.UserDetailsConfig;
-import org.eclipse.skalli.view.internal.config.UserDetailsResource;
+import org.eclipse.skalli.model.Member;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.internal.container.UserContainer;
 
 import com.vaadin.ui.Component;
@@ -46,7 +41,7 @@ public class PeopleComponent extends CustomComponent {
         sb.append("<img src=\"/VAADIN/themes/simple/icons/people/team.png\" /> "); //$NON-NLS-1$
         sb.append("</span>"); //$NON-NLS-1$
 
-        String userDetailsLink = getUserDetailsLink(user.getUserId());
+        String userDetailsLink = UserDetailsUtil.getUserDetailsLink(user.getUserId());
         if (userDetailsLink != null) {
             // user details link configured, render a link to user details dialog
             sb.append("<a href=\""); //$NON-NLS-1$
@@ -92,7 +87,7 @@ public class PeopleComponent extends CustomComponent {
         return new PeopleListComponent(users);
     }
 
-    public static Component getPeopleListComponentForMember(Set<ProjectMember> member) {
+    public static Component getPeopleListComponentForMember(Set<Member> member) {
         return new PeopleListComponent(UserContainer.getUsers(member));
     }
 
@@ -105,30 +100,5 @@ public class PeopleComponent extends CustomComponent {
             }
             setCompositionRoot(layout);
         }
-    }
-
-    /**
-     * if user details base url is customized, return a link to
-     * user details for the passed user id, return null otherwise
-     */
-    private static String getUserDetailsLink(String userId) {
-        ConfigurationService confService = Services.getService(ConfigurationService.class);
-        if (confService != null) {
-            UserDetailsConfig userDetailsConfig = confService.readCustomization(UserDetailsResource.KEY,
-                    UserDetailsConfig.class);
-            if (userDetailsConfig != null) {
-                try {
-                    // the configured base url can have a placeholder for
-                    // the user ID (e.g. [http://show.user.com/userId=%s]),
-                    // try to format with passed user ID and return
-                    return String.format(userDetailsConfig.getUrl(), userId);
-                } catch (IllegalFormatConversionException e) {
-                    // user details base url seems to not contain any placeholder for
-                    // the user ID, return the base url in this case.
-                    return userDetailsConfig.getUrl();
-                }
-            }
-        }
-        return null;
     }
 }

@@ -16,10 +16,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.skalli.api.java.authentication.LoginUtil;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.common.util.Statistics;
+import org.eclipse.skalli.commons.Statistics;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.services.user.LoginUtils;
 import org.eclipse.skalli.view.internal.application.ProjectApplication;
+
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.AbstractApplicationServlet;
 
@@ -37,15 +38,15 @@ public class ProjectServlet extends AbstractApplicationServlet {
 
     @Override
     protected Application getNewApplication(HttpServletRequest request) throws ServletException {
-        return new ProjectApplication(new LoginUtil(request).getLoggedInUser());
+        return new ProjectApplication(new LoginUtils(request).getLoggedInUser());
     }
 
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         super.service(request, response);
-        String browser = request.getHeader("User-Agent");
-        LoginUtil loginUtil = new LoginUtil(request);
+        String browser = request.getHeader("User-Agent"); //$NON-NLS-1$
+        LoginUtils loginUtil = new LoginUtils(request);
         User loggedInUser = loginUtil.getLoggedInUser();
         Statistics.getDefault().trackBrowser(loginUtil.getLoggedInUserId(), browser,
                 (loggedInUser != null) ? loggedInUser.getDepartment() : null,

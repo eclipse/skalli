@@ -19,10 +19,10 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.easymock.EasyMock;
-import org.eclipse.skalli.common.util.XMLUtils;
-import org.eclipse.skalli.model.ext.AbstractDataMigration;
-import org.eclipse.skalli.model.ext.DataMigration;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.commons.XMLUtils;
+import org.eclipse.skalli.services.extension.DataMigration;
+import org.eclipse.skalli.services.extension.DataMigrationBase;
+import org.eclipse.skalli.services.extension.MigrationException;
 import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,13 +43,13 @@ public class DataMigratorTest {
     private Set<DataMigration> migrations;
     private Element mockRoot;
 
-    private static class MigrationWithAlias extends AbstractDataMigration {
+    private static class MigrationWithAlias extends DataMigrationBase {
         private boolean migrateCalled;
         public MigrationWithAlias() {
             super(TestEntityBase1.class, 0);
         }
         @Override
-        public void migrate(Document doc) throws ValidationException {
+        public void migrate(Document doc) throws MigrationException {
             migrateCalled = true;
         }
         public boolean migrateCalled() {

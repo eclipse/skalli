@@ -16,9 +16,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.skalli.api.java.EventListener;
-import org.eclipse.skalli.api.java.EventService;
-import org.eclipse.skalli.api.java.events.AbstractEvent;
+import org.eclipse.skalli.services.event.Event;
+import org.eclipse.skalli.services.event.EventListener;
+import org.eclipse.skalli.services.event.EventService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -26,10 +26,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Beware: This eventing implementation is just a POC!!!
- *
- * @author d049863
  */
-// TODO: just a POC...
 public class EventComponent implements EventService {
     private static final Logger LOG = LoggerFactory.getLogger(EventComponent.class);
 
@@ -46,7 +43,7 @@ public class EventComponent implements EventService {
     }
 
     @Override
-    public <T extends AbstractEvent> void registerListener(Class<T> event, EventListener<T> listener) {
+    public <T extends Event> void registerListener(Class<T> event, EventListener<T> listener) {
         Set<EventListener<T>> set = listeners.get(event.getName());
         if (set == null) {
             set = new HashSet<EventListener<T>>(1);
@@ -56,7 +53,7 @@ public class EventComponent implements EventService {
     }
 
     @Override
-    public <T extends AbstractEvent> void unregisterEventListener(Class<T> event, EventListener<T> listener) {
+    public <T extends Event> void unregisterEventListener(Class<T> event, EventListener<T> listener) {
         Set<EventListener<T>> set = listeners.get(event.getName());
         if (set != null) {
             set.remove(listener);
@@ -64,7 +61,7 @@ public class EventComponent implements EventService {
     }
 
     @Override
-    public <T extends AbstractEvent> void fireEvent(T event) {
+    public <T extends Event> void fireEvent(T event) {
         Set<EventListener<T>> set = listeners.get(event.getClass().getName());
         if (set != null) {
             for (EventListener<T> listener : set) {

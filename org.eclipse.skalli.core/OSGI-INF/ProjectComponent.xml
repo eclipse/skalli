@@ -13,29 +13,39 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.project">
     <implementation class="org.eclipse.skalli.core.internal.project.ProjectServiceImpl"/>
     <service>
-        <provide interface="org.eclipse.skalli.api.java.EntityService"/>
-        <provide interface="org.eclipse.skalli.api.java.ProjectService"/>
+        <provide interface="org.eclipse.skalli.services.entity.EntityService"/>
+        <provide interface="org.eclipse.skalli.services.project.ProjectService"/>
     </service>
     <reference
         name="PersistenceService"
-        interface="org.eclipse.skalli.api.java.PersistenceService"
+        interface="org.eclipse.skalli.services.persistence.PersistenceService"
         cardinality="1..1"
         policy="dynamic"
         bind="bindPersistenceService"
         unbind="unbindPersistenceService"/>
     <reference
         name="ProjectTemplateService"
-        interface="org.eclipse.skalli.api.java.ProjectTemplateService"
+        interface="org.eclipse.skalli.services.template.ProjectTemplateService"
         cardinality="1..1"
         policy="dynamic"
         bind="bindProjectTemplateService"
         unbind="unbindProjectTemplateService"/>
     <reference
         name="ValidationService"
-        interface="org.eclipse.skalli.api.java.ValidationService"
+        interface="org.eclipse.skalli.services.validation.ValidationService"
         cardinality="0..1"
+        policy="dynamic" />
+    <reference
+        name="SearchService"
+        interface="org.eclipse.skalli.services.search.SearchService"
+        cardinality="0..1"
+        policy="dynamic" />
+    <reference
+        name="RoleService"
+        interface="org.eclipse.skalli.services.role.RoleService"
+        cardinality="0..n"
         policy="dynamic"
-        bind="bindValidationService"
-        unbind="unbindValidationService"/>
+        bind="bindRoleService"
+        unbind="unbindRoleService"/>
 </scr:component>
 

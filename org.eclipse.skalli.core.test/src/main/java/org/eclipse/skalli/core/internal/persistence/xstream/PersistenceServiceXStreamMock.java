@@ -10,41 +10,18 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.persistence.xstream;
 
-import java.util.Set;
-
-import org.eclipse.skalli.api.java.StorageService;
-import org.eclipse.skalli.model.ext.DataMigration;
-import org.eclipse.skalli.model.ext.ExtensionService;
+import org.eclipse.skalli.services.entity.EntityService;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.persistence.StorageService;
 
 public class PersistenceServiceXStreamMock extends PersistenceServiceXStream {
 
-    /** Array of extension services */
-    private ExtensionService<?>[] extensionServices;
-
-    public PersistenceServiceXStreamMock( StorageService storageService, ExtensionService<?>... extensionServices) {
+    public PersistenceServiceXStreamMock(StorageService storageService, EntityService<?> entityService,
+            ExtensionService<?>... extensionServices) {
         super(new XStreamPersistence(storageService));
-        this.extensionServices = extensionServices;
-    }
-
-    @Override
-    protected Set<DataMigration> getMigrations() {
-        Set<DataMigration> migrations = super.getMigrations();
-        if (extensionServices != null) {
-            for (ExtensionService<?> extensionService : extensionServices) {
-                migrations.addAll(extensionService.getMigrations());
-            }
+        bindEntityService(entityService);
+        for (ExtensionService<?> extensionService : extensionServices) {
+            bindExtensionService(extensionService);
         }
-        return migrations;
-    }
-
-    @Override
-    protected Set<ClassLoader> getEntityClassLoaders() {
-        Set<ClassLoader> classLoaders = super.getEntityClassLoaders();
-        if (extensionServices != null) {
-            for (ExtensionService<?> extensionService : extensionServices) {
-                classLoaders.add(extensionService.getClass().getClassLoader());
-            }
-        }
-        return classLoaders;
     }
 }

@@ -13,9 +13,9 @@
  */
 package org.eclipse.skalli.model.ext.maven.internal;
 
-import org.eclipse.skalli.common.util.RegularExpressionValidator;
-import org.eclipse.skalli.model.ext.ExtensionEntityBase;
-import org.eclipse.skalli.model.ext.Severity;
+import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.services.extension.validators.RegularExpressionValidator;
 
 public class MavenIdValidator extends RegularExpressionValidator {
     private static final long serialVersionUID = 7276050513601204905L;

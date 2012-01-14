@@ -15,8 +15,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.common.util.MapperUtil;
+import org.eclipse.skalli.ext.mapping.MapperUtil;
 import org.eclipse.skalli.model.ext.maven.MavenPathResolver;
 
 /**

@@ -27,19 +27,19 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.FavoritesService;
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.api.java.ProjectTemplateService;
-import org.eclipse.skalli.api.java.SearchHit;
-import org.eclipse.skalli.api.java.SearchResult;
-import org.eclipse.skalli.api.java.SearchService;
-import org.eclipse.skalli.api.java.authentication.LoginUtil;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.model.core.Favorites;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.core.ProjectTemplate;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.favorites.Favorites;
+import org.eclipse.skalli.services.favorites.FavoritesService;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.search.SearchHit;
+import org.eclipse.skalli.services.search.SearchResult;
+import org.eclipse.skalli.services.search.SearchService;
+import org.eclipse.skalli.services.template.ProjectTemplate;
+import org.eclipse.skalli.services.template.ProjectTemplateService;
+import org.eclipse.skalli.services.user.LoginUtils;
+import org.eclipse.skalli.view.Consts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,8 +172,8 @@ public abstract class AbstractSearchFilter implements Filter {
         return Services.getService(FavoritesService.class);
     }
 
-    protected User getUser(ServletRequest request) {
-        LoginUtil util = new LoginUtil(request);
+    protected User getUser(HttpServletRequest request) {
+        LoginUtils util = new LoginUtils(request);
         return util.getLoggedInUser();
     }
 

@@ -27,15 +27,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.api.java.ProjectService;
-import org.eclipse.skalli.common.Consts;
-import org.eclipse.skalli.common.Services;
-import org.eclipse.skalli.common.User;
-import org.eclipse.skalli.model.core.Project;
-import org.eclipse.skalli.model.ext.ValidationException;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.model.ext.scrum.ScrumProjectExt;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.internal.filter.FilterException;
 import org.eclipse.skalli.view.internal.filter.FilterUtil;
 

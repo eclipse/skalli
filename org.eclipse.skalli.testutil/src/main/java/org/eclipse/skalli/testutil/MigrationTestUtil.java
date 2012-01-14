@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.testutil;
 
-import org.eclipse.skalli.model.ext.DataMigration;
+import org.eclipse.skalli.services.extension.DataMigration;
 import org.junit.Assert;
 import org.w3c.dom.Document;
 

@@ -23,17 +23,18 @@ import java.util.TreeMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.api.java.EventService;
-import org.eclipse.skalli.api.java.StorageException;
-import org.eclipse.skalli.api.java.StorageService;
-import org.eclipse.skalli.api.java.events.EventConfigUpdate;
-import org.eclipse.skalli.api.java.events.EventCustomizingUpdate;
-import org.eclipse.skalli.common.configuration.ConfigKey;
-import org.eclipse.skalli.common.configuration.ConfigTransaction;
-import org.eclipse.skalli.common.configuration.ConfigurationService;
 import org.eclipse.skalli.core.internal.persistence.CompositeEntityClassLoader;
+import org.eclipse.skalli.core.internal.persistence.xstream.FileStorageService;
 import org.eclipse.skalli.core.internal.persistence.xstream.IgnoreUnknownElementsMapperWrapper;
-import org.eclipse.skalli.core.utils.ConfigurationProperties;
+import org.eclipse.skalli.services.configuration.ConfigKey;
+import org.eclipse.skalli.services.configuration.ConfigTransaction;
+import org.eclipse.skalli.services.configuration.ConfigurationProperties;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.event.EventConfigUpdate;
+import org.eclipse.skalli.services.event.EventCustomizingUpdate;
+import org.eclipse.skalli.services.event.EventService;
+import org.eclipse.skalli.services.persistence.StorageException;
+import org.eclipse.skalli.services.persistence.StorageService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,8 @@ public class ConfigurationComponent implements ConfigurationService {
             new HashMap<ConfigTransaction, Map<ConfigKey, String>>(0);
 
     public ConfigurationComponent() {
-        storageServiceClassName = ConfigurationProperties.getConfiguredStorageService();
+        storageServiceClassName = ConfigurationProperties.getProperty(ConfigurationProperties.PROPERTY_STORAGE_SERVICE,
+                FileStorageService.class.getName());
     }
 
     /**
