@@ -17,6 +17,7 @@ import org.eclipse.skalli.services.persistence.StorageService;
 import org.eclipse.skalli.testutil.AbstractStorageServiceTest;
 import org.eclipse.skalli.testutil.TestUtils;
 
+@SuppressWarnings("nls")
 public class FileStorageServiceTest extends AbstractStorageServiceTest {
 
     private File storageBase;

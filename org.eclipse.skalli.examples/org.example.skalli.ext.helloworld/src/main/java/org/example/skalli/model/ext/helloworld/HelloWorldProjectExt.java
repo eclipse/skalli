@@ -8,7 +8,6 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-
 package org.example.skalli.model.ext.helloworld;
 
 import java.util.Collection;

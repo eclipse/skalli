@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Constants;
 
+@SuppressWarnings("nls")
 public class LocalUserServiceImplTest {
 
     private UserService userService;

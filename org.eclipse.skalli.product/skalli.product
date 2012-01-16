@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?pde version="3.5"?>
-
 <product name="Skalli (Incubation)" uid="Skalli" application="org.eclipse.ui.ide.workbench" version="0.2.0" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
@@ -18,7 +16,6 @@
 
    <windowImages/>
 
-
    <launcher>
       <solaris/>
       <win useIco="false">
@@ -26,15 +23,12 @@
       </win>
    </launcher>
 
-
    <vm>
    </vm>
 
    <license>
         <url>http://www.eclipse.org/legal/epl-v10.html</url>
-        <text>
-   Eclipse Public License (EPL) 1.0
-         </text>
+        <text>Eclipse Public License (EPL) 1.0</text>
    </license>
 
    <plugins>

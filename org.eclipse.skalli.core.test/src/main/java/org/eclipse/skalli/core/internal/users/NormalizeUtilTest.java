@@ -13,6 +13,7 @@ package org.eclipse.skalli.core.internal.users;
 import org.junit.Assert;
 import org.junit.Test;
 
+@SuppressWarnings("nls")
 public class NormalizeUtilTest {
 
     @Test

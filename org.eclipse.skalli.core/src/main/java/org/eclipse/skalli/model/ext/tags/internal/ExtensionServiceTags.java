@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2010, 2011 SAP AG and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     SAP AG - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.skalli.model.ext.tags.internal;
 
 import java.util.Map;
@@ -11,9 +21,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExtensionServiceTags
-    extends ExtensionServiceBase<TagsExtension>
-{
+public class ExtensionServiceTags extends ExtensionServiceBase<TagsExtension> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExtensionServiceTags.class);
 

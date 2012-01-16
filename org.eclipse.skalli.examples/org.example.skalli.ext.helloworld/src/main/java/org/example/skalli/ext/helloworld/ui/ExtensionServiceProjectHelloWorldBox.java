@@ -8,7 +8,6 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-
 package org.example.skalli.ext.helloworld.ui;
 
 import org.eclipse.skalli.model.Project;

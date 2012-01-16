@@ -8,9 +8,6 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-/**
- *
- */
 package org.eclipse.skalli.view.component;
 
 import com.vaadin.terminal.ThemeResource;

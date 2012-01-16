@@ -8,7 +8,6 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-
 package org.example.skalli.ext.helloworld.internal;
 
 import java.util.ArrayList;

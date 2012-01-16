@@ -55,10 +55,6 @@ public class ValidationServiceImplTest {
             new Issue(Severity.ERROR, EntityService1.class, PropertyHelperUtils.TEST_UUIDS[0]),
             new Issue(Severity.WARNING, EntityService1.class, PropertyHelperUtils.TEST_UUIDS[0]));
 
-    private static final SortedSet<Issue> ISSUES2 = CollectionUtils.asSortedSet(
-            new Issue(Severity.INFO, EntityService2.class, PropertyHelperUtils.TEST_UUIDS[1]),
-            new Issue(Severity.ERROR, EntityService2.class, PropertyHelperUtils.TEST_UUIDS[1]));
-
     private IssuesService mockISS;
     private EntityService1 mockES1;
     private EntityService2 mockES2;
