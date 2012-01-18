@@ -17,6 +17,7 @@ import java.util.Map;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.services.extension.ExtensionServiceBase;
+import org.eclipse.skalli.services.extension.Indexer;
 import org.eclipse.skalli.services.extension.PropertyValidator;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.eclipse.skalli.services.extension.validators.StringLengthValidator;
@@ -100,4 +101,8 @@ public class ExtensionServiceHelloWorld extends ExtensionServiceBase<HelloWorldP
         return new HelloWorldConverter(host);
     }
 
+    @Override
+    public Indexer<HelloWorldProjectExt> getIndexer() {
+        return new HelloWorldIndexer();
+    }
 }

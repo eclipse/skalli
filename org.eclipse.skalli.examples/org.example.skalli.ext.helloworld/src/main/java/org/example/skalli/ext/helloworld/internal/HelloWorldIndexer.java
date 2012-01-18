@@ -17,7 +17,8 @@ class HelloWorldIndexer extends IndexerBase<HelloWorldProjectExt> {
 
     @Override
     protected void indexFields(HelloWorldProjectExt entity) {
-        addField(HelloWorldProjectExt.PROPERTY_NAME, entity.getName(), true, false);
+        addField(HelloWorldProjectExt.PROPERTY_NAME, entity.getName(), true, true);
+        addField(HelloWorldProjectExt.PROPERTY_FRIENDS, entity.getFriends(), true, true);
     }
 
 }

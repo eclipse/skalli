@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.extension;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -43,10 +44,12 @@ public abstract class IndexerBase<T extends EntityBase> implements Indexer<T> {
      *
      * @return a set of field names or <code>null</code>.
      */
+    @Override
     public Set<String> getDefaultSearchFields() {
         return null;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public final void indexEntity(List<IndexEntry> fields, Object entity) {
         if (entity == null) {
@@ -62,7 +65,7 @@ public abstract class IndexerBase<T extends EntityBase> implements Indexer<T> {
      * @param fieldName name of the field in the search index. May be refered to in {@link #getDefaultSearchFields()}.
      * @param value value of the field.
      * @param stored true if the value should be stored in the index, otherwise only the statistics will be stored. Needed for highlighting.
-     * @param indexed true if the field should searchable. Setting this to false only makes sense in rare cases.
+     * @param indexed true if the field should be searchable. Setting this to false only makes sense in rare cases.
      */
     protected final void addField(String fieldName, String value, boolean stored, boolean indexed) {
         if (!StringUtils.isEmpty(value)) {
@@ -80,7 +83,7 @@ public abstract class IndexerBase<T extends EntityBase> implements Indexer<T> {
      * @param stored true if the value should be stored in the index, otherwise only the statistics will be stored. Needed for highlighting.
      * @param indexed true if the field should searchable. Setting this to false only makes sense in rare cases.
      */
-    protected final void addField(String fieldName, Set<?> values, boolean stored, boolean indexed) {
+    protected final void addField(String fieldName, Collection<?> values, boolean stored, boolean indexed) {
         if (values == null) {
             return;
         }

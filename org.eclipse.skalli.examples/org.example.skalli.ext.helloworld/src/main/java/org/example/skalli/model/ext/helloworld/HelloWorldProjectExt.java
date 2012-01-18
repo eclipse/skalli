@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.example.skalli.model.ext.helloworld;
 
-import java.util.Collection;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.skalli.model.ExtensionEntityBase;
@@ -18,16 +18,16 @@ import org.eclipse.skalli.model.PropertyName;
 
 public class HelloWorldProjectExt extends ExtensionEntityBase {
 
-    public static final String MODEL_VERSION = "1.0";
-    public static final String NAMESPACE = "http://org.example.skalli/2011/04/ProjectPortal/Model/Extension-HelloWorld";
+    public static final String MODEL_VERSION = "1.0"; //$NON-NLS-1$
+    public static final String NAMESPACE = "http://org.example.skalli/2011/04/ProjectPortal/Model/Extension-HelloWorld"; //$NON-NLS-1$
 
     @PropertyName(position = 0)
-    public static final String PROPERTY_NAME = "name";
+    public static final String PROPERTY_NAME = "name"; //$NON-NLS-1$
 
     @PropertyName(position = 1)
-    public static final String PROPERTY_FRIENDS = "friends";
+    public static final String PROPERTY_FRIENDS = "friends"; //$NON-NLS-1$
 
-    private String name = "";
+    private String name = ""; //$NON-NLS-1$
     private TreeSet<String> friends = new TreeSet<String>();
 
     public String getName() {
@@ -38,21 +38,19 @@ public class HelloWorldProjectExt extends ExtensionEntityBase {
         this.name = name;
     }
 
-    public Collection<String> getFriends() {
+    public Set<String> getFriends() {
         return this.friends;
     }
 
-    //and some more optional methods for the field friends:
-    public void setFriends(Collection<String> friends) {
-        this.friends = new TreeSet<String>(friends);
-    }
-
-    public void addFriends(Collection<String> additionalFriends) {
-        this.friends.addAll(additionalFriends);
+    public boolean hasFriend(String friend) {
+        return friends.contains(friend);
     }
 
     public void addFriend(String friend) {
         this.friends.add(friend);
     }
 
+    public void removeFriend(String friend) {
+        friends.remove(friend);
+    }
 }
