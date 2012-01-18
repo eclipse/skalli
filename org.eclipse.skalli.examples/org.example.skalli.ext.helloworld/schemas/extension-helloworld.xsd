@@ -1,30 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema targetNamespace="http://xml.sap.com/2010/08/skalli/API/Extension-HelloWorld"
-	xmlns="http://xml.sap.com/2010/08/skalli/API/Extension-HelloWorld"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
-	attributeFormDefault="unqualified" version="1.0">
+<xsd:schema targetNamespace="http://xml.sap.com/2010/08/skalli/API/Extension-HelloWorld" xmlns="http://xml.sap.com/2010/08/skalli/API/Extension-HelloWorld"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified"
+    version="1.0">
 
-	<xsd:annotation>
-		<xsd:documentation xml:lang="EN">
-			This XML schema defines the HelloWorld extension.
-		</xsd:documentation>
-	</xsd:annotation>
+    <xsd:annotation>
+        <xsd:documentation xml:lang="EN">
+            This XML schema defines the HelloWorld extension.
+        </xsd:documentation>
+    </xsd:annotation>
 
-	<!-- BEGIN of common declarations -->
-	<xsd:include
-		schemaLocation="../../com.sap.ldi.projectportal.model.core/schemas/common.xsd" />
-	<!-- END of common declarations -->
+    <!-- BEGIN of common declarations -->
+    <xsd:include schemaLocation="../../../org.eclipse.skalli.api/schemas/common.xsd" />
+    <!-- END of common declarations -->
 
 
-	<xsd:element name="hello" type="helloExtension"></xsd:element>
+    <xsd:element name="hello" type="helloExtension"></xsd:element>
 
-	<xsd:complexType name="helloExtension">
-		<xsd:complexContent>
-			<xsd:extension base="Extension">
-				<xsd:sequence>
-					<xsd:element name="name" type="xsd:string"></xsd:element>					<xsd:element name="friends" type="xsd:string" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-				</xsd:sequence>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
+    <xsd:complexType name="helloExtension">
+        <xsd:complexContent>
+            <xsd:extension base="Extension">
+                <xsd:sequence>
+                    <xsd:element name="name" type="xsd:string"></xsd:element>
+                    <xsd:element name="friends" type="xsd:string" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
 </xsd:schema>

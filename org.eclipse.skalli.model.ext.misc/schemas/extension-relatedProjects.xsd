@@ -25,7 +25,7 @@
   </xsd:annotation>
 
   <!-- BEGIN of common declarations -->
-  <xsd:include schemaLocation="../../org.eclipse.skalli.model.core/schemas/common.xsd" />
+  <xsd:include schemaLocation="../../org.eclipse.skalli.api/schemas/common.xsd" />
   <!-- END of common declarations -->
 
   <xsd:element name="relatedProjects" type="RelatedProjectsExtension" />
