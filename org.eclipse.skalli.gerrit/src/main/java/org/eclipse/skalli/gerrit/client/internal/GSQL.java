@@ -15,47 +15,47 @@ package org.eclipse.skalli.gerrit.client.internal;
  */
 public final class GSQL {
 
-  private GSQL() {
+    private GSQL() {
 
-  }
-
-  enum Tables {
-    ACCOUNTS,
-    ACCOUNT_AGREEMENTS,
-    ACCOUNT_DIFF_PREFERENCES,
-    ACCOUNT_EXTERNAL_IDS,
-    ACCOUNT_GROUPS,
-    ACCOUNT_GROUP_AGREEMENTS,
-    ACCOUNT_GROUP_MEMBERS,
-    ACCOUNT_GROUP_MEMBERS_AUDIT,
-    ACCOUNT_GROUP_NAMES,
-    ACCOUNT_PATCH_REVIEWS,
-    ACCOUNT_PROJECT_WATCHES,
-    ACCOUNT_SSH_KEYS,
-    APPROVAL_CATEGORIES,
-    APPROVAL_CATEGORY_VALUES,
-    CHANGES,
-    CHANGE_MESSAGES,
-    CONTRIBUTOR_AGREEMENTS,
-    PATCH_COMMENTS,
-    PATCH_SETS,
-    PATCH_SET_ANCESTORS,
-    PATCH_SET_APPROVALS,
-    PROJECTS,
-    REF_RIGHTS,
-    SCHEMA_VERSION,
-    STARRED_CHANGES,
-    SYSTEM_CONFIG,
-    TRACKING_IDS;
-
-    @Override
-    public String toString() {
-      return name();
     }
-  }
 
-  enum ResultFormat {
-    PRETTY, JSON
-  }
+    enum Tables {
+        ACCOUNTS,
+        ACCOUNT_AGREEMENTS,
+        ACCOUNT_DIFF_PREFERENCES,
+        ACCOUNT_EXTERNAL_IDS,
+        ACCOUNT_GROUPS,
+        ACCOUNT_GROUP_AGREEMENTS,
+        ACCOUNT_GROUP_MEMBERS,
+        ACCOUNT_GROUP_MEMBERS_AUDIT,
+        ACCOUNT_GROUP_NAMES,
+        ACCOUNT_PATCH_REVIEWS,
+        ACCOUNT_PROJECT_WATCHES,
+        ACCOUNT_SSH_KEYS,
+        APPROVAL_CATEGORIES,
+        APPROVAL_CATEGORY_VALUES,
+        CHANGES,
+        CHANGE_MESSAGES,
+        CONTRIBUTOR_AGREEMENTS,
+        PATCH_COMMENTS,
+        PATCH_SETS,
+        PATCH_SET_ANCESTORS,
+        PATCH_SET_APPROVALS,
+        PROJECTS,
+        REF_RIGHTS,
+        SCHEMA_VERSION,
+        STARRED_CHANGES,
+        SYSTEM_CONFIG,
+        TRACKING_IDS;
+
+        @Override
+        public String toString() {
+            return name();
+        }
+    }
+
+    enum ResultFormat {
+        PRETTY, JSON
+    }
 
 }

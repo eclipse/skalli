@@ -15,55 +15,68 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("gerrit")
 public class GerritConfig {
 
-  private String host;
-  private String port;
-  private String user;
-  private String privateKey;
-  private String passphrase;
-  private String contact;
-  private String parent;
+    private String host;
+    private String port;
+    private String user;
+    private String privateKey;
+    private String passphrase;
+    private String contact;
+    private String parent;
 
-  public String getHost() {
-    return host;
-  }
-  public void setHost(String host) {
-    this.host = host;
-  }
-  public String getPort() {
-    return port;
-  }
-  public void setPort(String port) {
-    this.port = port;
-  }
-  public String getUser() {
-    return user;
-  }
-  public void setUser(String user) {
-    this.user = user;
-  }
-  public String getPrivateKey() {
-    return privateKey;
-  }
-  public void setPrivateKey(String privateKey) {
-    this.privateKey = privateKey;
-  }
-  public String getPassphrase() {
-    return passphrase;
-  }
-  public void setPassphrase(String passphrase) {
-    this.passphrase = passphrase;
-  }
-  public void setContact(String contact) {
-    this.contact = contact;
-  }
-  public String getContact() {
-    return contact;
-  }
-  public String getParent() {
-    return parent;
-  }
-  public void setParent(String parent) {
-    this.parent = parent;
-  }
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
+    }
+
+    public String getPassphrase() {
+        return passphrase;
+    }
+
+    public void setPassphrase(String passphrase) {
+        this.passphrase = passphrase;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    public void setParent(String parent) {
+        this.parent = parent;
+    }
 
 }

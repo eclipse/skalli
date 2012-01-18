@@ -15,21 +15,21 @@ package org.eclipse.skalli.gerrit.client.exception;
  */
 public class ConnectionException extends GerritClientException {
 
-  private static final long serialVersionUID = 6082875880219352467L;
+    private static final long serialVersionUID = 6082875880219352467L;
 
-  public ConnectionException() {
-  }
+    public ConnectionException() {
+    }
 
-  public ConnectionException(String message, Throwable throwable) {
-    super(message, throwable);
-  }
+    public ConnectionException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
 
-  public ConnectionException(String message) {
-    super(message);
-  }
+    public ConnectionException(String message) {
+        super(message);
+    }
 
-  public ConnectionException(Throwable throwable) {
-    super(throwable);
-  }
+    public ConnectionException(Throwable throwable) {
+        super(throwable);
+    }
 
 }

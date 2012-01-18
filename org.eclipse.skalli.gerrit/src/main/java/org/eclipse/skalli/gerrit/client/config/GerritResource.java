@@ -18,40 +18,40 @@ import org.eclipse.skalli.services.configuration.rest.ConfigResource;
 
 public class GerritResource extends ConfigResource<ConfigKeyGerrit, GerritConfig> {
 
-  @Override
-  protected Class<GerritConfig> getConfigClass() {
-    return GerritConfig.class;
-  }
+    @Override
+    protected Class<GerritConfig> getConfigClass() {
+        return GerritConfig.class;
+    }
 
-  @Override
-  protected ConfigKeyGerrit[] getAllKeys() {
-    return ConfigKeyGerrit.values();
-  }
+    @Override
+    protected ConfigKeyGerrit[] getAllKeys() {
+        return ConfigKeyGerrit.values();
+    }
 
-  @Override
-  protected Map<ConfigKey, String> configToMap(GerritConfig configObject) {
-    Map<ConfigKey, String> ret = new HashMap<ConfigKey, String>();
-    ret.put(ConfigKeyGerrit.HOST, configObject.getHost());
-    ret.put(ConfigKeyGerrit.PORT, configObject.getPort());
-    ret.put(ConfigKeyGerrit.USER, configObject.getUser());
-    ret.put(ConfigKeyGerrit.PASSPHRASE, configObject.getPassphrase());
-    ret.put(ConfigKeyGerrit.PRIVATEKEY, configObject.getPrivateKey());
-    ret.put(ConfigKeyGerrit.CONTACT, configObject.getContact());
-    ret.put(ConfigKeyGerrit.PARENT, configObject.getParent());
-    return ret;
-  }
+    @Override
+    protected Map<ConfigKey, String> configToMap(GerritConfig configObject) {
+        Map<ConfigKey, String> ret = new HashMap<ConfigKey, String>();
+        ret.put(ConfigKeyGerrit.HOST, configObject.getHost());
+        ret.put(ConfigKeyGerrit.PORT, configObject.getPort());
+        ret.put(ConfigKeyGerrit.USER, configObject.getUser());
+        ret.put(ConfigKeyGerrit.PASSPHRASE, configObject.getPassphrase());
+        ret.put(ConfigKeyGerrit.PRIVATEKEY, configObject.getPrivateKey());
+        ret.put(ConfigKeyGerrit.CONTACT, configObject.getContact());
+        ret.put(ConfigKeyGerrit.PARENT, configObject.getParent());
+        return ret;
+    }
 
-  @Override
-  protected GerritConfig mapToConfig(Map<ConfigKeyGerrit, String> values) {
-    GerritConfig ret = new GerritConfig();
-    ret.setHost(values.get(ConfigKeyGerrit.HOST));
-    ret.setPort(values.get(ConfigKeyGerrit.PORT));
-    ret.setUser(values.get(ConfigKeyGerrit.USER));
-    ret.setPassphrase(values.get(ConfigKeyGerrit.PASSPHRASE));
-    ret.setPrivateKey(values.get(ConfigKeyGerrit.PRIVATEKEY));
-    ret.setContact(values.get(ConfigKeyGerrit.CONTACT));
-    ret.setParent(values.get(ConfigKeyGerrit.PARENT));
-    return ret;
-  }
+    @Override
+    protected GerritConfig mapToConfig(Map<ConfigKeyGerrit, String> values) {
+        GerritConfig ret = new GerritConfig();
+        ret.setHost(values.get(ConfigKeyGerrit.HOST));
+        ret.setPort(values.get(ConfigKeyGerrit.PORT));
+        ret.setUser(values.get(ConfigKeyGerrit.USER));
+        ret.setPassphrase(values.get(ConfigKeyGerrit.PASSPHRASE));
+        ret.setPrivateKey(values.get(ConfigKeyGerrit.PRIVATEKEY));
+        ret.setContact(values.get(ConfigKeyGerrit.CONTACT));
+        ret.setParent(values.get(ConfigKeyGerrit.PARENT));
+        return ret;
+    }
 
 }

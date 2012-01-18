@@ -15,16 +15,16 @@ import org.restlet.resource.ServerResource;
 
 public class GerritConfigSection implements ConfigSection {
 
-  private static final String NAME = "gerrit"; //$NON-NLS-1$
+    private static final String NAME = "gerrit"; //$NON-NLS-1$
 
-  @Override
-  public String getName() {
-    return NAME;
-  }
+    @Override
+    public String getName() {
+        return NAME;
+    }
 
-  @Override
-  public Class<? extends ServerResource> getServerResource() {
-    return GerritResource.class;
-  }
+    @Override
+    public Class<? extends ServerResource> getServerResource() {
+        return GerritResource.class;
+    }
 
 }

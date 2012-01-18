@@ -16,33 +16,33 @@ import com.jcraft.jsch.Logger;
 
 public class JschLogger implements Logger {
 
-  private static org.slf4j.Logger LOG = LoggerFactory.getLogger(JschLogger.class);
+    private static org.slf4j.Logger LOG = LoggerFactory.getLogger(JschLogger.class);
 
-  @Override
-  public boolean isEnabled(int level) {
-    return true;
-  }
-
-  @Override
-  public void log(int level, String message) {
-    switch (level) {
-    case 0: //DEBUG
-      LOG.debug(message);
-      break;
-    case 1: //INFO
-      LOG.info(message);
-      break;
-    case 2: //WARN
-      LOG.warn(message);
-      break;
-    case 3: //ERROR
-    case 4: //FATAL
-      LOG.error(message);
-      break;
-    default:
-      LOG.info(message);
-      break;
+    @Override
+    public boolean isEnabled(int level) {
+        return true;
     }
-  }
+
+    @Override
+    public void log(int level, String message) {
+        switch (level) {
+        case 0: //DEBUG
+            LOG.debug(message);
+            break;
+        case 1: //INFO
+            LOG.info(message);
+            break;
+        case 2: //WARN
+            LOG.warn(message);
+            break;
+        case 3: //ERROR
+        case 4: //FATAL
+            LOG.error(message);
+            break;
+        default:
+            LOG.info(message);
+            break;
+        }
+    }
 
 }

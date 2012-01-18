@@ -21,75 +21,75 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("nls")
 public class GerritServiceImpl implements GerritService {
 
-  private final static Logger LOG = LoggerFactory.getLogger(GerritServiceImpl.class);
+    private final static Logger LOG = LoggerFactory.getLogger(GerritServiceImpl.class);
 
-  private ConfigurationService configService;
+    private ConfigurationService configService;
 
-  public GerritServiceImpl() {
+    public GerritServiceImpl() {
 
-  }
-
-  GerritServiceImpl(ConfigurationService configService) {
-    this.configService = configService;
-  }
-
-  public void bindConfigurationService(ConfigurationService configService) {
-    this.configService = configService;
-  }
-
-  public void unbindConfigurationService(ConfigurationService configService) {
-    this.configService = null;
-  }
-
-  @Override
-  public GerritClient getClient(String userId) {
-    if (StringUtils.isBlank(userId)) {
-      LOG.warn("No user ID passed. Cannot return GerritClient, but null.");
-      return null;
-    }
-    if (configService == null) {
-      LOG.warn("No ConfigurationService found. Cannot return GerritClient, but null.");
-      return null;
     }
 
-    String cfgHost = configService.readString(ConfigKeyGerrit.HOST);
-    String cfgPort = configService.readString(ConfigKeyGerrit.PORT);
-    String cfgUser = configService.readString(ConfigKeyGerrit.USER);
-    String cfgPrivateKey = configService.readString(ConfigKeyGerrit.PRIVATEKEY);
-    String cfgPassphrase = configService.readString(ConfigKeyGerrit.PASSPHRASE);
-
-    // check all so that the log gives as much information as possible for reconfiguration
-    boolean validHost = isValidString(cfgHost, "host");
-    boolean validPort = isValidNumber(cfgPort, "port");
-    boolean validUser = isValidString(cfgUser, "user");
-    boolean validPrivateKey = isValidString(cfgPrivateKey, "privateKey");
-    boolean validPassphrase = isValidString(cfgPassphrase, "passphrase");
-
-    if (!validHost || !validPort || !validUser || !validPrivateKey || !validPassphrase) {
-      LOG.warn("Invalid configuration. Cannot return GerritClient, but null.");
-      return null;
+    GerritServiceImpl(ConfigurationService configService) {
+        this.configService = configService;
     }
 
-    LOG.info("Configuration loaded successfully. Trying to initialize GerritClient.");
-    return new GerritClientImpl(cfgHost, Integer.valueOf(cfgPort), cfgUser, cfgPrivateKey, cfgPassphrase, userId);
-  }
-
-  private boolean isValidString(String value, String property) {
-    boolean isValid = !StringUtils.isBlank(value);
-
-    if (!isValid && !StringUtils.isBlank(property)) {
-      LOG.warn(String.format("Property '%s' is not set.", property));
+    public void bindConfigurationService(ConfigurationService configService) {
+        this.configService = configService;
     }
-    return isValid;
-  }
 
-  private boolean isValidNumber(String value, String property) {
-    boolean isValid = !StringUtils.isBlank(value) && StringUtils.isNumeric(value);
-
-    if (!isValid && !StringUtils.isBlank(property)) {
-      LOG.warn(String.format("Property '%s' is not set or not numeric.", property));
+    public void unbindConfigurationService(ConfigurationService configService) {
+        this.configService = null;
     }
-    return isValid;
-  }
+
+    @Override
+    public GerritClient getClient(String userId) {
+        if (StringUtils.isBlank(userId)) {
+            LOG.warn("No user ID passed. Cannot return GerritClient, but null.");
+            return null;
+        }
+        if (configService == null) {
+            LOG.warn("No ConfigurationService found. Cannot return GerritClient, but null.");
+            return null;
+        }
+
+        String cfgHost = configService.readString(ConfigKeyGerrit.HOST);
+        String cfgPort = configService.readString(ConfigKeyGerrit.PORT);
+        String cfgUser = configService.readString(ConfigKeyGerrit.USER);
+        String cfgPrivateKey = configService.readString(ConfigKeyGerrit.PRIVATEKEY);
+        String cfgPassphrase = configService.readString(ConfigKeyGerrit.PASSPHRASE);
+
+        // check all so that the log gives as much information as possible for reconfiguration
+        boolean validHost = isValidString(cfgHost, "host");
+        boolean validPort = isValidNumber(cfgPort, "port");
+        boolean validUser = isValidString(cfgUser, "user");
+        boolean validPrivateKey = isValidString(cfgPrivateKey, "privateKey");
+        boolean validPassphrase = isValidString(cfgPassphrase, "passphrase");
+
+        if (!validHost || !validPort || !validUser || !validPrivateKey || !validPassphrase) {
+            LOG.warn("Invalid configuration. Cannot return GerritClient, but null.");
+            return null;
+        }
+
+        LOG.info("Configuration loaded successfully. Trying to initialize GerritClient.");
+        return new GerritClientImpl(cfgHost, Integer.valueOf(cfgPort), cfgUser, cfgPrivateKey, cfgPassphrase, userId);
+    }
+
+    private boolean isValidString(String value, String property) {
+        boolean isValid = !StringUtils.isBlank(value);
+
+        if (!isValid && !StringUtils.isBlank(property)) {
+            LOG.warn(String.format("Property '%s' is not set.", property));
+        }
+        return isValid;
+    }
+
+    private boolean isValidNumber(String value, String property) {
+        boolean isValid = !StringUtils.isBlank(value) && StringUtils.isNumeric(value);
+
+        if (!isValid && !StringUtils.isBlank(property)) {
+            LOG.warn(String.format("Property '%s' is not set or not numeric.", property));
+        }
+        return isValid;
+    }
 
 }

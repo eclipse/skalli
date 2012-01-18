@@ -17,23 +17,22 @@ package org.eclipse.skalli.gerrit.client.exception;
  */
 public class GerritClientException extends Exception {
 
-  private static final long serialVersionUID = 636572388227939464L;
+    private static final long serialVersionUID = 636572388227939464L;
 
-  public GerritClientException() {
-    super();
-  }
+    public GerritClientException() {
+        super();
+    }
 
-  public GerritClientException(String message, Throwable throwable) {
-    super(message, throwable);
-  }
+    public GerritClientException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
 
-  public GerritClientException(String message) {
-    super(message);
-  }
+    public GerritClientException(String message) {
+        super(message);
+    }
 
-  public GerritClientException(Throwable throwable) {
-    super(throwable);
-  }
-
+    public GerritClientException(Throwable throwable) {
+        super(throwable);
+    }
 
 }

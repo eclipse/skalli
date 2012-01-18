@@ -10,10 +10,10 @@
         SAP AG - initial API and implementation
  -->
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.gerrit.service">
-   <implementation class="org.eclipse.skalli.gerrit.client.internal.GerritServiceImpl"/>
-   <service>
-      <provide interface="org.eclipse.skalli.gerrit.client.GerritService"/>
-   </service>
+    <implementation class="org.eclipse.skalli.gerrit.client.internal.GerritServiceImpl"/>
+    <service>
+        <provide interface="org.eclipse.skalli.gerrit.client.GerritService"/>
+    </service>
     <reference
         name="ConfigurationService"
         interface="org.eclipse.skalli.services.configuration.ConfigurationService"
