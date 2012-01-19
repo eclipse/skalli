@@ -108,8 +108,7 @@ public class FeedInfoBox extends InfoBox implements ProjectInfoBox {
 
     @Override
     public boolean isVisible(Project project, String userId) {
-        DevInfProjectExt ext = project.getExtension(DevInfProjectExt.class);
-        return ext != null && feedService != null;
+        return feedService != null;
     }
 
     @Override
