@@ -10,18 +10,18 @@
         SAP AG - initial API and implementation
  -->
 
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.core.component.feedmanager">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.feedmanager">
     <implementation class="org.eclipse.skalli.core.internal.feed.FeedManagerImpl"/>
     <service>
         <provide interface="org.eclipse.skalli.services.feed.FeedManager"/>
     </service>
     <reference
-        name="FeedProvider"
-        interface="org.eclipse.skalli.services.feed.FeedProvider"
-        cardinality="0..n"
+        name="FeedPersistenceService"
+        interface="org.eclipse.skalli.services.feed.FeedPersistenceService"
+        cardinality="0..1"
         policy="dynamic"
-        bind="bindFeedProvider"
-        unbind="unbindFeedProvider"/>
+        bind="bindFeedPersistenceService"
+        unbind="unbindFeedPersistenceService"/>
     <reference
         name="ProjectService"
         interface="org.eclipse.skalli.services.project.ProjectService"
@@ -30,10 +30,10 @@
         bind="bindProjectService"
         unbind="unbindProjectService"/>
     <reference
-        name="FeedPersistenceService"
-        interface="org.eclipse.skalli.services.feed.FeedPersistenceService"
-        cardinality="1..1"
+        name="FeedProvider"
+        interface="org.eclipse.skalli.services.feed.FeedProvider"
+        cardinality="0..n"
         policy="dynamic"
-        bind="bindFeedPersistenceService"
-        unbind="unbindFeedPersistenceService"/>
+        bind="bindFeedProvider"
+        unbind="unbindFeedProvider"/>
 </scr:component>

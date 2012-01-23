@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.feed.db;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
@@ -27,28 +27,48 @@ import org.eclipse.skalli.feed.db.entities.EntryJPA;
 import org.eclipse.skalli.services.feed.Entry;
 import org.eclipse.skalli.services.feed.FeedService;
 import org.eclipse.skalli.services.feed.FeedServiceException;
+import org.eclipse.skalli.services.persistence.StorageException;
+import org.osgi.service.component.ComponentConstants;
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JPAFeedService implements FeedService {
 
-    private EntityManagerFactory emf;
+    private static final Logger LOG = LoggerFactory.getLogger(JPAFeedService.class);
 
-    public JPAFeedService() {
+    private FeedEntityManagerService entityManagerService;
+
+    protected void activate(ComponentContext context) {
+        LOG.info(MessageFormat.format("[FeedService] {0} : activated",
+                (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
+    }
+
+    protected void deactivate(ComponentContext context) {
+        LOG.info(MessageFormat.format("[FeedService] {0} : deactivated",
+                (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
+    }
+
+    public void bindEntityManagerService(FeedEntityManagerService ems) {
+        this.entityManagerService = ems;
+        LOG.info(MessageFormat.format("bindEntityManagerService({0})", ems.getClass().getName())); //$NON-NLS-1$
+
+    }
+
+    public void unbindEntityManagerService(FeedEntityManagerService ems) {
+        this.entityManagerService = null;
+        LOG.info(MessageFormat.format("unbindEntityManagerService({0})", ems.getClass().getName())); //$NON-NLS-1$
     }
 
     private EntityManager getEntityManager() throws FeedServiceException {
-        try {
-            return emf.createEntityManager();
-        } catch (RuntimeException e) {
-            throw new FeedServiceException("EntityManager could not be created", e);
+        if (entityManagerService == null) {
+            throw new FeedServiceException("Can't create an entity manager as no entity manager service is available");
         }
-    }
-
-    public synchronized void setService(EntityManagerFactory emFactory) {
-        emf = emFactory;
-    }
-
-    public synchronized void unsetService(EntityManagerFactory emFactory) {
-        emf = null;
+        try {
+            return entityManagerService.getEntityManager();
+        } catch (StorageException e) {
+            throw new FeedServiceException(e);
+        }
     }
 
     @Override

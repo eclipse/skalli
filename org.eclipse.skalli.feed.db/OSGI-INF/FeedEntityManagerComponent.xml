@@ -1,0 +1,14 @@
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.storage.db.feedentitymanager">
+    <implementation class="org.eclipse.skalli.feed.db.FeedEntityManagerServiceImpl"/>
+    <service>
+        <provide interface="org.eclipse.skalli.feed.db.FeedEntityManagerService"/>
+    </service>
+    <reference
+        target="(osgi.unit.name=feed)"
+        interface="org.osgi.service.jpa.EntityManagerFactoryBuilder"
+        name="EntityManagerFactoryBuilder"
+        policy="dynamic"
+        cardinality="1..1"
+        bind="bindEntityManagerFactoryBuilder"
+        unbind="unbindEntityManagerFactoryBuilder"/>
+</scr:component>

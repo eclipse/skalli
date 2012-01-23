@@ -13,12 +13,12 @@ package org.eclipse.skalli.storage.db;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.TypedQuery;
 
 import org.apache.commons.io.IOUtils;
@@ -27,13 +27,29 @@ import org.eclipse.skalli.services.persistence.StorageService;
 import org.eclipse.skalli.storage.db.entities.HistoryStorageItem;
 import org.eclipse.skalli.storage.db.entities.StorageId;
 import org.eclipse.skalli.storage.db.entities.StorageItem;
+import org.osgi.service.component.ComponentConstants;
+import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PersistenceDB implements StorageService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PersistenceDB.class);
+
+    private StorageEntityManagerService storageEntityManagerService;
 
     public PersistenceDB() {
     }
 
-    private EntityManagerFactory emf;
+    protected void activate(ComponentContext context) {
+        LOG.info(MessageFormat.format("[StorageService] {0} : activated",
+                (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
+    }
+
+    protected void deactivate(ComponentContext context) {
+        LOG.info(MessageFormat.format("[StorageService] {0} : deactivated",
+                (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
+    }
 
     @Override
     public void write(String category, String id, InputStream blob) throws StorageException {
@@ -153,19 +169,21 @@ public class PersistenceDB implements StorageService {
     }
 
     private EntityManager getEntityManager() throws StorageException {
-        try {
-            return emf.createEntityManager();
-        } catch (Exception e) {
-            throw new StorageException("EntityManager could not be created", e);
+        if (storageEntityManagerService == null) {
+            throw new StorageException("Can't create an entity manager as no storage entity manager service is available");
         }
+        LOG.debug("storage entity mananger Service availaible");
+        return storageEntityManagerService.getEntityManager();
     }
 
-    public synchronized void setService(EntityManagerFactory emFactory) {
-        emf = emFactory;
+    public void bindEntityManagerService(StorageEntityManagerService ems) {
+        this.storageEntityManagerService = ems;
+        LOG.info(MessageFormat.format("bindEntityManagerService({0})", ems.getClass().getName())); //$NON-NLS-1$
     }
 
-    public synchronized void unsetService(EntityManagerFactory emFactory) {
-        emf = null;
+    public void unbindEntityManagerService(StorageEntityManagerService ems) {
+        this.storageEntityManagerService = null;
+        LOG.info(MessageFormat.format("unbindEntityManagerService({0})", ems.getClass().getName())); //$NON-NLS-1$
     }
 
 }

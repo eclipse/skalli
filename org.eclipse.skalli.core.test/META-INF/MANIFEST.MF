@@ -6,7 +6,9 @@ Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
 Fragment-Host: org.eclipse.skalli.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: org.apache.commons.httpclient.methods,
+Import-Package: javax.persistence.criteria,
+ javax.persistence.metamodel,
+ org.apache.commons.httpclient.methods,
  org.apache.commons.io,
  org.easymock,
  org.eclipse.skalli.testutil,

@@ -1,0 +1,6 @@
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.services.persistence.entitymanager">
+    <implementation class="org.eclipse.skalli.core.persistence.EntityManagerServiceImpl"/>
+    <service>
+        <provide interface="org.eclipse.skalli.services.persistence.EntityManagerService"/>
+    </service>
+</scr:component>

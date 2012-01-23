@@ -35,6 +35,7 @@ import org.eclipse.skalli.services.event.EventCustomizingUpdate;
 import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
+import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,11 +70,13 @@ public class ConfigurationComponent implements ConfigurationService {
     }
 
     protected void activate(ComponentContext context) {
-        LOG.info("Configuration service activated"); //$NON-NLS-1$
+        LOG.info(MessageFormat.format("[ConfigurationService] {0} : activated",
+                (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
     protected void deactivate(ComponentContext context) {
-        LOG.info("Configuration service deactivated"); //$NON-NLS-1$
+        LOG.info(MessageFormat.format("[ConfigurationService] {0} : deactivated",
+                (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
     protected void bindEventService(EventService eventService) {

@@ -7,6 +7,10 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: javax.persistence,
  org.apache.commons.io,
  org.eclipse.skalli.services.persistence,
- org.eclipse.skalli.storage.db.entities
-Service-Component: OSGI-INF/DatabaseStorageComponent.xml
+ org.eclipse.skalli.storage.db.entities,
+ org.osgi.service.component,
+ org.osgi.service.jpa,
+ org.slf4j
+Service-Component: OSGI-INF/DatabaseStorageComponent.xml,
+  OSGI-INF/StorageEntityManagerComponent.xml
 Bundle-ActivationPolicy: lazy
