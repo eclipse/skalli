@@ -30,12 +30,11 @@ public class NoSuchPropertyException extends RuntimeException {
         super(cause);
     }
 
-    public NoSuchPropertyException(ExtensionEntityBase extension, String propertyName) {
-        this(extension, propertyName, null);
+    public NoSuchPropertyException(EntityBase entity, String propertyName) {
+        this(entity, propertyName, null);
     }
 
-    public NoSuchPropertyException(ExtensionEntityBase extension, String propertyName, Throwable cause) {
-        super("Failed to retrieve property " + propertyName + " of " + extension.getClass().getName(), cause);
+    public NoSuchPropertyException(EntityBase entity, String propertyName, Throwable cause) {
+        super("Failed to retrieve property " + propertyName + " of " + entity.getClass().getName(), cause);
     }
-
 }

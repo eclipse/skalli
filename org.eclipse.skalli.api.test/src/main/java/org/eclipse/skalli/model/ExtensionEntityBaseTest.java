@@ -11,11 +11,8 @@
 package org.eclipse.skalli.model;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
-import org.eclipse.skalli.commons.CollectionUtils;
-import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.PropertyHelper;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
 import org.eclipse.skalli.testutil.TestExtensibleEntityBase;
@@ -43,32 +40,4 @@ public class ExtensionEntityBaseTest {
         ext.setExtensibleEntity(base);
         Assert.assertEquals(base, ext.getExtensibleEntity());
     }
-
-    @Test
-    public void testGetPropertyNames() {
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
-        TestExtension ext = new TestExtension();
-        ext.setExtensibleEntity(base);
-        AssertUtils.assertEqualsAnyOrder("getPropertyNames",
-                CollectionUtils.asSet("parentEntity", "str", "items", "parentEntityId",
-                        "uuid", "bool", "deleted", "lastModified", "lastModifiedBy"),
-                ext.getPropertyNames());
-    }
-
-    @SuppressWarnings("unchecked")
-    @Test
-    public void testGetProperty() throws Exception {
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
-        TestExtension extBase = new TestExtension();
-        extBase.setExtensibleEntity(base);
-        extBase.setBool(true);
-        extBase.setStr("Homer");
-        List<String> list = Arrays.asList("Marge", "Lisa", "Bart");
-        extBase.setItems(list);
-
-        Assert.assertEquals(Boolean.TRUE, (Boolean) extBase.getProperty(TestExtension.PROPERTY_BOOL));
-        Assert.assertEquals("Homer", (String) extBase.getProperty(TestExtension.PROPERTY_STR));
-        AssertUtils.assertEquals("List", list, (List<String>) extBase.getProperty(TestExtension.PROPERTY_ITEMS));
-    }
-
 }
