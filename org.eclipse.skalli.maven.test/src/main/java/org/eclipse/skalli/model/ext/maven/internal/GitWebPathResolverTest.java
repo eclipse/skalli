@@ -19,7 +19,7 @@ public class GitWebPathResolverTest {
 
     private static final String SCM_LOCATION = "scm:git:git://git.example.org/project.git";
     private static final String GIT_PATTERN = "^scm:git:git://(git\\.example\\.org(:\\d+)?)/(.*\\.git)$";
-    private static final String GITWEB_TEMPLATE = "http://{1}:50000/git/?p={3}";
+    private static final String GITWEB_TEMPLATE = "http://${1}:50000/git/?p=${3}";
 
     @Test(expected = java.lang.IllegalArgumentException.class)
     public void testResolveNoMapping() throws Exception {

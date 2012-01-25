@@ -54,7 +54,7 @@ public class GitWebPathResolver implements MavenPathResolver {
 
     @Override
     public boolean canResolve(String scmLocation) {
-        return MapperUtil.convert("", scmLocation, pattern, template) != null;
+        return MapperUtil.convert(scmLocation, pattern, template, "") != null;
     }
 
     @Override
@@ -63,7 +63,7 @@ public class GitWebPathResolver implements MavenPathResolver {
         if (!isValidNormalizedPath(relativePath)) {
             throw new IllegalArgumentException("not a valid path: " + relativePath);
         }
-        String repsitoryRoot = MapperUtil.convert("", scmLocation, pattern, template);
+        String repsitoryRoot = MapperUtil.convert(scmLocation, pattern, template, "");
         if (StringUtils.isBlank(repsitoryRoot)) {
             throw new IllegalArgumentException(MessageFormat.format(
                     "{0} is not applicable for scmLocation={1}", getClass(), scmLocation));

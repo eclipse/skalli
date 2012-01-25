@@ -194,7 +194,7 @@ public class ProjectMavenBox extends InfoBox implements ProjectInfoBox {
         }
         String repositoryRoot = null;
         for (ScmLocationMappingConfig mapping : mappings) {
-            repositoryRoot = MapperUtil.convert(project.getProjectId(), scmLocation, mapping);
+            repositoryRoot = MapperUtil.convert(scmLocation, mapping, project.getProjectId());
             if (StringUtils.isNotBlank(repositoryRoot)) {
                 break;
             }

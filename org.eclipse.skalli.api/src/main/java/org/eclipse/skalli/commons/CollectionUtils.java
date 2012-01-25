@@ -124,6 +124,22 @@ public class CollectionUtils {
         return c != null && !c.isEmpty();
     }
 
+    public static String toString(Collection<?> c, char separator) {
+        if (c == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Object o: c) {
+            if (o != null) {
+                if (sb.length() > 0) {
+                    sb.append(separator);
+                }
+                sb.append(o.toString());
+            }
+        }
+        return sb.toString();
+    }
+
     public static int[] asSortedArray(int[] a) {
         Arrays.sort(a);
         return a;
@@ -143,14 +159,17 @@ public class CollectionUtils {
         @Override
         public Iterator<T> iterator() {
             return new Iterator<T>() {
+                @Override
                 public boolean hasNext() {
                     return false;
                 }
 
+                @Override
                 public T next() {
                     throw new NoSuchElementException();
                 }
 
+                @Override
                 public void remove() {
                     throw new UnsupportedOperationException();
                 }

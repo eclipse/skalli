@@ -10,34 +10,64 @@
  *******************************************************************************/
 package org.eclipse.skalli.ext.mapping;
 
-import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrLookup;
+import org.apache.commons.lang.text.StrSubstitutor;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
+
 public class MapperUtil {
 
-    public static boolean matches(String source, LinkMappingConfig mapping) {
+    public static boolean matches(String s, LinkMappingConfig mapping) {
         Pattern regex = Pattern.compile(mapping.getPattern());
-        Matcher matcher = regex.matcher(source);
+        Matcher matcher = regex.matcher(s);
         return matcher.matches();
     }
 
-    public static String convert(String projectId, String source, LinkMappingConfig mapping) {
-        return convert(projectId, source, mapping.getPattern(), mapping.getTemplate());
+    public static String convert(String s, LinkMappingConfig mapping, String projectId) {
+        return convert(s, mapping.getPattern(), mapping.getTemplate(), projectId);
     }
 
-    public static String convert(String projectId, String source, String pattern, String template) {
+    public static String convert(String s, String pattern, String template, String projectId) {
+        Map<String,Object> properties = new HashMap<String,Object>();
+        if (StringUtils.isNotBlank(projectId)) {
+            properties.put("0", projectId); //$NON-NLS-1$
+        }
+        return convert(s, pattern, template, null, properties);
+    }
+
+    public static String convert(String s, String pattern, String template, Project project, String userId) {
+        Map<String,Object> properties = new HashMap<String,Object>();
+        if (StringUtils.isNotBlank(userId)) {
+            properties.put(User.PROPERTY_USERID, userId);
+        }
+        return convert(s, pattern, template, project, properties);
+    }
+
+    public static String convert(String s, String pattern, String template, Project project, Map<String,Object> properties) {
         Pattern regex = Pattern.compile(pattern);
-        Matcher matcher = regex.matcher(source);
+        Matcher matcher = regex.matcher(s);
         if (!matcher.matches()) {
             return null;
         }
-        String[] groups = new String[matcher.groupCount() + 1];
-        groups[0] = projectId;
-        for (int i = 1; i <= matcher.groupCount(); i++) {
-            groups[i] = matcher.group(i);
+        if (properties == null) {
+            properties = new HashMap<String,Object>();
         }
-        return MessageFormat.format(template, (Object[]) groups);
+        // put the project ID as property ${0}
+        if (project != null) {
+            properties.put("0", project.getProjectId()); //$NON-NLS-1$
+        }
+        // put the groups found by the matcher as properties ${1}, ${2}, ...
+        for (int i = 1; i <= matcher.groupCount(); i++) {
+            properties.put(Integer.toString(i), matcher.group(i));
+        }
+        StrLookup propertyResolver = new PropertyLookup(project, properties);
+        StrSubstitutor subst = new StrSubstitutor(propertyResolver);
+        return subst.replace(template);
     }
-
 }

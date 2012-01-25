@@ -4,7 +4,7 @@
       <id>egit.eclipse.gerrit</id>
       <purpose>review</purpose>
       <pattern>^scm:git:git://egit\.eclipse\.org/(.*)\.git$</pattern>
-      <template>http://egit.eclipse.org/r/#q,status:open+project:{1},n,z</template>
+      <template>http://egit.eclipse.org/r/#q,status:open+project:${1},n,z</template>
       <name>Gerrit Code Review</name>
       <provider>git</provider>
     </org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig>
@@ -12,7 +12,7 @@
       <id>egit.eclipse.gitweb</id>
       <purpose>browse</purpose>
       <pattern>^scm:git:git://egit\.eclipse\.org/(.*\.git)$</pattern>
-      <template>http://egit.eclipse.org/w/?p={1}</template>
+      <template>http://egit.eclipse.org/w/?p=${1}</template>
       <name>Browse Sources in GitWeb</name>
       <provider>git</provider>
     </org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig>
@@ -20,7 +20,7 @@
       <id>git.eclipse.org</id>
       <purpose>review</purpose>
       <pattern>^scm:git:git://git.eclipse.org/gitroot/(.+\.git)$</pattern>
-      <template>http://git.eclipse.org/c/{1}/</template>
+      <template>http://git.eclipse.org/c/${1}/</template>
       <name>Browse Sources on Eclipse.org</name>
       <provider>git</provider>
     </org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig>
@@ -28,7 +28,7 @@
       <id>activity.git.eclipse.org</id>
       <purpose>activity</purpose>
       <pattern>^scm:git:git://git.eclipse.org/gitroot/(.+\.git)$</pattern>
-      <template>http://dash.eclipse.org/dash/commits/web-app/active-graph.cgi?project={0}</template>
+      <template>http://dash.eclipse.org/dash/commits/web-app/active-graph.cgi?project=${0}</template>
       <name>Commits Activity Meter</name>
       <provider>git</provider>
     </org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig>
@@ -36,7 +36,7 @@
       <id>activitydetails.git.eclipse.org</id>
       <purpose>activitydetails</purpose>
       <pattern>^scm:git:git://git.eclipse.org/gitroot/(.+\.git)$</pattern>
-      <template>http://dash.eclipse.org/dash/commits/web-app/summary.cgi?company=y&amp;month=x&amp;project={0}</template>
+      <template>http://dash.eclipse.org/dash/commits/web-app/summary.cgi?company=y&amp;month=x&amp;project=${0}</template>
       <name>Commits by Company by Month</name>
       <provider>git</provider>
     </org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig>
@@ -44,7 +44,7 @@
       <id>createBug.bugs.eclipse.org</id>
       <purpose>create_bug</purpose>
       <pattern>^https://bugs.eclipse.org/bugs/buglist.cgi?.*(product=[^&amp;]*).*</pattern>
-      <template>https://bugs.eclipse.org/bugs/enter_bug.cgi?{1}</template>
+      <template>https://bugs.eclipse.org/bugs/enter_bug.cgi?${1}</template>
       <name>Create Bugs on bugs.eclipse.org</name>
       <provider>bugtracker</provider>
     </org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig>

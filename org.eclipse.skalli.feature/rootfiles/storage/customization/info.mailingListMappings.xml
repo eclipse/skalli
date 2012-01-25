@@ -4,14 +4,14 @@
       <id>listinfo.eclipse.org</id>
       <purpose>subscribe</purpose>
       <pattern>^(.+)@eclipse.org$</pattern>
-      <template>https://dev.eclipse.org/mailman/listinfo/{1}</template>
+      <template>https://dev.eclipse.org/mailman/listinfo/${1}</template>
       <name>Subscribe/Unsubscribe</name>
     </org.eclipse.skalli.ext.mapping.mail.MailingListMappingConfig>
     <org.eclipse.skalli.ext.mapping.mail.MailingListMappingConfig>
       <id>mhonarc.eclipse.org</id>
       <purpose>browse-archive</purpose>
       <pattern>^(.+)@eclipse.org$</pattern>
-      <template>http://dev.eclipse.org/mhonarc/lists/{1}</template>
+      <template>http://dev.eclipse.org/mhonarc/lists/${1}</template>
       <name>Browse Archive</name>
     </org.eclipse.skalli.ext.mapping.mail.MailingListMappingConfig>
   </mailingListMappings>

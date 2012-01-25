@@ -28,7 +28,7 @@ public abstract class LinkMapperBase implements LinkMapper {
             if (allMappings != null) {
                 for (LinkMappingConfig mapping : allMappings) {
                     if (matches(mapping, purposes)) {
-                        String url = MapperUtil.convert(projectId, source, mapping);
+                        String url = MapperUtil.convert(source, mapping, projectId);
                         if (url != null) {
                             Link location = new Link(url, mapping.getName());
                             ret.add(location);
