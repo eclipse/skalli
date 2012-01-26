@@ -27,14 +27,29 @@ import org.eclipse.skalli.services.feed.FeedEntry;
 import org.eclipse.skalli.services.feed.FeedPersistenceService;
 import org.eclipse.skalli.services.feed.FeedService;
 import org.eclipse.skalli.services.feed.FeedServiceException;
+import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.osgi.framework.BundleException;
 
 public class JPAFeedServiceTest {
     final private static UUID defaultProjectUuid = PropertyHelperUtils.TEST_UUIDS[0];
     final private static UUID allFieldsProjectUuid = PropertyHelperUtils.TEST_UUIDS[1];
     final private static UUID notPersistedProjectUuid = PropertyHelperUtils.TEST_UUIDS[2];
     final private static UUID testFindProjectUuid = PropertyHelperUtils.TEST_UUIDS[3];
+
+    private static JPAFeedService jPAFeedService;
+    private static JPAFeedPersistenceService jPAFeedPersistenceService;
+
+    @BeforeClass
+    public static void BeforeClass() throws BundleException {
+        BundleManager.startBundles();
+        jPAFeedService = (JPAFeedService) BundleManager.getRequiredService(FeedService.class);
+        jPAFeedPersistenceService = (JPAFeedPersistenceService) BundleManager
+                .getRequiredService(FeedPersistenceService.class);
+    }
+
 
     @Test
     public void testMergeWithFind() throws FeedServiceException {
@@ -48,8 +63,7 @@ public class JPAFeedServiceTest {
         final String link_title = "link title";
         final String link_href = "href info";
 
-        JPAFeedPersistenceService fps = new JPAFeedPersistenceService();
-        EntryJPA newEntry = fps.createEntry();
+        EntryJPA newEntry = jPAFeedPersistenceService.createEntry();
         newEntry.setSource(source);
         newEntry.setProjectId(allFieldsProjectUuid);
         newEntry.setTitle(title);
@@ -67,10 +81,9 @@ public class JPAFeedServiceTest {
 
         Collection<FeedEntry> entries = new ArrayList<FeedEntry>();
         entries.add(newEntry);
-        fps.merge(entries);
+        jPAFeedPersistenceService.merge(entries);
 
-        JPAFeedService fs = new JPAFeedService();
-        List<Entry> foundEntries = fs.findEntries(allFieldsProjectUuid, 10);
+        List<Entry> foundEntries = jPAFeedService.findEntries(allFieldsProjectUuid, 10);
         assertThat(foundEntries.size(), is(1));
 
         Entry foundEntry = foundEntries.get(0);
@@ -92,8 +105,8 @@ public class JPAFeedServiceTest {
         newEntry.setTitle(newTitle);
         entries = new ArrayList<FeedEntry>();
         entries.add(newEntry);
-        fps.merge(entries);
-        foundEntries = fs.findEntries(allFieldsProjectUuid, 10);
+        jPAFeedPersistenceService.merge(entries);
+        foundEntries = jPAFeedService.findEntries(allFieldsProjectUuid, 10);
         assertThat(foundEntries.size(), is(1));
         foundEntry = foundEntries.get(0);
         assertNotNull(foundEntry);
@@ -101,18 +114,19 @@ public class JPAFeedServiceTest {
         assertThat(foundEntry.getTitle(), is(newTitle));
     }
 
+
+
     @Test
     public void testMerge() throws FeedServiceException {
-        FeedPersistenceService fps = new JPAFeedPersistenceService();
 
-        FeedEntry entry1 = createDummyTestEntry(fps, "1");
-        FeedEntry entry2 = createDummyTestEntry(fps, "2");
-        FeedEntry entry3 = createDummyTestEntry(fps, "3");
+        FeedEntry entry1 = createDummyTestEntry(jPAFeedPersistenceService, "1");
+        FeedEntry entry2 = createDummyTestEntry(jPAFeedPersistenceService, "2");
+        FeedEntry entry3 = createDummyTestEntry(jPAFeedPersistenceService, "3");
 
         Collection<FeedEntry> entries = new ArrayList<FeedEntry>();
         entries.add(entry1);
         entries.add(entry2);
-        fps.merge(entries);
+        jPAFeedPersistenceService.merge(entries);
         assertEntriesExist(new String[] { entry1.getId(), entry2.getId() });
 
         // update again and add a third entry
@@ -121,14 +135,13 @@ public class JPAFeedServiceTest {
         // that the old once are not deleted.
         entries.add(entry2);
         entries.add(entry3);
-        fps.merge(entries);
+        jPAFeedPersistenceService.merge(entries);
 
         assertEntriesExist(new String[] { entry1.getId(), entry2.getId(), entry3.getId() });
     }
 
     private void assertEntriesExist(String[] expectedEntryIds) throws FeedServiceException {
-        FeedService fs = new JPAFeedService();
-        List<Entry> foundEntries = fs.findEntries(defaultProjectUuid, expectedEntryIds.length + 100);
+        List<Entry> foundEntries = jPAFeedService.findEntries(defaultProjectUuid, expectedEntryIds.length + 100);
         assertThat(foundEntries.size(), is(expectedEntryIds.length));
         for (String expectedId : expectedEntryIds) {
             assertHasEntry(foundEntries, expectedId);
@@ -158,40 +171,37 @@ public class JPAFeedServiceTest {
 
     @Test
     public void testFindEntries_not_exisiting() throws FeedServiceException {
-        FeedService fps = new JPAFeedService();
-        List<Entry> foundEntries = fps.findEntries(notPersistedProjectUuid, 10);
+        List<Entry> foundEntries = jPAFeedService.findEntries(notPersistedProjectUuid, 10);
         assertThat(foundEntries.size(), is(0));
     }
 
     @Test
     public void testFindCalls() throws FeedServiceException, InterruptedException {
-        JPAFeedPersistenceService fps = new JPAFeedPersistenceService();
-        JPAFeedService fs = new JPAFeedService();
 
         final Date testDate = new Date(1318946441120L);
 
-        FeedEntry e1 = fps.createEntry();
+        FeedEntry e1 = jPAFeedPersistenceService.createEntry();
         e1.setSource("source-a");
         e1.setProjectId(testFindProjectUuid);
         e1.setTitle("t1");
         e1.setPublished(testDate);
         updateId(e1);
 
-        FeedEntry e2 = fps.createEntry();
+        FeedEntry e2 = jPAFeedPersistenceService.createEntry();
         e2.setSource("source-a");
         e2.setProjectId(testFindProjectUuid);
         e2.setTitle("t2");
         e2.setPublished(new Date(testDate.getTime() + 1));
         updateId(e2);
 
-        FeedEntry e3 = fps.createEntry();
+        FeedEntry e3 = jPAFeedPersistenceService.createEntry();
         e3.setSource("source-a");
         e3.setProjectId(testFindProjectUuid);
         e3.setTitle("t3");
         e3.setPublished(new Date(testDate.getTime() + 2));
         updateId(e3);
 
-        FeedEntry e4 = fps.createEntry();
+        FeedEntry e4 = jPAFeedPersistenceService.createEntry();
         e4.setSource("source-b");
         e4.setProjectId(testFindProjectUuid);
         e4.setTitle("t4");
@@ -203,11 +213,11 @@ public class JPAFeedServiceTest {
         entries.add(e2);
         entries.add(e3);
         entries.add(e4);
-        fps.merge(entries);
+        jPAFeedPersistenceService.merge(entries);
 
         // findEntries: check that the maxResult parameter of findEnties works:
         for (int maxResults = 0; maxResults < 10; maxResults++) {
-            List<Entry> foundEntries = fs.findEntries(testFindProjectUuid, maxResults);
+            List<Entry> foundEntries = jPAFeedService.findEntries(testFindProjectUuid, maxResults);
             assertThat(foundEntries.size(), is(Math.min(maxResults, 4)));
 
             if (maxResults > 0) {
@@ -221,7 +231,7 @@ public class JPAFeedServiceTest {
         }
 
         // findEntries: check find with 1 source
-        List<Entry> foundEntries = fs.findEntries(testFindProjectUuid, Collections.singleton("source-a"), 10);
+        List<Entry> foundEntries = jPAFeedService.findEntries(testFindProjectUuid, Collections.singleton("source-a"), 10);
         assertThat(foundEntries.size(), is(3));
         for (Entry entry : foundEntries) {
             assertThat(entry.getSource(), is("source-a"));
@@ -231,7 +241,7 @@ public class JPAFeedServiceTest {
         Collection<String> sources = new ArrayList<String>();
         sources.add("source-a");
         sources.add("source-b");
-        foundEntries = fs.findEntries(testFindProjectUuid, sources, 10);
+        foundEntries = jPAFeedService.findEntries(testFindProjectUuid, sources, 10);
         assertThat(foundEntries.size(), is(4));
         for (Entry entry : foundEntries) {
             assertThat(entry.getSource(), isIn(sources));
@@ -241,7 +251,7 @@ public class JPAFeedServiceTest {
         sources = new ArrayList<String>();
         sources.add("source-a");
         sources.add("notExistingSource");
-        foundEntries = fs.findEntries(testFindProjectUuid, sources, 10);
+        foundEntries = jPAFeedService.findEntries(testFindProjectUuid, sources, 10);
         assertThat(foundEntries.size(), is(3));
         for (Entry entry : foundEntries) {
             assertThat(entry.getSource(), is("source-a"));
@@ -250,11 +260,11 @@ public class JPAFeedServiceTest {
         // findEntries: check find with 1 sources not persisted source
         sources = new ArrayList<String>();
         sources.add("notExistingSource");
-        foundEntries = fs.findEntries(testFindProjectUuid, sources, 10);
+        foundEntries = jPAFeedService.findEntries(testFindProjectUuid, sources, 10);
         assertThat(foundEntries.size(), is(0));
 
         // findSources
-        List<String> foundSources = fs.findSources(testFindProjectUuid);
+        List<String> foundSources = jPAFeedService.findSources(testFindProjectUuid);
         assertThat(foundSources.size(), is(2));
         // sources are expected to be order by there name
         assertThat(foundSources.get(0), is("source-a"));
@@ -269,17 +279,16 @@ public class JPAFeedServiceTest {
 
     @Test
     public void testfindEntriesIllegalParameters() throws FeedServiceException {
-        JPAFeedService fps = new JPAFeedService();
 
         try {
-            fps.findEntries(null, 4711);
+            jPAFeedService.findEntries(null, 4711);
             fail("IllegalArgumentException was expected.");
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), containsString("projectId"));
         }
 
         try {
-            fps.findEntries(defaultProjectUuid, -2);
+            jPAFeedService.findEntries(defaultProjectUuid, -2);
             fail("IllegalArgumentException was expected.");
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), containsString("maxResults"));
@@ -288,17 +297,17 @@ public class JPAFeedServiceTest {
         @SuppressWarnings("unchecked")
         Collection<String> empty_sources = Collections.EMPTY_LIST;
         try {
-            fps.findEntries(null, empty_sources, 4711);
+            jPAFeedService.findEntries(null, empty_sources, 4711);
             fail("IllegalArgumentException was expected.");
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), containsString("projectId"));
         }
 
-        List<Entry> result = fps.findEntries(defaultProjectUuid, null, 4711);
+        List<Entry> result = jPAFeedService.findEntries(defaultProjectUuid, null, 4711);
         assertThat(result.size(), is(0));
 
         try {
-            fps.findEntries(defaultProjectUuid, null, -2);
+            jPAFeedService.findEntries(defaultProjectUuid, null, -2);
             fail("IllegalArgumentException was expected.");
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), containsString("maxResults"));
@@ -307,9 +316,8 @@ public class JPAFeedServiceTest {
 
     @Test
     public void testFindSourcesIllegalParameters() throws FeedServiceException {
-        JPAFeedService fps = new JPAFeedService();
         try {
-            fps.findSources(null);
+            jPAFeedService.findSources(null);
             fail("IllegalArgumentException was expected.");
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), containsString("projectId"));
