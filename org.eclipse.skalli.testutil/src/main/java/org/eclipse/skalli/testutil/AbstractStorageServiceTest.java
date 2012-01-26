@@ -44,7 +44,7 @@ public abstract class AbstractStorageServiceTest {
     /**
      * Creates the {@link StorageService} instance under test.
      */
-    abstract protected StorageService createNewStorageServiceForTest();
+    abstract protected StorageService createNewStorageServiceForTest() throws Exception;
 
     protected StorageService getStorageService() {
         return stroageService;

@@ -5,4 +5,5 @@ org.eclipse.skalli.target/target-platform-3rdparty/
 org.eclipse.skalli.target/workdir/
 org.eclipse.skalli.selenium/workdir/storage/
 org.eclipse.skalli.selenium/logs/
+derby.log
 

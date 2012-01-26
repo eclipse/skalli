@@ -10,23 +10,33 @@
  *******************************************************************************/
 package org.eclipse.skalli.storage.db.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.eclipse.skalli.storage.db.PersistenceDB;
 import org.eclipse.skalli.storage.db.entities.HistoryStorageItem;
 import org.eclipse.skalli.testutil.AbstractStorageServiceTest;
+import org.eclipse.skalli.testutil.BundleManager;
 import org.junit.Test;
 
 public class PersistenceDBTest extends AbstractStorageServiceTest {
 
     @Override
-    protected StorageService createNewStorageServiceForTest() {
-        return new PersistenceDB();
+    protected StorageService createNewStorageServiceForTest() throws Exception {
+        BundleManager.startBundles();
+        Set<StorageService> services = Services.getServices(StorageService.class);
+        for (StorageService storageService : services) {
+            if (storageService instanceof PersistenceDB) {
+                return storageService;
+            }
+        }
+        fail("no storageService for " + PersistenceDB.class.getName() + " found!");
+        return null;
     }
 
     @Test
