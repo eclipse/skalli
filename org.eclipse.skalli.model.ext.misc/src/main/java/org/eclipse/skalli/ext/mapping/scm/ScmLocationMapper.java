@@ -27,15 +27,22 @@ public class ScmLocationMapper extends LinkMapperBase {
     /** Purpose filter for mappings that allow to review content of source locations. */
     public static final String PURPOSE_REVIEW = "review"; //$NON-NLS-1$
 
+    /**
+     * Purpose filter for mappings that determines how the source location should be transformed
+     * before copying it to the clipboard.
+     */
+    public static final String PURPOSE_COPY_TO_CLIPBOARD = "copy_to_clipboard"; //$NON-NLS-1$
+
     /** Purpose filter for mappings that provide activity information for a project. */
     public static final String PURPOSE_ACTIVITY = "activity"; //$NON-NLS-1$
 
     /** Purpose filter for mappings that provide activity details for a project. */
     public static final String PURPOSE_ACTIVITY_DETAILS = "activitydetails"; //$NON-NLS-1$
 
-    /** Purpose filter for mappings that provide the createBug url for the bug tracking system. */
+    /** Purpose filter for mappings that provide the "Create Bug" url for the bug tracking system. */
     public static final String PURPOSE_CREATE_BUG = "create_bug"; //$NON-NLS-1$
 
+    /** Purpose filter for mappings that provide feeds for source locations. */
     public static final String PURPOSE_FEED = "feed"; //$NON-NLS-1$
 
     public static final String ALL_PROVIDERS = "*"; //$NON-NLS-1$

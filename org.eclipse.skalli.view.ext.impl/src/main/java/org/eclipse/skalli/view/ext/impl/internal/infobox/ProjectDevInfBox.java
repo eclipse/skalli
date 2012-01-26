@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext.impl.internal.infobox;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,7 +19,9 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.commons.HtmlBuilder;
 import org.eclipse.skalli.commons.Link;
+import org.eclipse.skalli.ext.mapping.MapperUtil;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
@@ -106,10 +109,13 @@ public class ProjectDevInfBox extends InfoBox implements ProjectInfoBox {
                 html.appendHeader("Source Locations", 4).append('\n');
                 html.append("<ul>\n"); //$NON-NLS-1$
                 ScmLocationMapper mapper = new ScmLocationMapper();
-                for (String scmUrl : devInf.getScmLocations()) {
+                for (String scmLocation : devInf.getScmLocations()) {
                     html.append("<li>"); //$NON-NLS-1$
-                    html.append(copyToClipboardLink(scmUrl, scmUrl.replaceFirst("^scm:.+?:", ""))); //$NON-NLS-1$ //$NON-NLS-2$
-                    List<Link> mappedScmLinks = mapper.getMappedLinks(configService, project.getProjectId(), scmUrl,
+                    List<String> scmUrls = getScmUrls(scmLocation, mapper, project, util.getLoggedInUser().getUserId());
+                    for (String scmUrl: scmUrls) {
+                        html.append(copyToClipboardLink(scmUrl, scmUrl));
+                    }
+                    List<Link> mappedScmLinks = mapper.getMappedLinks(configService, project.getProjectId(), scmLocation,
                             ScmLocationMapper.PURPOSE_BROWSE, ScmLocationMapper.PURPOSE_REVIEW);
                     html.appendLinks(mappedScmLinks);
                     html.append("</li>\n"); //$NON-NLS-1$
@@ -124,6 +130,29 @@ public class ProjectDevInfBox extends InfoBox implements ProjectInfoBox {
             createLabel(layout, "This project has no development information.");
         }
         return layout;
+    }
+
+    /**
+     * Applies all SCM mapping with purpose {@link  ScmLocationMapper#PURPOSE_COPY_TO_CLIPBOARD copy-to-clipboard}
+     * to the given <code>scmLocation</code> and returns the mapped SCM URLs for locations that match any
+     * available mapping. If no matching mapping could be found, the <tt>"scm:<provider>:"</tt> prefix
+     * is truncated from the location and returned as sole result entry.
+     */
+    private List<String> getScmUrls(String scmLocation, ScmLocationMapper mapper, Project project, String userId) {
+        List<String> scmUrls = new ArrayList<String>();
+        List<ScmLocationMappingConfig> clipboardMappings = mapper.getMappings(configService,
+                null, ScmLocationMapper.PURPOSE_COPY_TO_CLIPBOARD);
+        for (ScmLocationMappingConfig clipboardMapping : clipboardMappings) {
+            String scmUrl = MapperUtil.convert(scmLocation, clipboardMapping.getPattern(),
+                    clipboardMapping.getTemplate(), project, userId);
+            if (scmUrl != null) {
+                scmUrls.add(scmUrl);
+            }
+        }
+        if (scmUrls.isEmpty()) {
+            scmUrls.add(scmLocation.replaceFirst("^scm:.+?:", "")); //$NON-NLS-1$ //$NON-NLS-2$
+        }
+        return scmUrls;
     }
 
     private void addCreateBugLinks(Set<String> linkList, Project project, DevInfProjectExt devInf) {
