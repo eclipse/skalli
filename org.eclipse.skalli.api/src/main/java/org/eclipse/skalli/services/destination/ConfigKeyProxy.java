@@ -17,6 +17,8 @@ public enum ConfigKeyProxy implements ConfigKey {
 
     HOST("proxy.host", "", false),
     PORT("proxy.port", "", false),
+    HTTPS_HOST("https.proxy.host", "", false),
+    HTTPS_PORT("https.proxy.port", "", false),
     NONPROXYHOSTS("proxy.nonProxyHosts", "", false);
 
     private final String key;

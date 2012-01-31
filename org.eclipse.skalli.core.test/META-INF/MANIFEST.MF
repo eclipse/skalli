@@ -8,8 +8,9 @@ Fragment-Host: org.eclipse.skalli.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: javax.persistence.criteria,
  javax.persistence.metamodel,
- org.apache.commons.httpclient.methods,
  org.apache.commons.io,
+ org.apache.http.client,
+ org.apache.http.client.methods,
  org.easymock,
  org.eclipse.skalli.testutil,
  org.eclipse.skalli.testutil.feeds,

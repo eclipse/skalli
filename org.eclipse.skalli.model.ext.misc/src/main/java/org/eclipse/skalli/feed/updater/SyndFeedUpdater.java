@@ -18,11 +18,14 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.destination.DestinationService;
+import org.eclipse.skalli.services.destination.HttpUtils;
 import org.eclipse.skalli.services.feed.FeedEntry;
 import org.eclipse.skalli.services.feed.FeedFactory;
 import org.eclipse.skalli.services.feed.FeedUpdater;
@@ -49,34 +52,35 @@ public class SyndFeedUpdater implements FeedUpdater {
         this.caption = caption;
     }
 
-    private List<FeedEntry> getEntries(FeedFactory factory) throws FeedException {
+    private List<FeedEntry> getEntries(FeedFactory factory) throws IOException, FeedException {
         if (LOG.isInfoEnabled()) {
-            LOG.info(MessageFormat.format("Updating ''{0}'' feed for project ''{1}'' from {2}", source, projectName, url.toString()));
+            LOG.info(MessageFormat.format("Updating ''{0}'' feed for project ''{1}'' from {2}", source, projectName,
+                    url.toString()));
         }
         return (new Converter(factory)).syndFeed2Entry(getSyndFeed());
     }
 
-    private SyndFeed getSyndFeed() throws FeedException {
+    private SyndFeed getSyndFeed() throws IOException, FeedException {
         SyndFeed syndFeed = null;
         DestinationService destinationService = Services.getService(DestinationService.class);
         if (destinationService != null) {
+            HttpClient client = destinationService.getClient(url);
             Reader reader = null;
+            HttpResponse response = null;
             try {
                 LOG.info("GET " + url); //$NON-NLS-1$
-                GetMethod method = new GetMethod(url.toExternalForm());
-                method.setFollowRedirects(true);
-                int status = destinationService.getClient(url).executeMethod(method);
-                LOG.info(status + " " + HttpStatus.getStatusText(status)); //$NON-NLS-1$
+                HttpGet method = new HttpGet(url.toExternalForm());
+                response = client.execute(method);
+                int status = response.getStatusLine().getStatusCode();
+                LOG.info(status + " " + response.getStatusLine().getReasonPhrase()); //$NON-NLS-1$
                 if (status != HttpStatus.SC_OK) {
                     throw new FeedException(MessageFormat.format("Failed to retrieve feed {0}", url));
                 }
-                reader = new InputStreamReader(method.getResponseBodyAsStream(), "UTF-8"); //$NON-NLS-1$
-                syndFeed = new SyndFeedInput().build(reader);
-                return syndFeed;
-            } catch (IOException e) {
-                throw new FeedException(MessageFormat.format("Failed to retrieve feed {0}", url), e);
+                reader = new InputStreamReader(response.getEntity().getContent(), "UTF-8"); //$NON-NLS-1$
+                return new SyndFeedInput().build(reader);
             } finally {
                 IOUtils.closeQuietly(reader);
+                HttpUtils.consumeQuietly(response);
             }
         }
         return syndFeed;
@@ -87,7 +91,7 @@ public class SyndFeedUpdater implements FeedUpdater {
         try {
             return getEntries(factory);
         } catch (Exception e) {
-            LOG.error("Problems updating the Feed (" + url.toString() + ":" + e.getMessage(), e);
+            LOG.error(MessageFormat.format("Failed to update the feed {0}:\n{1}", url.toString(), e.getMessage()), e);
         }
         return Collections.emptyList();
     }

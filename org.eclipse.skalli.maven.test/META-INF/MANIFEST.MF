@@ -7,6 +7,7 @@ Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Fragment-Host: org.eclipse.skalli.maven
 Import-Package: org.apache.commons.io,
+ org.apache.http,
  org.easymock,
  org.eclipse.skalli.model.ext.devinf,
  org.eclipse.skalli.testutil,

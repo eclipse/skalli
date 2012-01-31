@@ -10,38 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.extension.validators;
 
-import static org.apache.commons.httpclient.HttpStatus.SC_BAD_GATEWAY;
-import static org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST;
-import static org.apache.commons.httpclient.HttpStatus.SC_CONFLICT;
-import static org.apache.commons.httpclient.HttpStatus.SC_EXPECTATION_FAILED;
-import static org.apache.commons.httpclient.HttpStatus.SC_FAILED_DEPENDENCY;
-import static org.apache.commons.httpclient.HttpStatus.SC_FORBIDDEN;
-import static org.apache.commons.httpclient.HttpStatus.SC_GATEWAY_TIMEOUT;
-import static org.apache.commons.httpclient.HttpStatus.SC_GONE;
-import static org.apache.commons.httpclient.HttpStatus.SC_INSUFFICIENT_STORAGE;
-import static org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR;
-import static org.apache.commons.httpclient.HttpStatus.SC_LENGTH_REQUIRED;
-import static org.apache.commons.httpclient.HttpStatus.SC_LOCKED;
-import static org.apache.commons.httpclient.HttpStatus.SC_METHOD_NOT_ALLOWED;
-import static org.apache.commons.httpclient.HttpStatus.SC_MOVED_PERMANENTLY;
-import static org.apache.commons.httpclient.HttpStatus.SC_MULTIPLE_CHOICES;
-import static org.apache.commons.httpclient.HttpStatus.SC_NOT_ACCEPTABLE;
-import static org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND;
-import static org.apache.commons.httpclient.HttpStatus.SC_NOT_IMPLEMENTED;
-import static org.apache.commons.httpclient.HttpStatus.SC_PRECONDITION_FAILED;
-import static org.apache.commons.httpclient.HttpStatus.SC_PROXY_AUTHENTICATION_REQUIRED;
-import static org.apache.commons.httpclient.HttpStatus.SC_REQUESTED_RANGE_NOT_SATISFIABLE;
-import static org.apache.commons.httpclient.HttpStatus.SC_REQUEST_TIMEOUT;
-import static org.apache.commons.httpclient.HttpStatus.SC_REQUEST_TOO_LONG;
-import static org.apache.commons.httpclient.HttpStatus.SC_REQUEST_URI_TOO_LONG;
-import static org.apache.commons.httpclient.HttpStatus.SC_SEE_OTHER;
-import static org.apache.commons.httpclient.HttpStatus.SC_SERVICE_UNAVAILABLE;
-import static org.apache.commons.httpclient.HttpStatus.SC_TEMPORARY_REDIRECT;
-import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
-import static org.apache.commons.httpclient.HttpStatus.SC_UNPROCESSABLE_ENTITY;
-import static org.apache.commons.httpclient.HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE;
-import static org.apache.commons.httpclient.HttpStatus.SC_USE_PROXY;
-import static org.apache.commons.httpclient.HttpStatus.getStatusText;
+import static org.apache.http.HttpStatus.*;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -57,8 +26,12 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.HttpClientParams;
+import org.apache.http.params.HttpParams;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.commons.Link;
 import org.eclipse.skalli.model.ExtensionEntityBase;
@@ -67,6 +40,7 @@ import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.destination.DestinationService;
+import org.eclipse.skalli.services.destination.HttpUtils;
 import org.eclipse.skalli.services.extension.PropertyValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,15 +142,19 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
 
         DestinationService destinationService = Services.getService(DestinationService.class);
         if (destinationService != null && destinationService.isSupportedProtocol(url)) {
+            HttpClient client = destinationService.getClient(url);
+            HttpResponse response = null;
             try {
                 url = encodeURL(url);
+                HttpParams params = client.getParams();
+                HttpClientParams.setRedirecting(params, false); // we want to find 301 MOVED PERMANTENTLY
+                HttpGet method = new HttpGet(url.toExternalForm());
                 LOG.info("GET " + url); //$NON-NLS-1$
-                GetMethod method = new GetMethod(url.toExternalForm());
-                method.setFollowRedirects(false); // we want to find 301 (MOVED PERMANTENTLY)
-                int status = destinationService.getClient(url).executeMethod(method);
-                LOG.info(status + " " + HttpStatus.getStatusText(status)); //$NON-NLS-1$
+                response = client.execute(method);
+                int status = response.getStatusLine().getStatusCode();
+                LOG.info(status + " " + response.getStatusLine().getReasonPhrase()); //$NON-NLS-1$
                 CollectionUtils.addSafe(issues,
-                        getIssueByResponseCode(minSeverity, entityId, item, method.getStatusCode(), label));
+                        getIssueByResponseCode(minSeverity, entityId, item, response.getStatusLine(), label));
             } catch (UnknownHostException e) {
                 issues.add(newIssue(Severity.ERROR, entityId, item, TXT_HOST_UNKNOWN, url.getHost()));
             } catch (ConnectException e) {
@@ -187,11 +165,15 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
                 LOG.warn(MessageFormat.format("I/O Exception on validation: {0}", e.getMessage()), e); //$NON-NLS-1$
             } catch (RuntimeException e) {
                 LOG.error(MessageFormat.format("RuntimeException on validation: {0}", e.getMessage()), e); //$NON-NLS-1$
+            } finally {
+                HttpUtils.consumeQuietly(response);
             }
         } else {
             CollectionUtils.addSafe(issues, getIssueByReachableHost(minSeverity, entityId, item, url.getHost()));
         }
     }
+
+
 
     // use URI to properly encode the given URL
     static URL encodeURL(URL url) throws MalformedURLException {
@@ -228,51 +210,51 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
      * Returning an issue depending on the HTTP response code, might be null
      */
     private Issue getIssueByResponseCode(final Severity minSeverity, final UUID entityId, int item,
-            final int responseCode, String label) {
+            StatusLine statusLine, String label) {
         // everything below HTTP 300 is OK. Do not generate issues...
-        if (responseCode < 300) {
+        if (statusLine.getStatusCode() < 300) {
             return null;
         }
 
         switch (minSeverity) {
         case INFO:
-            switch (responseCode) {
+            switch (statusLine.getStatusCode()) {
             case SC_MULTIPLE_CHOICES:
                 // Confluence Wiki generates a 302 for anonymous requests (for ANY page). This would mess up the entries using SAPs wiki.
                 // case SC_MOVED_TEMPORARILY:
             case SC_SEE_OTHER:
             case SC_TEMPORARY_REDIRECT:
-                return newIssue(Severity.INFO, entityId, item, TXT_RESOURCE_FOUND_REDIRECT, label, responseCode,
-                        getStatusText(responseCode));
+                return newIssue(Severity.INFO, entityId, item, TXT_RESOURCE_FOUND_REDIRECT, label,
+                        statusLine.getStatusCode(), statusLine.getReasonPhrase());
             case SC_REQUEST_TIMEOUT:
-                return newIssue(Severity.INFO, entityId, item, TXT_VALIDATOR_NEEDS_UPDATE, label, responseCode,
-                        getStatusText(responseCode));
+                return newIssue(Severity.INFO, entityId, item, TXT_VALIDATOR_NEEDS_UPDATE, label,
+                        statusLine.getStatusCode(), statusLine.getReasonPhrase());
             }
         case WARNING:
-            switch (responseCode) {
+            switch (statusLine.getStatusCode()) {
             case SC_MOVED_PERMANENTLY:
-                return newIssue(Severity.ERROR, entityId, item, TXT_RESOURCE_MOVED, label, responseCode,
-                        getStatusText(responseCode));
+                return newIssue(Severity.ERROR, entityId, item, TXT_RESOURCE_MOVED, label, statusLine.getStatusCode(),
+                        statusLine.getReasonPhrase());
             case SC_USE_PROXY:
             case SC_PROXY_AUTHENTICATION_REQUIRED:
-                return newIssue(Severity.WARNING, entityId, item, TXT_MISSING_PROXY, label, responseCode,
-                        getStatusText(responseCode));
+                return newIssue(Severity.WARNING, entityId, item, TXT_MISSING_PROXY, label, statusLine.getStatusCode(),
+                        statusLine.getReasonPhrase());
             case SC_UNAUTHORIZED:
                 // do not create an issue, as the link might be checked with an anonymous user;
                 // project members might have the rights, you can't know.
                 return null;
             case SC_LOCKED:
-                return newIssue(Severity.WARNING, entityId, item, TXT_RESOURCE_LOCKED, label, responseCode,
-                        getStatusText(responseCode));
+                return newIssue(Severity.WARNING, entityId, item, TXT_RESOURCE_LOCKED, label,
+                        statusLine.getStatusCode(), statusLine.getReasonPhrase());
             case SC_INTERNAL_SERVER_ERROR:
             case SC_SERVICE_UNAVAILABLE:
             case SC_GATEWAY_TIMEOUT:
             case SC_INSUFFICIENT_STORAGE:
-                return newIssue(Severity.WARNING, entityId, item, TXT_TEMP_SERVER_PROBLEM, label, responseCode,
-                        getStatusText(responseCode));
+                return newIssue(Severity.WARNING, entityId, item, TXT_TEMP_SERVER_PROBLEM, label,
+                        statusLine.getStatusCode(), statusLine.getReasonPhrase());
             }
         case ERROR:
-            switch (responseCode) {
+            switch (statusLine.getStatusCode()) {
             case SC_BAD_REQUEST:
             case SC_FORBIDDEN:
             case SC_NOT_FOUND:
@@ -289,12 +271,12 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
             case SC_EXPECTATION_FAILED:
             case SC_UNPROCESSABLE_ENTITY:
             case SC_FAILED_DEPENDENCY:
-                return newIssue(Severity.ERROR, entityId, item, TXT_PERMANENT_REQUEST_PROBLEM, label, responseCode,
-                        getStatusText(responseCode));
+                return newIssue(Severity.ERROR, entityId, item, TXT_PERMANENT_REQUEST_PROBLEM, label,
+                        statusLine.getStatusCode(), statusLine.getReasonPhrase());
             case SC_NOT_IMPLEMENTED:
             case SC_BAD_GATEWAY:
-                return newIssue(Severity.ERROR, entityId, item, TXT_PERMANENT_SERVER_PROBLEM, label, responseCode,
-                        getStatusText(responseCode));
+                return newIssue(Severity.ERROR, entityId, item, TXT_PERMANENT_SERVER_PROBLEM, label,
+                        statusLine.getStatusCode(), statusLine.getReasonPhrase());
             }
         }
 

@@ -15,8 +15,10 @@ import static org.junit.Assert.assertNotNull;
 
 import java.net.URL;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.eclipse.skalli.services.destination.DestinationService;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.HttpServerMock;
@@ -26,7 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
-public class HttpUtilsTest {
+public class DestinationServiceImplTest {
 
     private static HttpServerMock mmus;
     private static final String TEST_CONTENT = "BODY";
@@ -53,7 +55,7 @@ public class HttpUtilsTest {
     @Test
     public void testGetContent() throws Exception {
         mmus.addContent("testGetContent", TEST_CONTENT);
-        assertGetRequest(DestinationService.HTTP, 200, "testGetContent", TEST_CONTENT);
+        assertGetRequest("http", 200, "testGetContent", TEST_CONTENT);
     }
 
     private void assertGetRequest(String protocol, int responseCode, String contentId, String content) throws Exception {
@@ -61,10 +63,13 @@ public class HttpUtilsTest {
                 + responseCode);
         HttpClient client = destinationService.getClient(url);
         assertNotNull(client);
-        GetMethod method = new GetMethod(url.toExternalForm());
-        assertEquals(200, client.executeMethod(method));
+
+        HttpGet method = new HttpGet(url.toExternalForm());
+        HttpResponse response = client.execute(method);
+        assertEquals(200, response.getStatusLine().getStatusCode());
         if (content != null) {
-            assertEquals(content, method.getResponseBodyAsString());
+            String contents = IOUtils.toString(response.getEntity().getContent());
+            assertEquals(content, contents);
         }
     }
 }

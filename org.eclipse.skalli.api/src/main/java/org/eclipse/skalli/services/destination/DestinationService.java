@@ -12,13 +12,28 @@ package org.eclipse.skalli.services.destination;
 
 import java.net.URL;
 
-import org.apache.commons.httpclient.HttpClient;
+import org.apache.http.client.HttpClient;
 
 public interface DestinationService {
 
-    public static final String HTTPS = "https"; //$NON-NLS-1$
-    public static final String HTTP = "http"; //$NON-NLS-1$
-
+    /**
+     * Returns a preconfigured HTTP client (including credentials and proxy settings)
+     * for the given URL.
+     *
+     * @param url  the URL for which to return a client.
+     * @return  an HTTP client for the given url.
+     *
+     * @throws IllegalArgumentException  if the protocol of the URL is not supported.
+     */
     public HttpClient getClient(URL url);
+
+    /**
+     * Checks of the protocol of the given URL is supported. Supported protocols are
+     * {@link #HTTP http://} and {@link #HTTPS https://}.
+     *
+     * @param url  the url to check.
+     * @return <code>true</code>, if the protocol specifier of the url is
+     * either <tt>http://</tt> or <tt>https://</tt>, respectively.
+     */
     public boolean isSupportedProtocol(URL url);
 }

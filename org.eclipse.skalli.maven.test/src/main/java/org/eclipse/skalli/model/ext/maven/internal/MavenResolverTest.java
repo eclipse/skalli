@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal;
 
-import static org.apache.commons.httpclient.HttpStatus.*;
+import static org.apache.http.HttpStatus.*;
 import static org.easymock.EasyMock.*;
 import static org.eclipse.skalli.model.ext.maven.MavenCoordinateUtil.*;
 import static org.eclipse.skalli.model.ext.maven.MavenPomUtility.*;
@@ -49,7 +49,8 @@ public class MavenResolverTest {
 
         private HashMap<String, InputStream> testContent = new HashMap<String, InputStream>();
 
-        public MavenResolverMock(MavenPomParser parser, MavenPathResolver pathResolver, DestinationService destinationService) {
+        public MavenResolverMock(MavenPomParser parser, MavenPathResolver pathResolver,
+                DestinationService destinationService) {
             super(PropertyHelperUtils.TEST_UUIDS[0], parser, pathResolver, destinationService);
         }
 
@@ -177,7 +178,8 @@ public class MavenResolverTest {
     public void testGetMavenPom() throws Exception {
         mmus.addContent("testGetMaven", MavenPomUtility.getPomWithParentAndModules());
         URL url = new URL("http://" + mmus.getHost() + ":" + mmus.getPort() + "/testGetMaven/" + SC_OK);
-        MavenResolverMock mavenResolver = new MavenResolverMock(new MavenPomParserImpl(), pathResolver, destinationService);
+        MavenResolverMock mavenResolver = new MavenResolverMock(new MavenPomParserImpl(), pathResolver,
+                destinationService);
 
         MavenPom expectedPom = new MavenPom();
         expectedPom.setSelf(getCoordinatesWithoutGroupId());

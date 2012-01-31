@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.nexus.internal;
 
-import static org.apache.commons.httpclient.HttpStatus.SC_MOVED_PERMANENTLY;
-import static org.apache.commons.httpclient.HttpStatus.SC_UNAUTHORIZED;
+import static org.apache.http.HttpStatus.SC_MOVED_PERMANENTLY;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,9 +20,12 @@ import java.text.MessageFormat;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.HttpClientParams;
+import org.apache.http.params.HttpParams;
 import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.nexus.NexusClient;
 import org.eclipse.skalli.nexus.NexusClientException;
@@ -31,6 +34,7 @@ import org.eclipse.skalli.nexus.internal.config.NexusConfig;
 import org.eclipse.skalli.nexus.internal.config.NexusResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.destination.DestinationService;
+import org.eclipse.skalli.services.destination.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -59,7 +63,8 @@ public class NexusClientImpl implements NexusClient {
 
         NexusConfig nexusConfig = configService.readCustomization(NexusResource.KEY, NexusConfig.class);
         if (nexusConfig == null) {
-            throw new NexusClientException(MessageFormat.format("Nexus configuration not found (key={0})", NexusResource.KEY));
+            throw new NexusClientException(MessageFormat.format("Nexus configuration not found (key={0})",
+                    NexusResource.KEY));
         }
 
         //hint, count=Integer.MAX_VALUE, does not work. the http request comes back without an error and from the result you cannot find out
@@ -79,25 +84,20 @@ public class NexusClientImpl implements NexusClient {
 
     }
 
-    Element getElementFromUrlResponse(URL nexusUrl) throws NexusClientException, IOException {
-        String externalForm = nexusUrl.toExternalForm();
-        GetMethod method = new GetMethod(externalForm);
-        method.setFollowRedirects(false);
+    Element getElementFromUrlResponse(URL nexusUrl) throws IOException, NexusClientException {
+        HttpClient client = destinationService.getClient(nexusUrl);
+        HttpParams params = client.getParams();
+        HttpClientParams.setRedirecting(params, false); // we want to find 301 (MOVED PERMANTENTLY)
+
+        HttpGet method = new HttpGet(nexusUrl.toExternalForm());
+        HttpResponse response = null;
         try {
-            int statusCode;
-            try {
-                LOG.info("GET " + nexusUrl); //$NON-NLS-1$
-                statusCode = destinationService.getClient(nexusUrl).executeMethod(method);
-                LOG.info(statusCode + " " + HttpStatus.getStatusText(statusCode)); //$NON-NLS-1$
-            } catch (HttpException e) {
-                throw new HttpException(MessageFormat.format("Problems found for {0}: {1}", nexusUrl,
-                        e.getMessage()), e);
-            } catch (IOException e) {
-                throw new IOException(MessageFormat.format("Problems found for {0}: {1}", nexusUrl,
-                        e.getMessage()), e);
-            }
-            if (statusCode == HttpStatus.SC_OK) {
-                InputStream in = method.getResponseBodyAsStream();
+            LOG.info("GET " + nexusUrl); //$NON-NLS-1$
+            response = client.execute(method);
+            int status = response.getStatusLine().getStatusCode();
+            LOG.info(status + " " + response.getStatusLine().getReasonPhrase()); //$NON-NLS-1$
+            if (status == HttpStatus.SC_OK) {
+                InputStream in = response.getEntity().getContent();
                 Document document;
                 try {
                     document = XMLUtils.documentFromStream(in);
@@ -110,21 +110,21 @@ public class NexusClientImpl implements NexusClient {
                 }
                 return document.getDocumentElement();
             } else {
-                switch (statusCode) {
+                switch (status) {
                 case SC_UNAUTHORIZED:
-                    throw new HttpException(MessageFormat.format("{0} found but authentication required", nexusUrl));
+                    throw new IOException(MessageFormat.format("{0} found but authentication required", nexusUrl));
                 case SC_MOVED_PERMANENTLY:
-                    throw new HttpException(
+                    throw new IOException(
                             MessageFormat.format("{0} not found. Resource has been moved permanently to {1}",
-                                    nexusUrl, method.getResponseHeader("Location")));
+                                    nexusUrl, response.getFirstHeader("Location")));
                 default:
-                    throw new HttpException(MessageFormat.format(
+                    throw new IOException(MessageFormat.format(
                             "{0} not found. Host reports a temporary problem: {1} {2}",
-                            nexusUrl, statusCode, method.getStatusText()));
+                            nexusUrl, status, response.getStatusLine().getReasonPhrase()));
                 }
             }
         } finally {
-            method.releaseConnection();
+            HttpUtils.consumeQuietly(response);
         }
     }
 

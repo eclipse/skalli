@@ -14,11 +14,15 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.regex.Pattern;
 
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
-import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.http.HttpHost;
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.destination.ConfigKeyProxy;
 import org.eclipse.skalli.services.destination.DestinationService;
@@ -31,12 +35,16 @@ public class DestinationServiceImpl implements DestinationService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DestinationServiceImpl.class);
 
-    // HTTP protocol stuff
-    private static final String PROTOCOL_SEPARATOR = "://"; //$NON-NLS-1$
-    private static final String PROTOCOL_HTTPS = HTTPS + PROTOCOL_SEPARATOR;
-    private static final String PROTOCOL_HTTP = HTTP + PROTOCOL_SEPARATOR;
+    private static final String HTTP = "http"; //$NON-NLS-1$
+    private static final String HTTPS = "https"; //$NON-NLS-1$
 
-    // RegExp for non proxy hosts
+    private static final String HTTP_PROXY_HOST = "http.proxyHost"; //$NON-NLS-1$
+    private static final String HTTP_PROXY_PORT = "http.proxyPort"; //$NON-NLS-1$
+    private static final String HTTPS_PROXY_HOST = "https.proxyHost"; //$NON-NLS-1$
+    private static final String HTTPS_PROXY_PORT = "https.proxyPort"; //$NON-NLS-1$
+    private static final String NON_PROXY_HOSTS = "proxy.nonProxyHosts"; //$NON-NLS-1$
+
+    // regular expression to sanitize non-proxy host parameter
     private static final String[] RE_SEARCH = new String[] { ";", "*", "." }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     private static final String[] RE_REPLACE = new String[] { "|", "(\\w|\\.|\\-)*", "\\." }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -49,13 +57,13 @@ public class DestinationServiceImpl implements DestinationService {
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[DestinationService] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
-        Protocol.registerProtocol(HTTPS, new Protocol(HTTPS, new AlwaysTrustSSLProtocolSocketFactory(), 443));
+        SSLBypass.activate();
     }
 
     protected void deactivate(ComponentContext context) {
         LOG.info(MessageFormat.format("[DestinationService] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
-        Protocol.unregisterProtocol(HTTPS);
+        SSLBypass.deactivate();
     }
 
     protected void bindConfigurationService(ConfigurationService configService) {
@@ -75,11 +83,12 @@ public class DestinationServiceImpl implements DestinationService {
                     "Protocol ''{0}'' is not suppported by this method", url.getProtocol()));
         }
 
-        HttpClient client = new HttpClient();
-        HttpConnectionManagerParams params = client.getHttpConnectionManager().getParams();
-        params.setConnectionTimeout(CONNECT_TIMEOUT);
-        params.setSoTimeout(READ_TIMEOUT);
-        params.setTcpNoDelay(true);
+        HttpParams params = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(params, CONNECT_TIMEOUT);
+        HttpConnectionParams.setSoTimeout(params, READ_TIMEOUT);
+        HttpConnectionParams.setTcpNoDelay(params, true);
+
+        HttpClient client = new DefaultHttpClient(params);
 
         if (!isLocalDomain(url)) {
             setProxy(client, url);
@@ -89,29 +98,50 @@ public class DestinationServiceImpl implements DestinationService {
     }
 
     private void setProxy(HttpClient client, URL url) {
-        String proxyHost = null;
-        int proxyPort = -1;
-        String nonProxyHostsPattern = StringUtils.EMPTY;
+        String protocol = url.getProtocol();
+
+        // use the system properties as default
+        String defaultProxyHost = System.getProperty(HTTP_PROXY_HOST);
+        String defaultProxyPort = System.getProperty(HTTP_PROXY_PORT);
+        String proxyHost = HTTPS.equals(protocol) ?
+                System.getProperty(HTTPS_PROXY_HOST, defaultProxyHost)
+                : defaultProxyHost;
+        int proxyPort = NumberUtils.toInt(HTTPS.equals(protocol) ?
+                System.getProperty(HTTPS_PROXY_PORT, defaultProxyPort)
+                : defaultProxyPort);
+        String nonProxyHosts = System.getProperty(NON_PROXY_HOSTS, StringUtils.EMPTY);
+
+        // allow to overwrite the system properties with configuration /api/config/proxy
         if (configService != null) {
-            String host = configService.readString(ConfigKeyProxy.HOST);
-            String port = configService.readString(ConfigKeyProxy.PORT);
-            String nonProxyHosts = configService.readString(ConfigKeyProxy.NONPROXYHOSTS);
-            if (StringUtils.isNotBlank(host) && StringUtils.isNotBlank(port) && StringUtils.isNumeric(port)) {
-                proxyHost = host;
-                proxyPort = Integer.valueOf(port);
-                if (StringUtils.isNotBlank(nonProxyHosts)) {
-                    nonProxyHostsPattern = StringUtils.replaceEach(StringUtils.deleteWhitespace(nonProxyHosts),
-                            RE_SEARCH, RE_REPLACE);
-                } else {
-                    nonProxyHostsPattern = StringUtils.EMPTY;
-                }
+            String defaultConfigProxyHost = configService.readString(ConfigKeyProxy.HOST);
+            String defaultConfigProxyPort = configService.readString(ConfigKeyProxy.PORT);
+            String configProxyHost = HTTPS.equals(protocol) ?
+                    configService.readString(ConfigKeyProxy.HTTPS_HOST)
+                    : defaultConfigProxyHost;
+            int configProxyPort = NumberUtils.toInt(HTTPS.equals(protocol) ?
+                    configService.readString(ConfigKeyProxy.HTTPS_PORT)
+                    : defaultConfigProxyPort);
+            if (StringUtils.isNotBlank(configProxyHost) && configProxyPort > 0) {
+                proxyHost = configProxyHost;
+                proxyPort = configProxyPort;
+            }
+            String configNonProxyHosts = configService.readString(ConfigKeyProxy.NONPROXYHOSTS);
+            if (StringUtils.isNotBlank(configNonProxyHosts)) {
+                nonProxyHosts = configNonProxyHosts;
             }
         }
+
+        // sanitize the nonProxyHost pattern (remove whitespace etc.)
+        if (StringUtils.isNotBlank(nonProxyHosts)) {
+            nonProxyHosts = StringUtils.replaceEach(StringUtils.deleteWhitespace(nonProxyHosts),
+                    RE_SEARCH, RE_REPLACE);
+        }
+
         if (StringUtils.isNotBlank(proxyHost)
-                && proxyPort >= 0
-                && !Pattern.matches(nonProxyHostsPattern, url.getHost())) {
-            HostConfiguration config = client.getHostConfiguration();
-            config.setProxy(proxyHost, proxyPort);
+                && proxyPort > 0
+                && !Pattern.matches(nonProxyHosts, url.getHost())) {
+            HttpHost proxy = new HttpHost(proxyHost, proxyPort, HTTP);
+            client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
         }
     }
 
