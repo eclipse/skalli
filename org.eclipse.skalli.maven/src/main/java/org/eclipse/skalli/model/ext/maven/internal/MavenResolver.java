@@ -185,7 +185,7 @@ public class MavenResolver implements Issuer {
                     throw new MavenValidationException(
                             new Issue(Severity.ERROR, MavenResolver.class, project,
                                     MavenProjectExt.class, MavenReactorProjectExt.PROPERTY_MAVEN_REACTOR,
-                                    url + " not found"));
+                                    MessageFormat.format("{0} not found", url)));
                 case SC_UNAUTHORIZED:
                     throw new MavenValidationException(
                             new Issue(Severity.WARNING, MavenResolver.class, project,

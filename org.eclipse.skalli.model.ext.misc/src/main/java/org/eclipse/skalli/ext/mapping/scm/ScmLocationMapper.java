@@ -33,6 +33,9 @@ public class ScmLocationMapper extends LinkMapperBase {
      */
     public static final String PURPOSE_COPY_TO_CLIPBOARD = "copy_to_clipboard"; //$NON-NLS-1$
 
+    /** Purpose filter for mappings used for resolving of Maven POMs */
+    public static final String MAVEN_RESOLVER = "maven-resolver"; //$NON-NLS-1$
+
     /** Purpose filter for mappings that provide activity information for a project. */
     public static final String PURPOSE_ACTIVITY = "activity"; //$NON-NLS-1$
 

@@ -230,12 +230,12 @@ public class MavenResolverRunnable implements Runnable {
         }
         ScmLocationMapper mapper = new ScmLocationMapper();
         List<ScmLocationMappingConfig> mappings = mapper.getMappings(configService,
-                "git", ScmLocationMapper.PURPOSE_BROWSE); //$NON-NLS-1$
+                "git", ScmLocationMapper.MAVEN_RESOLVER); //$NON-NLS-1$
         if (mappings.isEmpty()) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(MessageFormat.format(
                         "no suitable scm mapping found matching filter provider=''git'' && purpose=''{0}''",
-                        ScmLocationMapper.PURPOSE_BROWSE));
+                        ScmLocationMapper.MAVEN_RESOLVER));
             }
             return null;
         }
@@ -247,7 +247,7 @@ public class MavenResolverRunnable implements Runnable {
         if (LOG.isDebugEnabled()) {
             LOG.debug(MessageFormat.format(
                     "no suitable scm mapping found matching scmLocation=''{0}'' && purpose=''{1}''",
-                    scmLocation, ScmLocationMapper.PURPOSE_BROWSE));
+                    scmLocation, ScmLocationMapper.MAVEN_RESOLVER));
         }
         return null;
     }
