@@ -25,6 +25,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.eclipse.persistence.annotations.Index;
 import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.services.feed.Content;
 import org.eclipse.skalli.services.feed.FeedEntry;
@@ -93,9 +94,11 @@ public class EntryJPA implements FeedEntry {
     private PersonJPA author;
 
     @Column(nullable = false)
+    @Index
     private String projectId;
 
     @Column(length = SOURCE_LENGTH, nullable = false)
+    @Index
     private String source;
 
     @Override
