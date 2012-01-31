@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    targetNamespace="http://www.eclipse.org/skalli/2010/API"
+    xmlns="http://www.eclipse.org/skalli/2010/API"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    version="1.0">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="EN">
+      Copyright (c) 2010, 2011 SAP AG and others.
+      All rights reserved. This program and the accompanying materials
+      are made available under the terms of the Eclipse Public License v1.0
+      which accompanies this distribution, and is available at
+      http://www.eclipse.org/legal/epl-v10.html
+
+      Contributors:
+         SAP AG - initial API and implementation
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="propertyUpdate">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="template" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+</xsd:schema>

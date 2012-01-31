@@ -53,6 +53,9 @@ public class RestUtils {
     public static final String PARAM_COUNT = "count"; //$NON-NLS-1$
     public static final String PARAM_USER = "user"; //$NON-NLS-1$
     public static final String PARAM_TAG = "tag"; //$NON-NLS-1$
+    public static final String PARAM_PERSIST = "persist"; //$NON-NLS-1$
+    public static final String PARAM_PROPERTY = "property"; //$NON-NLS-1$
+    public static final String PARAM_PATTERN = "pattern"; //$NON-NLS-1$
 
 
     /**

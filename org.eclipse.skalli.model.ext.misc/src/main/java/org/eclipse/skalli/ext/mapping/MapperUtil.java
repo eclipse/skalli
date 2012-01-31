@@ -20,6 +20,7 @@ import org.apache.commons.lang.text.StrLookup;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.services.extension.PropertyLookup;
 
 public class MapperUtil {
 

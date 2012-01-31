@@ -3,11 +3,11 @@ package org.eclipse.skalli.model.ext.mapping;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.skalli.ext.mapping.PropertyLookup;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.PropertyLookup;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.eclipse.skalli.testutil.TestExtensionService;
 import org.junit.Assert;

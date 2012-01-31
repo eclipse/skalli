@@ -25,9 +25,9 @@ import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.ExtensionService;
-import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.project.ProjectService;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -121,7 +121,7 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
         writer.endNode();
     }
 
-    private void marshalExtension(ExtensibleEntityBase extensibleEntity, ExtensionService<?> extensionService,
+    protected void marshalExtension(ExtensibleEntityBase extensibleEntity, ExtensionService<?> extensionService,
             HierarchicalStreamWriter writer, MarshallingContext context) {
         Class<? extends ExtensionEntityBase> extensionClass = extensionService.getExtensionClass();
         if (extensionClass.equals(Project.class)) {

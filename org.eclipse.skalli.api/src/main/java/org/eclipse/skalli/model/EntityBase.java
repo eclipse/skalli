@@ -13,6 +13,7 @@ package org.eclipse.skalli.model;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -268,20 +269,44 @@ public abstract class EntityBase implements Comparable<Object> {
     }
 
     private Method getMethod(String propertyName) {
-        Method getter = getMethod("get", propertyName); //$NON-NLS-1$
+        Method getter = getMethod("get", propertyName, new Class[] {}); //$NON-NLS-1$
         if (getter == null) {
-            getter = getMethod("is", propertyName); //$NON-NLS-1$
+            getter = getMethod("is", propertyName, new Class[] {}); //$NON-NLS-1$
         }
         return getter;
     }
 
-    private Method getMethod(String prefix, String propertyName) {
-        String methodName = prefix + StringUtils.capitalize(propertyName);
+    /**
+     * Sets the value for the given property, if that property exists.
+     *
+     * @param propertyName  the identifier of the property.
+     * @param propertyValue  value of the property.
+     * @throws Exception
+     * @throws NoSuchPropertyException  if no property with the given name
+     * exists.
+     *
+     * @see org.eclipse.skalli.services.projects.PropertyName
+     */
+    public void setProperty(String propertyName, Object propertyValue) throws Exception {
+        Class<? extends Object> paramType = (propertyValue instanceof Collection) ? Collection.class : String.class;
+        Method method = getMethod("set", propertyName, new Class[] { paramType }); //$NON-NLS-1$
+        if (method == null) {
+            throw new NoSuchPropertyException(this, propertyName);
+        }
         try {
-            return getClass().getMethod(methodName, new Class[] {});
+            method.invoke(this, propertyValue);
+        } catch (Exception e) {
+           throw new Exception(MessageFormat.format("Property {0} could not be updated", propertyName), e);
+        }
+    }
+
+    private Method getMethod(String methodPrefix, String propertyName, Class[] methodArgs) {
+        String methodName = methodPrefix + StringUtils.capitalize(propertyName);
+        try {
+            return getClass().getMethod(methodName, methodArgs);
         } catch (NoSuchMethodException e) {
-            LOG.debug(MessageFormat.format("Entity of type {0} does not have a getter {1} for property {2}", getClass()
-                    .getName(), methodName, propertyName));
+            LOG.debug(MessageFormat.format("Entity of type {0} does not have a {1}ter {2} for property {3}", getClass()
+                    .getName(), methodPrefix, methodName, propertyName));
         }
         return null;
     }
