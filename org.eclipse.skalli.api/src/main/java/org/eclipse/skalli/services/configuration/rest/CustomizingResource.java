@@ -10,9 +10,6 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.configuration.rest;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 
 import com.thoughtworks.xstream.XStream;
@@ -27,14 +24,6 @@ public abstract class CustomizingResource<T> extends ConfigResourceBase<T> {
      * @return
      */
     protected abstract String getKey();
-
-    /**
-     * Defines classes (in addition to  {@link #getConfigClass()}) that should be known to (and parsed for annotations by) the serializer.
-     * @return
-     */
-    protected List<Class<?>> getAdditionalConfigClasses() {
-        return Collections.emptyList();
-    };
 
     @Override
     protected final XStream getXStream() {

@@ -8,6 +8,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.thoughtworks.xstream,
  com.thoughtworks.xstream.annotations,
  com.thoughtworks.xstream.converters,
+ com.thoughtworks.xstream.converters.basic,
  com.thoughtworks.xstream.io,
  com.thoughtworks.xstream.mapper,
  javax.mail,
@@ -110,7 +111,8 @@ Service-Component: OSGI-INF/EventComponent.xml,
  OSGI-INF/CoreRoleComponent.xml,
  OSGI-INF/FeedManagerComponent.xml,
  OSGI-INF/FeedUpdaterConfigSection.xml,
- OSGI-INF/FeedUpdaterRunnable.xml
+ OSGI-INF/FeedUpdaterRunnable.xml,
+ OSGI-INF/DestinationsConfigSection.xml
 Web-ContextPath: /api
 Webapp-Context: /api
 Bundle-ActivationPolicy: lazy
