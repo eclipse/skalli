@@ -11,19 +11,17 @@
 package org.eclipse.skalli.api.rest.internal.resources;
 
 import java.util.HashSet;
-import java.util.List;
 
 import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
-import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.search.PagingInfo;
 import org.eclipse.skalli.services.search.QueryParseException;
-import org.eclipse.skalli.services.search.SearchService;
+import org.eclipse.skalli.services.search.SearchResult;
+import org.eclipse.skalli.services.search.SearchUtils;
 import org.restlet.data.Form;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -52,18 +50,9 @@ public class ProjectsResource extends ResourceBase {
                 count = Integer.MAX_VALUE;
             }
 
-            List<Project> projectList = null;
-            if (query != null) {
-                SearchService searchService = Services.getRequiredService(SearchService.class);
-                projectList = searchService.findProjectsByQuery(query, new PagingInfo(start, count)).getEntities();
-            } else if (tag != null) {
-                SearchService searchService = Services.getRequiredService(SearchService.class);
-                projectList = searchService.findProjectsByTag(tag, new PagingInfo(start, count)).getEntities();
-            } else {
-                ProjectService projectService = Services.getRequiredService(ProjectService.class);
-                projectList = projectService.getAll();
-            }
-            for (Project project : projectList) {
+            SearchResult<Project> projectList = SearchUtils.searchProjects(query, tag, null, new PagingInfo(start, count));
+
+            for (Project project : projectList.getEntities()) {
                 projects.getProjects().add(project);
             }
 

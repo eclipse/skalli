@@ -19,10 +19,9 @@ import javax.servlet.ServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
-import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.search.PagingInfo;
 import org.eclipse.skalli.services.search.SearchResult;
-import org.eclipse.skalli.services.search.SearchService;
+import org.eclipse.skalli.services.search.SearchUtils;
 import org.eclipse.skalli.view.Consts;
 
 public class SearchFilter extends AbstractSearchFilter {
@@ -49,26 +48,15 @@ public class SearchFilter extends AbstractSearchFilter {
 
     @Override
     protected SearchResult<Project> getSearchHits(User user, ServletRequest request, ServletResponse response,
-            int start,
-            int viewSize) throws IOException, ServletException {
+            int start, int viewSize) throws IOException, ServletException {
 
         String query = request.getParameter(Consts.PARAM_QUERY);
         String tagquery = request.getParameter(Consts.PARAM_TAG);
         String userquery = request.getParameter(Consts.PARAM_USER);
 
-        SearchService searchService = Services.getService(SearchService.class);
         SearchResult<Project> result = null;
-
         try {
-            if (query != null) {
-                result = searchService.findProjectsByQuery(query, new PagingInfo(start, viewSize));
-            } else if (tagquery != null) {
-                result = searchService.findProjectsByTag(tagquery, new PagingInfo(start, viewSize));
-            } else if (userquery != null) {
-                result = searchService.findProjectsByUser(userquery, new PagingInfo(start, viewSize));
-            } else {
-                result = searchService.findProjectsByQuery("*", new PagingInfo(start, viewSize)); //$NON-NLS-1$
-            }
+            result = SearchUtils.searchProjects(query, tagquery, userquery, new PagingInfo(start, viewSize));
         } catch (Exception e) {
             FilterUtil.handleException(request, response, e);
         }
