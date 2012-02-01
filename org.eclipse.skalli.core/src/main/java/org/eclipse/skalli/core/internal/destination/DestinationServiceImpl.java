@@ -12,17 +12,25 @@ package org.eclipse.skalli.core.internal.destination;
 
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.eclipse.skalli.destination.internal.config.Destination;
+import org.eclipse.skalli.destination.internal.config.DestinationsConfig;
+import org.eclipse.skalli.destination.internal.config.DestinationsResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.destination.ConfigKeyProxy;
 import org.eclipse.skalli.services.destination.DestinationService;
@@ -88,13 +96,50 @@ public class DestinationServiceImpl implements DestinationService {
         HttpConnectionParams.setSoTimeout(params, READ_TIMEOUT);
         HttpConnectionParams.setTcpNoDelay(params, true);
 
-        HttpClient client = new DefaultHttpClient(params);
+        DefaultHttpClient client = new DefaultHttpClient(params);
 
         if (!isLocalDomain(url)) {
             setProxy(client, url);
         }
 
+        setAuthentication(client, url);
+
         return client;
+    }
+
+    private void setAuthentication(DefaultHttpClient client, URL url) {
+        if (configService == null) {
+            return;
+        }
+
+        DestinationsConfig config = configService.readCustomization(DestinationsResource.KEY, DestinationsConfig.class);
+        if (config == null) {
+            return;
+        }
+
+        for (Destination destination : config.getDestinations()) {
+            Pattern regex = Pattern.compile(destination.getPattern());
+            Matcher matcher = regex.matcher(url.toExternalForm());
+            if (matcher.matches()) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(MessageFormat.format("matched URL {0} with destination ''{1}''", url.toExternalForm(),
+                            destination.getId()));
+                }
+                if (StringUtils.isNotBlank(destination.getUser()) && StringUtils.isNotBlank(destination.getPattern())) {
+                    String authenticationMethod = destination.getAuthenticationMethod();
+                    if ("basic".equalsIgnoreCase(authenticationMethod)) { //$NON-NLS-1$
+                        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+                        credsProvider.setCredentials(AuthScope.ANY,
+                                new UsernamePasswordCredentials(destination.getUser(), destination.getPassword()));
+                        client.setCredentialsProvider(credsProvider);
+                    } else if (StringUtils.isNotBlank(authenticationMethod)) {
+                        LOG.warn(MessageFormat.format("Authentication method ''{1}'' is not supported",
+                                authenticationMethod));
+                    }
+                }
+                break;
+            }
+        }
     }
 
     private void setProxy(HttpClient client, URL url) {
