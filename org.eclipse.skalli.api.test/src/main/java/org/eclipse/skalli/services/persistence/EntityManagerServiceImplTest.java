@@ -1,11 +1,13 @@
 package org.eclipse.skalli.services.persistence;
 
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.persistence.Cache;
 import javax.persistence.EntityManager;
@@ -25,6 +27,7 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.junit.Test;
 import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 
+@SuppressWarnings("nls")
 public class EntityManagerServiceImplTest {
 
     private static final String TEST_JPA_UNIT_NAME = "EntityManagerServiceImplTestJpaUnitName";
@@ -360,5 +363,17 @@ public class EntityManagerServiceImplTest {
         properties.put(EntityManagerServiceBase.SKALLI_PERSISTENCE + PersistenceUnitProperties.TARGET_DATABASE,
                 TEST_TARGET_DB);
         return properties;
+    }
+
+    @Test
+    public void testGetAllPersistenceProperties() {
+        Set<String> allFieldValues = EntityManagerServiceBase.getPublicStaticFinalFieldValues(PersistenceUnitProperties.class);
+
+        //check that the most relevant properties of PersistenceUnitProperties have not disappeared
+        assertThat(allFieldValues, hasItems(PersistenceUnitProperties.JDBC_DRIVER,
+                PersistenceUnitProperties.JDBC_URL,
+                PersistenceUnitProperties.JDBC_USER,
+                PersistenceUnitProperties.JDBC_PASSWORD,
+                PersistenceUnitProperties.TARGET_DATABASE));
     }
 }

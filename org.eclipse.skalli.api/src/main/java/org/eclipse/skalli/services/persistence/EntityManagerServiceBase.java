@@ -1,7 +1,10 @@
 package org.eclipse.skalli.services.persistence;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,7 +15,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationProperties;
-import org.eclipse.skalli.services.persistence.internal.ReflectionUtil;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jpa.EntityManagerFactoryBuilder;
@@ -36,8 +38,8 @@ public class EntityManagerServiceBase implements EntityManagerService {
 
     private static final Logger LOG = LoggerFactory.getLogger(EntityManagerServiceBase.class);
 
-    private static final Set<String> ALL_PERSISTENCE_PROPERTIES = ReflectionUtil
-            .getPublicStaticFinalFieldValues(PersistenceUnitProperties.class);
+    private static final Set<String> ALL_PERSISTENCE_PROPERTIES =
+            getPublicStaticFinalFieldValues(PersistenceUnitProperties.class);
 
     static final String SKALLI_PERSISTENCE = "skalli.persistence."; //$NON-NLS-1$
 
@@ -213,7 +215,7 @@ public class EntityManagerServiceBase implements EntityManagerService {
 
     public void bindEntityManagerFactoryBuilder(EntityManagerFactoryBuilder emfb, Map<Object, Object> properties) {
         this.emfb = emfb;
-        Object value = properties.get("osgi.unit.name");
+        Object value = properties.get("osgi.unit.name"); //$NON-NLS-1$
         this.jpaUnitName = (value == null ? null : value.toString());
     }
 
@@ -221,4 +223,24 @@ public class EntityManagerServiceBase implements EntityManagerService {
         this.emfb = null;
     }
 
+    static public Set<String> getPublicStaticFinalFieldValues(Class<?> clazz) {
+        Set<String> properties = new HashSet<String>();
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            if (field.getType().isAssignableFrom(String.class)) {
+                int mod = field.getModifiers();
+                if (Modifier.isPublic(mod) && Modifier.isStatic(mod) && Modifier.isFinal(mod)) {
+                    try {
+                        String propertyValue = field.get(null).toString();
+                        if (StringUtils.isNotBlank(propertyValue)) {
+                            properties.add(propertyValue);
+                        }
+                    } catch (Exception e) {
+                        // should not happen, nothing to do
+                    }
+                }
+            }
+        }
+        return properties;
+    }
 }
