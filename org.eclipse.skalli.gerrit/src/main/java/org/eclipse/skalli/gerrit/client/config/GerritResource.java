@@ -31,6 +31,7 @@ public class GerritResource extends ConfigResource<ConfigKeyGerrit, GerritConfig
     @Override
     protected Map<ConfigKey, String> configToMap(GerritConfig configObject) {
         Map<ConfigKey, String> ret = new HashMap<ConfigKey, String>();
+        ret.put(ConfigKeyGerrit.PROTOCOL, configObject.getProtocol());
         ret.put(ConfigKeyGerrit.HOST, configObject.getHost());
         ret.put(ConfigKeyGerrit.PORT, configObject.getPort());
         ret.put(ConfigKeyGerrit.USER, configObject.getUser());
@@ -44,6 +45,7 @@ public class GerritResource extends ConfigResource<ConfigKeyGerrit, GerritConfig
     @Override
     protected GerritConfig mapToConfig(Map<ConfigKeyGerrit, String> values) {
         GerritConfig ret = new GerritConfig();
+        ret.setProtocol(values.get(ConfigKeyGerrit.PROTOCOL));
         ret.setHost(values.get(ConfigKeyGerrit.HOST));
         ret.setPort(values.get(ConfigKeyGerrit.PORT));
         ret.setUser(values.get(ConfigKeyGerrit.USER));

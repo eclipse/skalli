@@ -15,6 +15,7 @@ import org.eclipse.skalli.services.configuration.ConfigKey;
 @SuppressWarnings("nls")
 public enum ConfigKeyGerrit implements ConfigKey {
 
+    PROTOCOL("scm.gerrit.protocol", "git", false),
     HOST("scm.gerrit.host", "", false),
     PORT("scm.gerrit.port", "", false),
     USER("scm.gerrit.username", "", false),

@@ -407,7 +407,7 @@ public class GitGerritFilter implements Filter {
      */
     @SuppressWarnings("nls")
     private String getScmLocationStaticPart() {
-        return String.format("%sgit://%s/", GIT_PREFIX, fromConfig(ConfigKeyGerrit.HOST));
+        return String.format("%s%s://%s/", GIT_PREFIX, fromConfig(ConfigKeyGerrit.PROTOCOL), fromConfig(ConfigKeyGerrit.HOST));
     }
 
     /**

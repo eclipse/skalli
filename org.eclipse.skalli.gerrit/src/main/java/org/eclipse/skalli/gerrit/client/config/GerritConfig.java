@@ -15,6 +15,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("gerrit")
 public class GerritConfig {
 
+    private String protocol;
     private String host;
     private String port;
     private String user;
@@ -22,6 +23,14 @@ public class GerritConfig {
     private String passphrase;
     private String contact;
     private String parent;
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
 
     public String getHost() {
         return host;
