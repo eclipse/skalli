@@ -22,11 +22,13 @@ public class DefaultProjectTemplate extends ProjectTemplateBase {
 
     private static final String TEMPLATE_DISPLAYNAME = "Free-Style Project";
     private static final String TEMPLATE_DESCRIPTION =
-            "Compose a project freely from all available project natures and enter exactly the information you need.<br/>"
-          + "This kind of project represents a group of people working on a topic, for example a TGiF innovation. "
-          + "It can have subprojects allowing to break down the topic into more manageable pieces or represent "
-          + "different parallel work streams. Furthermore, you can assign component-like subprojects, for example"
-          + "Free-Style Components, to represent the more technical aspects of the topic.";
+            "Compose a project freely from all available plugins and enter exactly the information you need.<br/>"
+          + "In Skalli's philosophy projects are about people — they represent a group of people that work together on "
+          + "a common topic. A project can have subprojects allowing to break down the topic into more manageable pieces "
+          + "or represent different parallel work streams. Furthermore, you may assign component-like subprojects "
+          + "to represent the more technical aspects of the topic.<br/>"
+          + "If in doubt, what template fits best to your needs, <b>start with a Free-Style Project</b> "
+          + "and replace the template later on as necessary.";
 
     @Override
     public String getId() {

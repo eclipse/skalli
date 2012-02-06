@@ -19,15 +19,11 @@ public class DefaultComponentTemplate extends DefaultProjectTemplate {
 
     private static final String TEMPLATE_DISPLAYNAME = "Free-Style Component";
     private static final String TEMPLATE_DESCRIPTION =
-            "Compose a component freely from all available project natures and enter exactly the information you need.<br/>"
-                    +
-                    "This kind of project represents the technical aspects of a project "
-                    +
-                    "like source code, repositories, artifacts, build jobs, technical documentation and so on. "
-                    +
-                    "You can assign a Free-Style Component for example to a Free-Style Project, and you can assign other "
-                    +
-                    "Free-Style Components to it.";
+            "Compose a component freely from all available plugins and enter exactly the information you need.<br/>"
+          + "This template is suitable to represent the more technical aspects of a project. A typical use case "
+          + "for a component would be to represent an orbit repository. Or you might want to split the source code"
+          + "of your project into multiple independent parts, each with its own source repository.<br/>"
+          + "Components must always be assigned to a parent project or other component.";
 
     @Override
     public String getId() {
