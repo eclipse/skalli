@@ -11,9 +11,14 @@
 package org.eclipse.skalli.core.internal.destination;
 
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -22,7 +27,11 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
@@ -52,6 +61,9 @@ public class DestinationServiceImpl implements DestinationService {
     private static final String HTTPS_PROXY_PORT = "https.proxyPort"; //$NON-NLS-1$
     private static final String NON_PROXY_HOSTS = "proxy.nonProxyHosts"; //$NON-NLS-1$
 
+    @SuppressWarnings("nls")
+    private static final String[] SSL_PROTOCOLS = new String[] { "TLS", "SSLv3", "SSLv2", "SSL" };
+
     // regular expression to sanitize non-proxy host parameter
     private static final String[] RE_SEARCH = new String[] { ";", "*", "." }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     private static final String[] RE_REPLACE = new String[] { "|", "(\\w|\\.|\\-)*", "\\." }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -65,13 +77,11 @@ public class DestinationServiceImpl implements DestinationService {
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[DestinationService] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
-        SSLBypass.activate();
     }
 
     protected void deactivate(ComponentContext context) {
         LOG.info(MessageFormat.format("[DestinationService] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
-        SSLBypass.deactivate();
     }
 
     protected void bindConfigurationService(ConfigurationService configService) {
@@ -96,7 +106,7 @@ public class DestinationServiceImpl implements DestinationService {
         HttpConnectionParams.setSoTimeout(params, READ_TIMEOUT);
         HttpConnectionParams.setTcpNoDelay(params, true);
 
-        DefaultHttpClient client = new DefaultHttpClient(params);
+        DefaultHttpClient client = createClient(url, params);
 
         if (!isLocalDomain(url)) {
             setProxy(client, url);
@@ -185,7 +195,7 @@ public class DestinationServiceImpl implements DestinationService {
         if (StringUtils.isNotBlank(proxyHost)
                 && proxyPort > 0
                 && !Pattern.matches(nonProxyHosts, url.getHost())) {
-            HttpHost proxy = new HttpHost(proxyHost, proxyPort, HTTP);
+            HttpHost proxy = new HttpHost(proxyHost, proxyPort, protocol);
             client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
         }
     }
@@ -212,4 +222,47 @@ public class DestinationServiceImpl implements DestinationService {
     private boolean isLocalDomain(URL url) {
         return url.getHost().indexOf('.') < 0;
     }
+
+    private DefaultHttpClient createClient(URL url, HttpParams params) {
+        DefaultHttpClient client = new DefaultHttpClient(params);
+        if (HTTPS.equals(url.getProtocol())) {
+            SSLContext sslContext = getSSLContext();
+            try {
+                sslContext.init(null, new TrustManager[]{ new AlwaysTrustX509Manager() }, null);
+            } catch (KeyManagementException e) {
+                // should not happen since we do not use any keystore
+                throw new IllegalStateException("Failed to initialize SSL context", e);
+            }
+            SSLSocketFactory socketFactory = new SSLSocketFactory(sslContext, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            ClientConnectionManager connectionManager = client.getConnectionManager();
+            SchemeRegistry schemeRegistry = connectionManager.getSchemeRegistry();
+            schemeRegistry.register(new Scheme(HTTPS, getPort(url), socketFactory));
+            client = new DefaultHttpClient(connectionManager, params);
+        }
+        return client;
+    }
+
+    private int getPort(URL url) {
+        int port = url.getPort();
+        if ((port <= 0) || (port > 0xffff)) {
+            port = HTTP.equals(url.getProtocol())? 80 : 443;
+        }
+        return port;
+    }
+
+    private SSLContext getSSLContext() {
+        SSLContext sslContext = null;
+        for (int i = 0; i < SSL_PROTOCOLS.length && sslContext == null; ++i) {
+            try {
+                sslContext = SSLContext.getInstance(SSL_PROTOCOLS[i]);
+            } catch (NoSuchAlgorithmException e) {
+                LOG.debug(MessageFormat.format("SSL protocol {0} is not supported by the platform", SSL_PROTOCOLS[i]));
+            }
+        }
+        if (sslContext == null) {
+            throw new IllegalStateException("Platform does not support a suitable SSL protocol");
+        }
+        return sslContext;
+    }
+
 }
