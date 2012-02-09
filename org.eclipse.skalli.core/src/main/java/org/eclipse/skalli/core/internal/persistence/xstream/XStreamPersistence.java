@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -44,6 +45,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.ConversionException;
@@ -58,6 +61,7 @@ public class XStreamPersistence implements Issuer {
     private static final String TAG_VERSION = "version"; //$NON-NLS-1$
     private static final String TAG_MODIFIED_BY = "modifiedBy"; //$NON-NLS-1$
     private static final String TAG_LAST_MODIFIED = "lastModified"; //$NON-NLS-1$
+    private static final String TAG_INHERITED_EXTENSIONS = "inheritedExtensions"; //$NON-NLS-1$
 
     private static final Logger LOG = LoggerFactory.getLogger(XStreamPersistence.class);
 
@@ -123,6 +127,50 @@ public class XStreamPersistence implements Issuer {
                 }
             }
         }
+    }
+
+    void mapInheritedExtensions(Document doc, Map<String, String> aliases) throws MigrationException {
+        if (aliases == null || aliases.isEmpty()) {
+            return;
+        }
+        Element inheritedElement = MigrationUtils.getElementOfEntity(doc, TAG_INHERITED_EXTENSIONS);
+        if (inheritedElement != null) {
+            NodeList nodes = inheritedElement.getChildNodes();
+            if (nodes != null) {
+                for (int i = 0; i < nodes.getLength(); i++) {
+                    Node node = nodes.item(i);
+                    if ("string".equals(node.getNodeName())) { //$NON-NLS-1$
+                        mapTextContent((Element)node, aliases);
+                    }
+                }
+            }
+        }
+    }
+
+    void mapTextContent(Element stringElement, Map<String, String> aliases) {
+        String alias = stringElement.getTextContent();
+        if (StringUtils.isNotBlank(alias)) {
+            String mapped = aliases.get(alias);
+            if (mapped != null) {
+                stringElement.setTextContent(mapped);
+            }
+        }
+    }
+
+    Map<String, String> byAlias(Map<String, Class<?>> aliases) {
+        Map<String, String> map = new HashMap<String, String>(aliases.size());
+        for (Map.Entry<String, Class<?>> entry: aliases.entrySet()) {
+            map.put(entry.getKey(), entry.getValue().getName());
+        }
+        return map;
+    }
+
+    Map<String, String> byClassNames(Map<String, Class<?>> aliases) {
+        Map<String, String> map = new HashMap<String, String>(aliases.size());
+        for (Map.Entry<String, Class<?>> entry: aliases.entrySet()) {
+            map.put(entry.getValue().getName(), entry.getKey());
+        }
+        return map;
     }
 
     String getLastModifiedAttribute(Element element) {
@@ -221,6 +269,8 @@ public class XStreamPersistence implements Issuer {
         }
 
         Document newDoc = entityToDom(entity, aliases, converters);
+        mapInheritedExtensions(newDoc, byClassNames(aliases));
+
         Document oldDoc = readEntityAsDom(entityClass, entity.getUuid().toString());
         postProcessXML(newDoc, oldDoc, aliases, userId, entityService.getModelVersion());
 
@@ -280,10 +330,13 @@ public class XStreamPersistence implements Issuer {
         }
 
         preProcessXML(doc, migrations, aliases, entityService.getModelVersion());
+        mapInheritedExtensions(doc, byAlias(aliases));
+
         EntityBase entity = domToEntity(classLoaders, aliases, converters, doc);
         if (entity == null) {
             return null;
         }
+
         postProcessEntity(doc, entity, aliases);
         LOG.info(MessageFormat.format("Loaded entity {0}", entity.getUuid()));
 

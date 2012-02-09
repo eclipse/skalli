@@ -65,12 +65,10 @@ public class ExtensionServiceLinkGroups
         return DESCRIPTION;
     }
 
-
-
     @Override
     public Map<String, Class<?>> getAliases() {
         Map<String, Class<?>> aliases = super.getAliases();
-        aliases.put("linkgroup", LinkGroup.class); //$NON-NLS-1$
+        aliases.put("linkGroup", LinkGroup.class); //$NON-NLS-1$
         aliases.put("link", Link.class); //$NON-NLS-1$
         return aliases;
     }
