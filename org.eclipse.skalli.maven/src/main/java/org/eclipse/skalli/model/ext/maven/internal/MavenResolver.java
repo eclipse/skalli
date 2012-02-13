@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -109,12 +111,15 @@ public class MavenResolver implements Issuer {
         Set<String> moduleTags = reactorPom.getModuleTags();
         for (String moduleTag : moduleTags) {
             String normalizedPath = getNormalizedPath(reactorPomPath, moduleTag);
-            mavenReactor.addModules(getModules(scmLocation, normalizedPath, self));
+            List<String> visitedPaths = new ArrayList<String>();
+            visitedPaths.add(normalizedPath);
+            mavenReactor.addModules(getModules(visitedPaths, scmLocation, normalizedPath, self));
         }
         return mavenReactor;
     }
 
-    private Set<MavenModule> getModules(String scmLocation, String relativePath, MavenModule parent)
+    private Set<MavenModule> getModules(List<String> visitedPaths, String scmLocation,
+            String relativePath, MavenModule parent)
             throws IOException, MavenValidationException {
         TreeSet<MavenModule> result = new TreeSet<MavenModule>();
         MavenPom modulePom = getMavenPom(scmLocation, relativePath);
@@ -126,7 +131,10 @@ public class MavenResolver implements Issuer {
         Set<String> moduleTags = modulePom.getModuleTags();
         for (String moduleTag : moduleTags) {
             String normalizedPath = getNormalizedPath(relativePath, moduleTag);
-            result.addAll(getModules(scmLocation, normalizedPath, self));
+            if (!visitedPaths.contains(normalizedPath)) {
+                visitedPaths.add(normalizedPath);
+                result.addAll(getModules(visitedPaths, scmLocation, normalizedPath, self));
+            }
         }
         return result;
     }

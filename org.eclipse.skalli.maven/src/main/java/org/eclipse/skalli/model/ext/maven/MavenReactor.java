@@ -13,6 +13,7 @@ package org.eclipse.skalli.model.ext.maven;
 import java.util.Collection;
 import java.util.TreeSet;
 
+import org.eclipse.skalli.commons.ComparatorUtils;
 import org.eclipse.skalli.model.Derived;
 
 public class MavenReactor {
@@ -43,13 +44,45 @@ public class MavenReactor {
 
     public void addModule(MavenModule module) {
         if (module != null) {
-            getModules().add(module);
+            if (!hasModule(module)) {
+                getModules().add(module);
+            }
         }
+    }
+
+    private boolean hasModule(MavenModule module) {
+        for (MavenModule mavenModule : getModules()) {
+            if (isSame(module, mavenModule)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isSame(MavenModule mod1, MavenModule mod2) {
+        if (mod1 == null && mod2 == null) {
+            return true;
+        }
+        if (mod1 == null) {
+            return false;
+        }
+        if (mod2 == null) {
+            return false;
+        }
+        if (!ComparatorUtils.equals(mod1.getGroupId(), mod2.getGroupId())) {
+            return false;
+        }
+        if (!ComparatorUtils.equals(mod1.getArtefactId(), mod2.getArtefactId())) {
+            return false;
+        }
+        return false;
     }
 
     public void addModules(Collection<MavenModule> modules) {
         if (modules != null) {
-            getModules().addAll(modules);
+            for (MavenModule mavenModule : modules) {
+                addModule(mavenModule);
+            }
         }
     }
 
