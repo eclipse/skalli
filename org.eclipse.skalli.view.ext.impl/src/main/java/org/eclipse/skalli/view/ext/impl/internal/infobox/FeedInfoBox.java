@@ -25,8 +25,10 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.HtmlBuilder;
+import org.eclipse.skalli.commons.Link;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.feed.Entry;
 import org.eclipse.skalli.services.feed.FeedProvider;
 import org.eclipse.skalli.services.feed.FeedService;
@@ -88,6 +90,16 @@ public class FeedInfoBox extends InfoBox implements ProjectInfoBox {
 
     protected void unbindFeedProvider(FeedProvider feedProvider) {
         feedProviders.remove(feedProvider);
+    }
+
+    private ConfigurationService configService;
+
+    protected void bindConfigurationService(ConfigurationService configService) {
+        this.configService = configService;
+    }
+
+    protected void unbindConfigurationService(ConfigurationService configService) {
+        this.configService = null;
     }
 
     @Override
@@ -185,7 +197,7 @@ public class FeedInfoBox extends InfoBox implements ProjectInfoBox {
 
                 List<Entry> entries = feedService.findEntries(project.getUuid(), selectedSources,
                         maxFeedEntries + 1);
-                createLabel(layout, getEntriesAsHtml(entries, Math.min(entries.size(), maxFeedEntries))
+                createLabel(layout, getEntriesAsHtml(project, entries, Math.min(entries.size(), maxFeedEntries))
                         .toString());
 
                 if (entries.size() > maxFeedEntries) {
@@ -213,10 +225,10 @@ public class FeedInfoBox extends InfoBox implements ProjectInfoBox {
         layout.addComponent(moreButton);
     }
 
-    private HtmlBuilder getEntriesAsHtml(List<Entry> entries, int maxCount) {
+    private HtmlBuilder getEntriesAsHtml(Project project,List<Entry> entries, int maxCount) {
         HtmlBuilder html = new HtmlBuilder();
         for (int i = 0; i < maxCount; i++) {
-            addEntry(html, entries.get(i));
+            addEntry(project, html, entries.get(i));
         }
         return html;
     }
@@ -251,7 +263,7 @@ public class FeedInfoBox extends InfoBox implements ProjectInfoBox {
     }
 
     @SuppressWarnings("nls")
-    private void addEntry(HtmlBuilder html, Entry entry) {
+    private void addEntry(Project project, HtmlBuilder html, Entry entry) {
         html.append("<p class=\"").append(STYLE_TIMELINE_ENTRY).append("\">");
 
         String title = StringUtils.abbreviate(entry.getTitle(), MAX_DISPLAY_LENGTH_TITLE);
@@ -260,6 +272,9 @@ public class FeedInfoBox extends InfoBox implements ProjectInfoBox {
         if (entry.getLink() != null) {
             link = entry.getLink().getHref();
         }
+
+        link = mapLink(project, link);
+
         html.appendLink(title, link);
 
         html.append("<br />");
@@ -279,6 +294,25 @@ public class FeedInfoBox extends InfoBox implements ProjectInfoBox {
             html.append(" - ").append(author);
         }
         html.append("</p>");
+    }
+
+    private String mapLink(Project project, String link) {
+        if (configService == null) {
+            return link;
+        }
+        ScmLocationMapper mapper = new ScmLocationMapper();
+        List<Link> mappedScmLinks = mapper.getMappedLinks(configService, project.getUuid().toString(), link,
+                ScmLocationMapper.PURPOSE_FEED_LINK);
+        if (mappedScmLinks.size() == 0) {
+            LOG.debug("no mapping for feed link ='" + link + "' with purpose = '" + ScmLocationMapper.PURPOSE_FEED_LINK
+                    + "' defined.");
+            return link;
+        }
+
+
+            // take the first found mapping
+            return mappedScmLinks.get(0).getUrl();
+
     }
 
     @SuppressWarnings("nls")

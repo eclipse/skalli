@@ -29,4 +29,11 @@
         policy="dynamic"
         bind="bindFeedProvider"
         unbind="unbindFeedProvider"/>
+    <reference
+      name="ConfigurationService"
+      bind="bindConfigurationService"
+      unbind="unbindConfigurationService"
+      interface="org.eclipse.skalli.services.configuration.ConfigurationService"
+      cardinality="0..1"
+      policy="dynamic"/>
 </scr:component>

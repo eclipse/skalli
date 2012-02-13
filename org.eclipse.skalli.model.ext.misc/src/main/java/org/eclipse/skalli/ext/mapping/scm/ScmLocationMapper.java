@@ -48,6 +48,8 @@ public class ScmLocationMapper extends LinkMapperBase {
     /** Purpose filter for mappings that provide feeds for source locations. */
     public static final String PURPOSE_FEED = "feed"; //$NON-NLS-1$
 
+    public static final String PURPOSE_FEED_LINK = "feed-link"; //$NON-NLS-1$
+
     public static final String ALL_PROVIDERS = "*"; //$NON-NLS-1$
 
     public List<ScmLocationMappingConfig> getMappings(ConfigurationService configService, String provider,
