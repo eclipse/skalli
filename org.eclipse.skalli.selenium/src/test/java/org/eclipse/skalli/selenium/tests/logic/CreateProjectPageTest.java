@@ -246,8 +246,10 @@ public class CreateProjectPageTest {
         relatedProjectsExtensionEditForm.isDisplayedWithExplicitWait();
 
         relatedProjectsExtensionEditForm.makeExtensionEditable();
+        relatedProjectsExtensionEditForm.isDisplayedWithExplicitWait();
 
         relatedProjectsExtensionEditForm.checkCalculateRelatedProjectCheckBox(false);
+        relatedProjectsExtensionEditForm.isDisplayedWithExplicitWait();
 
         relatedProjectsExtensionEditForm.clickAddRelatedProjectLink();
         relatedProjectsExtensionEditForm.isDisplayedWithExplicitWait();
@@ -308,13 +310,17 @@ public class CreateProjectPageTest {
 
         //set project homepage
         infoExtensionEditForm.sendKeysToProjectHomepageField("http://www.test.org");
+        infoExtensionEditForm.isDisplayedWithExplicitWait();
 
         //add a mailing list
         infoExtensionEditForm.clickAddMailingListLink();
+        infoExtensionEditForm.isDisplayedWithExplicitWait();
         infoExtensionEditForm.sendKeysToMailingListField("skalli-dev@eclipse.org", 1);
+        infoExtensionEditForm.isDisplayedWithExplicitWait();
 
         //remove the first empty mailing list
         infoExtensionEditForm.clickRemoveMailingListLink(0);
+        infoExtensionEditForm.isDisplayedWithExplicitWait();
     }
 
     public void fillProjectMembersExtension(AddUserForm addUserForm) {

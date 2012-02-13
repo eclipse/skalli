@@ -22,7 +22,6 @@ import org.eclipse.skalli.selenium.tests.TestUtilities;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
@@ -118,7 +117,6 @@ public class EditPageRelatedProjectsExtensionEditFormTest {
     }
 
     //TODO https://bugs.eclipse.org/bugs/show_bug.cgi?id=366372
-    @Ignore
     @Test
     public void relatedProjectsEditFormAddRemoveTest() {
         //uncheck calculate related projects to be able to add links

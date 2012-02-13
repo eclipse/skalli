@@ -164,6 +164,7 @@ public class EditPageProjectMembersExtensionEditFormTest {
 
             //...add the entry
             addUserForm.clickAddButton();
+            addUserForm.isDisplayedWithExplicitWait();
         }
 
         //close the form

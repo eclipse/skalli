@@ -111,18 +111,6 @@ public class EditPageDevelopmentInfrastructureEditFormTest {
     }
 
     @Test
-    public void developmentInfrastructureEditFormAddRepositoryTest() {
-        //get the number of repositories
-        int num = editForm.getNumberOfRepositories();
-
-        //add a repository
-        editForm.clickAddRepositoryLink();
-        editForm.isDisplayedWithExplicitWait();
-
-        Assert.assertTrue("could not add repository", editForm.getNumberOfRepositories() == num + 1);
-    }
-
-    @Test
     public void developmentInfrastructureEditFormAddRemoveRepositoryTest() {
         //get the number of repositories
         int num = editForm.getNumberOfRepositories();
@@ -136,6 +124,18 @@ public class EditPageDevelopmentInfrastructureEditFormTest {
         editForm.isDisplayedWithExplicitWait();
 
         Assert.assertTrue("could not add and remove repository", editForm.getNumberOfRepositories() == num);
+    }
+
+    @Test
+    public void developmentInfrastructureEditFormAddRepositoryTest() {
+        //get the number of repositories
+        int num = editForm.getNumberOfRepositories();
+
+        //add a repository
+        editForm.clickAddRepositoryLink();
+        editForm.isDisplayedWithExplicitWait();
+
+        Assert.assertTrue("could not add repository", editForm.getNumberOfRepositories() == num + 1);
     }
 
     @Test
