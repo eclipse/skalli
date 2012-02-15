@@ -47,6 +47,7 @@ public class NexusClientImpl implements NexusClient {
 
     private ConfigurationService configService;
     private DestinationService destinationService;
+    private HttpClient client;
 
     /* (non-Javadoc)
      * @see org.eclipse.skalli.nexus.NexusClient#searchArtifactVersions(java.lang.String, java.lang.String)
@@ -85,10 +86,7 @@ public class NexusClientImpl implements NexusClient {
     }
 
     Element getElementFromUrlResponse(URL nexusUrl) throws IOException, NexusClientException {
-        HttpClient client = destinationService.getClient(nexusUrl);
-        HttpParams params = client.getParams();
-        HttpClientParams.setRedirecting(params, false); // we want to find 301 (MOVED PERMANTENTLY)
-
+        HttpClient client = getClient(nexusUrl);
         HttpGet method = new HttpGet(nexusUrl.toExternalForm());
         HttpResponse response = null;
         try {
@@ -126,6 +124,15 @@ public class NexusClientImpl implements NexusClient {
         } finally {
             HttpUtils.consumeQuietly(response);
         }
+    }
+
+    private HttpClient getClient(URL url) {
+        if (client == null) {
+            client = destinationService.getClient(url);
+            HttpParams params = client.getParams();
+            HttpClientParams.setRedirecting(params, false); // we want to find 301 MOVED PERMANTENTLY
+        }
+        return client;
     }
 
     protected void bindConfigurationService(ConfigurationService configService) {

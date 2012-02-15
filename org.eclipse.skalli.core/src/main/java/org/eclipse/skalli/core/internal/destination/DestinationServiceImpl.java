@@ -27,13 +27,13 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
-import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -72,14 +72,23 @@ public class DestinationServiceImpl implements DestinationService {
     private static final int CONNECT_TIMEOUT = 10000;
     private static final int READ_TIMEOUT = 300000;
 
+    // connection manager settings
+    private static final int MAX_TOTAL_CONNECTIONS = 100;
+    private static final int MAX_CONNECTIONS_PER_ROUTE = 5;
+
     private ConfigurationService configService;
+    private ThreadSafeClientConnManager connectionManager;
 
     protected void activate(ComponentContext context) {
+        initializeConnectionManager();
         LOG.info(MessageFormat.format("[DestinationService] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
     protected void deactivate(ComponentContext context) {
+        if (connectionManager != null) {
+            connectionManager.shutdown();
+        }
         LOG.info(MessageFormat.format("[DestinationService] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
@@ -106,18 +115,26 @@ public class DestinationServiceImpl implements DestinationService {
         HttpConnectionParams.setSoTimeout(params, READ_TIMEOUT);
         HttpConnectionParams.setTcpNoDelay(params, true);
 
-        DefaultHttpClient client = createClient(url, params);
-
-        if (!isLocalDomain(url)) {
-            setProxy(client, url);
-        }
-
-        setAuthentication(client, url);
-
+        DefaultHttpClient client = new DefaultHttpClient(connectionManager, params);
+        setProxy(client, url);
+        setCredentials(client, url);
         return client;
     }
 
-    private void setAuthentication(DefaultHttpClient client, URL url) {
+
+    /**
+     * Returns <code>true</code>, if the given URL starts with a known
+     * protocol specifier, i.e. <tt>http://</tt> or <tt>https://</tt>.
+     *
+     * @param url  the URL to check.
+     */
+    @Override
+    public boolean isSupportedProtocol(URL url) {
+        String protocol = url.getProtocol();
+        return protocol.equals(HTTP) || protocol.equals(HTTPS);
+    }
+
+    private void setCredentials(DefaultHttpClient client, URL url) {
         if (configService == null) {
             return;
         }
@@ -153,6 +170,10 @@ public class DestinationServiceImpl implements DestinationService {
     }
 
     private void setProxy(HttpClient client, URL url) {
+        if (isLocalDomain(url)) {
+            return;
+        }
+
         String protocol = url.getProtocol();
 
         // use the system properties as default
@@ -201,18 +222,6 @@ public class DestinationServiceImpl implements DestinationService {
     }
 
     /**
-     * Returns <code>true</code>, if the given URL starts with a known
-     * protocol specifier, i.e. <tt>http://</tt> or <tt>https://</tt>.
-     *
-     * @param url  the URL to check.
-     */
-    @Override
-    public boolean isSupportedProtocol(URL url) {
-        String protocol = url.getProtocol();
-        return protocol.equals(HTTP) || protocol.equals(HTTPS);
-    }
-
-    /**
      * Returns <code>true</code> if the given URL belongs to the local domain,
      * i.e. only a host name like <tt>"myhost"</tt> instead of <tt>"myhost.example,org"</tt>
      * is specified.
@@ -223,31 +232,21 @@ public class DestinationServiceImpl implements DestinationService {
         return url.getHost().indexOf('.') < 0;
     }
 
-    private DefaultHttpClient createClient(URL url, HttpParams params) {
-        DefaultHttpClient client = new DefaultHttpClient(params);
-        if (HTTPS.equals(url.getProtocol())) {
-            SSLContext sslContext = getSSLContext();
-            try {
-                sslContext.init(null, new TrustManager[]{ new AlwaysTrustX509Manager() }, null);
-            } catch (KeyManagementException e) {
-                // should not happen since we do not use any keystore
-                throw new IllegalStateException("Failed to initialize SSL context", e);
-            }
-            SSLSocketFactory socketFactory = new SSLSocketFactory(sslContext, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            ClientConnectionManager connectionManager = client.getConnectionManager();
-            SchemeRegistry schemeRegistry = connectionManager.getSchemeRegistry();
-            schemeRegistry.register(new Scheme(HTTPS, getPort(url), socketFactory));
-            client = new DefaultHttpClient(connectionManager, params);
-        }
-        return client;
-    }
+    private void initializeConnectionManager() {
+        connectionManager = new ThreadSafeClientConnManager();
+        connectionManager.setMaxTotal(MAX_TOTAL_CONNECTIONS);
+        connectionManager.setDefaultMaxPerRoute(MAX_CONNECTIONS_PER_ROUTE);
 
-    private int getPort(URL url) {
-        int port = url.getPort();
-        if ((port <= 0) || (port > 0xffff)) {
-            port = HTTP.equals(url.getProtocol())? 80 : 443;
+        SSLContext sslContext = getSSLContext();
+        try {
+            sslContext.init(null, new TrustManager[]{ new AlwaysTrustX509Manager() }, null);
+        } catch (KeyManagementException e) {
+            // should not happen since we do not use any keystore
+            throw new IllegalStateException("Failed to initialize SSL context", e);
         }
-        return port;
+        SSLSocketFactory socketFactory = new SSLSocketFactory(sslContext, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        SchemeRegistry schemeRegistry = connectionManager.getSchemeRegistry();
+        schemeRegistry.register(new Scheme(HTTPS, 443, socketFactory));
     }
 
     private SSLContext getSSLContext() {

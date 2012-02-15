@@ -52,6 +52,8 @@ public class MavenResolver implements Issuer {
     protected final MavenPathResolver pathResolver;
     protected final DestinationService destinationService;
 
+    private HttpClient client;
+
     /**
      * Creates a resolver for a given project.
      * @param project  the unique identifier of the project for which reactor information is to be calculated.
@@ -172,9 +174,7 @@ public class MavenResolver implements Issuer {
     MavenPom getMavenPom(URL url) throws IOException, MavenValidationException {
         MavenPom mavenPom = null;
 
-        HttpClient client = destinationService.getClient(url);
-        HttpParams params = client.getParams();
-        HttpClientParams.setRedirecting(params, false); // we want to find 301 MOVED PERMANTENTLY
+        HttpClient client = getClient(url);
         HttpResponse response = null;
         try {
             LOG.info("GET " + url); //$NON-NLS-1$
@@ -227,5 +227,14 @@ public class MavenResolver implements Issuer {
             HttpUtils.consumeQuietly(response);
         }
         return mavenPom;
+    }
+
+    private HttpClient getClient(URL url) {
+        if (client == null) {
+            client = destinationService.getClient(url);
+            HttpParams params = client.getParams();
+            HttpClientParams.setRedirecting(params, false); // we want to find 301 MOVED PERMANTENTLY
+        }
+        return client;
     }
 }
