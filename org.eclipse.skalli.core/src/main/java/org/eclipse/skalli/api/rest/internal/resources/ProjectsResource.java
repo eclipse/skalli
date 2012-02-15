@@ -68,6 +68,7 @@ public class ProjectsResource extends ResourceBase {
     private int start;
     private int count;
     private String[] extensionsToDisplay;
+    private boolean isPropertyAbsentSearch = false;
 
     /**Get might be used for 2 different cases:
      * 1) to list the details of the projects. Project set might be limited using lucene search query or tag.
@@ -125,7 +126,7 @@ public class ProjectsResource extends ResourceBase {
     private Projects matchByProperty(Projects projects, Project project, ExtensionEntityBase extensionEntity) {
         PropertyLookup propertyLookup = new PropertyLookup(extensionEntity);
         String lookupResult = propertyLookup.lookup(propertyName);
-        if (lookupResult != null) {
+        if (lookupResult != null & !isPropertyAbsentSearch) {
             if (extensionEntity.getProperty(propertyName) instanceof Iterable) {
                 String[] lookupSet = lookupResult.split(",");
                 for (String string : lookupSet) {
@@ -140,6 +141,8 @@ public class ProjectsResource extends ResourceBase {
                     projects.getProjects().add(project);
                 }
             }
+        } else if (lookupResult == null && isPropertyAbsentSearch){
+            projects.getProjects().add(project);
         }
         return projects;
     }
@@ -269,6 +272,10 @@ public class ProjectsResource extends ResourceBase {
         String property = form.getFirstValue(RestUtils.PARAM_PROPERTY);
         if (StringUtils.isNotBlank(property)) {
 
+            if (property.startsWith("!")) {
+                this.isPropertyAbsentSearch  = true;
+                property = property.substring(1);
+            }
             String[] split = property.split("\\.");
             if (split.length < 1 || split.length > 2) {
                 throw new Exception("Property should conform to the pattern <extension.propertyName>");
