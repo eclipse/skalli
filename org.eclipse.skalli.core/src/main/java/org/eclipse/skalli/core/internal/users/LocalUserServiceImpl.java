@@ -130,7 +130,7 @@ public class LocalUserServiceImpl extends EntityServiceBase<User> implements Use
                         result.add(user);
                     }
                     // surname givenname('Ochmann, Michael')
-                    if (matches(patterns, user.getLastname(), user.getFirstname())) {
+                    else if (matches(patterns, user.getLastname(), user.getFirstname())) {
                         result.add(user);
                     }
                 }
@@ -140,13 +140,13 @@ public class LocalUserServiceImpl extends EntityServiceBase<User> implements Use
                     if (matches(patterns, user.getFirstname(), null, user.getLastname())) {
                         result.add(user);
                     }
-                    if (matches(patterns, user.getLastname(), null, user.getFirstname())) {
+                    else if (matches(patterns, user.getLastname(), null, user.getFirstname())) {
                         result.add(user);
                     }
-                    if (matches(patterns, null, user.getFirstname(), user.getLastname())) {
+                    else if (matches(patterns, null, user.getFirstname(), user.getLastname())) {
                         result.add(user);
                     }
-                    if (matches(patterns, user.getFirstname(), user.getLastname(), null)) {
+                    else if (matches(patterns, user.getFirstname(), user.getLastname(), null)) {
                         result.add(user);
                     }
                 }
@@ -164,13 +164,13 @@ public class LocalUserServiceImpl extends EntityServiceBase<User> implements Use
     }
 
     private boolean matches(Pattern[] pattern, String... strings) {
-        boolean matches = true;
         for (int i = 0; i < strings.length; ++i) {
-            if (StringUtils.isNotBlank(strings[i])) {
-                matches &= pattern[i].matcher(strings[i]).matches();
+            if (StringUtils.isNotBlank(strings[i])
+                && pattern[i].matcher(strings[i]).matches()) {
+                    return true;
             }
         }
-        return matches;
+        return false;
     }
 
     private void match(User user, Pattern pattern, List<User> result) {
@@ -180,7 +180,7 @@ public class LocalUserServiceImpl extends EntityServiceBase<User> implements Use
             result.add(user);
         }
         // try a match with firstname*
-        if (matches(patterns, user.getFirstname())) {
+        else if (matches(patterns, user.getFirstname())) {
             result.add(user);
         }
         //try a match with the account name
