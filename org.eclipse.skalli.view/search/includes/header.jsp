@@ -40,7 +40,7 @@
         <c:choose>
           <c:when test="${user!=null}">
             Welcome
-            <a href="<%=Consts.URL_MYPROJECTS%>"><%=user.getFullName()%></a>
+            <a href="<%=Consts.URL_MYPROJECTS%>"><%=user.getDisplayName()%></a>
             <c:if test="${feedbackConfig != null }">
               <span class="vertical_separator"><img src="/VAADIN/themes/simple/images/separator.png" alt="separator"></span>
               <a title="${feedbackConfig.displayName}" href="${feedbackConfig.url}">${feedbackConfig.displayName}</a>

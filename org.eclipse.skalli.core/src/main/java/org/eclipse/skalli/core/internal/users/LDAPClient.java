@@ -165,7 +165,7 @@ public class LDAPClient {
             SearchResult entry = results.next();
             User user = processEntry(entry);
             if (user != null) {
-                LOG.debug("Success reading from LDAP: " + user.getUserId() + ", " + user.getFullName()
+                LOG.debug("Success reading from LDAP: " + user.getUserId() + ", " + user.getDisplayName()
                         + " <" + user.getEmail() + ">");
                 return user;
             }
@@ -255,7 +255,7 @@ public class LDAPClient {
             SearchResult entry = results.next();
             User user = processEntry(entry);
             if (user != null) {
-                LOG.debug("Success reading from LDAP: " + user.getUserId() + ", " + user.getFullName()
+                LOG.debug("Success reading from LDAP: " + user.getUserId() + ", " + user.getDisplayName()
                         + " <" + user.getEmail() + ">");
                 users.add(user);
                 somethingAdded = true;

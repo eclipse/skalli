@@ -27,8 +27,7 @@ public class UserTest {
         values.put(User.PROPERTY_FIRSTNAME, "Homer");
         values.put(User.PROPERTY_LASTNAME, "Simpson");
         values.put(User.PROPERTY_EMAIL, "homer@springfield.net");
-        values.put(User.PROPERTY_FULL_NAME, "Homer Simpson");
-        values.put(User.PROPERTY_DISPLAY_NAME, "Homer Simpson (homer)");
+        values.put(User.PROPERTY_DISPLAY_NAME, "Homer Simpson");
 
         Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
 

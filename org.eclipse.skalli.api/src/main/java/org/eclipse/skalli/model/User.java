@@ -35,10 +35,6 @@ public class User extends EntityBase {
 
     @Derived
     @PropertyName
-    public static final String PROPERTY_FULL_NAME = "fullName"; //$NON-NLS-1$
-
-    @Derived
-    @PropertyName
     public static final String PROPERTY_DISPLAY_NAME = "displayName"; //$NON-NLS-1$
 
     private String userId;
@@ -102,19 +98,12 @@ public class User extends EntityBase {
         this.email = email;
     }
 
-    public String getFullName() {
+    public String getDisplayName() {
         if (detailsMissing) {
             return getUserId();
         } else {
             return getFirstname() + " " + getLastname(); //$NON-NLS-1$
         }
-    }
-
-    public String getDisplayName() {
-        if (detailsMissing) {
-            return getUserId();
-        }
-        return getFullName() + " (" + userId + ")"; //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public String getTelephone() {
