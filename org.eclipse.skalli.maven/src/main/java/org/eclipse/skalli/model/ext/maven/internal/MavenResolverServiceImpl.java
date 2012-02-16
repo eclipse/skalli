@@ -94,7 +94,7 @@ public class MavenResolverServiceImpl implements MavenResolverService, EventList
     }
 
     protected void bindDestinationService(DestinationService destinationService) {
-        LOG.info(MessageFormat.format("bindDestinationService({0})", configService)); //$NON-NLS-1$
+        LOG.info(MessageFormat.format("bindDestinationService({0})", destinationService)); //$NON-NLS-1$
         this.destinationService = destinationService;
 
     }
