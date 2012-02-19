@@ -12,6 +12,7 @@ package org.eclipse.skalli.feed.updater;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.skalli.commons.CollectionUtils;
@@ -69,7 +70,14 @@ class Converter {
             entry.getAuthor().setEmail(syndAuthor.getEmail());
         }
 
-        entry.setPublished(syndEntry.getPublishedDate());
+        Date publishedDate = syndEntry.getPublishedDate();
+        if (publishedDate == null) {
+            publishedDate = syndEntry.getUpdatedDate();
+            if (publishedDate == null) {
+                publishedDate = new Date();
+            }
+        }
+        entry.setPublished(publishedDate);
         return entry;
     }
 
