@@ -32,5 +32,13 @@
       <name>Commits by Company by Month</name>
       <provider>git</provider>
     </org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig>
+    <org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig>
+      <id>feed.eclipse.bugzilla</id>
+      <purpose>feed</purpose>
+      <pattern>^scm:git:git://git\.eclipse\.org/gitroot/(.+)/org\.eclipse\.(.+)\.git$</pattern>
+      <template>https://bugs.eclipse.org/bugs/buglist.cgi?product=${1}&amp;ctype=atom</template>
+      <name>Bugzilla</name>
+      <provider>bugzilla</provider>
+    </org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig>
   </scmMapping>
 </org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingsConfig>
