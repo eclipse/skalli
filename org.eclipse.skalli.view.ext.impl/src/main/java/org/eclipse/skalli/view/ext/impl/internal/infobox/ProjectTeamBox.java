@@ -13,6 +13,7 @@ package org.eclipse.skalli.view.ext.impl.internal.infobox;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.commons.PeopleExtension;
 import org.eclipse.skalli.view.component.InformationBox;
+import org.eclipse.skalli.view.component.MailToTeam;
 import org.eclipse.skalli.view.component.PeopleComponent;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;
@@ -63,6 +64,9 @@ public class ProjectTeamBox extends InfoBox implements ProjectInfoBox {
                 peopleComponent.addStyleName(InformationBox.STYLE);
                 layout.addComponent(peopleComponent);
             }
+
+            String mailToTeamHtml = new MailToTeam(ext).composeMailToTeamLabel();
+            createLabel(layout, mailToTeamHtml);
         }
         return layout;
     }

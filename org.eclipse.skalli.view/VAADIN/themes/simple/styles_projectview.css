@@ -227,6 +227,18 @@
     font-weight: bold;
 }
 
+.v-app-ProjectApplication .v-panel-infobox .infobox-team .v-link a {
+    vertical-align: bottom;
+    line-height: 16px;
+    font-size: 10px;
+    text-decoration: none;
+}
+
+.v-app-ProjectApplication .v-panel-infobox .infobox-team .v-img-mailImage img {
+    width: 16px;
+    height: 16px;
+    vertical-align: bottom;
+}
 
 /* styles for info box "Scrum" */
 .v-app-ProjectApplication .v-panel-infobox .infobox-scrum {
