@@ -192,10 +192,10 @@ public class DestinationServiceImpl implements DestinationService {
             String defaultConfigProxyHost = configService.readString(ConfigKeyProxy.HOST);
             String defaultConfigProxyPort = configService.readString(ConfigKeyProxy.PORT);
             String configProxyHost = HTTPS.equals(protocol) ?
-                    configService.readString(ConfigKeyProxy.HTTPS_HOST)
+                    configService.readString(ConfigKeyProxy.HOST_SSL)
                     : defaultConfigProxyHost;
             int configProxyPort = NumberUtils.toInt(HTTPS.equals(protocol) ?
-                    configService.readString(ConfigKeyProxy.HTTPS_PORT)
+                    configService.readString(ConfigKeyProxy.PORT_SSL)
                     : defaultConfigProxyPort);
             if (StringUtils.isNotBlank(configProxyHost) && configProxyPort > 0) {
                 proxyHost = configProxyHost;
@@ -216,7 +216,7 @@ public class DestinationServiceImpl implements DestinationService {
         if (StringUtils.isNotBlank(proxyHost)
                 && proxyPort > 0
                 && !Pattern.matches(nonProxyHosts, url.getHost())) {
-            HttpHost proxy = new HttpHost(proxyHost, proxyPort, protocol);
+            HttpHost proxy = new HttpHost(proxyHost, proxyPort, HTTP);
             client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
         }
     }
@@ -244,7 +244,7 @@ public class DestinationServiceImpl implements DestinationService {
             // should not happen since we do not use any keystore
             throw new IllegalStateException("Failed to initialize SSL context", e);
         }
-        SSLSocketFactory socketFactory = new SSLSocketFactory(sslContext, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        SSLSocketFactory socketFactory = new SSLSocketFactory(sslContext, new AllowAllHostnamesVerifier());
         SchemeRegistry schemeRegistry = connectionManager.getSchemeRegistry();
         schemeRegistry.register(new Scheme(HTTPS, 443, socketFactory));
     }

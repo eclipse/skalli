@@ -17,6 +17,8 @@ public class ProxyConfig {
 
     private String host;
     private String port;
+    private String hostSSL;
+    private String portSSL;
     private String nonProxyHosts;
 
     public String getHost() {
@@ -33,6 +35,22 @@ public class ProxyConfig {
 
     public void setPort(String port) {
         this.port = port;
+    }
+
+    public String getHostSSL() {
+        return hostSSL;
+    }
+
+    public void setHostSSL(String hostSSL) {
+        this.hostSSL = hostSSL;
+    }
+
+    public String getPortSSL() {
+        return portSSL;
+    }
+
+    public void setPortSSL(String portSSL) {
+        this.portSSL = portSSL;
     }
 
     public void setNonProxyHosts(String nonProxyHosts) {

@@ -34,6 +34,8 @@ public class ProxyResource extends ConfigResource<ConfigKeyProxy, ProxyConfig> {
         Map<ConfigKey, String> map = new HashMap<ConfigKey, String>();
         map.put(ConfigKeyProxy.HOST, configObject.getHost());
         map.put(ConfigKeyProxy.PORT, configObject.getPort());
+        map.put(ConfigKeyProxy.HOST_SSL, configObject.getHostSSL());
+        map.put(ConfigKeyProxy.PORT_SSL, configObject.getPortSSL());
         map.put(ConfigKeyProxy.NONPROXYHOSTS, configObject.getNonProxyHosts());
 
         return map;
@@ -44,6 +46,8 @@ public class ProxyResource extends ConfigResource<ConfigKeyProxy, ProxyConfig> {
         ProxyConfig config = new ProxyConfig();
         config.setHost(values.get(ConfigKeyProxy.HOST));
         config.setPort(values.get(ConfigKeyProxy.PORT));
+        config.setHostSSL(values.get(ConfigKeyProxy.HOST_SSL));
+        config.setPortSSL(values.get(ConfigKeyProxy.PORT_SSL));
         config.setNonProxyHosts(values.get(ConfigKeyProxy.NONPROXYHOSTS));
 
         return config;
