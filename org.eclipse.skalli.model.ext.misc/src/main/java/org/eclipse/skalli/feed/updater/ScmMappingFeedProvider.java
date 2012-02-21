@@ -16,8 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.skalli.commons.Link;
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.ext.mapping.MapperUtil;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
@@ -26,12 +28,9 @@ import org.eclipse.skalli.services.feed.FeedUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- */
-public class GitWebFeedProvider implements FeedProvider {
+public class ScmMappingFeedProvider implements FeedProvider {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GitWebFeedProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ScmMappingFeedProvider.class);
 
     private ConfigurationService configService;
 
@@ -52,21 +51,30 @@ public class GitWebFeedProvider implements FeedProvider {
             Set<String> scmLocations = ext.getScmLocations();
             ScmLocationMapper mapper = new ScmLocationMapper();
             for (String scmLocation : scmLocations) {
-                List<Link> mappedScmLinks = mapper.getMappedLinks(configService, project.getUuid().toString(),
-                        scmLocation, ScmLocationMapper.PURPOSE_FEED);
-                if (mappedScmLinks.size() == 0) {
+
+                //we want to have all providers
+                List<ScmLocationMappingConfig> feedMappings = mapper.getMappings(configService, null,
+                        ScmLocationMapper.PURPOSE_FEED);
+
+                for (ScmLocationMappingConfig mappingConfig : feedMappings) {
+                    String urlStr = MapperUtil.convert(scmLocation, mappingConfig.getPattern(),
+                            mappingConfig.getTemplate(), project, "");
+                    if (StringUtils.isNotBlank(urlStr)) {
+                        try {
+                            URL url = new URL(urlStr);
+                            SyndFeedUpdater feedUpdater = new SyndFeedUpdater(url, project.getName(),
+                                    mappingConfig.getProvider(), mappingConfig.getName()); //$NON-NLS-1$
+                            result.add(feedUpdater);
+                        } catch (MalformedURLException e) {
+                            LOG.error("The mapping of scmLocation ='" + scmLocation + "' with purpose = '"
+                                    + ScmLocationMapper.PURPOSE_FEED + "' got an invalid URL = '" + urlStr + "'");
+                        }
+                    }
+                }
+
+                if (result.isEmpty()) {
                     LOG.debug("no mapping for scmLocation ='" + scmLocation + "' with purpose = '"
                             + ScmLocationMapper.PURPOSE_FEED + "' defined.");
-                }
-                for (Link link : mappedScmLinks) {
-                    try {
-                        URL url = new URL(link.getUrl());
-                        SyndFeedUpdater feedUpdater = new SyndFeedUpdater(url, project.getName(), "gitweb", "Git"); //$NON-NLS-1$
-                        result.add(feedUpdater);
-                    } catch (MalformedURLException e) {
-                        LOG.error("The mapping of scmLocation ='" + scmLocation + "' with purpose = '"
-                                + ScmLocationMapper.PURPOSE_FEED + "' got an invalid URL = '" + link.getUrl() + "'");
-                    }
                 }
             }
         }
