@@ -51,6 +51,7 @@ public class ExtensionServiceCore
                     { Project.PROPERTY_PARENT_PROJECT, "Parent Project" },
                     { Project.PROPERTY_NAME, "Display Name" },
                     { Project.PROPERTY_SHORT_NAME, "Short Name" },
+                    { Project.PROPERTY_DESCRIPTION_FORMAT, "Description Format" },
                     { Project.PROPERTY_DESCRIPTION, "Description" },
                     { Project.PROPERTY_LOGO_URL, "Project Logo" },
                     { Project.PROPERTY_PHASE, "Project Phase" },
@@ -67,6 +68,7 @@ public class ExtensionServiceCore
                     { Project.PROPERTY_NAME, "A human readable name for this project" },
                     { Project.PROPERTY_SHORT_NAME, "Abbreviation of the project name. If not maintained, it will be " +
                             "contructed automatically from the display name if needed." },
+                    { Project.PROPERTY_DESCRIPTION_FORMAT, "Format of the description" },
                     { Project.PROPERTY_DESCRIPTION, "Description of this project" },
                     { Project.PROPERTY_LOGO_URL, "Link to a picture that serves as logo of this project" },
                     { Project.PROPERTY_PHASE, "Current lifecycle phase of this project" },

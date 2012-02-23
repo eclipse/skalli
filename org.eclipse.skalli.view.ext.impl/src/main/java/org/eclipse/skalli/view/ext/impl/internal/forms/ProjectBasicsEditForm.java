@@ -56,6 +56,7 @@ public class ProjectBasicsEditForm extends AbstractExtensionFormService<Project>
                 Project.PROPERTY_PROJECTID,
                 Project.PROPERTY_NAME,
                 Project.PROPERTY_SHORT_NAME,
+                Project.PROPERTY_DESCRIPTION_FORMAT,
                 Project.PROPERTY_DESCRIPTION,
                 Project.PROPERTY_TEMPLATEID,
                 Project.PROPERTY_PARENT_ENTITY,
@@ -93,6 +94,8 @@ public class ProjectBasicsEditForm extends AbstractExtensionFormService<Project>
                 field = new PhaseSelect(caption,
                         projectTemplate.getAllowedValues(getExtensionClass().getName(), Project.PROPERTY_PHASE),
                         project, isAdmin);
+            } else if (Project.PROPERTY_DESCRIPTION_FORMAT.equals(propertyId)){
+               field = new ComboBox(caption, Project.TEXT_FORMATS);
             }
             return field;
         }
@@ -138,6 +141,12 @@ public class ProjectBasicsEditForm extends AbstractExtensionFormService<Project>
             } else if (Project.PROPERTY_DESCRIPTION.equals(propertyId)) {
                 TextField tf = (TextField) field;
                 tf.setRows(3);
+            } else if (Project.PROPERTY_DESCRIPTION_FORMAT.equals(propertyId)){
+                final ComboBox cb = (ComboBox) field;
+                cb.setFilteringMode(Filtering.FILTERINGMODE_STARTSWITH);
+                cb.setNewItemsAllowed(false);
+                cb.setNullSelectionAllowed(false);
+                cb.select(project.getDescriptionFormat());
             }
         }
     }

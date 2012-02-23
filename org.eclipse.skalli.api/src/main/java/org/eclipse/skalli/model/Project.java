@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.model;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang.CharUtils;
@@ -31,13 +33,16 @@ public class Project extends ExtensibleEntityBase {
     public static final String PROPERTY_SHORT_NAME = "shortName"; //$NON-NLS-1$
 
     @PropertyName(position = 3)
-    public static final String PROPERTY_DESCRIPTION = "description"; //$NON-NLS-1$
+    public static final String PROPERTY_DESCRIPTION_FORMAT = "descriptionFormat"; //$NON-NLS-1$
 
     @PropertyName(position = 4)
+    public static final String PROPERTY_DESCRIPTION = "description"; //$NON-NLS-1$
+
+    @PropertyName(position = 5)
     public static final String PROPERTY_TEMPLATEID = "projectTemplateId"; //$NON-NLS-1$
 
     @Derived
-    @PropertyName(position = 5)
+    @PropertyName(position = 6)
     public static final String PROPERTY_PARENT_PROJECT = "parentProject"; //$NON-NLS-1$
 
     @PropertyName
@@ -50,12 +55,16 @@ public class Project extends ExtensibleEntityBase {
     public static final String PROPERTY_REGISTERED = "registered"; //$NON-NLS-1$
 
     private static final String DEFAULT_TEMPLATE_ID = "default"; //$NON-NLS-1$
+
+    private static final String DEFAULT_FORMAT = "text"; //$NON-NLS-1$
+    public static final List<String> TEXT_FORMATS = Arrays.asList(DEFAULT_FORMAT, "html"); //$NON-NLS-1$
     private static final String INITIAL_PHASE = "initial"; //$NON-NLS-1$
 
     private String projectId = ""; //$NON-NLS-1$
     private String projectTemplateId = DEFAULT_TEMPLATE_ID;
     private String name = ""; //$NON-NLS-1$
     private String shortName = ""; //$NON-NLS-1$
+    private String descriptionFormat = TEXT_FORMATS.get(0);
     private String description = ""; //$NON-NLS-1$
     private String logoUrl = ""; //$NON-NLS-1$
     private String phase = INITIAL_PHASE;
@@ -72,6 +81,17 @@ public class Project extends ExtensibleEntityBase {
         this.name = name;
         this.description = description;
         this.projectId = projectid;
+    }
+
+    public String getDescriptionFormat() {
+        if (StringUtils.isBlank(descriptionFormat)) {
+            descriptionFormat = DEFAULT_FORMAT;
+        }
+        return descriptionFormat;
+    }
+
+    public void setDescriptionFormat(String descriptionFormat) {
+        this.descriptionFormat = descriptionFormat;
     }
 
     public String getDescription() {
@@ -124,7 +144,7 @@ public class Project extends ExtensibleEntityBase {
                         }
                     }
                 }
-                // if the first-char abbbreviation is long enough, use it
+                // if the first-char abbreviation is long enough, use it
                 if (retAbbrev.length() > 1) {
                     return retAbbrev.toString();
                 }
@@ -161,7 +181,6 @@ public class Project extends ExtensibleEntityBase {
     public void setProjectId(String projectid) {
         this.projectId = projectid;
     }
-
 
     public String getLogoUrl() {
         return logoUrl;

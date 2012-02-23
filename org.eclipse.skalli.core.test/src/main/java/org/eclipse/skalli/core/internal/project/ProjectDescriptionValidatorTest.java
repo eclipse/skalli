@@ -21,6 +21,21 @@ public class ProjectDescriptionValidatorTest {
 
     @Test
     @SuppressWarnings("nls")
+    public void testIssuesFATAL() throws Exception {
+        ProjectDescriptionValidator validator = new ProjectDescriptionValidator(TestExtension.class,
+                TestExtension.PROPERTY_STR);
+        Assert.assertEquals(Severity.FATAL,
+                validator.validate(PropertyHelperUtils.TEST_UUIDS[0], "<test>", Severity.FATAL).first().getSeverity());
+        StringBuilder tags = new StringBuilder();
+        tags.append("<");
+        tags.append(StringUtils.join(ProjectDescriptionValidator.allowedTags, ">, <"));
+        tags.append(">");
+
+        Assert.assertTrue(validator.validate(PropertyHelperUtils.TEST_UUIDS[0], tags, Severity.FATAL).isEmpty());
+    }
+
+    @Test
+    @SuppressWarnings("nls")
     public void testIssuesWARNING() throws Exception {
         ProjectDescriptionValidator validator = new ProjectDescriptionValidator(TestExtension.class,
                 TestExtension.PROPERTY_STR);

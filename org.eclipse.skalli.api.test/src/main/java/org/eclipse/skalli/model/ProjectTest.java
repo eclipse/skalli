@@ -28,6 +28,7 @@ public class ProjectTest {
         values.put(Project.PROPERTY_TEMPLATEID, "default");
         values.put(Project.PROPERTY_PARENT_PROJECT, null);
         values.put(Project.PROPERTY_NAME, "Skalli");
+        values.put(Project.PROPERTY_DESCRIPTION_FORMAT, "text");
         values.put(Project.PROPERTY_DESCRIPTION, "The goal of the project is to build an extensible" +
                 " system for organizing projects.");
         TreeSet<String> tags = new TreeSet<String>();

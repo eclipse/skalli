@@ -55,8 +55,10 @@ public class ProjectAboutBox extends InfoBox implements ProjectInfoBox {
         String description = "No description available";
         if (StringUtils.isNotBlank(project.getDescription())) {
             description = project.getDescription();
-            description = StringEscapeUtils.escapeHtml(description);
-            description = StringUtils.replace(description, "\n", "<br />");  //$NON-NLS-1$//$NON-NLS-2$
+            if (project.getDescriptionFormat().equals("text")) {//$NON-NLS-1$
+                description = StringEscapeUtils.escapeHtml(description);
+                description = StringUtils.replace(description, "\n", "<br />"); //$NON-NLS-1$//$NON-NLS-2$
+            }
         }
         createLabel(layout, description, STYLE_ABOUT);
 
