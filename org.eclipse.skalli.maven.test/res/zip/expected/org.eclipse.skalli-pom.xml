@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>org.eclipse.skalli.parent</artifactId>
+        <groupId>org.eclipse.skalli</groupId>
+        <version>0.2.0-SNAPSHOT</version>
+        <relativePath>org.eclipse.skalli.parent</relativePath>
+    </parent>
+
+    <artifactId>org.eclipse.skalli.reactor</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Skalli (Incubation)</name>
+
+    <modules>
+        <module>org.eclipse.skalli.target</module>
+        <module>org.eclipse.skalli.parent</module>
+        <module>org.eclipse.skalli.api</module>
+        <module>org.eclipse.skalli.core</module>
+        <module>org.eclipse.skalli.storage.db</module>
+        <module>org.eclipse.skalli.storage.db.entities</module>
+        <module>org.eclipse.skalli.commands</module>
+        <module>org.eclipse.skalli.model.ext.misc</module>
+        <module>org.eclipse.skalli.feed.db</module>
+        <module>org.eclipse.skalli.feed.db.entities</module>
+        <module>org.eclipse.skalli.view</module>
+        <module>org.eclipse.skalli.view.ext</module>
+        <module>org.eclipse.skalli.view.ext.impl</module>
+        <module>org.eclipse.skalli.view.theme</module>
+        <module>org.eclipse.skalli.gerrit</module>
+        <module>org.eclipse.skalli.maven</module>
+        <module>org.eclipse.skalli.nexus</module>
+        <module>org.eclipse.skalli.testutil</module>
+        <module>org.eclipse.skalli.api.test</module>
+        <module>org.eclipse.skalli.core.test</module>
+        <module>org.eclipse.skalli.commands.test</module>
+        <module>org.eclipse.skalli.model.ext.misc.test</module>
+        <module>org.eclipse.skalli.view.test</module>
+        <module>org.eclipse.skalli.view.ext.impl.test</module>
+        <module>org.eclipse.skalli.maven.test</module>
+        <module>org.eclipse.skalli.nexus.test</module>
+        <module>org.eclipse.skalli.examples</module>
+        <!-- modules building the update site:-->
+        <module>org.eclipse.skalli.feature</module>
+        <module>org.eclipse.skalli.orbit.feature</module>
+        <module>org.eclipse.skalli.eclipse.feature</module>
+        <module>org.eclipse.skalli.source.feature</module>
+        <module>org.eclipse.skalli.testing.feature</module>
+        <module>org.eclipse.skalli.site</module>
+        <module>org.eclipse.skalli.product</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>db</id>
+            <modules>
+                <module>org.eclipse.skalli.storage.db.test</module>
+                <module>org.eclipse.skalli.feed.db.test</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>gerrit</id>
+            <modules>
+                <module>org.eclipse.skalli.gerrit.test</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>selenium</id>
+            <modules>
+                <module>org.eclipse.skalli.selenium</module>
+            </modules>
+        </profile>
+    </profiles>
+</project>
