@@ -55,6 +55,7 @@ Export-Package: org.eclipse.skalli.model.ext.maven,
  org.eclipse.skalli.model.ext.maven.recommendedupdatesites
 Service-Component: OSGI-INF/ExtensionServiceMaven.xml,
  OSGI-INF/ExtensionServiceMavenReactor.xml,
+ OSGI-INF/GitWebMavenPomResolver.xml,
  OSGI-INF/MavenResolverComponent.xml,
  OSGI-INF/MavenResolverConfigSection.xml,
  OSGI-INF/RecommendedUpdateSitesComponent.xml,

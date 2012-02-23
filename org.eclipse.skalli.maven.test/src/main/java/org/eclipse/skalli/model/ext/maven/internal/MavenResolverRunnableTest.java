@@ -21,11 +21,10 @@ import org.easymock.Capture;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenCoordinateUtil;
-import org.eclipse.skalli.model.ext.maven.MavenPathResolver;
+import org.eclipse.skalli.model.ext.maven.MavenPomResolver;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
-import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
 import org.junit.Before;
@@ -35,13 +34,12 @@ import org.junit.Test;
 public class MavenResolverRunnableTest {
 
     private static final String GIT_SCM_LOCATION = "scm:git:git://git.example.org/myproject";
-    private static final String UNKNOWN_SCM_LOCATION = "scm:myrepro://myrepro.example.org/myproject";
 
     private static final String REACTOR_POM_PATH = "pom.xml";
     private static final String USERID = "USERID";
 
     private ProjectService projectServiceMock;
-    private MavenPathResolver pathResolverMock;
+    private MavenPomResolver pathResolverMock;
     private MavenResolverMock resolverMock;
 
     private MavenResolverRunnableMock classUnderTest;
@@ -51,17 +49,17 @@ public class MavenResolverRunnableTest {
         private MavenResolverMock resolverMock;
 
         public MavenResolverRunnableMock(MavenResolverMock resolverMock) {
-            super(null, null, null, USERID);
+            super(null, USERID);
             this.resolverMock = resolverMock;
         }
 
         @Override
-        protected MavenPathResolver getMavenPathResolver(ConfigurationService configService, String scmLocation) {
+        protected MavenPomResolver getMavenPomResolver(String scmLocation) {
             return pathResolverMock;
         }
 
         @Override
-        protected MavenResolver getMavenResolver(UUID entityId, MavenPathResolver pathResolver) {
+        protected MavenResolver getMavenResolver(UUID entityId, MavenPomResolver pathResolver) {
             return resolverMock;
         }
 
@@ -76,8 +74,8 @@ public class MavenResolverRunnableTest {
         private boolean isResolveCalled = false;
         private MavenReactor mavenReactor;
 
-        public MavenResolverMock(MavenPathResolver pathResolver) {
-            super(PropertyHelperUtils.TEST_UUIDS[0], pathResolver, null);
+        public MavenResolverMock(MavenPomResolver pathResolver) {
+            super(PropertyHelperUtils.TEST_UUIDS[0], pathResolver);
         }
 
         @Override
@@ -98,9 +96,7 @@ public class MavenResolverRunnableTest {
 
     @Before
     public void setUp() {
-        pathResolverMock = createNiceMock(MavenPathResolver.class);
-        expect(pathResolverMock.canResolve(eq(GIT_SCM_LOCATION))).andReturn(true).anyTimes();
-        expect(pathResolverMock.canResolve(not(eq(GIT_SCM_LOCATION)))).andReturn(false).anyTimes();
+        pathResolverMock = createNiceMock(MavenPomResolver.class);
         replay(pathResolverMock);
         resolverMock = new MavenResolverMock(pathResolverMock);
         classUnderTest = new MavenResolverRunnableMock(resolverMock);
@@ -142,18 +138,6 @@ public class MavenResolverRunnableTest {
         assertFalse(resolverMock.isResolveCalled());
     }
 
-    @Test
-    public void testResolveProjectUnknownScmPattern() throws Exception {
-        MavenReactor mavenReactor = createReactor();
-        resolverMock.setMavenReactor(mavenReactor);
-
-        Project project = new Project();
-        addScmLocation(project, UNKNOWN_SCM_LOCATION);
-        addReactorPath(project, REACTOR_POM_PATH);
-
-        assertNull(classUnderTest.resolveProject(project));
-        assertFalse(resolverMock.isResolveCalled());
-    }
 
     @Test
     public void testRunSingleProject() throws Exception {

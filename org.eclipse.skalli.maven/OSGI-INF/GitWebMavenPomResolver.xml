@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (c) 2010, 2011 SAP AG and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+
+    Contributors:
+        SAP AG - initial API and implementation
+ -->
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.ext.maven.pomresolver.gitweb">
+    <implementation class="org.eclipse.skalli.model.ext.maven.internal.GitWebMavenPomResolver"/>
+    <service>
+        <provide interface="org.eclipse.skalli.model.ext.maven.MavenPomResolver"/>
+    </service>
+   <reference
+      bind="bindConfigurationService"
+      unbind="unbindConfigurationService"
+      interface="org.eclipse.skalli.services.configuration.ConfigurationService"
+      name="ConfigurationService"
+      cardinality="0..1"
+      policy="dynamic"/>
+    <reference
+        bind="bindDestinationService"
+        unbind="unbindDestinationService"
+        interface="org.eclipse.skalli.services.destination.DestinationService"
+        name="DestinationService"
+        cardinality="1..1"
+        policy="dynamic"/>
+</scr:component>
+

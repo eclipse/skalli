@@ -18,7 +18,6 @@ import org.eclipse.skalli.model.ext.maven.internal.config.MavenResolverConfig;
 import org.eclipse.skalli.model.ext.maven.internal.config.MavenResolverResource;
 import org.eclipse.skalli.nexus.NexusClient;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.destination.DestinationService;
 import org.eclipse.skalli.services.event.EventCustomizingUpdate;
 import org.eclipse.skalli.services.event.EventListener;
 import org.eclipse.skalli.services.event.EventService;
@@ -35,7 +34,6 @@ public class MavenResolverServiceImpl implements MavenResolverService, EventList
 
     private SchedulerService schedulerService;
     private ConfigurationService configService;
-    private DestinationService destinationService;
     private NexusClient nexusClient;
 
     private UUID scheduleId;
@@ -93,17 +91,6 @@ public class MavenResolverServiceImpl implements MavenResolverService, EventList
         this.nexusClient = null;
     }
 
-    protected void bindDestinationService(DestinationService destinationService) {
-        LOG.info(MessageFormat.format("bindDestinationService({0})", destinationService)); //$NON-NLS-1$
-        this.destinationService = destinationService;
-
-    }
-
-    protected void unbindDestinationService(DestinationService destinationService) {
-        LOG.info(MessageFormat.format("unbindDestinationService({0})", destinationService)); //$NON-NLS-1$
-        this.destinationService = null;
-    }
-
     synchronized void startAllTasks() {
         if (schedulerService != null) {
             if (scheduleId != null) {
@@ -121,7 +108,7 @@ public class MavenResolverServiceImpl implements MavenResolverService, EventList
                             if (StringUtils.isBlank(userId)) {
                                 userId = MavenResolverService.class.getName();
                             }
-                            return new MavenResolverRunnable(configService, destinationService, nexusClient, userId);
+                            return new MavenResolverRunnable(nexusClient, userId);
                         }
                     };
                     scheduleId = schedulerService.registerSchedule(runnableSchedule);

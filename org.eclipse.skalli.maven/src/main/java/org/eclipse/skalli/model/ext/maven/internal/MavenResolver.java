@@ -10,11 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal;
 
-import static org.apache.http.HttpStatus.*;
-
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,53 +19,26 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.params.HttpClientParams;
-import org.apache.http.params.HttpParams;
-import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
-import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenModule;
-import org.eclipse.skalli.model.ext.maven.MavenPathResolver;
-import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
+import org.eclipse.skalli.model.ext.maven.MavenPomResolver;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
-import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
-import org.eclipse.skalli.services.destination.DestinationService;
-import org.eclipse.skalli.services.destination.HttpUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class MavenResolver implements Issuer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MavenResolver.class);
 
     protected final UUID project;
-    protected final MavenPomParser parser;
-    protected final MavenPathResolver pathResolver;
-    protected final DestinationService destinationService;
-
-    private HttpClient client;
+    protected final MavenPomResolver pomResolver;
 
     /**
      * Creates a resolver for a given project.
      * @param project  the unique identifier of the project for which reactor information is to be calculated.
-     * @param pathResolver  the path resolver to use to convert resource paths to download URLs.
+     * @param pomResolver  the path resolver to use to convert resource paths to download URLs.
      */
-    public MavenResolver(UUID project, MavenPathResolver pathResolver, DestinationService destinationService) {
-        this(project, new MavenPomParserImpl(), pathResolver, destinationService);
-    }
-
-    // package protected for testing purposes
-    MavenResolver(UUID project, MavenPomParser parser, MavenPathResolver pathResolver,
-            DestinationService destinationService) {
+    public MavenResolver(UUID project, MavenPomResolver pomResolver) {
         this.project = project;
-        this.parser = parser;
-        this.pathResolver = pathResolver;
-        this.destinationService = destinationService;
+        this.pomResolver = pomResolver;
     }
 
     /**
@@ -93,15 +62,8 @@ public class MavenResolver implements Issuer {
      */
     public MavenReactor resolve(String scmLocation, String reactorPomPath)
             throws IOException, MavenValidationException {
-        if (destinationService == null) {
-            throw new IllegalArgumentException("destination service not available");
-        }
-        if (!pathResolver.canResolve(scmLocation)) {
-            throw new IllegalArgumentException(MessageFormat.format(
-                    "path resolver {0} is not applicable to scmLocation={1}", pathResolver.getClass(), scmLocation));
-        }
         MavenReactor mavenReactor = new MavenReactor();
-        MavenPom reactorPom = getMavenPom(scmLocation, reactorPomPath);
+        MavenPom reactorPom = pomResolver.getMavenPom(project, scmLocation, reactorPomPath);
         if (reactorPom == null) {
             throw new MavenValidationException(MessageFormat.format(
                     "no pom for scm location {0} and reactorPomPath {1}", scmLocation, reactorPomPath));
@@ -124,7 +86,7 @@ public class MavenResolver implements Issuer {
             String relativePath, MavenModule parent)
             throws IOException, MavenValidationException {
         TreeSet<MavenModule> result = new TreeSet<MavenModule>();
-        MavenPom modulePom = getMavenPom(scmLocation, relativePath);
+        MavenPom modulePom = pomResolver.getMavenPom(project, scmLocation, relativePath);
         if (modulePom == null) {
             return result;
         }
@@ -159,82 +121,4 @@ public class MavenResolver implements Issuer {
         return self;
     }
 
-    // package protected for testing purposes
-    MavenPom getMavenPom(String scmLocation, String relativePath)
-            throws IOException, MavenValidationException {
-        URL url = pathResolver.resolvePath(scmLocation, relativePath);
-        if (url == null) {
-            throw new MavenValidationException(MessageFormat.format(
-                    "url to read the pom for scm {0}, relativePath {1} is null.", scmLocation, relativePath));
-        }
-        return getMavenPom(url);
-    }
-
-    // package protected for testing purposes
-    MavenPom getMavenPom(URL url) throws IOException, MavenValidationException {
-        MavenPom mavenPom = null;
-
-        HttpClient client = getClient(url);
-        HttpResponse response = null;
-        try {
-            LOG.info("GET " + url); //$NON-NLS-1$
-            HttpGet method = new HttpGet(url.toExternalForm());
-            response = client.execute(method);
-            int status = response.getStatusLine().getStatusCode();
-            LOG.info(status + " " + response.getStatusLine().getReasonPhrase()); //$NON-NLS-1$
-            if (status == HttpStatus.SC_OK) {
-                InputStream in = response.getEntity().getContent();
-                mavenPom = parser.parse(in);
-            }
-            else {
-                String statusText = response.getStatusLine().getReasonPhrase();
-                switch (status) {
-                case SC_NOT_FOUND:
-                    throw new MavenValidationException(
-                            new Issue(Severity.ERROR, MavenResolver.class, project,
-                                    MavenProjectExt.class, MavenReactorProjectExt.PROPERTY_MAVEN_REACTOR,
-                                    MessageFormat.format("{0} not found", url)));
-                case SC_UNAUTHORIZED:
-                    throw new MavenValidationException(
-                            new Issue(Severity.WARNING, MavenResolver.class, project,
-                                    MavenProjectExt.class, MavenReactorProjectExt.PROPERTY_MAVEN_REACTOR,
-                                    MessageFormat.format("{0} found but authentication required", url, status,
-                                            statusText)));
-                case SC_INTERNAL_SERVER_ERROR:
-                case SC_SERVICE_UNAVAILABLE:
-                case SC_GATEWAY_TIMEOUT:
-                case SC_INSUFFICIENT_STORAGE:
-                    throw new MavenValidationException(
-                            new Issue(Severity.WARNING, MavenResolver.class, project,
-                                    MavenProjectExt.class, MavenReactorProjectExt.PROPERTY_MAVEN_REACTOR,
-                                    MessageFormat.format("{0} not found. Host reports a temporary problem: {1} {2}",
-                                            url, status, statusText)));
-                case SC_MOVED_PERMANENTLY:
-                    throw new MavenValidationException(
-                            new Issue(Severity.WARNING, MavenResolver.class, project,
-                                    MavenProjectExt.class, MavenReactorProjectExt.PROPERTY_MAVEN_REACTOR,
-                                    MessageFormat.format("{0} not found. Resource has been moved permanently to {1}",
-                                            url, response.getFirstHeader("Location"))));
-                default:
-                    throw new MavenValidationException(
-                            new Issue(Severity.ERROR, MavenResolver.class, project,
-                                    MavenProjectExt.class, MavenReactorProjectExt.PROPERTY_MAVEN_REACTOR,
-                                    MessageFormat.format("{0} not found. Host responded with {1} {2}", url, status,
-                                            statusText)));
-                }
-            }
-        } finally {
-            HttpUtils.consumeQuietly(response);
-        }
-        return mavenPom;
-    }
-
-    private HttpClient getClient(URL url) {
-        if (client == null) {
-            client = destinationService.getClient(url);
-            HttpParams params = client.getParams();
-            HttpClientParams.setRedirecting(params, false); // we want to find 301 MOVED PERMANTENTLY
-        }
-        return client;
-    }
 }

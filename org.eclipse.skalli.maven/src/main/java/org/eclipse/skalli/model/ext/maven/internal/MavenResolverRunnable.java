@@ -13,24 +13,20 @@ package org.eclipse.skalli.model.ext.maven.internal;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.ComparatorUtils;
-import org.eclipse.skalli.ext.mapping.MapperUtil;
-import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
-import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
-import org.eclipse.skalli.model.ext.maven.MavenPathResolver;
+import org.eclipse.skalli.model.ext.maven.MavenPomResolver;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
 import org.eclipse.skalli.nexus.NexusClient;
 import org.eclipse.skalli.services.Services;
-import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.destination.DestinationService;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +35,6 @@ public class MavenResolverRunnable implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MavenResolverRunnable.class);
 
-    private ConfigurationService configService;
-    private DestinationService destinationService;
     private NexusClient nexusClient;
     private String userId;
 
@@ -49,10 +43,7 @@ public class MavenResolverRunnable implements Runnable {
      * @param nexusClient - if set versions are calculated via nexusClinet. If nexusClient is null the versions cant be calculated.
      * @param userId
      */
-    public MavenResolverRunnable(ConfigurationService configService, DestinationService destinationService,
-            NexusClient nexusClient, String userId) {
-        this.configService = configService;
-        this.destinationService = destinationService;
+    public MavenResolverRunnable(NexusClient nexusClient, String userId) {
         this.userId = userId;
         this.nexusClient = nexusClient;
     }
@@ -151,14 +142,11 @@ public class MavenResolverRunnable implements Runnable {
         if (scmLocation == null) {
             return null;
         }
-        MavenPathResolver pathResolver = getMavenPathResolver(configService, scmLocation);
-        if (pathResolver == null) {
+        MavenPomResolver pomResolver = getMavenPomResolver(scmLocation);
+        if (pomResolver == null) {
             return null;
         }
-        if (!pathResolver.canResolve(scmLocation)) {
-            return null;
-        }
-        MavenResolver resolver = getMavenResolver(project.getUuid(), pathResolver);
+        MavenResolver resolver = getMavenResolver(project.getUuid(), pomResolver);
         return resolver.resolve(scmLocation, reactorPomPath);
     }
 
@@ -215,46 +203,26 @@ public class MavenResolverRunnable implements Runnable {
     }
 
     // package protected for testing purposes
-    MavenPathResolver getMavenPathResolver(ConfigurationService configService, String scmLocation) {
-        if (configService == null) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("no configuration service available");
-            }
+    MavenPomResolver getMavenPomResolver(String scmLocation) {
+        Set<MavenPomResolver> mavenPomResolvers = Services.getServices(MavenPomResolver.class);
+
+        if (mavenPomResolvers.isEmpty()) {
+            LOG.debug("no " + MavenPomResolver.class.getName() + " configuration");
             return null;
         }
-        if (destinationService == null) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("no destination service available");
-            }
-            return null;
-        }
-        ScmLocationMapper mapper = new ScmLocationMapper();
-        List<ScmLocationMappingConfig> mappings = mapper.getMappings(configService,
-                "git", ScmLocationMapper.MAVEN_RESOLVER); //$NON-NLS-1$
-        if (mappings.isEmpty()) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(MessageFormat.format(
-                        "no suitable scm mapping found matching filter provider=''git'' && purpose=''{0}''",
-                        ScmLocationMapper.MAVEN_RESOLVER));
-            }
-            return null;
-        }
-        for (ScmLocationMappingConfig mapping : mappings) {
-            if (MapperUtil.matches(scmLocation, mapping)) {
-                return new GitWebPathResolver(mapping.getPattern(), mapping.getTemplate());
+
+        for (MavenPomResolver mavenPomResolver: mavenPomResolvers) {
+            if (mavenPomResolver.canResolve(scmLocation)) {
+                return mavenPomResolver;
             }
         }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(MessageFormat.format(
-                    "no suitable scm mapping found matching scmLocation=''{0}'' && purpose=''{1}''",
-                    scmLocation, ScmLocationMapper.MAVEN_RESOLVER));
-        }
+
         return null;
     }
 
     // package protected for testing purposes
-    MavenResolver getMavenResolver(UUID entityId, MavenPathResolver pathResolver) {
-        return new MavenResolver(entityId, pathResolver, destinationService);
+    MavenResolver getMavenResolver(UUID entityId, MavenPomResolver mavenPomResolver) {
+        return new MavenResolver(entityId, mavenPomResolver);
     }
 
     // package protected for testing purposes
