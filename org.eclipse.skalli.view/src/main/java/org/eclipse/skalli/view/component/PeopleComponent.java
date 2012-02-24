@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.component;
 
+import java.util.Comparator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Member;
@@ -93,9 +95,18 @@ public class PeopleComponent extends CustomComponent {
 
     static class PeopleListComponent extends CustomComponent {
         public PeopleListComponent(Set<User> users) {
+
+            TreeSet<User> sortedUsers = new TreeSet<User>(new Comparator<User>() {
+                @Override
+                public int compare(User u1, User u2) {
+                    return u1.getDisplayName().compareTo(u2.getDisplayName());
+                }
+            });
+            sortedUsers.addAll(users);
+
             Layout layout = new CssLayout();
             layout.setSizeFull();
-            for (User user : users) {
+            for (User user : sortedUsers) {
                 layout.addComponent(new PeopleComponent(user));
             }
             setCompositionRoot(layout);
