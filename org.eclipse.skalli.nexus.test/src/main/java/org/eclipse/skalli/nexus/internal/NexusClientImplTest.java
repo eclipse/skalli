@@ -163,7 +163,7 @@ public class NexusClientImplTest {
         };
 
         nexusClientImpl.bindConfigurationService(configService);
-        nexusClientImpl.bindDestinationService(destinationService);
+
 
         NexusSearchResult nexusSearchResult = nexusClientImpl.searchArtifactVersions(groupId, artifactId);
         assertNexusSearchResult(nexusSearchResult);
@@ -236,7 +236,6 @@ public class NexusClientImplTest {
         };
 
         nexusClientImpl.bindConfigurationService(configService);
-        nexusClientImpl.bindDestinationService(destinationService);
 
         try {
             nexusClientImpl.searchArtifactVersions(groupId, artifactId);

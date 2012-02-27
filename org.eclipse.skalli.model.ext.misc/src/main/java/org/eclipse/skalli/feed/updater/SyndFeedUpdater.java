@@ -23,8 +23,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.eclipse.skalli.services.Services;
-import org.eclipse.skalli.services.destination.DestinationService;
+import org.eclipse.skalli.services.destination.Destinations;
 import org.eclipse.skalli.services.destination.HttpUtils;
 import org.eclipse.skalli.services.feed.FeedEntry;
 import org.eclipse.skalli.services.feed.FeedFactory;
@@ -62,9 +61,8 @@ public class SyndFeedUpdater implements FeedUpdater {
 
     private SyndFeed getSyndFeed() throws IOException, FeedException {
         SyndFeed syndFeed = null;
-        DestinationService destinationService = Services.getService(DestinationService.class);
-        if (destinationService != null) {
-            HttpClient client = destinationService.getClient(url);
+        HttpClient client = Destinations.getClient(url);
+        if (client != null) {
             Reader reader = null;
             HttpResponse response = null;
             try {

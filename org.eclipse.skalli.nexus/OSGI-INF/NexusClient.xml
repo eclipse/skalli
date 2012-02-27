@@ -21,11 +21,4 @@
         policy="dynamic"
         bind="bindConfigurationService"
         unbind="unbindConfigurationService"/>
-     <reference
-        name="DestinationService"
-        interface="org.eclipse.skalli.services.destination.DestinationService"
-        cardinality="1..1"
-        policy="dynamic"
-        bind="bindDestinationService"
-        unbind="unbindDestinationService"/>
 </scr:component>

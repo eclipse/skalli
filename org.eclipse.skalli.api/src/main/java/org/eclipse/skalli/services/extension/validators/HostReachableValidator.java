@@ -38,8 +38,7 @@ import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Severity;
-import org.eclipse.skalli.services.Services;
-import org.eclipse.skalli.services.destination.DestinationService;
+import org.eclipse.skalli.services.destination.Destinations;
 import org.eclipse.skalli.services.destination.HttpUtils;
 import org.eclipse.skalli.services.extension.PropertyValidator;
 import org.slf4j.Logger;
@@ -140,9 +139,8 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
             return;
         }
 
-        DestinationService destinationService = Services.getService(DestinationService.class);
-        if (destinationService != null && destinationService.isSupportedProtocol(url)) {
-            HttpClient client = destinationService.getClient(url);
+        HttpClient client = Destinations.getClient(url);
+        if (client != null) {
             HttpResponse response = null;
             try {
                 url = encodeURL(url);
@@ -172,8 +170,6 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
             CollectionUtils.addSafe(issues, getIssueByReachableHost(minSeverity, entityId, item, url.getHost()));
         }
     }
-
-
 
     // use URI to properly encode the given URL
     static URL encodeURL(URL url) throws MalformedURLException {

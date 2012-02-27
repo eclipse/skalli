@@ -52,6 +52,8 @@ public class ScmLocationMapper extends LinkMapperBase {
 
     public static final String ALL_PROVIDERS = "*"; //$NON-NLS-1$
 
+    public static final String DESTINATION = "destination";
+
     public List<ScmLocationMappingConfig> getMappings(ConfigurationService configService, String provider,
             String... purposes) {
         List<ScmLocationMappingConfig> mappings = new ArrayList<ScmLocationMappingConfig>();

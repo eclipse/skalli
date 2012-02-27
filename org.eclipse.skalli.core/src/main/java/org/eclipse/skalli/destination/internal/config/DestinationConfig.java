@@ -15,24 +15,23 @@ import org.eclipse.skalli.services.configuration.rest.Protect;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("destination")
-public class Destination {
+public class DestinationConfig {
     private String id;
     private String authenticationMethod;
     private String pattern;
     private String user;
     @Protect
-    public String password;
+    private String password;
+    private String service;
 
-    public Destination() {
+    public DestinationConfig() {
     }
 
-    public Destination(String id) {
-        super();
+    public DestinationConfig(String id) {
         this.id = id;
     }
 
-    public Destination(String id, String pattern, String user, String password) {
-        super();
+    public DestinationConfig(String id, String pattern, String user, String password) {
         this.id = id;
         this.pattern = pattern;
         this.user = user;

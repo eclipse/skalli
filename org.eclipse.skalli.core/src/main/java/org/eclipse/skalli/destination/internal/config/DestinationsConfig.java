@@ -20,20 +20,20 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 public class DestinationsConfig {
 
     @XStreamImplicit
-    private List<Destination> destinations;
+    private List<DestinationConfig> destinations;
 
-    public List<Destination> getDestinations() {
+    public List<DestinationConfig> getDestinations() {
         if (destinations == null) {
-            destinations = new ArrayList<Destination>();
+            destinations = new ArrayList<DestinationConfig>();
         }
         return destinations;
     }
 
-    public void setDestinations(List<Destination> destinations) {
+    public void setDestinations(List<DestinationConfig> destinations) {
         this.destinations = destinations;
     }
 
-    public void addDestination(Destination dest) {
+    public void addDestination(DestinationConfig dest) {
         getDestinations().add(dest);
     }
 }

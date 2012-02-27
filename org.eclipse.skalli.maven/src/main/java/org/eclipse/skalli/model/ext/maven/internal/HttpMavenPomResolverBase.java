@@ -17,7 +17,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.params.HttpParams;
-import org.eclipse.skalli.services.destination.DestinationService;
+import org.eclipse.skalli.services.destination.Destinations;
 import org.eclipse.skalli.services.destination.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,18 +25,6 @@ import org.slf4j.LoggerFactory;
 public abstract class HttpMavenPomResolverBase extends MavenPomResolverBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpMavenPomResolverBase.class);
-
-    private DestinationService destinationService;
-
-    protected void bindDestinationService(DestinationService destinationService) {
-        LOG.info(MessageFormat.format("bindDestinationService({0})", destinationService)); //$NON-NLS-1$
-        this.destinationService = destinationService;
-    }
-
-    protected void unbindDestinationService(DestinationService destinationService) {
-        LOG.info(MessageFormat.format("unbindDestinationService({0})", destinationService)); //$NON-NLS-1$
-        this.destinationService = null;
-    }
 
     /**
      * Calculates the <code>URL</code> corresponding to the parameters <code>scmLocation</code> and <code>relativePath</code>.
@@ -69,8 +57,13 @@ public abstract class HttpMavenPomResolverBase extends MavenPomResolverBase {
         }
     }
 
-    private MavenPom parse(URL url, String relativePath) throws IOException, HttpException, MavenValidationException {
-        HttpClient client = destinationService.getClient(url);
+    private MavenPom parse(URL url, String relativePath) throws IOException, HttpException,
+            MavenValidationException {
+        HttpClient client = Destinations.getClient(url);
+        if (client == null) {
+            //we can't read the Url
+            return null;
+        }
         HttpParams params = client.getParams();
         HttpClientParams.setRedirecting(params, false); // we want to find 301 MOVED PERMANTENTLY
         HttpResponse response = null;

@@ -24,8 +24,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.params.HttpClientParams;
-import org.apache.http.params.HttpParams;
 import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.nexus.NexusClient;
 import org.eclipse.skalli.nexus.NexusClientException;
@@ -33,7 +31,7 @@ import org.eclipse.skalli.nexus.NexusSearchResult;
 import org.eclipse.skalli.nexus.internal.config.NexusConfig;
 import org.eclipse.skalli.nexus.internal.config.NexusResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.destination.DestinationService;
+import org.eclipse.skalli.services.destination.Destinations;
 import org.eclipse.skalli.services.destination.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +44,6 @@ public class NexusClientImpl implements NexusClient {
     private static final Logger LOG = LoggerFactory.getLogger(NexusClientImpl.class);
 
     private ConfigurationService configService;
-    private DestinationService destinationService;
     private HttpClient client;
 
     /* (non-Javadoc)
@@ -58,10 +55,6 @@ public class NexusClientImpl implements NexusClient {
         if (configService == null) {
             throw new NexusClientException("No configuration service available");
         }
-        if (destinationService == null) {
-            throw new NexusClientException("No destination service service available");
-        }
-
         NexusConfig nexusConfig = configService.readCustomization(NexusResource.KEY, NexusConfig.class);
         if (nexusConfig == null) {
             throw new NexusClientException(MessageFormat.format("Nexus configuration not found (key={0})",
@@ -128,9 +121,7 @@ public class NexusClientImpl implements NexusClient {
 
     private HttpClient getClient(URL url) {
         if (client == null) {
-            client = destinationService.getClient(url);
-            HttpParams params = client.getParams();
-            HttpClientParams.setRedirecting(params, false); // we want to find 301 MOVED PERMANTENTLY
+            client = Destinations.getClient(url);
         }
         return client;
     }
@@ -145,15 +136,4 @@ public class NexusClientImpl implements NexusClient {
         LOG.info(MessageFormat.format("unbindConfigurationService({0})", configService)); //$NON-NLS-1$
         this.configService = null;
     }
-
-    protected void bindDestinationService(DestinationService destinationService) {
-        LOG.info(MessageFormat.format("bindDestinationService({0})", configService)); //$NON-NLS-1$
-        this.destinationService = destinationService;
-
-    }
-
-    protected void unbindDestinationService(DestinationService destinationService) {
-        LOG.info(MessageFormat.format("unbindDestinationService({0})", destinationService)); //$NON-NLS-1$
-        this.destinationService = null;
-    }
-}
+  }

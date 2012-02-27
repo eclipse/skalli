@@ -37,7 +37,7 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.eclipse.skalli.destination.internal.config.Destination;
+import org.eclipse.skalli.destination.internal.config.DestinationConfig;
 import org.eclipse.skalli.destination.internal.config.DestinationsConfig;
 import org.eclipse.skalli.destination.internal.config.DestinationsResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
@@ -144,7 +144,7 @@ public class DestinationServiceImpl implements DestinationService {
             return;
         }
 
-        for (Destination destination : config.getDestinations()) {
+        for (DestinationConfig destination : config.getDestinations()) {
             Pattern regex = Pattern.compile(destination.getPattern());
             Matcher matcher = regex.matcher(url.toExternalForm());
             if (matcher.matches()) {
@@ -152,6 +152,7 @@ public class DestinationServiceImpl implements DestinationService {
                     LOG.debug(MessageFormat.format("matched URL {0} with destination ''{1}''", url.toExternalForm(),
                             destination.getId()));
                 }
+
                 if (StringUtils.isNotBlank(destination.getUser()) && StringUtils.isNotBlank(destination.getPattern())) {
                     String authenticationMethod = destination.getAuthenticationMethod();
                     if ("basic".equalsIgnoreCase(authenticationMethod)) { //$NON-NLS-1$

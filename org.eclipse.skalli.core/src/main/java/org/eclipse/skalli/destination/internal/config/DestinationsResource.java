@@ -32,7 +32,7 @@ public class DestinationsResource extends CustomizingResource<DestinationsConfig
     @Override
     protected List<Class<?>> getAdditionalConfigClasses() {
         List<Class<?>> ret = new LinkedList<Class<?>>();
-        ret.add(Destination.class);
+        ret.add(DestinationConfig.class);
         return ret;
     }
 

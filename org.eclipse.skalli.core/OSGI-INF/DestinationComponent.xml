@@ -22,4 +22,5 @@
         policy="dynamic"
         bind="bindConfigurationService"
         unbind="unbindConfigurationService"/>
+    <property name="destinationService.type" type="String" value="default"/>
 </scr:component>
