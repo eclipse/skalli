@@ -22,7 +22,8 @@ public enum ConfigKeyGerrit implements ConfigKey {
     PRIVATEKEY("scm.gerrit.privatekey", "", true),
     PASSPHRASE("scm.gerrit.passphrase", "", true),
     CONTACT("scm.gerrit.contact", "", false),
-    PARENT("scm.gerrit.parent", "", false);
+    PARENT("scm.gerrit.parent", "", false),
+    SCM_TEMPLATE("scm.gerrit.template","scm:git:git://${scm.gerrit.host}/${repository}.git", false);
 
     private final String key;
     private final String defaultValue;

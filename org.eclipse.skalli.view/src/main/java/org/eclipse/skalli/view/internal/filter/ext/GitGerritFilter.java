@@ -16,8 +16,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -33,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritService;
@@ -222,7 +225,14 @@ public class GitGerritFilter implements Filter {
                             devInf = new DevInfProjectExt();
                             project.addExtension(devInf);
                         }
-                        String newScmLocation = getScmLocationStaticPart() + repo + GIT_EXT;
+                        Map<String, String> parameters = new HashMap<String, String>();
+                        parameters.put(ConfigKeyGerrit.HOST.getKey(), fromConfig(ConfigKeyGerrit.HOST));
+                        parameters.put("repository", repo);
+                        parameters.put(ConfigKeyGerrit.PORT.getKey(), fromConfig(ConfigKeyGerrit.PORT));
+                        StrSubstitutor substitutor = new StrSubstitutor(parameters);
+                        String template = fromConfig(ConfigKeyGerrit.SCM_TEMPLATE);
+                        String newScmLocation = substitutor.replace(template);
+
                         if (!devInf.hasScmLocation(newScmLocation)) {
                             devInf.addScmLocation(newScmLocation);
                             Services.getRequiredService(ProjectService.class).persist(project, user.getUserId());
@@ -330,10 +340,10 @@ public class GitGerritFilter implements Filter {
             result.addAll(client.getGroups());
             return result;
         } catch (ConnectionException e) {
-            LOG.warn("Can't connect to gerrit:",e);
+            LOG.warn("Can't connect to gerrit:", e);
             return Collections.emptySet();
         } catch (CommandException e) {
-            LOG.warn("Can't connect to gerrit:",e);
+            LOG.warn("Can't connect to gerrit:", e);
             return Collections.emptySet();
         }
     }
@@ -405,9 +415,9 @@ public class GitGerritFilter implements Filter {
     /**
      * Constructs the static part of a SCM location for the configured Gerrit
      */
-    @SuppressWarnings("nls")
     private String getScmLocationStaticPart() {
-        return String.format("%s%s://%s/", GIT_PREFIX, fromConfig(ConfigKeyGerrit.PROTOCOL), fromConfig(ConfigKeyGerrit.HOST));
+        return String.format("%s%s://%s/", GIT_PREFIX, fromConfig(ConfigKeyGerrit.PROTOCOL),
+                fromConfig(ConfigKeyGerrit.HOST));
     }
 
     /**

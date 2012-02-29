@@ -23,6 +23,7 @@ public class GerritConfig {
     private String passphrase;
     private String contact;
     private String parent;
+    private String scmTemplate;
 
     public String getProtocol() {
         return protocol;
@@ -88,4 +89,11 @@ public class GerritConfig {
         this.parent = parent;
     }
 
+    public String getScmTemplate() {
+        return scmTemplate;
+    }
+
+    public void setScmTemplate(String scmTemplate) {
+        this.scmTemplate = scmTemplate;
+    }
 }

@@ -39,6 +39,7 @@ public class GerritResource extends ConfigResource<ConfigKeyGerrit, GerritConfig
         ret.put(ConfigKeyGerrit.PRIVATEKEY, configObject.getPrivateKey());
         ret.put(ConfigKeyGerrit.CONTACT, configObject.getContact());
         ret.put(ConfigKeyGerrit.PARENT, configObject.getParent());
+        ret.put(ConfigKeyGerrit.SCM_TEMPLATE, configObject.getScmTemplate());
         return ret;
     }
 
@@ -53,6 +54,7 @@ public class GerritResource extends ConfigResource<ConfigKeyGerrit, GerritConfig
         ret.setPrivateKey(values.get(ConfigKeyGerrit.PRIVATEKEY));
         ret.setContact(values.get(ConfigKeyGerrit.CONTACT));
         ret.setParent(values.get(ConfigKeyGerrit.PARENT));
+        ret.setScmTemplate(values.get(ConfigKeyGerrit.SCM_TEMPLATE));
         return ret;
     }
 
