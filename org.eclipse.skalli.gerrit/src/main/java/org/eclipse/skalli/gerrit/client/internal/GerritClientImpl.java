@@ -203,9 +203,6 @@ public class GerritClientImpl implements GerritClient {
         if (name == null) {
             throw andDisconnect(new IllegalArgumentException("'name' is required"));
         }
-        if (StringUtils.contains(name, " ")) {
-            throw andDisconnect(new IllegalArgumentException("'name' must not contain whitespaces"));
-        }
 
         appendArgument(sb, "owner", owner);
         appendArgument(sb, "description", description);

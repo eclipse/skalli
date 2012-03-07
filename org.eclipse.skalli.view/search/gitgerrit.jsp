@@ -139,7 +139,7 @@
              <td>Gerrit Group:</td>
              <td>
                <strong>'${param.group}'</strong>
-            <c:if test="${invalidGroup}">is invalid<br />(must not be blank, no whitespaces)</c:if>
+            <c:if test="${invalidGroup}">must not be blank</c:if>
             <c:if test="${!invalidGroup && groupExists}">already exists</c:if>
             <c:if test="${!invalidGroup && !groupExists}">will be created</c:if>
              </td>

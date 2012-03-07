@@ -94,8 +94,6 @@ public class GitGerritFilter implements Filter {
     public static final String GIT_PREFIX = "scm:git:"; //$NON-NLS-1$
     public static final String GIT_EXT = ".git"; //$NON-NLS-1$
 
-    private static final String SPACE = " "; //$NON-NLS-1$
-
     private static final Logger LOG = LoggerFactory.getLogger(GitGerritFilter.class);
 
     @Override
@@ -173,14 +171,14 @@ public class GitGerritFilter implements Filter {
                 client.connect();
 
                 // general group checks
-                final boolean invalidGroup = StringUtils.isBlank(group) || StringUtils.contains(group, SPACE);
+                final boolean invalidGroup = StringUtils.isBlank(group);
                 request.setAttribute(ATTRIBUTE_INVALID_GROUP, invalidGroup);
                 final boolean groupExists = !invalidGroup && client.groupExists(group);
                 request.setAttribute(ATTRIBUTE_GROUP_EXISTS, groupExists);
                 final boolean createGroup = !invalidGroup && !groupExists;
 
                 // general repo checks
-                final boolean invalidRepo = StringUtils.isBlank(repo) || StringUtils.contains(repo, SPACE);
+                final boolean invalidRepo = StringUtils.isBlank(repo) || StringUtils.contains(repo, " "); //$NON-NLS-1$
                 request.setAttribute(ATTRIBUTE_INVALID_REPO, invalidRepo);
                 final boolean repoExists = !invalidRepo && client.projectExists(repo);
                 request.setAttribute(ATTRIBUTE_REPO_EXISTS, repoExists);

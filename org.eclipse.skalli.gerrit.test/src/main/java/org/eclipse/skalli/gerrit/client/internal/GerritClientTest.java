@@ -261,15 +261,15 @@ public class GerritClientTest {
 
   @Test
   public void testInvalidGroupNames() throws Exception {
-    String[] invalidGroupNames = new String[] { null, "", " ", "my group" };
+    String[] invalidGroupNames = new String[] { null, "" };
     for (String invalidGroupName : invalidGroupNames) {
       try {
         client.createGroup(invalidGroupName, null, DESCRIPTION, null);
         Assert.fail(String.format("No error for group name '%s'.", invalidGroupName));
       } catch (GerritClientException e) {
-        LOG.debug(MessageFormat.format("'{0}' is identified as an invalid project name.", invalidGroupName));
+        LOG.debug(MessageFormat.format("'{0}' is identified as an invalid group name.", invalidGroupName));
       } catch (IllegalArgumentException e) {
-        LOG.debug(MessageFormat.format("'{0}' is identified as an invalid project name.", invalidGroupName));
+        LOG.debug(MessageFormat.format("'{0}' is identified as an invalid group name.", invalidGroupName));
       }
     }
   }
