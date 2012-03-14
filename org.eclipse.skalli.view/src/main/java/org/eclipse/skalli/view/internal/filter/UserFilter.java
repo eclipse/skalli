@@ -22,7 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.User;
-import org.eclipse.skalli.services.user.LoginUtils;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.permit.PermitService;
 import org.eclipse.skalli.services.user.UserUtils;
 import org.eclipse.skalli.view.Consts;
 
@@ -43,8 +44,8 @@ public class UserFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
 
-        LoginUtils loginUtil = new LoginUtils((HttpServletRequest)request);
-        String userId = loginUtil.getLoggedInUserId();
+        PermitService permitService = Services.getRequiredService(PermitService.class);
+        String userId = permitService.login((HttpServletRequest) request, null);
         if (StringUtils.isNotBlank(userId)) {
             request.setAttribute(Consts.ATTRIBUTE_USERID, userId);
             User user = UserUtils.getUser(userId);
