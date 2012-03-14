@@ -23,15 +23,15 @@ import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.commons.PeopleExtension;
-import org.eclipse.skalli.services.role.RoleServiceBase;
+import org.eclipse.skalli.services.role.RoleProviderBase;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class CoreRoleService extends RoleServiceBase {
+public final class CoreRoleProvider extends RoleProviderBase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CoreRoleService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CoreRoleProvider.class);
 
     private static final String ROLE_LEAD = "projectlead"; //$NON-NLS-1$
     private static final String ROLE_MEMBER = "projectmember"; //$NON-NLS-1$

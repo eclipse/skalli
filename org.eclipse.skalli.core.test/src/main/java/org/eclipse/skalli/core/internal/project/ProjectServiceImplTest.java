@@ -28,7 +28,7 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ProjectNature;
 import org.eclipse.skalli.model.ext.commons.PeopleExtension;
 import org.eclipse.skalli.model.ext.commons.TagsExtension;
-import org.eclipse.skalli.model.ext.people.internal.CoreRoleService;
+import org.eclipse.skalli.model.ext.people.internal.CoreRoleProvider;
 import org.eclipse.skalli.services.persistence.PersistenceService;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
 import org.eclipse.skalli.testutil.BundleManager;
@@ -144,7 +144,7 @@ public class ProjectServiceImplTest {
         ps = new ProjectServiceImpl();
         ps.bindPersistenceService(mockIPS);
         ps.bindProjectTemplateService(mockTS);
-        ps.bindRoleService(new CoreRoleService());
+        ps.bindRoleProvider(new CoreRoleProvider());
 
         reset(mocks);
         recordMocks();

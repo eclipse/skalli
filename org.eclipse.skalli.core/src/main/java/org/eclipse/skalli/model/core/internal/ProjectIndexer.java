@@ -19,7 +19,7 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.IndexerBase;
-import org.eclipse.skalli.services.role.RoleService;
+import org.eclipse.skalli.services.role.RoleProvider;
 import org.eclipse.skalli.services.user.UserService;
 import org.eclipse.skalli.services.user.UserServices;
 
@@ -32,8 +32,8 @@ public class ProjectIndexer extends IndexerBase<Project> {
     protected void indexFields(Project project) {
         UserService userService = UserServices.getUserService();
         TreeSet<Member> members = new TreeSet<Member>();
-        for (RoleService roleService : Services.getServices(RoleService.class)) {
-            members.addAll(roleService.getMembers(project));
+        for (RoleProvider roleProvider : Services.getServices(RoleProvider.class)) {
+            members.addAll(roleProvider.getMembers(project));
         }
 
         addField(Project.PROPERTY_UUID, project.getUuid().toString(), true, true);

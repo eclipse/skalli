@@ -23,14 +23,14 @@ import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.scrum.ScrumProjectExt;
-import org.eclipse.skalli.services.role.RoleServiceBase;
+import org.eclipse.skalli.services.role.RoleProviderBase;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ScrumRoleService extends RoleServiceBase {
-    private static final Logger LOG = LoggerFactory.getLogger(ScrumRoleService.class);
+public class ScrumRoleProvider extends RoleProviderBase {
+    private static final Logger LOG = LoggerFactory.getLogger(ScrumRoleProvider.class);
 
     private static final String ROLE_SM = "scrummaster"; //$NON-NLS-1$
     private static final String ROLE_PO = "productowner"; //$NON-NLS-1$

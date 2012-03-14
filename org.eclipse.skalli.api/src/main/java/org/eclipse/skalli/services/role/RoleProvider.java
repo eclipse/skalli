@@ -22,10 +22,10 @@ import org.eclipse.skalli.model.Project;
  * with given role from a project. Each implementation of this interface recognizes
  * a certain set of roles and must be registered as OSGi service.
  */
-public interface RoleService {
+public interface RoleProvider {
 
     /**
-     * Returns the set of roles this member provider is able to recognize.
+     * Returns the set of roles this provider is able to recognize.
      *
      * @return a non-empty set of role names.
      */
@@ -33,7 +33,7 @@ public interface RoleService {
 
     /**
      * Returns the members of the project that are assigned to roles
-     * recognized by this member provider.
+     * recognized by this provider.
      *
      * @param project  the project to evaluate.
      * @return a map of members with role names as keys, or an empty map.
@@ -42,7 +42,7 @@ public interface RoleService {
 
     /**
      * Returns the members of the project that are assigned to roles
-     * recognized by this member provider.
+     * recognized by this provider.
      *
      * @param project  the project to evaluate.
      * @return a set of members, or an empty set.
@@ -50,7 +50,8 @@ public interface RoleService {
     public SortedSet<Member> getMembers(Project project);
 
     /**
-     * Returns the members of the project that are assigned to given roles.
+     * Returns the members of the project that are assigned to given roles
+     * recognized by this provider.
      *
      * @param project  the project to evaluate.
      * @param roles  the role names to search for.
@@ -63,7 +64,7 @@ public interface RoleService {
 
     /**
      * Adds the given member to a project and assigns a given role to this member.
-     * If the role is not supported by the member provider, nothing is added
+     * If the role is not supported by this provider, nothing is added
      * to the project.
      *
      * @param project  the project to which to add a member.

@@ -10,9 +10,9 @@
  -->
 
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.core.component.role">
-   <implementation class="org.eclipse.skalli.model.ext.people.internal.CoreRoleService"/>
+   <implementation class="org.eclipse.skalli.model.ext.people.internal.CoreRoleProvider"/>
    <service>
-      <provide interface="org.eclipse.skalli.services.role.RoleService"/>
+      <provide interface="org.eclipse.skalli.services.role.RoleProvider"/>
    </service>
 </scr:component>
 

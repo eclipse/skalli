@@ -21,7 +21,7 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
-import org.eclipse.skalli.services.role.RoleService;
+import org.eclipse.skalli.services.role.RoleProvider;
 
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
@@ -92,8 +92,8 @@ class ProjectConverter extends CommonProjectConverter {
             if ("userId".equals(field)) { //$NON-NLS-1$
                 member.setUserID(value);
             } else if ("role".equals(field)) { //$NON-NLS-1$
-                for (RoleService memberProvider : Services.getServices(RoleService.class)) {
-                    memberProvider.addMember(project, member, value);
+                for (RoleProvider roleProvider : Services.getServices(RoleProvider.class)) {
+                    roleProvider.addMember(project, member, value);
                 }
             }
             reader.moveUp();

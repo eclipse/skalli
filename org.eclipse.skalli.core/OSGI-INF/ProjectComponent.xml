@@ -41,11 +41,11 @@
         cardinality="0..1"
         policy="dynamic" />
     <reference
-        name="RoleService"
-        interface="org.eclipse.skalli.services.role.RoleService"
+        name="RoleProvider"
+        interface="org.eclipse.skalli.services.role.RoleProvider"
         cardinality="0..n"
         policy="dynamic"
-        bind="bindRoleService"
-        unbind="unbindRoleService"/>
+        bind="bindRoleProvider"
+        unbind="unbindRoleProvider"/>
 </scr:component>
 

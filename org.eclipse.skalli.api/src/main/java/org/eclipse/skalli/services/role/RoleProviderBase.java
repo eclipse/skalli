@@ -18,7 +18,7 @@ import java.util.TreeSet;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
 
-public abstract class RoleServiceBase implements RoleService {
+public abstract class RoleProviderBase implements RoleProvider {
 
     @Override
     public SortedSet<Member> getMembers(Project project, String... roles) {

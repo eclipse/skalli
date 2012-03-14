@@ -43,7 +43,7 @@ import org.eclipse.skalli.services.persistence.PersistenceService;
 import org.eclipse.skalli.services.project.InvalidParentChainException;
 import org.eclipse.skalli.services.project.ProjectNode;
 import org.eclipse.skalli.services.project.ProjectService;
-import org.eclipse.skalli.services.role.RoleService;
+import org.eclipse.skalli.services.role.RoleProvider;
 import org.eclipse.skalli.services.search.SearchService;
 import org.eclipse.skalli.services.template.NoSuchTemplateException;
 import org.eclipse.skalli.services.template.ProjectTemplate;
@@ -73,7 +73,7 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
 
 
     private ProjectTemplateService projectTemplateService;
-    private Set<RoleService> roleServices = new HashSet<RoleService>();
+    private Set<RoleProvider> roleProviders = new HashSet<RoleProvider>();
 
     @Override
     protected void activate(ComponentContext context) {
@@ -97,12 +97,12 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
         this.projectTemplateService = null;
     }
 
-    protected void bindRoleService(RoleService roleService) {
-        roleServices.add(roleService);
+    protected void bindRoleProvider(RoleProvider roleProvider) {
+        roleProviders.add(roleProvider);
     }
 
-    protected void unbindRoleService(RoleService roleService) {
-        roleServices.remove(roleService);
+    protected void unbindRoleProvider(RoleProvider roleProvider) {
+        roleProviders.remove(roleProvider);
     }
 
     @Override
@@ -534,8 +534,8 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
     @Override
     public SortedSet<Member> getMembers(Project project) {
         TreeSet<Member> ret = new TreeSet<Member>();
-        for (RoleService roleService : roleServices) {
-            ret.addAll(roleService.getMembers(project));
+        for (RoleProvider roleProvider : roleProviders) {
+            ret.addAll(roleProvider.getMembers(project));
         }
         return ret;
     }
@@ -543,8 +543,8 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
     @Override
     public SortedSet<Member> getMembers(Project project, String... roles) {
         TreeSet<Member> ret = new TreeSet<Member>();
-        for (RoleService roleService : roleServices) {
-            ret.addAll(roleService.getMembers(project, roles));
+        for (RoleProvider roleProvider : roleProviders) {
+            ret.addAll(roleProvider.getMembers(project, roles));
         }
         return ret;
     }
@@ -552,8 +552,8 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
     @Override
     public Map<String, SortedSet<Member>> getMembersByRole(Project project) {
         Map<String, SortedSet<Member>> ret = new HashMap<String, SortedSet<Member>>();
-        for (RoleService roleService : roleServices) {
-            ret.putAll(roleService.getMembersByRole(project));
+        for (RoleProvider roleProvider : roleProviders) {
+            ret.putAll(roleProvider.getMembersByRole(project));
         }
         return ret;
     }
