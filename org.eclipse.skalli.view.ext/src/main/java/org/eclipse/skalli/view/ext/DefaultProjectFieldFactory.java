@@ -21,6 +21,7 @@ import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.PropertyValidator;
 import org.eclipse.skalli.services.extension.validators.MinMaxOccurrencesPropertyValidator;
+import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +57,16 @@ public abstract class DefaultProjectFieldFactory<T extends ExtensionEntityBase> 
         this.context = context;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public Field createField(Item item, Object propertyId, final Component uiContext) {
+
+        // if the logged in user is not allowed to see this property, don't create a field
+        if (!Permits.isAllowed("GET", "projects", project.getProjectId(), "extensions",
+                extensionService.getShortName(), "properties", (String)propertyId)) {
+            return null;
+        }
+
         String propertyName = propertyId.toString();
         String caption = getCaption(propertyName);
         Field field = createField(propertyId, caption);
@@ -113,6 +122,12 @@ public abstract class DefaultProjectFieldFactory<T extends ExtensionEntityBase> 
             if (defaultValue != null) {
                 field.setValue(defaultValue);
             }
+        }
+
+        // if the logged in user is not allowed to change this property, render a read-only field
+        if (!Permits.isAllowed("PUT", "projects", project.getProjectId(), "extensions",
+                extensionService.getShortName(), "properties", (String)propertyId)) {
+            field.setReadOnly(true);
         }
 
         if (projectTemplate.isReadOnly(extensionClassName, propertyId, isAdmin)) {

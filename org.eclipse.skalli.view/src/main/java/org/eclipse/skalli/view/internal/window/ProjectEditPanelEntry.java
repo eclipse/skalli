@@ -11,6 +11,8 @@
 package org.eclipse.skalli.view.internal.window;
 
 import java.text.MessageFormat;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.SortedSet;
 
 import org.apache.commons.io.FilenameUtils;
@@ -37,6 +39,7 @@ import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Embedded;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -81,6 +84,9 @@ class ProjectEditPanelEntry extends CustomComponent {
     private ExtensionService<? extends ExtensionEntityBase> extensionService;
     private ProjectEditContext context;
     private Application application;
+
+    private Set<String> readOnlyFieldsIds = new HashSet<String>();
+    private Set<String> disabledFieldsIds = new HashSet<String>();
 
     // service to create a Vaadin form for the extension
     // and retrieve caption/description/icon for the tray
@@ -393,8 +399,8 @@ class ProjectEditPanelEntry extends CustomComponent {
             visibleButton.setDescription(BUTTON_TEXT_SHOW);
             visibleButton.setStyleName(STYLE_TRAY_CLOSED);
             form.setVisible(false);
-            form.setEnabled(false);
-            form.setReadOnly(false);
+            setFormEnabled(false);
+            setFormReadOnly(true);
             editButton.removeStyleName(STYLE_BUTTON_SELECTED);
             inheritButton.removeStyleName(STYLE_BUTTON_SELECTED);
             disableButton.addStyleName(STYLE_BUTTON_SELECTED);
@@ -414,8 +420,8 @@ class ProjectEditPanelEntry extends CustomComponent {
             visibleButton.setDescription(BUTTON_TEXT_HIDE);
             visibleButton.setStyleName(STYLE_TRAY_OPEN);
             form.setVisible(true);
-            form.setEnabled(true);
-            form.setReadOnly(true);
+            setFormEnabled(true);
+            setFormReadOnly(true);
             editButton.removeStyleName(STYLE_BUTTON_SELECTED);
             inheritButton.addStyleName(STYLE_BUTTON_SELECTED);
             disableButton.removeStyleName(STYLE_BUTTON_SELECTED);
@@ -435,8 +441,8 @@ class ProjectEditPanelEntry extends CustomComponent {
             visibleButton.setDescription(BUTTON_TEXT_SHOW);
             visibleButton.setStyleName(STYLE_TRAY_CLOSED);
             form.setVisible(false);
-            form.setEnabled(false);
-            form.setReadOnly(false);
+            setFormEnabled(false);
+            setFormReadOnly(false);
             editButton.removeStyleName(STYLE_BUTTON_SELECTED);
             inheritButton.addStyleName(STYLE_BUTTON_SELECTED);
             disableButton.removeStyleName(STYLE_BUTTON_SELECTED);
@@ -456,8 +462,8 @@ class ProjectEditPanelEntry extends CustomComponent {
             visibleButton.setDescription(BUTTON_TEXT_HIDE);
             visibleButton.setStyleName(STYLE_TRAY_OPEN);
             form.setVisible(true);
-            form.setEnabled(true);
-            form.setReadOnly(false);
+            setFormEnabled(true);
+            setFormReadOnly(false);
             editButton.addStyleName(STYLE_BUTTON_SELECTED);
             inheritButton.removeStyleName(STYLE_BUTTON_SELECTED);
             disableButton.removeStyleName(STYLE_BUTTON_SELECTED);
@@ -477,14 +483,28 @@ class ProjectEditPanelEntry extends CustomComponent {
             visibleButton.setDescription(BUTTON_TEXT_SHOW);
             visibleButton.setStyleName(STYLE_TRAY_CLOSED);
             form.setVisible(false);
-            form.setEnabled(true);
-            form.setReadOnly(false);
+            setFormEnabled(true);
+            setFormReadOnly(false);
             editButton.addStyleName(STYLE_BUTTON_SELECTED);
             inheritButton.removeStyleName(STYLE_BUTTON_SELECTED);
             disableButton.removeStyleName(STYLE_BUTTON_SELECTED);
             break;
         }
         state = newState;
+    }
+
+    private void setFormReadOnly(boolean readonly) {
+        form.setReadOnly(readonly);
+        for (String readOnlyFieldId: readOnlyFieldsIds) {
+            form.getField(readOnlyFieldId).setReadOnly(true);
+        }
+    }
+
+    private void setFormEnabled(boolean enabled) {
+        form.setEnabled(enabled);
+        for (String disabledFieldsId: disabledFieldsIds) {
+            form.getField(disabledFieldsId).setEnabled(false);
+        }
     }
 
     private void layoutNewEditForm() {
@@ -503,6 +523,21 @@ class ProjectEditPanelEntry extends CustomComponent {
             tray.addComponent(newForm);
         }
         form = newForm;
+        initFieldStates();
+    }
+
+    private void initFieldStates() {
+        readOnlyFieldsIds.clear();
+        disabledFieldsIds.clear();
+        for (Object propertyId: form.getItemPropertyIds()) {
+            Field field = form.getField(propertyId);
+            if (field.isReadOnly()) {
+                readOnlyFieldsIds.add((String)propertyId);
+            }
+            if (!field.isEnabled()) {
+                disabledFieldsIds.add((String)propertyId);
+            }
+        }
     }
 
     @SuppressWarnings("deprecation")

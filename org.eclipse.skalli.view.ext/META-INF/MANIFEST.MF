@@ -17,6 +17,7 @@ Import-Package: com.vaadin,
  org.eclipse.skalli.services,
  org.eclipse.skalli.services.extension,
  org.eclipse.skalli.services.extension.validators,
+ org.eclipse.skalli.services.permit,
  org.eclipse.skalli.services.template,
  org.osgi.framework,
  org.slf4j
