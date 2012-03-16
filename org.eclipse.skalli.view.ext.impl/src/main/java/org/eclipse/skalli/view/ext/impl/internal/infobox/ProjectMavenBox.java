@@ -27,8 +27,8 @@ import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
-import org.eclipse.skalli.view.ext.ProjectInfoBox;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Component;
@@ -37,7 +37,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.PopupView;
 
-public class ProjectMavenBox extends InfoBox implements ProjectInfoBox {
+public class ProjectMavenBox extends InfoBoxBase implements InfoBox {
 
     private static final String STYLE_MAVEN_INFOBOX = "infobox-maven"; //$NON-NLS-1$
     private static final String STYLE_MODULE_POPUP = "module-popup"; //$NON-NLS-1$

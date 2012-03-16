@@ -10,129 +10,74 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext;
 
-import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.commons.HtmlBuilder;
+import org.eclipse.skalli.model.Project;
 
-import com.vaadin.terminal.ExternalResource;
-import com.vaadin.terminal.Resource;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Layout;
-import com.vaadin.ui.Link;
+import com.vaadin.ui.Component;
 
-public class InfoBox {
+/**
+ * Extension point for info boxes on the project details page.
+ * Implementations must be registered as OSGi service component.
+ * <p>
+ * IMPORTANT NOTES:<br>
+ * <ul>
+ * <li>There is only one instance of a <code>ProjectInfoBox</code> per implementing class, i.e.
+ * info boxes must be stateless and thread safe.</li>
+ * <li>An implementation of <code>ProjectInfoBox</code> must not have Vaadin components/layouts
+ * as instance variables. Otherwise there is the risk of <tt>Out-Of-Sync</tt> errors.</li>
+ * </ul>
+ */
+public interface InfoBox extends IconProvider {
 
-    protected Clipboard clipboard;
-
-    protected static final String STYLE_LABEL = "infolabel"; //$NON-NLS-1$
-    protected static final String STYLE_LINK = "infolink"; //$NON-NLS-1$
-
-    protected static final String HSPACE = "&nbsp;&nbsp;&nbsp;&nbsp;"; //$NON-NLS-1$
-    protected static final String DEFAULT_TARGET = HtmlBuilder.DEFAULT_TARGET;
-
-    protected void bindClipboard(Clipboard clipboard) {
-        this.clipboard = clipboard;
-    }
-
-    protected void unbindConfigurationService(Clipboard clipboard) {
-        this.clipboard = null;
-    }
-
-    protected void createLabel(Layout layout, String caption) {
-        createLabel(layout, caption, STYLE_LABEL);
-    }
-
-    protected void createLabel(Layout layout, String caption, String styleName) {
-        Label label = new Label(caption, Label.CONTENT_XHTML);
-        if (StringUtils.isNotBlank(styleName)) {
-            label.addStyleName(styleName);
-        } else {
-            label.addStyleName(STYLE_LABEL);
-        }
-        layout.addComponent(label);
-    }
-
-    protected void createLink(Layout layout, String caption, String url){
-        createLink(layout, caption, url, DEFAULT_TARGET, null);
-    }
-
-    protected void createLink(Layout layout, String caption, String url, String targetName, String styleName){
-        createLink(layout, caption, new ExternalResource(url), targetName, styleName);
-    }
-
-    protected void createLink(Layout layout, String caption, Resource resource){
-        createLink(layout, caption, resource, DEFAULT_TARGET, null);
-    }
-
-    protected void createLink(Layout layout, String caption, Resource resource, String targetName, String styleName){
-        Link link = new Link(caption, resource);
-        if (StringUtils.isNotBlank(targetName)) {
-            link.setTargetName(targetName);
-        } else {
-            link.setTargetName(DEFAULT_TARGET);
-        }
-        if (StringUtils.isNotBlank(styleName)) {
-            link.addStyleName(styleName);
-        } else {
-            link.addStyleName(STYLE_LINK);
-        }
-        layout.addComponent(link);
-    }
-
-    public Label asLabel(String s) {
-        return asLabel(s, (String[])null);
-    }
-
-    public Label asLabel(StringBuilder sb) {
-        return asLabel(sb.toString(), (String[])null);
-    }
-
-    public Label asLabel(HtmlBuilder sb) {
-        return asLabel(sb.toString(), (String[])null);
-    }
-
-    public Label asLabel(String s, String... styles) {
-        Label label = new Label(s, Label.CONTENT_XHTML);
-        if (styles != null) {
-            for (String style: styles) {
-                label.addStyleName(style);
-            }
-        }
-        return label;
-    }
-
-    public Label asLabel(StringBuilder sb, String... styles) {
-        return asLabel(sb.toString(), styles);
-    }
-
-    public Label asLabel(HtmlBuilder sb, String... styles) {
-        return asLabel(sb.toString(), styles);
-    }
+    public static final int COLUMN_WEST = 1;
+    public static final int COLUMN_EAST = 2;
 
     /**
-     * Creates a link that copies a given text to the clipboard.<p>
-     * Note: An info box that uses this method must bind to the {@link Clipboard} service:
-     * <pre>
-     * &lt;reference
-     *   name="Clipboard"
-     *   interface="org.eclipse.skalli.view.ext.Clipboard"
-     *   bind="bindClipboard"
-     *   unbind="unbindClipboard"
-     *   cardinality="0..1"
-     *   policy="dynamic" /&gt;
-     * </pre>
-     *
-     * @param label   the label to display with the link.
-     * @param textToClipboard   the text to copy to the clipboard when the
-     * link is clicked.
+     * Returns the caption of the info box.
      */
-    @SuppressWarnings("nls")
-    protected String copyToClipboardLink(String label, String textToClipboard) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<div>").append(label);
-        if (clipboard != null) {
-            sb.append(clipboard.copyToClipboardLink(textToClipboard));
-        }
-        sb.append("</div>\n");
-        return sb.toString();
-    }
+    public String getCaption();
+
+    /**
+     * Returns the rank of the info box in relation to the other info
+     * boxes in the column. Smaller rank means the info box should
+     * appear above all other info boxes with larger rank. Info boxes
+     * with the same rank are arranged in alphabetical order of to their
+     * captions.
+     *
+     * @return the rank of the info box, i.e. a positive float number greater 1.0.
+     */
+    public float getPositionWeight();
+
+    /**
+     * Specifies whether the info box prefers the left ("west") or right ("east") column
+     * on the project details page.
+     *
+     * @return either {@link #COLUMN_WEST} or {@link #COLUMN_EAST}.
+     */
+    public int getPreferredColumn();
+
+    /**
+     * Returns <code>true</code>, if the info box is visible and the user
+     * requesting the info box is allowed to see it.
+     *
+     * Info boxes that can be switched on/off in the project edit dialog should
+     * check whether a corresponding extension is attached to the <code>project</code>
+     * and return <code>false</code> if there is no such extension available.
+     *
+     * @param project  the project for which the info box is to be rendered.
+     * @param userId  the unique identifier of the user viewing the project details page.
+     *
+     * @return <code>true</code>, if the info box is visible.
+     */
+    public boolean isVisible(Project project, String userId);
+
+    /**
+     * Returns the Vaadin component to be rendered inside the info box panel,
+     * or <code>null</code> if the info box has nothing to display and should
+     * therefore not be rendered at all.
+     *
+     * @param project  the project for which the component is to be created.
+     * @param util  context information for the creation of the component.
+     */
+    public Component getContent(Project project, ExtensionUtil util);
+
 }

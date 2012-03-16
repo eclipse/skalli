@@ -13,7 +13,7 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.ui.infobox.activity">
     <implementation class="org.eclipse.skalli.view.ext.impl.internal.infobox.ProjectActivityBox"/>
     <service>
-        <provide interface="org.eclipse.skalli.view.ext.ProjectInfoBox"/>
+        <provide interface="org.eclipse.skalli.view.ext.InfoBox"/>
     </service>
     <reference
         name="ConfigurationService"

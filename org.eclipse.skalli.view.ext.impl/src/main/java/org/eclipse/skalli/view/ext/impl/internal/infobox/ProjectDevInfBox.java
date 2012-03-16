@@ -26,14 +26,14 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
-import org.eclipse.skalli.view.ext.ProjectInfoBox;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Layout;
 
-public class ProjectDevInfBox extends InfoBox implements ProjectInfoBox {
+public class ProjectDevInfBox extends InfoBoxBase implements InfoBox {
 
     private static final String STYLE_DEFINF_INFOBOX = "infobox-devInf"; //$NON-NLS-1$
 

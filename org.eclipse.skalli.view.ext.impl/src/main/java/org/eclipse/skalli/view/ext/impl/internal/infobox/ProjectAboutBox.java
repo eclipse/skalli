@@ -19,14 +19,14 @@ import org.eclipse.skalli.model.ext.commons.InfoExtension;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.tagging.TaggingService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
-import org.eclipse.skalli.view.ext.ProjectInfoBox;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 
-public class ProjectAboutBox extends InfoBox implements ProjectInfoBox {
+public class ProjectAboutBox extends InfoBoxBase implements InfoBox {
 
     private static final String DEBUG_ID = "projectAboutInfoBoxContent"; //$NON-NLS-1$
 

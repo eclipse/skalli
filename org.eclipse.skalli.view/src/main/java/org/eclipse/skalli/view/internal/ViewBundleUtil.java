@@ -17,7 +17,7 @@ import org.eclipse.skalli.services.BundleFilter;
 import org.eclipse.skalli.services.FilterMode;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.ExtensionService;
-import org.eclipse.skalli.view.ext.ProjectInfoBox;
+import org.eclipse.skalli.view.ext.InfoBox;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.Version;
 
@@ -30,7 +30,7 @@ public class ViewBundleUtil {
 
     /**
      * Scans the Vaadin bundle, the o.e.s.view bundle (including its fragments)
-     * all extensions providing a {@link ProjectInfoBox}, all extensions providing
+     * all extensions providing a {@link InfoBox}, all extensions providing
      * a {@link ExtensionServic} and finally all bundles for theme resources
      * matching the given <code>path</code> and <code>pattern</code>.
      *
@@ -53,7 +53,7 @@ public class ViewBundleUtil {
                 // try the o.e.s.view bundle
                 new BundleFilter.AcceptMatching(FrameworkUtil.getBundle(ViewBundleUtil.class).getLocation()),
                 // try view extension bundle
-                new BundleFilter.AcceptService(ProjectInfoBox.class),
+                new BundleFilter.AcceptService(InfoBox.class),
                 // try extension bundles
                 new BundleFilter.AcceptService(ExtensionService.class),
                 // and finally all bundles

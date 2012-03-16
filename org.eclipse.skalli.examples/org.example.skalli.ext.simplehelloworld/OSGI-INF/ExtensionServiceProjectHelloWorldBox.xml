@@ -12,6 +12,6 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.example.skalli.ext.simplehelloworld.infobox">
     <implementation class="org.example.skalli.ext.simplehelloworld.ui.ExtensionServiceProjectHelloWorldBox"/>
     <service>
-        <provide interface="org.eclipse.skalli.view.ext.ProjectInfoBox"/>
+        <provide interface="org.eclipse.skalli.view.ext.InfoBox"/>
     </service>
 </scr:component>

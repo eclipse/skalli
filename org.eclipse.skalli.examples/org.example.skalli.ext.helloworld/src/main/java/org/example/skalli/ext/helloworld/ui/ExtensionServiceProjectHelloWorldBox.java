@@ -12,7 +12,7 @@ package org.example.skalli.ext.helloworld.ui;
 
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
-import org.eclipse.skalli.view.ext.ProjectInfoBox;
+import org.eclipse.skalli.view.ext.InfoBox;
 import org.example.skalli.model.ext.helloworld.HelloWorldProjectExt;
 
 import com.vaadin.ui.Component;
@@ -20,7 +20,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 
-public class ExtensionServiceProjectHelloWorldBox implements ProjectInfoBox {
+public class ExtensionServiceProjectHelloWorldBox implements InfoBox {
 
     @Override
     public String getIconPath() {

@@ -21,8 +21,8 @@ import org.eclipse.skalli.services.search.SearchHit;
 import org.eclipse.skalli.services.search.SearchResult;
 import org.eclipse.skalli.services.search.SearchService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
-import org.eclipse.skalli.view.ext.ProjectInfoBox;
 
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Component;
@@ -30,7 +30,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 
-public class RelatedProjectsInfoBox extends InfoBox implements ProjectInfoBox {
+public class RelatedProjectsInfoBox extends InfoBoxBase implements InfoBox {
 
     private static final String STYLE_RELATEDPROJECTS_INFOBOX = "infobox-related-projects"; //$NON-NLS-1$
 

@@ -22,14 +22,14 @@ import org.eclipse.skalli.services.issues.IssuesService;
 import org.eclipse.skalli.services.project.ProjectUtils;
 import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
-import org.eclipse.skalli.view.ext.ProjectInfoBox;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Layout;
 
-public class ProjectIssuesBox extends InfoBox implements ProjectInfoBox {
+public class ProjectIssuesBox extends InfoBoxBase implements InfoBox {
 
     private static final String STYLE_ISSUES_INFOBOX = "infobox-issues"; //$NON-NLS-1$
     private static final String STYLE_ISSUES = "prj-issues"; //$NON-NLS-1$

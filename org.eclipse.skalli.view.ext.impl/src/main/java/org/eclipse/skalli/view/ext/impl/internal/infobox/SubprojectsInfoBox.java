@@ -21,15 +21,15 @@ import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
 import org.eclipse.skalli.view.component.SubprojectComparator;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
-import org.eclipse.skalli.view.ext.ProjectInfoBox;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 
-public class SubprojectsInfoBox extends InfoBox implements ProjectInfoBox {
+public class SubprojectsInfoBox extends InfoBoxBase implements InfoBox {
 
     private static final int DELTA_INDENT = 20;
 

@@ -31,7 +31,7 @@ import org.eclipse.skalli.view.ext.ExtensionStreamSource;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.IconProvider;
 import org.eclipse.skalli.view.ext.Navigator;
-import org.eclipse.skalli.view.ext.ProjectInfoBox;
+import org.eclipse.skalli.view.ext.InfoBox;
 import org.eclipse.skalli.view.internal.application.ProjectApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,8 +85,8 @@ public class ProjectViewPanel extends CssLayout {
         int leftCounter = 0;
         int rightCounter = 0;
 
-        Set<ProjectInfoBox> infoBoxes = getOrderedVisibleInfoBoxList();
-        for (ProjectInfoBox projectInfoBox : infoBoxes) {
+        Set<InfoBox> infoBoxes = getOrderedVisibleInfoBoxList();
+        for (InfoBox projectInfoBox : infoBoxes) {
             ExtensionUtil context = new ProjectViewContextImpl(projectInfoBox.getClass());
             Component content;
             try {
@@ -105,10 +105,10 @@ public class ProjectViewPanel extends CssLayout {
                             FilenameUtils.getName(icon), application));
                 }
 
-                if (projectInfoBox.getPreferredColumn() == ProjectInfoBox.COLUMN_WEST) {
+                if (projectInfoBox.getPreferredColumn() == InfoBox.COLUMN_WEST) {
                     leftLayout.addComponent(infoBox);
                     leftCounter++;
-                } else if (projectInfoBox.getPreferredColumn() == ProjectInfoBox.COLUMN_EAST) {
+                } else if (projectInfoBox.getPreferredColumn() == InfoBox.COLUMN_EAST) {
                     rightLayout.addComponent(infoBox);
                     rightCounter++;
                 } else {
@@ -134,17 +134,17 @@ public class ProjectViewPanel extends CssLayout {
         return errorContent;
     }
 
-    private Set<ProjectInfoBox> getOrderedVisibleInfoBoxList() {
-        Set<ProjectInfoBox> set = Services.getServices(ProjectInfoBox.class,
-                new ServiceFilter<ProjectInfoBox>() {
+    private Set<InfoBox> getOrderedVisibleInfoBoxList() {
+        Set<InfoBox> set = Services.getServices(InfoBox.class,
+                new ServiceFilter<InfoBox>() {
                     @Override
-                    public boolean accept(ProjectInfoBox infoBox) {
+                    public boolean accept(InfoBox infoBox) {
                         return infoBox.isVisible(project, application.getLoggedInUser());
                     }
                 },
-                new Comparator<ProjectInfoBox>() {
+                new Comparator<InfoBox>() {
                     @Override
-                    public int compare(ProjectInfoBox o1, ProjectInfoBox o2) {
+                    public int compare(InfoBox o1, InfoBox o2) {
                         if (o1.getPositionWeight() != o2.getPositionWeight()) {
                             return new Float(o1.getPositionWeight()).compareTo(o2.getPositionWeight());
                         } else {

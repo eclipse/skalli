@@ -21,14 +21,14 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.commons.InfoExtension;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
-import org.eclipse.skalli.view.ext.ProjectInfoBox;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Layout;
 
-public class ProjectMailingListBox extends InfoBox implements ProjectInfoBox {
+public class ProjectMailingListBox extends InfoBoxBase implements InfoBox {
 
     private static final String STYLE_MAILING_INFOBOX = "infobox-mailingList"; //$NON-NLS-1$
 

@@ -16,14 +16,14 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.scrum.ScrumProjectExt;
 import org.eclipse.skalli.view.component.PeopleComponent;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
-import org.eclipse.skalli.view.ext.ProjectInfoBox;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Layout;
 
-public class ProjectScrumBox extends InfoBox implements ProjectInfoBox {
+public class ProjectScrumBox extends InfoBoxBase implements InfoBox {
 
     private static final String STYLE_SCRUM_INFOBOX = "infobox-scrum"; //$NON-NLS-1$
     private static final String STYLE_TEAMLABEL = "teamlabel"; //$NON-NLS-1$

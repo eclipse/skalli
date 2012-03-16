@@ -36,8 +36,8 @@ import org.eclipse.skalli.services.feed.FeedServiceException;
 import org.eclipse.skalli.services.feed.FeedUpdater;
 import org.eclipse.skalli.view.component.FloatLayout;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
-import org.eclipse.skalli.view.ext.ProjectInfoBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Layout;
 
-public class FeedInfoBox extends InfoBox implements ProjectInfoBox {
+public class FeedInfoBox extends InfoBoxBase implements InfoBox {
 
     private static final String CAPTION = "Timeline"; //$NON-NLS-1$
 
