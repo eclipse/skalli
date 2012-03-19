@@ -40,6 +40,7 @@ import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
 import org.eclipse.skalli.services.validation.ValidationService;
 import org.eclipse.skalli.view.Consts;
+import org.eclipse.skalli.view.ext.InfoBox;
 import org.eclipse.skalli.view.ext.ProjectContextLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +97,8 @@ public class ProjectDetailsFilter implements Filter {
                 }
                 request.setAttribute(Consts.ATTRIBUTE_FAVORITES, favorites.asMap());
 
-                boolean isProjectAdmin = GroupUtils.isAdministrator(userId) || ProjectUtils.isProjectAdmin(userId, project);
+                boolean isProjectAdmin = GroupUtils.isAdministrator(userId)
+                        || ProjectUtils.isProjectAdmin(userId, project);
                 request.setAttribute(Consts.ATTRIBUTE_PROJECTADMIN, isProjectAdmin);
 
                 boolean showIssues = isProjectAdmin || ProjectUtils.isProjectAdminInParentChain(userId, project);
@@ -114,13 +116,27 @@ public class ProjectDetailsFilter implements Filter {
                     Issues issues = issuesService.getByUUID(project.getUuid());
                     if (issues != null && issues.hasIssues()) {
                         request.setAttribute(Consts.ATTRIBUTE_ISSUES, issues);
-                        request.setAttribute(Consts.ATTRIBUTE_MAX_SEVERITY, issues.getIssues().first().getSeverity().name());
+                        request.setAttribute(Consts.ATTRIBUTE_MAX_SEVERITY, issues.getIssues().first().getSeverity()
+                                .name());
                     }
                 }
 
                 request.setAttribute(Consts.ATTRIBUTE_PROJECTCONTEXTLINKS,
                         getOrderedVisibleProjectContextLinks(project, userId));
             }
+
+            String pathInfo = httpRequest.getPathInfo();
+            int infoBoxIndex = pathInfo.indexOf(Consts.URL_INFOBOXES);
+            if (infoBoxIndex > 0) {
+                final String action = request.getParameter(Consts.PARAM_ACTION);
+                String infoBoxShortName = pathInfo.substring(infoBoxIndex + Consts.URL_INFOBOXES.length());
+                if (infoBoxShortName.startsWith(FilterUtil.PATH_SEPARATOR)) {
+                    infoBoxShortName = infoBoxShortName.substring(1);
+                }
+                filterInfobox(project, infoBoxShortName, action, userId);
+
+            }
+
         } else {
             request.setAttribute(Consts.ATTRIBUTE_WINDOWNAME, httpRequest.getPathInfo());
             // do nothing else as we have to support creation of projects and search urls, too
@@ -128,6 +144,24 @@ public class ProjectDetailsFilter implements Filter {
 
         // proceed along the chain
         chain.doFilter(request, response);
+    }
+
+    private void filterInfobox(final Project project, String infoBoxShortName, String action, final String userId) {
+        final boolean performAllInfoBoxes = StringUtils.isBlank(infoBoxShortName) ? true : false;
+
+        Set<InfoBox> infoboxes = Services.getServices(InfoBox.class,
+                new ServiceFilter<InfoBox>() {
+                    @Override
+                    public boolean accept(InfoBox infoBox) {
+                        return infoBox.isVisible(project, userId);
+                    }
+                });
+
+        for (InfoBox infoBox : infoboxes) {
+            if (performAllInfoBoxes || infoBoxShortName.equals(infoBox.getShortName())) {
+                infoBox.perform(action, project, userId);
+            }
+        }
     }
 
     @Override

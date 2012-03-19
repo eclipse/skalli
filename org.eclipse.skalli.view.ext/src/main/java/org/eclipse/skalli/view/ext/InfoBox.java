@@ -80,4 +80,25 @@ public interface InfoBox extends IconProvider {
      */
     public Component getContent(Project project, ExtensionUtil util);
 
+    /**
+    * Returns a short name for the info box or null.
+    * If the short name is not null it must be unique among all info boxes in the system.
+    * Consumers should treed a null short name as if it does not require his conditions.
+    *
+    * One possible Consumer is a Project filer, which  perform actions only to those Infoxes which have the requested name.
+    */
+    public String getShortName();
+
+    /**
+     * Performs a given action on a project related to this info box.
+     * For example, an info box might trigger a refresh of remote content that it displays.
+     * This method is called before rendering of the project's detail page for URLs of the
+     * form <tt>/projects/&lt;projectId&gt;/infoboxes?action=&lt;action&gt;</tt>
+     * and <tt>/projects/&lt;projectId&gt;/infoboxes/<shortName>?action=&lt;action&gt;</tt>, respectively.
+     * @param action the action to perform
+     * @param project the project for which to perform the action
+     * @param userId the unique identifier of the user that triggered the action
+     */
+    public void perform(String action, Project project, String userId);
+
 }

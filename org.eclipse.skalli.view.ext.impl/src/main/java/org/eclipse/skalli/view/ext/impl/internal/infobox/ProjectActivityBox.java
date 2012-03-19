@@ -20,13 +20,14 @@ import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 
-public class ProjectActivityBox implements InfoBox {
+public class ProjectActivityBox extends InfoBoxBase implements InfoBox {
 
     private static final String STYLE_ACTIVITY_INFOBOX = "infobox-activity"; //$NON-NLS-1$
 
