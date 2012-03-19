@@ -25,10 +25,14 @@ import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
+import org.eclipse.skalli.model.ext.maven.MavenResolverService;
+import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
-import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Component;
@@ -38,6 +42,8 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.PopupView;
 
 public class ProjectMavenBox extends InfoBoxBase implements InfoBox {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProjectMavenBox.class);
 
     private static final String STYLE_MAVEN_INFOBOX = "infobox-maven"; //$NON-NLS-1$
     private static final String STYLE_MODULE_POPUP = "module-popup"; //$NON-NLS-1$
@@ -261,4 +267,26 @@ public class ProjectMavenBox extends InfoBoxBase implements InfoBox {
         return project.getExtension(MavenProjectExt.class) != null;
     }
 
+    @Override
+    public String getShortName() {
+        return "maven";
+    }
+
+    @Override
+    public void perform(String action, Project project, String userId) {
+        if ("refresh".equalsIgnoreCase(action)) {
+            try {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("performing action = \'" + action + "\' project = \'"+ project.getUuid()+ " \' user = \'"+ userId+ "\'.");
+                }
+
+                MavenResolverService mavenService = Services.getService(MavenResolverService.class);
+                if (mavenService != null) {
+                    mavenService.queue(project, userId);
+                }
+            } catch (Exception e) {
+                LOG.error("could not perform action = \'" + action + "\' project = \'"+ project.getUuid()+ " \' user = \'"+ userId+ "\'.");
+            }
+        }
+    }
 }
