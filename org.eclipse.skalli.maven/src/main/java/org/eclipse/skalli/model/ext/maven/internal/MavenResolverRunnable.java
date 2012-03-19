@@ -12,6 +12,7 @@ package org.eclipse.skalli.model.ext.maven.internal;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -37,6 +38,7 @@ public class MavenResolverRunnable implements Runnable {
 
     private NexusClient nexusClient;
     private String userId;
+    private Project project;
 
     /**
      * @param configService
@@ -46,17 +48,44 @@ public class MavenResolverRunnable implements Runnable {
     public MavenResolverRunnable(NexusClient nexusClient, String userId) {
         this.userId = userId;
         this.nexusClient = nexusClient;
+
+    }
+
+    public MavenResolverRunnable(NexusClient nexusClient, String userId, Project project) {
+        this(nexusClient, userId);
+        this.project = project;
     }
 
     @Override
     public void run() {
+        ProjectService projectService = getProjectService();
+        List<Project> projects;
+        if (project != null) {
+            projects = Collections.singletonList(project);
+            LOG.info(MessageFormat.format("MavenResolver: started 1 project ({0}) to scan", project.getProjectId()));
+        }
+        else {
+            //for each run we want to need the current project list
+            projects = projectService.getAll();
+            LOG.info(MessageFormat.format("MavenResolver: started ({0} projects to scan", projects.size()));
+        }
+
         int countUpdated = 0;
         int countInvalid = 0;
-        ProjectService projectService = getProjectService();
-        List<Project> projects = projectService.getAll();
         NexusVersionsResolver versionsResolver = new NexusVersionsResolver(nexusClient);
-        LOG.info(MessageFormat.format("MavenResolver: started ({0} projects to scan)", projects.size()));
-        for (Project project : projects) {
+        for (int i = 0; i < projects.size(); i++) {
+            if (i > 0) {
+                // delay the execution for 10 seconds, otherwise we may
+                // overcharge the remote systems like gitweb/gitblit/Nexus with out requests
+                // but not before the first project in the loop
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+
+            Project project = projects.get(i);
             MavenReactor oldReactor = getMavenReactorProperty(project);
             MavenReactor newReactor = null;
             try {
@@ -103,13 +132,6 @@ public class MavenResolverRunnable implements Runnable {
                     "MavenResolver: ({0} projects scanned: {1} updated, {2} invalid, {3} remaining)",
                     projects.size(), countUpdated, countInvalid, projects.size() - countUpdated - countInvalid));
 
-            // delay the execution for 10 seconds, otherwise we may
-            // overcharge gitweb/Nexus with out requests
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                break;
-            }
         }
         LOG.info(MessageFormat.format(
                 "MavenResolver: finished ({0} projects scanned: {1} updated, {2} invalid)",
@@ -211,7 +233,7 @@ public class MavenResolverRunnable implements Runnable {
             return null;
         }
 
-        for (MavenPomResolver mavenPomResolver: mavenPomResolvers) {
+        for (MavenPomResolver mavenPomResolver : mavenPomResolvers) {
             if (mavenPomResolver.canResolve(scmLocation)) {
                 return mavenPomResolver;
             }

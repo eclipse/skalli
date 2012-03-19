@@ -8,8 +8,15 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.model.ext.maven.internal;
+package org.eclipse.skalli.model.ext.maven;
+
+import org.eclipse.skalli.model.Project;
 
 public interface MavenResolverService {
+
+    /**
+     * queue the maven resolving for a single project
+     */
+    public void queue(Project project, String userId);
 
 }

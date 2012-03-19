@@ -13,7 +13,7 @@
     name="org.eclipse.skalli.ext.maven.component.resolver">
    <implementation class="org.eclipse.skalli.model.ext.maven.internal.MavenResolverServiceImpl"/>
    <service>
-      <provide interface="org.eclipse.skalli.model.ext.maven.internal.MavenResolverService"/>
+      <provide interface="org.eclipse.skalli.model.ext.maven.MavenResolverService"/>
    </service>
    <reference
       bind="bindConfigurationService"

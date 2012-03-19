@@ -14,6 +14,8 @@ import java.text.MessageFormat;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ext.maven.MavenResolverService;
 import org.eclipse.skalli.model.ext.maven.internal.config.MavenResolverConfig;
 import org.eclipse.skalli.model.ext.maven.internal.config.MavenResolverResource;
 import org.eclipse.skalli.nexus.NexusClient;
@@ -89,6 +91,11 @@ public class MavenResolverServiceImpl implements MavenResolverService, EventList
     protected void unbindNexusClient(NexusClient nexusClient) {
         LOG.info(MessageFormat.format("unbindNexusClient({0})", nexusClient)); //$NON-NLS-1$
         this.nexusClient = null;
+    }
+
+    @Override
+    public void queue(Project project, String userId) {
+        new MavenResolverRunnable(nexusClient, userId, project).run();
     }
 
     synchronized void startAllTasks() {
