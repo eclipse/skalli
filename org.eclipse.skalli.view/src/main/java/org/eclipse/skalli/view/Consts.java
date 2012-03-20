@@ -85,6 +85,8 @@ public class Consts {
     public static final String URL_PROJECTS_TAG = URL_PROJECTS + "?" + PARAM_TAG + "=";
     public static final String URL_PROJECTS_USER = URL_PROJECTS + "?" + PARAM_USER + "=";
 
+    public static final String ACTION_REFRESH= "refresh";
+
     public static final String JSP_WELCOME = "/search/welcome.jsp";
     protected static final String JSP_TAGCLOUD = "/search/tagcloud.jsp";
     protected static final String JSP_MYPROJECTS = "/search/myprojects.jsp";
