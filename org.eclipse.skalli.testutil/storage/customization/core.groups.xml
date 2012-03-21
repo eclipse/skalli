@@ -1,0 +1,33 @@
+<org.eclipse.skalli.core.internal.groups.GroupsConfig>
+    <groups>
+        <org.eclipse.skalli.core.internal.groups.SkalliCoreGroup>
+            <groupId>administrators</groupId>
+            <groupMembers>
+                <no-comparator />
+                <string>lc</string>
+            </groupMembers>
+        </org.eclipse.skalli.core.internal.groups.SkalliCoreGroup>
+        <org.eclipse.skalli.core.internal.groups.SkalliCoreGroup>
+            <groupId>doctors</groupId>
+            <groupMembers>
+                <no-comparator />
+                <string>gh</string>
+                <string>jw</string>
+            </groupMembers>
+        </org.eclipse.skalli.core.internal.groups.SkalliCoreGroup>
+        <org.eclipse.skalli.core.internal.groups.SkalliCoreGroup>
+            <groupId>scrummaster</groupId>
+            <groupMembers>
+                <no-comparator />
+                <string>ua</string>
+            </groupMembers>
+        </org.eclipse.skalli.core.internal.groups.SkalliCoreGroup>
+        <org.eclipse.skalli.core.internal.groups.SkalliCoreGroup>
+            <groupId>expert</groupId>
+            <groupMembers>
+                <no-comparator />
+                <string>ua</string>
+            </groupMembers>
+        </org.eclipse.skalli.core.internal.groups.SkalliCoreGroup>
+    </groups>
+</org.eclipse.skalli.core.internal.groups.GroupsConfig>

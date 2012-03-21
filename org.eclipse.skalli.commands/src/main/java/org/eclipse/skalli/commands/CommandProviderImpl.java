@@ -17,7 +17,6 @@ import org.eclipse.osgi.framework.console.CommandProvider;
 public class CommandProviderImpl implements CommandProvider {
 
     private static final String COMMAND = "skalli"; //$NON-NLS-1$
-    private static final String COMMAND_ADMIN = "admin"; //$NON-NLS-1$
     private static final String COMMAND_STORAGE = "storage"; //$NON-NLS-1$
 
     private static final String OPTION_LIST = "-list"; //$NON-NLS-1$
@@ -28,19 +27,12 @@ public class CommandProviderImpl implements CommandProvider {
 
     private static final String DESCRIPTION_ADMIN = "maintain set of user with administrative permissions";
 
-    private static String HELP_ADMIN = "\t" + COMMAND + " " + COMMAND_ADMIN + //$NON-NLS-1$ //$NON-NLS-2$
-            " [" + OPTION_LIST + "]" + //$NON-NLS-1$ //$NON-NLS-2$
-            " [" + OPTION_ADD + " <admin_id>]" + //$NON-NLS-1$ //$NON-NLS-2$
-            " [" + OPTION_REMOVE + " <admin_id>]" + //$NON-NLS-1$//$NON-NLS-2$
-            " - " + DESCRIPTION_ADMIN + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
-
     private static final String DESCRIPTION_STORAGE = "maintain data storage";
     private static String HELP_STORAGE = "\t" + COMMAND + " " + COMMAND_STORAGE + //$NON-NLS-1$ //$NON-NLS-2$
             " -copy <sourceType> <destinationType> <category>" + //$NON-NLS-1$
             " - " + DESCRIPTION_STORAGE + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
 
-
-    private static String HELP = "\n---Skalli---\n" + HELP_ADMIN + HELP_STORAGE; //$NON-NLS-1$
+    private static String HELP = "\n---Skalli---\n" + HELP_STORAGE; //$NON-NLS-1$
 
     private static String INVALID = "Invalid command invocation.\n" + HELP; //$NON-NLS-1$
 
@@ -52,28 +44,7 @@ public class CommandProviderImpl implements CommandProvider {
     public void _skalli(CommandInterpreter intr) {
         try {
             String command = intr.nextArgument();
-            if (StringUtils.equals(command, COMMAND_ADMIN)) {
-                String option = intr.nextArgument();
-                if (StringUtils.equals(option, OPTION_LIST)) {
-                    intr.println(AdminCommand.list());
-                } else if (StringUtils.equals(option, OPTION_ADD)) {
-                    String adminId = intr.nextArgument();
-                    if (StringUtils.isNotBlank(adminId)) {
-                        intr.println(AdminCommand.add(adminId));
-                    } else {
-                        intr.println(INVALID);
-                    }
-                } else if (StringUtils.equals(option, OPTION_REMOVE)) {
-                    String adminId = intr.nextArgument();
-                    if (StringUtils.isNotBlank(adminId)) {
-                        intr.println(AdminCommand.remove(adminId));
-                    } else {
-                        intr.println(INVALID);
-                    }
-                } else {
-                    intr.println(INVALID);
-                }
-            } else if (StringUtils.equalsIgnoreCase(command, COMMAND_STORAGE)) {
+            if (StringUtils.equalsIgnoreCase(command, COMMAND_STORAGE)) {
                 String arg = intr.nextArgument();
                 if (StringUtils.isBlank(arg) || OPTION_COPY.compareToIgnoreCase(arg) != 0) {
                     intr.println(INVALID);

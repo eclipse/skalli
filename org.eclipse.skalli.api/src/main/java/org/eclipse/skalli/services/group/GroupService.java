@@ -13,13 +13,14 @@ package org.eclipse.skalli.services.group;
 import java.util.List;
 
 import org.eclipse.skalli.model.Group;
-import org.eclipse.skalli.services.entity.EntityService;
+
+
 
 /**
  * Service that allows to retrieve user groups and check whether a certain
  * user is member of a certain group.
  */
-public interface GroupService extends EntityService<Group> {
+public interface GroupService {
 
     /** Unique identifier of the admiminstrators group */
     public static final String ADMIN_GROUP = "administrators"; //$NON-NLS-1$

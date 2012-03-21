@@ -10,19 +10,18 @@
         SAP AG - initial API and implementation
  -->
 
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.group.local">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"  name="org.eclipse.skalli.core.component.group.local">
     <implementation class="org.eclipse.skalli.core.internal.users.LocalGroupServiceImpl"/>
     <service>
-       <provide interface="org.eclipse.skalli.services.entity.EntityService"/>
        <provide interface="org.eclipse.skalli.services.group.GroupService"/>
     </service>
     <reference
-        name="PersistenceService"
-        interface="org.eclipse.skalli.services.persistence.PersistenceService"
-        cardinality="1..1"
-        policy="dynamic"
-        bind="bindPersistenceService"
-        unbind="unbindPersistenceService"/>
+      name="ConfigurationService"
+      interface="org.eclipse.skalli.services.configuration.ConfigurationService"
+      policy="dynamic"
+      cardinality="1..1"
+      bind="bindConfigurationService"
+      unbind="unbindConfigurationService"/>
     <property name="groupService.type" type="String" value="local"/>
 </scr:component>
 

@@ -10,12 +10,12 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.configuration.rest;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
@@ -202,8 +202,7 @@ public abstract class ConfigResourceBase<T> extends ServerResource {
     }
 
     private final Representation checkAdminAuthorization() {
-        LoginUtils loginUtils = new LoginUtils(ServletUtils.getRequest(getRequest()));
-        String loggedInUser = loginUtils.getLoggedInUserId();
+        String loggedInUser = getLoggedInUser();
         if (!GroupUtils.isAdministrator(loggedInUser)) {
             String msg = "Access denied for user " + loggedInUser;
             Representation result = new StringRepresentation(msg, MediaType.TEXT_PLAIN);
@@ -252,18 +251,38 @@ public abstract class ConfigResourceBase<T> extends ServerResource {
             ConfigurationService configService = getConfigService();
             if (configService != null) {
                 XStream xstream = getXStream();
+                @SuppressWarnings("unchecked")
                 T configObject = (T) xstream.fromXML(entity.getText());
-                storeConfig(configService, configObject);
-                result = new StringRepresentation("Configuration successfully stored", MediaType.TEXT_PLAIN);
+                ValidationException validationException = validate(configObject, getLoggedInUser());
+                if (validationException.hasFatalIssues()) {
+                    result = new StringRepresentation("Configuration not stored due to validation errors:"
+                            + validationException.getMessage(), MediaType.TEXT_PLAIN);
+                } else {
+                    storeConfig(configService, configObject);
+                    StringBuilder msg = new StringBuilder("Configuration successfully stored");
+                    if (validationException.hasIssues()) {
+                        msg.append(". But had following issues: ").append(validationException.getMessage());
+                    }
+                    result = new StringRepresentation(msg.toString(), MediaType.TEXT_PLAIN);
+                }
             } else {
                 LOG.warn("Failed to store configuration - no instance of " + ConfigurationService.class.getName() + "available"); //$NON-NLS-1$
                 result = new StringRepresentation("Failed to store configuration", MediaType.TEXT_PLAIN);
                 getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return result;
+    }
+
+    private String getLoggedInUser() {
+        LoginUtils loginUtils = new LoginUtils(ServletUtils.getRequest(getRequest()));
+        return loginUtils.getLoggedInUserId();
+    }
+
+    public ValidationException validate(T configObject, String loggedInUser) {
+        return new ValidationException();
     }
 
 }

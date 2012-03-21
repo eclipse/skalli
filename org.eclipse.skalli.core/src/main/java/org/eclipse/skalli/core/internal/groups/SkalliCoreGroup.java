@@ -8,38 +8,46 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.model;
+package org.eclipse.skalli.core.internal.groups;
 
+import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.model.Group;
 import org.eclipse.skalli.services.group.GroupService;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
  * Class for user groups. To work with groups use the {@link GroupService}.
  */
-
-public class Group {
+@XStreamAlias("group")
+public class SkalliCoreGroup {
 
     private String groupId;
 
-    private SortedSet<String> groupMembers = new TreeSet<String>();
+    @XStreamImplicit(itemFieldName = "member")
+    private TreeSet<String> groupMembers = new TreeSet<String>();
 
-    public Group() {
+    public SkalliCoreGroup() {
     }
 
-    public Group(String groupId, SortedSet<String> groupMembers) {
-        super();
+    public SkalliCoreGroup(String groupId, Collection<String> groupMembers) {
         this.groupId = groupId;
-        this.groupMembers = groupMembers;
+        if (CollectionUtils.isNotBlank(groupMembers)) {
+            this.groupMembers.addAll(groupMembers);
+        }
+    }
+
+    public SkalliCoreGroup(org.eclipse.skalli.model.Group group) {
+        this(group.getGroupId(), group.getGroupMembers());
     }
 
     public String getGroupId() {
         return groupId;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
     }
 
     public synchronized SortedSet<String> getGroupMembers() {
@@ -47,10 +55,6 @@ public class Group {
             groupMembers = new TreeSet<String>();
         }
         return groupMembers;
-    }
-
-    public void setGroupMembers(SortedSet<String> groupMembers) {
-        this.groupMembers = groupMembers;
     }
 
     public boolean hasGroupMember(String userId) {
@@ -62,4 +66,7 @@ public class Group {
         return false;
     }
 
+    public Group getAsModelGroup() {
+        return new Group(this.getGroupId(), this.getGroupMembers());
+    }
 }

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
     Copyright (c) 2010, 2011 SAP AG and others.
     All rights reserved. This program and the accompanying materials
@@ -8,11 +9,11 @@
     Contributors:
         SAP AG - initial API and implementation
  -->
-<entity-group>
-  <uuid>18aaefc8-d30e-42d4-a2f1-80ee1b957fb1</uuid>
-  <groupId>scrummaster</groupId>
-  <groupMembers>
-    <no-comparator/>
-    <string>ua</string>
-  </groupMembers>
-</entity-group>
+
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.config.groups">
+   <implementation class="org.eclipse.skalli.core.internal.groups.GroupsConfigSection"/>
+   <service>
+      <provide interface="org.eclipse.skalli.services.configuration.rest.ConfigSection"/>
+   </service>
+</scr:component>
+

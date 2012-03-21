@@ -116,10 +116,6 @@ public class IssueTest implements Issuer {
         new Issue(Severity.WARNING, null, PropertyHelperUtils.TEST_UUIDS[0]);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testBasics_noEntityId() {
-        new Issue(Severity.WARNING, ISSUER, null);
-    }
 
     @Test
     public void testCompareToEquals() {

@@ -59,6 +59,17 @@ public class Issue implements Comparable<Issue> {
     }
 
     /**
+     * Creates an issue with the given <code>severity</code> and custom message.
+     *
+     * @param severity  the severity of the issue.
+     * @param issuer    the issuer that raises this issue, e.g. a validator.
+     * @param message   the message of the issue.
+     */
+    public Issue(Severity severity, Class<? extends Issuer> issuer, String message) {
+        this(severity, issuer, null, null, null, 0, message);
+    }
+
+    /**
      * Creates an issue with the given <code>severity</code> and custom message for an entity
      * specified by its unique identifier.
      *
@@ -123,9 +134,6 @@ public class Issue implements Comparable<Issue> {
         if (issuer == null) {
             throw new IllegalArgumentException("argument 'issuer' must not be null");
         }
-        if (entityId == null) {
-            throw new IllegalArgumentException("argument 'entityId' must not be null");
-        }
         this.severity = severity;
         this.issuer = issuer;
         this.entityId = entityId;
@@ -165,16 +173,31 @@ public class Issue implements Comparable<Issue> {
             return message;
         }
         String msg = null;
-        if (extension != null) {
-            if (propertyId != null) {
-                msg = MessageFormat.format("Property {0} of extension {1} of entity {2} is invalid",
-                        propertyId, extension.getName(), entityId);
+        if (entityId != null) {
+            if (extension != null) {
+                if (propertyId != null) {
+                    msg = MessageFormat.format("Property {0} of extension {1} of entity {2} is invalid",
+                            propertyId, extension.getName(), entityId);
+                } else {
+                    msg = MessageFormat.format("Extension {0} of entity {1} is invalid",
+                            extension.getName(), entityId);
+                }
             } else {
-                msg = MessageFormat.format("Extension {0} of entity {1} is invalid",
-                        extension.getName(), entityId);
+                msg = MessageFormat.format("Entity {0} is invalid", entityId);
             }
         } else {
-            msg = MessageFormat.format("Entity {0} is invalid", entityId);
+            if (extension != null) {
+                if (propertyId != null) {
+                    msg = MessageFormat.format("Property {0} of extension {1} is invalid",
+                            propertyId, extension.getName());
+                } else {
+                    msg = MessageFormat.format("Extension {0} is invalid",
+                            extension.getName());
+                }
+            } else {
+                msg = "invalid";
+            }
+
         }
         return msg;
     }
@@ -262,15 +285,9 @@ public class Issue implements Comparable<Issue> {
 
     @Override
     public int hashCode() {
-        int result = 31 + severity.hashCode();
-        result = 31 * result + issuer.hashCode();
-        result = 31 * result + entityId.hashCode();
-        if (extension != null) {
-            result = 31 * result + extension.getName().hashCode();
-        }
-        if (propertyId != null) {
-            result = 31 * result + propertyId.hashCode();
-        }
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((entityId == null) ? 0 : entityId.hashCode());
         return result;
     }
 
@@ -300,7 +317,7 @@ public class Issue implements Comparable<Issue> {
     public int compareTo(Issue issue) {
         int result = severity.compareTo(issue.severity);
         if (result == 0) {
-            result = entityId.compareTo(issue.entityId);
+            result = ComparatorUtils.compare(entityId, issue.entityId);
             if (result == 0) {
                 result = ComparatorUtils.compareAsStrings(extension, issue.extension);
                 if (result == 0) {
@@ -394,7 +411,7 @@ public class Issue implements Comparable<Issue> {
      * message of the issue.
      */
     @SuppressWarnings("nls")
-    public static String asHTMLList(String message, Set<Issue> issues, Map<String,String> displayNames) {
+    public static String asHTMLList(String message, Set<Issue> issues, Map<String, String> displayNames) {
         StringBuilder sb = new StringBuilder();
         if (StringUtils.isNotBlank(message)) {
             sb.append(message);
@@ -407,7 +424,7 @@ public class Issue implements Comparable<Issue> {
                 if (displayNames != null) {
                     Class<? extends ExtensionEntityBase> extension = issue.getExtension();
                     if (extension != null && displayNames.containsKey(extension.getName())) {
-                        sb.append("<a href=\"#" + extension.getName()  +"\">");
+                        sb.append("<a href=\"#" + extension.getName() + "\">");
                         sb.append(displayNames.get(extension.getName())).append("</a>:&nbsp;");
                     }
                 }
