@@ -36,7 +36,7 @@ public class LocalGroupServiceImplTest {
         groupService = Services.getService(GroupService.class, FILTER);
         Assert.assertNotNull("local group service not found", groupService);
         groups = groupService.getGroups();
-        Assert.assertEquals(2, groups.size());
+        Assert.assertEquals(4, groups.size());
     }
 
     @Test
@@ -51,5 +51,21 @@ public class LocalGroupServiceImplTest {
         Assert.assertTrue(groupService.isMemberOfGroup("gh", "doctors"));
         Assert.assertFalse(groupService.isMemberOfGroup("lc", "doctors"));
         Assert.assertFalse(groupService.isMemberOfGroup("unknown", "doctors"));
+    }
+
+    @Test
+    public void testGetGroups() throws Exception {
+        List<Group> groups = groupService.getGroups("lc");
+        Assert.assertEquals(1, groups.size());
+        Assert.assertEquals(GroupService.ADMIN_GROUP, groups.get(0).getGroupId());
+
+        groups = groupService.getGroups("ua");
+        Assert.assertEquals(2, groups.size());
+
+        //there is no order in the groups
+        int scrumMasterGroupId = "scrummaster".equals(groups.get(0).getGroupId()) ? 0 : 1;
+        int expertGroupId = scrumMasterGroupId == 0 ? 1 : 0;
+        Assert.assertEquals("scrummaster", groups.get(scrumMasterGroupId).getGroupId());
+        Assert.assertEquals("expert", groups.get(expertGroupId).getGroupId());
     }
 }

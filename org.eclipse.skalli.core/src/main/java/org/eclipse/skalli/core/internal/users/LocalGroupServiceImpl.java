@@ -11,6 +11,7 @@
 package org.eclipse.skalli.core.internal.users;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -116,5 +117,16 @@ public class LocalGroupServiceImpl extends EntityServiceBase<Group> implements G
             }
         });
         return group;
+    }
+
+    @Override
+    public List<Group> getGroups(String userId) {
+        List<Group> groups = new ArrayList<Group>();
+        for (Group group: getAll()) {
+            if (group.hasGroupMember(userId)) {
+                groups.add(group);
+            }
+        }
+        return groups;
     }
 }

@@ -45,11 +45,20 @@ public interface GroupService extends EntityService<Group> {
     public boolean isAdministrator(String userId);
 
     /**
-     * Checks whether a is member of the given group.
+     * Checks whether a user is member of the given group.
      *
      * @param userId  unique identifier of the user to check.
      * @param groupId  unique identifier of the group, for example
      * {@link #ADMIN_GROUP}.
      */
     public boolean isMemberOfGroup(String userId, String groupId);
+
+
+    /**
+     * Returs the groups the given user is member of.
+     *
+     * @param userId  unique identifier of the user to check.
+     * @return the groups of the user, or an empty list.
+     */
+    public List<Group> getGroups(String userId);
 }
