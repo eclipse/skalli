@@ -4,11 +4,14 @@ import static org.apache.http.HttpStatus.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
@@ -49,16 +52,27 @@ public abstract class HttpMavenPomResolverBase extends MavenPomResolverBase {
                     "url to read the pom for scm {0}, relativePath {1} is null.", scmLocation, relativePath));
         }
         try {
-            return parse(url, relativePath);
+            return parse(url, relativePath, false);
         } catch (Exception e) {
+            try {
+                parse(url, relativePath, true);
+            } catch (Exception e1) {
+                LOG.error("some unexpected error occured while trying to writing content of " + url.toExternalForm()+ " to log", e);
+            }
+
             throw new IOException(MessageFormat.format(
                     "Can not resolve pom for scm=\"{0}\", relativePath =\"{1}\", url=\"{2}\" ",
                     scmLocation, relativePath, url.toExternalForm()), e);
+
         }
     }
 
-    private MavenPom parse(URL url, String relativePath) throws IOException, HttpException,
-            MavenValidationException {
+    /**
+     * @param writeContentDetailToLog = true will return an default empty MavenPom  and log the content read from the url with level Error to LOG; if set to false the method
+     * parse is called.
+     */
+    private MavenPom parse(URL url, String relativePath, boolean writeContentDetailToLog) throws IOException,
+            HttpException, MavenValidationException {
         HttpClient client = Destinations.getClient(url);
         if (client == null) {
             //we can't read the Url
@@ -78,7 +92,12 @@ public abstract class HttpMavenPomResolverBase extends MavenPomResolverBase {
                 if (entity == null) {
                     return null;
                 }
-                return parse(asPomInputStream(entity, relativePath));
+                if (!writeContentDetailToLog) {
+                    return parse(asPomInputStream(entity, relativePath));
+                } else {
+                    writeContentDetailToLog(url, entity);
+                    return new MavenPom();
+                }
             }
             else {
                 String statusText = response.getStatusLine().getReasonPhrase();
@@ -106,5 +125,31 @@ public abstract class HttpMavenPomResolverBase extends MavenPomResolverBase {
         } finally {
             HttpUtils.consumeQuietly(response);
         }
+    }
+
+    private void writeContentDetailToLog(URL url, HttpEntity entity) {
+        try {
+            StringWriter writer = new StringWriter();
+
+            String encoding = null;
+            if (entity.getContentEncoding() != null) {
+                encoding = entity.getContentEncoding().getValue();
+            }
+            IOUtils.copy(entity.getContent(), writer, encoding);
+            String theString = writer.toString();
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("Details of reading from ").append(url.toExternalForm()).append(": ");
+
+            Header contentType = entity.getContentType();
+            sb.append("ContentType = ").append(
+                    (contentType == null ? "null" : (entity.getContentType().getValue()))).append("; ");
+            sb.append("encoding =  ").append(encoding).append("; ");
+            sb.append("String contet = ").append(theString);
+            LOG.error(sb.toString());
+        } catch (Exception e) {
+            LOG.error("unexpected exception while trying to read the content: ", e);
+        }
+
     }
 }
