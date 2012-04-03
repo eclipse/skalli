@@ -15,8 +15,8 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.linkgroups.LinkGroup;
 import org.eclipse.skalli.model.ext.linkgroups.LinkGroupsProjectExt;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
-import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Component;
@@ -39,6 +39,11 @@ public class ProjectLinkGroupsBox extends InfoBoxBase implements InfoBox {
     @Override
     public String getCaption() {
         return "Additional Links";
+    }
+
+    @Override
+    public String getShortName() {
+        return "linkgroups";
     }
 
     @Override

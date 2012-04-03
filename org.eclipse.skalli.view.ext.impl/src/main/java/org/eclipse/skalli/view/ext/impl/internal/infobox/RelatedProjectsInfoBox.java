@@ -21,8 +21,8 @@ import org.eclipse.skalli.services.search.SearchHit;
 import org.eclipse.skalli.services.search.SearchResult;
 import org.eclipse.skalli.services.search.SearchService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
-import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Component;
@@ -42,6 +42,11 @@ public class RelatedProjectsInfoBox extends InfoBoxBase implements InfoBox {
     @Override
     public String getCaption() {
         return "Related Projects";
+    }
+
+    @Override
+    public String getShortName() {
+        return "relatedProjects";
     }
 
     @Override

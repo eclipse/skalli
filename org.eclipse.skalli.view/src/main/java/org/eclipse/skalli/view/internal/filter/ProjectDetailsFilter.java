@@ -165,7 +165,7 @@ public class ProjectDetailsFilter implements Filter {
                 });
 
         for (InfoBox infoBox : infoboxes) {
-            if (performAllInfoBoxes || infoBoxShortName.equals(infoBox.getShortName())) {
+            if (performAllInfoBoxes || infoBoxShortName.equalsIgnoreCase(infoBox.getShortName())) {
                 infoBox.perform(action, project, userId);
             }
         }

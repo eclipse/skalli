@@ -36,8 +36,8 @@ import org.eclipse.skalli.services.feed.FeedServiceException;
 import org.eclipse.skalli.services.feed.FeedUpdater;
 import org.eclipse.skalli.view.component.FloatLayout;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
-import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,6 +105,11 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
     @Override
     public String getCaption() {
         return CAPTION;
+    }
+
+    @Override
+    public String getShortName() {
+        return "timeline";
     }
 
     @Override

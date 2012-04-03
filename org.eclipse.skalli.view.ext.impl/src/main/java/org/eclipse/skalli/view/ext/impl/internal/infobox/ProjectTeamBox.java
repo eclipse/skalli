@@ -16,8 +16,8 @@ import org.eclipse.skalli.view.component.InformationBox;
 import org.eclipse.skalli.view.component.MailToTeam;
 import org.eclipse.skalli.view.component.PeopleComponent;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
-import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -37,6 +37,11 @@ public class ProjectTeamBox extends InfoBoxBase implements InfoBox {
     @Override
     public String getCaption() {
         return "Team";
+    }
+
+    @Override
+    public String getShortName() {
+        return "team";
     }
 
     @Override

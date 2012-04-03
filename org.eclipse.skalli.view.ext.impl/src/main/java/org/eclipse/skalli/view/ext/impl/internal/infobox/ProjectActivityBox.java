@@ -52,6 +52,11 @@ public class ProjectActivityBox extends InfoBoxBase implements InfoBox {
     }
 
     @Override
+    public String getShortName() {
+        return "activity";
+    }
+
+    @Override
     public float getPositionWeight() {
         return 1.55f;
     }

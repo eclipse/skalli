@@ -26,8 +26,8 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
-import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -63,6 +63,11 @@ public class ProjectDevInfBox extends InfoBoxBase implements InfoBox {
     @Override
     public String getCaption() {
         return "Development Information";
+    }
+
+    @Override
+    public String getShortName() {
+        return "devInf" ;
     }
 
     @Override

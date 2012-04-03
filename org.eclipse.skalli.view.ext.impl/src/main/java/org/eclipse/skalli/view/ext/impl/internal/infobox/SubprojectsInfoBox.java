@@ -21,8 +21,8 @@ import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
 import org.eclipse.skalli.view.component.SubprojectComparator;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
-import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -62,6 +62,11 @@ public class SubprojectsInfoBox extends InfoBoxBase implements InfoBox {
     @Override
     public String getCaption() {
         return "Project Hierarchy";
+    }
+
+    @Override
+    public String getShortName() {
+        return "subprojects";
     }
 
     @Override

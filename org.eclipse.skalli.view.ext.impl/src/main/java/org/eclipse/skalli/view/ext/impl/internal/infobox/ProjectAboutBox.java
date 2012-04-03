@@ -19,8 +19,8 @@ import org.eclipse.skalli.model.ext.commons.InfoExtension;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.tagging.TaggingService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
-import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -44,6 +44,11 @@ public class ProjectAboutBox extends InfoBoxBase implements InfoBox {
     @Override
     public String getCaption() {
         return "About";
+    }
+
+    @Override
+    public String getShortName() {
+        return "about";
     }
 
     @Override

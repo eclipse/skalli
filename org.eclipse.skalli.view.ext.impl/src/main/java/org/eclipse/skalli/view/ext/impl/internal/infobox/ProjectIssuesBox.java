@@ -22,8 +22,8 @@ import org.eclipse.skalli.services.issues.IssuesService;
 import org.eclipse.skalli.services.project.ProjectUtils;
 import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
-import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -42,6 +42,11 @@ public class ProjectIssuesBox extends InfoBoxBase implements InfoBox {
     @Override
     public String getCaption() {
         return "Issues";
+    }
+
+    @Override
+    public String getShortName() {
+        return "issues";
     }
 
     @Override
