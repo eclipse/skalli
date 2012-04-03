@@ -1,0 +1,9 @@
+<org.eclipse.skalli.core.services.permit.PermitsConfig>
+  <globalPermits>
+    <org.eclipse.skalli.core.services.permit.PermitConfig>
+      <action>**</action>
+      <path>/</path>
+      <level>1</level>
+    </org.eclipse.skalli.core.services.permit.PermitConfig>
+  </globalPermits>
+</org.eclipse.skalli.core.services.permit.PermitsConfig>
