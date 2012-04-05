@@ -126,15 +126,18 @@ public class ProjectDetailsFilter implements Filter {
             }
 
             String pathInfo = httpRequest.getPathInfo();
-            int infoBoxIndex = pathInfo.indexOf(Consts.URL_INFOBOXES);
-            if (infoBoxIndex > 0) {
-                final String action = request.getParameter(Consts.PARAM_ACTION);
-                String infoBoxShortName = pathInfo.substring(infoBoxIndex + Consts.URL_INFOBOXES.length());
-                if (infoBoxShortName.startsWith(FilterUtil.PATH_SEPARATOR)) {
-                    infoBoxShortName = infoBoxShortName.substring(1);
+            if (pathInfo != null) {
+                int infoBoxIndex = pathInfo.indexOf(Consts.URL_INFOBOXES);
+                if (infoBoxIndex > 0) {
+                    final String action = request.getParameter(Consts.PARAM_ACTION);
+                    if (StringUtils.isNotBlank(action)) {
+                        String infoBoxShortName = pathInfo.substring(infoBoxIndex + Consts.URL_INFOBOXES.length());
+                        if (infoBoxShortName.startsWith(FilterUtil.PATH_SEPARATOR)) {
+                            infoBoxShortName = infoBoxShortName.substring(1);
+                        }
+                        filterInfobox(project, infoBoxShortName, action, userId);
+                    }
                 }
-                filterInfobox(project, infoBoxShortName, action, userId);
-
             }
 
         } else {
