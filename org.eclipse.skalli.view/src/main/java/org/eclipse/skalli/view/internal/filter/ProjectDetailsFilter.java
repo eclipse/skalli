@@ -35,6 +35,8 @@ import org.eclipse.skalli.services.favorites.FavoritesService;
 import org.eclipse.skalli.services.group.GroupUtils;
 import org.eclipse.skalli.services.issues.Issues;
 import org.eclipse.skalli.services.issues.IssuesService;
+import org.eclipse.skalli.services.permit.Permit;
+import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.project.ProjectUtils;
 import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
@@ -98,7 +100,9 @@ public class ProjectDetailsFilter implements Filter {
                 request.setAttribute(Consts.ATTRIBUTE_FAVORITES, favorites.asMap());
 
                 boolean isProjectAdmin = GroupUtils.isAdministrator(userId)
-                        || ProjectUtils.isProjectAdmin(userId, project);
+                        || ProjectUtils.isProjectAdmin(userId, project)
+                        || Permits.isAllowed(Permit.ACTION_PUT, "projects", project.getProjectId()) //$NON-NLS-1$
+                        || Permits.isAllowed(Permit.ACTION_PUT, "projects", project.getUuid().toString()); //$NON-NLS-1$
                 request.setAttribute(Consts.ATTRIBUTE_PROJECTADMIN, isProjectAdmin);
 
                 boolean showIssues = isProjectAdmin || ProjectUtils.isProjectAdminInParentChain(userId, project);

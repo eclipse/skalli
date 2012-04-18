@@ -34,6 +34,11 @@ public class Permit implements Comparable<Permit> {
 
     public static final String ALL_ACTIONS = "**"; //$NON-NLS-1$
 
+    public static final String ACTION_GET = "GET"; //$NON-NLS-1$
+    public static final String ACTION_PUT = "PUT"; //$NON-NLS-1$
+    public static final String ACTION_POST = "POST"; //$NON-NLS-1$
+    public static final String ACTION_DELETE = "DELETE"; //$NON-NLS-1$
+
     public static final String ROOT = "/"; //$NON-NLS-1$
     public static final String WILDCARD = "**"; //$NON-NLS-1$
 
