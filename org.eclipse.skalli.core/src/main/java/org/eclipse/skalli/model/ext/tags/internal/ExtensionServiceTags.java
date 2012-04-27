@@ -15,7 +15,7 @@ import java.util.Map;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.ext.commons.TagsExtension;
 import org.eclipse.skalli.services.extension.ExtensionServiceBase;
-import org.eclipse.skalli.services.extension.IndexerBase;
+import org.eclipse.skalli.services.extension.Indexer;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -87,7 +87,7 @@ public class ExtensionServiceTags extends ExtensionServiceBase<TagsExtension> {
     }
 
     @Override
-    public IndexerBase<TagsExtension> getIndexer() {
+    public Indexer<TagsExtension> getIndexer() {
         return new TagsIndexer();
     }
 

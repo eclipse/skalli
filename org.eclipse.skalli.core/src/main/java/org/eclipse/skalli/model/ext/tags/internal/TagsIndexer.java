@@ -10,10 +10,18 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.tags.internal;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.eclipse.skalli.model.ext.commons.TagsExtension;
 import org.eclipse.skalli.services.extension.IndexerBase;
 
 public class TagsIndexer extends IndexerBase<TagsExtension> {
+
+    @Override
+    public Set<String> getDefaultSearchFields() {
+        return Collections.singleton(TagsExtension.PROPERTY_TAGS);
+    }
 
     @Override
     protected void indexFields(TagsExtension entity) {
