@@ -18,8 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.model.User;
-import org.eclipse.skalli.services.Services;
-import org.eclipse.skalli.services.permit.PermitService;
 import org.eclipse.skalli.services.user.LoginUtils;
 import org.eclipse.skalli.view.internal.application.ProjectApplication;
 
@@ -46,9 +44,6 @@ public class ProjectServlet extends AbstractApplicationServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        PermitService permitService = Services.getRequiredService(PermitService.class);
-        permitService.login((HttpServletRequest) request, null);
-
         String browser = request.getHeader("User-Agent"); //$NON-NLS-1$
         LoginUtils loginUtil = new LoginUtils(request);
         User loggedInUser = loginUtil.getLoggedInUser();

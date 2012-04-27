@@ -21,8 +21,8 @@ import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.permit.PermitService;
 import org.eclipse.skalli.services.project.ProjectService;
-import org.eclipse.skalli.services.user.LoginUtils;
 import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.internal.window.ProjectWindow;
 
@@ -100,9 +100,7 @@ public class ProjectApplication extends com.vaadin.Application implements HttpSe
 
     @Override
     public void onRequestStart(HttpServletRequest request, HttpServletResponse response) {
-        LoginUtils util = new LoginUtils(request);
-        userId = util.getLoggedInUserId();
-
+        PermitService permitService = Services.getRequiredService(PermitService.class);
         String windowName = request.getParameter(Consts.ATTRIBUTE_WINDOWNAME);
         if (StringUtils.isNotBlank(windowName)) {
             String prefix = Consts.URL_VAADIN_PROJECTS + windowName;
@@ -112,8 +110,12 @@ public class ProjectApplication extends com.vaadin.Application implements HttpSe
                 if (requestUri.indexOf("/edit/") > 0) { //$NON-NLS-1$
                     relativeUri = "edit";  //$NON-NLS-1$
                 }
-                ((ProjectWindow) getWindow(windowName)).handleRelativeURI(relativeUri);
+                ProjectWindow window = (ProjectWindow) getWindow(windowName);
+                permitService.login(request, window.getProject());
+                window.handleRelativeURI(relativeUri);
             }
+        } else {
+            permitService.login(request, null);
         }
     }
 

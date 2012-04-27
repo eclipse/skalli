@@ -15,6 +15,7 @@ import java.util.TreeSet;
 
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.permit.PermitService;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
@@ -120,6 +121,9 @@ public class TemplateSelectPanel extends Panel {
         public void buttonClick(ClickEvent event) {
             ProjectService projectService = Services.getRequiredService(ProjectService.class);
             Project project = projectService.createProject(select.getSelected(), application.getLoggedInUser());
+
+            PermitService permitService = Services.getRequiredService(PermitService.class);
+            permitService.switchProject(project);
 
             Component component = new ProjectEditPanel(application, navigator, project, ProjectEditMode.NEW_PROJECT);
             window.setMainContent(component);

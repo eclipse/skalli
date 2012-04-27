@@ -70,6 +70,10 @@ public class ProjectWindow extends Window {
         return super.getContent();
     }
 
+    public Project getProject() {
+        return project;
+    }
+
     public void refreshProject(Project project) {
         this.project = project;
         repaint = true;
