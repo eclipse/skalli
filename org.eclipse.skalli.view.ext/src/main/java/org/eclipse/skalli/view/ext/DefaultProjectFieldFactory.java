@@ -62,7 +62,7 @@ public abstract class DefaultProjectFieldFactory<T extends ExtensionEntityBase> 
     public Field createField(Item item, Object propertyId, final Component uiContext) {
 
         // if the logged in user is not allowed to see this property, don't create a field
-        if (!Permits.isAllowed("GET", "projects", project.getProjectId(), "extensions",
+        if (!Permits.isAllowed("GET", project, "extensions",
                 extensionService.getShortName(), "properties", (String)propertyId)) {
             return null;
         }
@@ -125,7 +125,7 @@ public abstract class DefaultProjectFieldFactory<T extends ExtensionEntityBase> 
         }
 
         // if the logged in user is not allowed to change this property, render a read-only field
-        if (!Permits.isAllowed("PUT", "projects", project.getProjectId(), "extensions",
+        if (!Permits.isAllowed("PUT", project, "extensions",
                 extensionService.getShortName(), "properties", (String)propertyId)) {
             field.setReadOnly(true);
         }
