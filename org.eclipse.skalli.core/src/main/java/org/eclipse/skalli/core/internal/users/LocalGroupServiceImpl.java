@@ -19,7 +19,11 @@ import org.eclipse.skalli.core.internal.groups.GroupResource;
 import org.eclipse.skalli.core.internal.groups.GroupsConfig;
 import org.eclipse.skalli.model.Group;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.event.EventCustomizingUpdate;
+import org.eclipse.skalli.services.event.EventListener;
+import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.group.GroupService;
+import org.eclipse.skalli.services.permit.PermitService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -31,17 +35,23 @@ import org.slf4j.LoggerFactory;
  * <tt>&lt;groupId&gt.xml</tt> in the <tt>$workdir/storage/Group</tt>
  * directory.
  */
-public class LocalGroupServiceImpl implements GroupService {
+public class LocalGroupServiceImpl implements GroupService, EventListener<EventCustomizingUpdate> {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalGroupServiceImpl.class);
+
+    private ComponentContext context;
     private ConfigurationService configService;
 
     protected void activate(ComponentContext context) {
+        this.context = context;
+        invalidatePermits();
         LOG.info(MessageFormat.format("[GroupService][type=local] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
     protected void deactivate(ComponentContext context) {
+        invalidatePermits();
+        this.context = null;
         LOG.info(MessageFormat.format("[GroupService][type=local] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
@@ -49,20 +59,29 @@ public class LocalGroupServiceImpl implements GroupService {
     protected void bindConfigurationService(ConfigurationService configService) {
         LOG.info(MessageFormat.format("bindConfigurationService({0})", configService)); //$NON-NLS-1$
         this.configService = configService;
-
+        invalidatePermits();
     }
 
     protected void unbindConfigurationService(ConfigurationService configService) {
         LOG.info(MessageFormat.format("unbindConfigurationService({0})", configService)); //$NON-NLS-1$
         this.configService = null;
-
+        invalidatePermits();
     }
 
-    private GroupsConfig getGroupsConfig() {
-        if (configService == null) {
-            throw new IllegalStateException("configService not bound");
+    protected void bindEventService(EventService eventService) {
+        LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
+        eventService.registerListener(EventCustomizingUpdate.class, this);
+    }
+
+    protected void unbindEventService(EventService eventService) {
+        LOG.info(MessageFormat.format("unbindEventService({0})", eventService)); //$NON-NLS-1$
+    }
+
+    private PermitService getPermitService() {
+        if (context != null) {
+            return (PermitService)context.locateService("PermitService"); //$NON-NLS-1$
         }
-        return configService.readCustomization(GroupResource.MAPPINGS_KEY, GroupsConfig.class);
+        return null;
     }
 
     @Override
@@ -80,15 +99,16 @@ public class LocalGroupServiceImpl implements GroupService {
                 return true;
             }
         }
-
         return group != null ? group.hasGroupMember(userId) : false;
     }
 
     @Override
     public List<Group> getGroups() {
-        GroupsConfig groupsConfig = getGroupsConfig();
+        if (configService == null) {
+            return Collections.emptyList();
+        }
+        GroupsConfig groupsConfig = configService.readCustomization(GroupResource.MAPPINGS_KEY, GroupsConfig.class);
         if (groupsConfig == null) {
-            //obvious no groups are defined
             return Collections.emptyList();
         }
         return groupsConfig.getModelGroups();
@@ -116,4 +136,15 @@ public class LocalGroupServiceImpl implements GroupService {
         return groups;
     }
 
+    @Override
+    public void onEvent(EventCustomizingUpdate event) {
+        invalidatePermits();
+    }
+
+    private void invalidatePermits() {
+        PermitService permitService = getPermitService();
+        if (permitService != null) {
+            permitService.logoutAll();
+        }
+    }
 }
