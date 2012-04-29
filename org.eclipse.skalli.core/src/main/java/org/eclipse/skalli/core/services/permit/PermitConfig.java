@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.services.permit;
 
+import java.util.Map;
+
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.eclipse.skalli.services.permit.Permit;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -55,6 +58,14 @@ public class PermitConfig {
     }
 
     public Permit asPermit() {
-        return new Permit(level, action, path);
+        return asPermit(null);
+    }
+
+    public Permit asPermit(Map<String,String> properties) {
+        if (properties == null || properties.isEmpty()) {
+            return new Permit(level, action, path);
+        }
+        StrSubstitutor subst = new StrSubstitutor(properties);
+        return new Permit(level, action, subst.replace(path));
     }
 }

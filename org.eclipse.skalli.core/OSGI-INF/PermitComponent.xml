@@ -35,8 +35,15 @@
         cardinality="0..1"
         policy="dynamic"/>
     <reference
-        name="ProjectService"
-        interface="org.eclipse.skalli.services.project.ProjectService"
+        name="RoleService"
+        interface="org.eclipse.skalli.services.role.RoleService"
         cardinality="0..1"
         policy="dynamic"/>
+    <reference
+        name="RoleProvider"
+        interface="org.eclipse.skalli.services.role.RoleProvider"
+        cardinality="0..n"
+        policy="dynamic"
+        bind="bindRoleProvider"
+        unbind="unbindRoleProvider"/>
 </scr:component>
