@@ -116,8 +116,8 @@ public class Permits {
      * attached to the current thread, has the given permit.
      *
      * @param level  the requested permit level, e.g. 1 for <tt>"ALLOW"</tt>.
-     * @param action  the requested action
-     * @param segments  the requested resource. Either a  complete resource
+     * @param action  the requested action.
+     * @param segments  the requested resource path. Either a  complete resource
      * path (with forward slashes (/) as separators), or a list of path
      * segments (without slashes).
      *

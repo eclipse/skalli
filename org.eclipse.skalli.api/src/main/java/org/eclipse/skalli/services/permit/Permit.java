@@ -319,13 +319,19 @@ public class Permit implements Comparable<Permit> {
      * @param permits  the permits to search for a match.
      * @param requestedLevel  requested permit level.
      * @param requestedAction  requested action.
-     * @param requestedSegments  requested resource path segments.
+     * @param requestedSegments   the requested resource path. Either a  complete resource
+     * path (with forward slashes (/) as separators), or a list of path
+     * segments (without slashes). If the argument is <code>null</code> or an
+     * empty array, always <code>false</code> is returned.
      *
      * @return <code>true</code>, if any of the given permits
      * matches the requested permit.
      */
     public static boolean match(PermitSet permits,
             int requestedLevel, String requestedAction, String... requestedSegments) {
+        if (requestedSegments.length == 1) {
+            requestedSegments = split(requestedSegments[0]);
+        }
         for (Permit permit: permits) {
             // if permit's action is neither ** nor the same
             // as the requested action, then the permit is irrelevant
