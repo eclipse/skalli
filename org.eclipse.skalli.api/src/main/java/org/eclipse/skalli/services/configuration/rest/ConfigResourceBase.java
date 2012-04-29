@@ -11,15 +11,18 @@
 package org.eclipse.skalli.services.configuration.rest;
 
 import java.lang.reflect.Field;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
-import org.eclipse.skalli.services.group.GroupUtils;
+import org.eclipse.skalli.services.permit.Permit;
+import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.user.LoginUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -201,10 +204,12 @@ public abstract class ConfigResourceBase<T> extends ServerResource {
         return configService;
     }
 
-    private final Representation checkAdminAuthorization() {
-        String loggedInUser = getLoggedInUser();
-        if (!GroupUtils.isAdministrator(loggedInUser)) {
-            String msg = "Access denied for user " + loggedInUser;
+    private final Representation checkAuthorization(String action, String path) {
+        if (!Permits.isAllowed(action, path)) {
+            String loggedInUser = Permits.getLoggedInUser();
+            String msg = StringUtils.isBlank(loggedInUser)?
+                    "Access denied for anonymous users" :
+                    MessageFormat.format("Access denied for user {0}", loggedInUser);
             Representation result = new StringRepresentation(msg, MediaType.TEXT_PLAIN);
             setStatus(Status.CLIENT_ERROR_FORBIDDEN, msg);
             return result;
@@ -214,9 +219,9 @@ public abstract class ConfigResourceBase<T> extends ServerResource {
 
     @Get
     public final Representation retrieve() {
-        Representation ret = checkAdminAuthorization();
-        if (ret != null) {
-            return ret;
+        Representation result = checkAuthorization(Permit.ACTION_GET, getReference().getPath());
+        if (result != null) {
+            return result;
         }
 
         ConfigurationService configService = getConfigService();
@@ -242,7 +247,7 @@ public abstract class ConfigResourceBase<T> extends ServerResource {
 
     @Put
     public final Representation store(Representation entity) {
-        Representation result = checkAdminAuthorization();
+        Representation result = checkAuthorization(Permit.ACTION_PUT, getReference().getPath());
         if (result != null) {
             return result;
         }
@@ -255,8 +260,8 @@ public abstract class ConfigResourceBase<T> extends ServerResource {
                 T configObject = (T) xstream.fromXML(entity.getText());
                 ValidationException validationException = validate(configObject, getLoggedInUser());
                 if (validationException.hasFatalIssues()) {
-                    result = new StringRepresentation("Configuration not stored due to validation errors:"
-                            + validationException.getMessage(), MediaType.TEXT_PLAIN);
+                    result = new StringRepresentation(validationException.getMessage(), MediaType.TEXT_PLAIN);
+                    getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
                 } else {
                     storeConfig(configService, configObject);
                     StringBuilder msg = new StringBuilder("Configuration successfully stored");

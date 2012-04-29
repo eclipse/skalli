@@ -19,7 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.Statistics;
-import org.eclipse.skalli.services.user.LoginUtils;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.permit.PermitService;
 import org.restlet.ext.servlet.ServerServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +62,8 @@ public class RestletServlet extends ServerServlet {
 
     @Override
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        LoginUtils loginUtils = new LoginUtils(request);
-        String loggedInUser = loginUtils.getLoggedInUserId();
+        PermitService permitService = Services.getRequiredService(PermitService.class);
+        String loggedInUser = permitService.login(request, null);
 
         if (StringUtils.isNotBlank(loggedInUser)) {
             Statistics.getDefault().trackReferer(loggedInUser);

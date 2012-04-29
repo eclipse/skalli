@@ -32,15 +32,8 @@ public class GroupResourceTest {
     public void testValidate_noAdmin() {
         final String loggedInUser = "admin";
 
-        //group without admin as member
-        ValidationException exceptions = groupResource.validate(
-                new GroupsConfig(Arrays.asList(
-                        new SkalliCoreGroup(GroupService.ADMIN_GROUP, Arrays.asList("jon")))),
-                loggedInUser);
-        assertTrue(exceptions.hasFatalIssues());
-
         //no group at all
-        exceptions = groupResource.validate(new GroupsConfig(), loggedInUser);
+        ValidationException exceptions = groupResource.validate(new GroupsConfig(), loggedInUser);
         assertFalse(exceptions.hasFatalIssues());
         assertTrue(exceptions.hasIssues());
 
