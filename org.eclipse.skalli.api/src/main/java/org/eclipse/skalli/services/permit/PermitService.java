@@ -62,6 +62,14 @@ public interface PermitService {
     public void logoutAll();
 
     /**
+     * Returns the currently logged in user.
+     *
+     * @return  the currently logged in user, or <code>null</code> if the
+     * user is anonymous.
+     */
+    public String getLoggedInUser();
+
+    /**
      * Checks whether the currently logged in user, i.e. the user that is
      * attached to the current thread, has the given permit.
      *

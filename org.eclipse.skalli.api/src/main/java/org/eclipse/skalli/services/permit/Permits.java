@@ -162,4 +162,15 @@ public class Permits {
         PermitService permitService = getPermitService();
         return permitService != null? permitService.hasPermit(level, action, project, segments) : false;
     }
+
+    /**
+     * Returns the currently logged in user.
+     *
+     * @return  the currently logged in user, or <code>null</code> if the
+     * user is anonymous.
+     */
+    public static String getLoggedInUser() {
+        PermitService permitService = getPermitService();
+        return permitService != null? permitService.getLoggedInUser() : null;
+    }
 }

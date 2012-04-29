@@ -211,6 +211,11 @@ public class PermitServiceImpl implements PermitService, EventListener<EventCust
     }
 
     @Override
+    public String getLoggedInUser() {
+        return threadUserId.get();
+    }
+
+    @Override
     public void onEvent(EventCustomizingUpdate event) {
         if (PermitsResource.MAPPINGS_KEY.equals(event.getCustomizationName())) {
             logoutAll();
