@@ -18,6 +18,17 @@ import org.apache.commons.lang.text.StrTokenizer;
 
 public class Permit implements Comparable<Permit> {
 
+    /**
+     * Enumeration representing the default levels of a permit
+     * equivalent to allowing (<code>level = 1</code>) or denying
+     * (<code>level = 0</code>) a certain action.
+     * <p>
+     * Note: Custom levels can be set with the alternative constructors
+     * {@link Permit#Permit(int, String, String)} and
+     * {@link Permit#Permit(int, String, String...)}, respectively.
+     *
+     * @see Permit#Permit(Level, String, String)}
+     */
     public static enum Level {
         FORBID(0), ALLOW(1);
 
@@ -32,19 +43,81 @@ public class Permit implements Comparable<Permit> {
         }
     }
 
+    /**
+     * Wildcard for permit actions. A permit with this action
+     * applies to all actions, i.e. to the standard actions
+     * like <tt>GET</tt>, <tt>PUT</tt>, <tt>POST</tt> and <tt>DELETE</tt>,
+     * but also to all extension actions.
+     */
     public static final String ALL_ACTIONS = "**"; //$NON-NLS-1$
 
+    /**
+     * Action that implies the retrieval of a resource (in the sense
+     * of an REST <tt>GET</tt> request).
+     */
     public static final String ACTION_GET = "GET"; //$NON-NLS-1$
+
+    /**
+     * Action that implies the change of a resource (in the sense
+     * of an REST <tt>PUT</tt> request).
+     */
     public static final String ACTION_PUT = "PUT"; //$NON-NLS-1$
+
+    /**
+     * Action that implies the creation of a member in a collection-like
+     * resource (in the sense of an REST <tt>POST</tt> request).
+     */
     public static final String ACTION_POST = "POST"; //$NON-NLS-1$
+
+    /**
+     * Action that implies the deletion of a resource (in the sense
+     * of an REST <tt>DELETE</tt> request).
+     */
     public static final String ACTION_DELETE = "DELETE"; //$NON-NLS-1$
 
+    /**
+     * The root of the permit tree. A permit with this path applies
+     * to all resources of a Skalli instance.
+     */
     public static final String ROOT = "/"; //$NON-NLS-1$
+
+    /**
+     * Wildcard for permit paths. By replacing a path segment that represents
+     * members of a resource collection, e.g. projects in the collection
+     * of all projects, a permit can be applied to all members of that collection.
+     * <p>
+     * Example: a permit with the path <tt>"/projects/**</tt> would apply to
+     * all known projects.
+     */
     public static final String WILDCARD = "**"; //$NON-NLS-1$
 
-    public static final Permit FORBID_ALL = new Permit();
+    /**
+     * Wildcard representing the "current" project the user has requested.
+     * When evaluating permits, this wildcard is replaced with the
+     * {@link org.eclipse.skalli.modelProject#getProjectId() symbolic name}
+     * of a project.
+     * <p>
+     * Example: a permit with the path <tt>"/projects/${project}</tt> would
+     * map to <tt>"/projects/technology.skalli</tt> when a user would look
+     * at the detail page of a project <tt>"technology.skalli"</tt>.
+     */
+    public static final String PROJECT_WILDCARD = "${project}"; //$NON-NLS-1$
 
-    public static final Permit DEFAULT_PERMIT = new Permit();
+    /**
+     * Wildcard representing the currently logged in user.
+     * When evaluating permits, this wildcard is replaced with the identifier
+     * of the current user.
+     * <p>
+     * Example: a permit with the path <tt>"/users/${user}</tt> would
+     * map to <tt>"/projects/hugo</tt> when a user with identifier <tt>"hugo"</tt>
+     * would request that resource.
+     */
+    public static final String USER_WILDCARD = "${user}"; //$NON-NLS-1$
+
+    /**
+     * Equivalent to <code>Permit valueOf("FORBID ALL /)"</code>.
+     */
+    public static final Permit FORBID_ALL = new Permit();
 
 
     private String action = ALL_ACTIONS;
@@ -54,7 +127,7 @@ public class Permit implements Comparable<Permit> {
     private transient String[] segments;
 
     /**
-     * Creates a default permission equivalent to <tt>"FORBID ALL /"</tt>.
+     * Creates a default permit equivalent to <tt>"FORBID ALL /"</tt>.
      */
     public Permit() {
     }
@@ -131,19 +204,36 @@ public class Permit implements Comparable<Permit> {
         return level;
     }
 
-
+    /**
+     * Returns the permit's action.
+     */
     public String getAction() {
         return action;
     }
 
+    /**
+     * Sets the permit's action.
+     *
+     * @param action  the action to set, or <code>null</code>, which is treated equivalent to
+     * <code>setAction(ALL_ACTIONS)</code>.
+     */
     public void setAction(String action) {
         this.action = StringUtils.isNotBlank(action) ? action.toUpperCase(Locale.ENGLISH) : ALL_ACTIONS;
     }
 
+    /**
+     * Returns the permit's path.
+     */
     public String getPath() {
         return path;
     }
 
+    /**
+     * Sets the permit's path.
+     *
+     * @param path  the path to set, or <code>null</code>, which is treated equivalent to
+     * <code>setPath(ROOT)</code>.
+     */
     public void setPath(String path) {
         if (StringUtils.isBlank(path)) {
             setRootPath();
@@ -153,19 +243,36 @@ public class Permit implements Comparable<Permit> {
         }
     }
 
+    /**
+     * Returns the permit's level.
+     */
     public int getLevel() {
         return level;
     }
 
-
+    /**
+     * Sets the permit's level.
+     *
+     * @param level  the level to set. Negative arguments are treated equivalent to
+     * <code>setLevel(0)</code>.
+     */
     public void setLevel(int level) {
         this.level = level < 0? 0 : level;
     }
 
+    /**
+     * Sets the permit's level.
+     *
+     * @param level  the level to set, or <code>null</code>, which is treated equivalent to
+     * <code>setPath(Level.FORBID)</code>.
+     */
     public void setLevel(Level level) {
-       setLevel(level.intValue());
+       setLevel(level != null? level.intValue() : Level.FORBID.intValue());
     }
 
+    /**
+     * Returns the permit's path split up into its segments.
+     */
     public String[] getSegments() {
         if (segments == null) {
             segments = split(path);
@@ -174,6 +281,12 @@ public class Permit implements Comparable<Permit> {
         return segments;
     }
 
+    /**
+     * Composes the permit's path from a given list of segments
+     *
+     * @param segments  the path segments. Empty lists and <code>null</code> are treated
+     * equivalent to <code>setPath(ROOT)</code>.
+     */
     public void setSegments(String...segments) {
         if (segments == null || segments.length == 0) {
             setRootPath();
@@ -307,7 +420,7 @@ public class Permit implements Comparable<Permit> {
         return "Permit [" +getLevel() + " " + getAction() + " " + getPath() + "]";
     }
 
-    public static String[] split(String path) {
+    private static String[] split(String path) {
         StrTokenizer tokenizer = new StrTokenizer();
         tokenizer.setDelimiterChar('/');
         tokenizer.setTrimmerMatcher(StrMatcher.trimMatcher());
@@ -315,7 +428,7 @@ public class Permit implements Comparable<Permit> {
         return tokenizer.getTokenArray();
     }
 
-    public static String join(String...segments) {
+    private static String join(String...segments) {
         return "/" + StringUtils.join(segments, '/'); //$NON-NLS-1$
     }
 
