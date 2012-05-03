@@ -41,7 +41,9 @@ public class Consts {
     public static final String ATTRIBUTE_PROJECT = "project";
     public static final String ATTRIBUTE_PROJECTID = "projectId";
     public static final String ATTRIBUTE_PROJECTUUID = "projectUUID";
+    public static final String ATTRIBUTE_ANONYMOUS_USER = "isAnonymousUser";
     public static final String ATTRIBUTE_PROJECTADMIN = "isProjectAdmin";
+    public static final String ATTRIBUTE_PARENTPROJECTADMIN = "isProjectAdminInParentChain";
     public static final String ATTRIBUTE_SHOW_ISSUES = "showIssues";
     public static final String ATTRIBUTE_EDITMODE = "editmode";
     public static final String ATTRIBUTE_WINDOWNAME = "windowName";

@@ -24,6 +24,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.view.Consts;
 
+/**
+ * This filter forwards the request to the REST API if an <tt>"Accept"</tt> header
+ * with the value <tt>"text/xml"</tt> is present.
+ */
 public class RestFilter implements Filter {
 
     @Override

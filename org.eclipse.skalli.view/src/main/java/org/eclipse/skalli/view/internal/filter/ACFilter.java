@@ -22,12 +22,28 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.services.group.GroupUtils;
-import org.eclipse.skalli.services.project.ProjectUtils;
 import org.eclipse.skalli.view.Consts;
 
+/**
+ * Checks project related permits, e.g. that only project members or users with explicit PUT permit
+ * are allowed to edit a project.
+ * <p>
+ * This filter reads the following attributes:
+ * <ul>
+ * <li>"{@value Consts#ATTRIBUTE_USERID}" - the identifier of the logged in user; if not defined: anonymous user.</li>
+ * <li>"{@value Consts#ATTRIBUTE_PROJECT}" - the project, or <code>null</code> in case the project is to be created.</li>
+ * </ul>
+ * Furthermore, it reads the "{@value Consts#PARAM_ACTION}" query parameter.
+ * <p>
+ * This filter sets the following attributes:
+ * <ul>
+ * <li>"{@value Consts#ATTRIBUTE_PROJECTADMIN}" - <code>true</code>, if the logged in user is project administrator,
+ * <code>false</code> otherwise.</li>
+ * </ul>
+ */
 public class ACFilter implements Filter {
 
     @Override
@@ -35,65 +51,57 @@ public class ACFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-            ServletException {
-
-        // check userId and project instance from depending servlet filters
-        String userId = (String) request.getAttribute(Consts.ATTRIBUTE_USERID);
-        Project project = (Project) request.getAttribute(Consts.ATTRIBUTE_PROJECT);
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+
+        // retrieve userId and project instance from previous filters in chain
+        String userId = (String) request.getAttribute(Consts.ATTRIBUTE_USERID);
+        Project project = (Project) request.getAttribute(Consts.ATTRIBUTE_PROJECT);
+        boolean isAnonymousUser = BooleanUtils.toBoolean((Boolean)request.getAttribute(Consts.ATTRIBUTE_ANONYMOUS_USER));
+        boolean isProjectAdmin = BooleanUtils.toBoolean((Boolean)request.getAttribute(Consts.ATTRIBUTE_PROJECTADMIN));
 
         String servletPath = httpRequest.getServletPath();
         String pathInfo = httpRequest.getPathInfo();
 
         if (servletPath.startsWith(Consts.URL_PROJECTS)) {
-            // handling of 'Consts.URL_PROJECTS' url mapping
+            // handle URL starting with /projects
             String actionValue = request.getParameter(Consts.PARAM_ACTION);
             if (project != null && Consts.PARAM_VALUE_EDIT.equals(actionValue)) {
-                // handles 'Consts.URL_PROJECTS/{projectId}?Consts.PARAM_ACTION=Consts.PARAM_VALUE_EDIT'
-                if (!(GroupUtils.isAdministrator(userId) || ProjectUtils.isProjectAdmin(userId, project))) {
+                // handle /projects/{projectId}?action=edit
+                if (!isProjectAdmin) {
                     AccessControlException e = new AccessControlException(MessageFormat.format(
-                            "User {0} is not authorized to call this page for project {1}.", userId,
+                            "User {0} is not authorized to edit project {1}", userId,
                             project.getProjectId()));
                     FilterUtil.handleACException(httpRequest, response, e);
                 }
-            } else if (project == null && pathInfo != null && pathInfo.length() > 0) {
-                // handles 'Consts.URL_PROJECTS/{projectIdThatDoesNotExist}' => project creation dialog
-                if (StringUtils.isBlank(userId)) {
+            } else if (project == null && StringUtils.isNotBlank(pathInfo)) {
+                // handle /projects/{projectId} with unknown projectId => project creation dialog
+                if (isAnonymousUser) {
                     AccessControlException e = new AccessControlException(
-                            "Anonymous user is not authorized to create new projects.");
+                            "Anonymous users are not authorized to create new projects");
                     FilterUtil.handleACException(httpRequest, response, e);
                 }
             }
-            // else {
-            // handles all other urls like
-            // 'Consts.URL_PROJECTS/{projectId}?Consts.PARAM_QUERY={query}
-            // 'Consts.URL_PROJECTS/{projectId}?Consts.PARAM_TAG={tag}
-            // 'Consts.URL_PROJECTS/{projectId}?Consts.PARAM_USER={user}
-            // ...
-            // }
         } else {
-            // handling of all other url mappings
-            if (StringUtils.isBlank(userId)) {
+            // handle all other URLs not starting with /projects
+            if (isAnonymousUser) {
                 AccessControlException e = new AccessControlException(
-                        "Anonymous users are not authorized to call this page.");
+                        "Anonymous users are not authorized to request this page");
                 FilterUtil.handleACException(request, response, e);
             }
-            if (!StringUtils.isBlank(pathInfo)) {
+            if (StringUtils.isNotBlank(pathInfo)) {
                 if (project == null) {
                     FilterException e = new FilterException(MessageFormat.format(
-                            "project instance is null, servletPath is {0}.",
+                            "No project instance available although servlet path is {0}.",
                             servletPath));
                     FilterUtil.handleException(request, response, e);
-                } else if (!GroupUtils.isAdministrator(userId) && !ProjectUtils.isProjectAdmin(userId, project)) {
-                    AccessControlException e = new AccessControlException("User is not authorized to call this page.");
+                } else if (!isProjectAdmin) {
+                    AccessControlException e = new AccessControlException("User is not authorized to request this page");
                     FilterUtil.handleACException(request, response, e);
                 }
-            } // else {
-              // project creation dialog, do nothing
-              // }
-
+            }
         }
 
         // proceed along the chain

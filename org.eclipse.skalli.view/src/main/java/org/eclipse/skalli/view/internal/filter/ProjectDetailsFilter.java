@@ -25,6 +25,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Severity;
@@ -32,12 +33,8 @@ import org.eclipse.skalli.services.ServiceFilter;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.favorites.Favorites;
 import org.eclipse.skalli.services.favorites.FavoritesService;
-import org.eclipse.skalli.services.group.GroupUtils;
 import org.eclipse.skalli.services.issues.Issues;
 import org.eclipse.skalli.services.issues.IssuesService;
-import org.eclipse.skalli.services.permit.Permit;
-import org.eclipse.skalli.services.permit.Permits;
-import org.eclipse.skalli.services.project.ProjectUtils;
 import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
 import org.eclipse.skalli.services.validation.ValidationService;
@@ -48,23 +45,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This filter reads the following attributes:
+ * <ul>
+ * <li>"{@value Consts#ATTRIBUTE_USERID}" - the identifier of the logged in user; if not defined: anonymous user.</li>
+ * <li>"{@value Consts#ATTRIBUTE_PROJECT}" - the project, or <code>null</code> in case the project is to be created.</li>
+ * <li>"{@value Consts#ATTRIBUTE_PROJECTADMIN}" - <code>true</code>, if the logged in user is project administrator
+ * <code>false</code> otherwise.</li>
+ * </ul>
+ * <p>
  * This filter sets the following attributes if the request attribute "{@value Consts#ATTRIBUTE_PROJECT}" is defined:
  * <ul>
- * <li>"{@value Consts#ATTRIBUTE_PROJECTTEMPLATE} - the {@link ProjectTemplate} assigned to the project.</li>
+ * <li>"{@value Consts#ATTRIBUTE_PROJECTTEMPLATE}" - the {@link ProjectTemplate} assigned to the project.</li>
  * </ul>
+ * Otherwise the path info of the request is set as attribute "{@value Consts#ATTRIBUTE_WINDOWNAME}".
+ * <p>
  * This filter sets the following additional attributes if the request attributes "{@value Consts#ATTRIBUTE_PROJECT}"
  * and "{@value Consts#ATTRIBUTE_USERID}" are defined:
  * <ul>
- * <li>"{@value Consts#ATTRIBUTE_FAVORITES} - the favorites of the logged in user.</li>
- * <li>"{@value Consts#ATTRIBUTE_PROJECTADMIN} - <code>true</code>, if the logged in user is project administrator,
- * <code>false</code> otherwise.</li>
- * <li>"{@value Consts#ATTRIBUTE_SHOW_ISSUES} - code>true</code>, if the logged in user is allows to see the issues
+ * <li>"{@value Consts#ATTRIBUTE_FAVORITES}" - the favorites of the logged in user.</li>
+ * <li>"{@value Consts#ATTRIBUTE_SHOW_ISSUES}" - code>true</code>, if the logged in user is allowed to see the issues
  * of the project, <code>false</code> otherwise. A user must be administrator of the project or administrator of
- * any project ion the project's parent hierarchy to see issues.</li>
- * </li>
- * <li>"{@value Consts#ATTRIBUTE_ISSUES} - the {@link Issues} of the project.</li>
- * <li>"{@value Consts#ATTRIBUTE_MAX_SEVERITY} - the maximum severity found in the project issues.</li>
- * <li>"{@value Consts#ATTRIBUTE_PROJECTCONTEXTLINKS} - ????</li>
+ * any project in the project's parent hierarchy to see issues.</li>
+ * <li>"{@value Consts#ATTRIBUTE_ISSUES}" - the {@link Issues issues} of the project.</li>
+ * <li>"{@value Consts#ATTRIBUTE_MAX_SEVERITY}" - the maximum severity found in the project issues.</li>
+ * <li>"{@value Consts#ATTRIBUTE_PROJECTCONTEXTLINKS}" - the context links to be display in the navigation bar.</li>
  * </ul>
  */
 public class ProjectDetailsFilter implements Filter {
@@ -81,8 +85,11 @@ public class ProjectDetailsFilter implements Filter {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        final Project project = (Project) request.getAttribute(Consts.ATTRIBUTE_PROJECT);
-        final String userId = (String) request.getAttribute(Consts.ATTRIBUTE_USERID);
+        String userId = (String) request.getAttribute(Consts.ATTRIBUTE_USERID);
+        Project project = (Project) request.getAttribute(Consts.ATTRIBUTE_PROJECT);
+        boolean isProjectAdmin = BooleanUtils.toBoolean((Boolean)request.getAttribute(Consts.ATTRIBUTE_PROJECTADMIN));
+        boolean isProjectAdminInParentChain =
+                BooleanUtils.toBoolean((Boolean)request.getAttribute(Consts.ATTRIBUTE_PARENTPROJECTADMIN));
 
         if (project != null) {
             ProjectTemplateService templateService = Services.getRequiredService(ProjectTemplateService.class);
@@ -99,29 +106,25 @@ public class ProjectDetailsFilter implements Filter {
                 }
                 request.setAttribute(Consts.ATTRIBUTE_FAVORITES, favorites.asMap());
 
-                boolean isProjectAdmin = GroupUtils.isAdministrator(userId)
-                        || ProjectUtils.isProjectAdmin(userId, project)
-                        || Permits.isAllowed(Permit.ACTION_PUT, "projects", project.getProjectId()) //$NON-NLS-1$
-                        || Permits.isAllowed(Permit.ACTION_PUT, "projects", project.getUuid().toString()); //$NON-NLS-1$
-                request.setAttribute(Consts.ATTRIBUTE_PROJECTADMIN, isProjectAdmin);
-
-                boolean showIssues = isProjectAdmin || ProjectUtils.isProjectAdminInParentChain(userId, project);
+                boolean showIssues = isProjectAdmin || isProjectAdminInParentChain;
                 request.setAttribute(Consts.ATTRIBUTE_SHOW_ISSUES, isProjectAdmin);
 
-                IssuesService issuesService = Services.getService(IssuesService.class);
-                if (issuesService != null && showIssues) {
-                    String action = request.getParameter(Consts.PARAM_ACTION);
-                    if (action != null && action.equals(Consts.PARAM_VALUE_VALIDATE)) {
-                        ValidationService validationService = Services.getService(ValidationService.class);
-                        if (validationService != null) {
-                            validationService.validate(Project.class, project.getUuid(), Severity.INFO, userId);
+                if (showIssues) {
+                    IssuesService issuesService = Services.getService(IssuesService.class);
+                    if (issuesService != null) {
+                        String action = request.getParameter(Consts.PARAM_ACTION);
+                        if (Consts.PARAM_VALUE_VALIDATE.equals(action)) {
+                            ValidationService validationService = Services.getService(ValidationService.class);
+                            if (validationService != null) {
+                                validationService.validate(Project.class, project.getUuid(), Severity.INFO, userId);
+                            }
                         }
-                    }
-                    Issues issues = issuesService.getByUUID(project.getUuid());
-                    if (issues != null && issues.hasIssues()) {
-                        request.setAttribute(Consts.ATTRIBUTE_ISSUES, issues);
-                        request.setAttribute(Consts.ATTRIBUTE_MAX_SEVERITY, issues.getIssues().first().getSeverity()
-                                .name());
+                        Issues issues = issuesService.getByUUID(project.getUuid());
+                        if (issues != null && issues.hasIssues()) {
+                            request.setAttribute(Consts.ATTRIBUTE_ISSUES, issues);
+                            request.setAttribute(Consts.ATTRIBUTE_MAX_SEVERITY, issues.getIssues().first().getSeverity()
+                                    .name());
+                        }
                     }
                 }
 
@@ -203,10 +206,9 @@ public class ProjectDetailsFilter implements Filter {
 
         for (ProjectContextLink contextLink : set) {
             if (StringUtils.isBlank(contextLink.getCaption(project))) {
-                LOG.warn(MessageFormat
-                        .format(
-                                "instance of {0} returned null or blank when calling method getCaption(project) with projectId={1}",
-                                contextLink.getClass(), project.getProjectId()));
+                LOG.warn(MessageFormat.format(
+                        "instance of {0} returned null or blank when calling method getCaption(project) with projectId={1}",
+                        contextLink.getClass(), project.getProjectId()));
             } else if (contextLink.getUri(project) == null) {
                 LOG.warn(MessageFormat.format(
                         "instance of {0} returned null when calling method getUri(project) with projectId={1}",
