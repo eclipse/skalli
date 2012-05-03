@@ -69,7 +69,7 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
      * "version" information in the persisted xml? => Maybe something like a
      * checksum (must be stable with respect to the order of calculation)
      */
-    private static final int CURRENT_MODEL_VERISON = 20;
+    private static final int CURRENT_MODEL_VERISON = 21;
 
 
     private ProjectTemplateService projectTemplateService;
