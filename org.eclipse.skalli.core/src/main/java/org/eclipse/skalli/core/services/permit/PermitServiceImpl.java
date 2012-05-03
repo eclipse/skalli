@@ -282,17 +282,18 @@ public class PermitServiceImpl implements PermitService, EventListener<EventCust
             if (permitsConfig != null) {
                 Map<String,String> properties = new HashMap<String,String>();
                 properties.put(USER_WILDCARD, userId);
+                String projectWildcard = "???"; //$NON-NLS-1$
                 if (project != null) {
-                    String projectId = project.getProjectId();
-                    if (StringUtils.isBlank(projectId)) {
-                        projectId = project.getUuid().toString();
+                    projectWildcard = project.getProjectId();
+                    if (StringUtils.isBlank(projectWildcard)) {
+                        projectWildcard = project.getUuid().toString();
                     }
-                    properties.put(PROJECT_WILDCARD, projectId);
                 }
+                properties.put(PROJECT_WILDCARD, projectWildcard);
 
-                collectGlobalCommits(permitsConfig, permits);
+                collectGlobalCommits(properties, permitsConfig, permits);
                 if (templateId != null) {
-                    collectTemplatePermits(templateId, permitsConfig, permits);
+                    collectTemplatePermits(templateId, properties, permitsConfig, permits);
                 }
                 if (groupRoles.size() > 0) {
                     collectRolePermits(groupRoles, properties, permitsConfig, permits);
@@ -304,9 +305,9 @@ public class PermitServiceImpl implements PermitService, EventListener<EventCust
                     collectRolePermits(projectRoles, properties, permitsConfig, permits);
                 }
                 if (groups.size() > 0) {
-                    collectGroupPermits(groups, permitsConfig, permits);
+                    collectGroupPermits(groups, properties, permitsConfig, permits);
                 }
-                collectUserPermits(userId, permitsConfig, permits);
+                collectUserPermits(userId, properties, permitsConfig, permits);
             }
         }
         if (permits.isEmpty()) {
@@ -316,27 +317,29 @@ public class PermitServiceImpl implements PermitService, EventListener<EventCust
         return permits;
     }
 
-    private void collectGlobalCommits(PermitsConfig permitsConfig, PermitSet permits) {
+    private void collectGlobalCommits(Map<String,String> properties, PermitsConfig permitsConfig, PermitSet permits) {
         List<PermitConfig> globalPermits = permitsConfig.getGlobalPermits();
         for (PermitConfig globalPermit: globalPermits) {
-            permits.add(globalPermit.asPermit());
+            permits.add(globalPermit.asPermit(properties));
         }
     }
 
-    private void collectUserPermits(String userId, PermitsConfig permitsConfig, PermitSet permits) {
+    private void collectUserPermits(String userId,  Map<String,String> properties,
+            PermitsConfig permitsConfig, PermitSet permits) {
         List<PermitConfig> userPermits = permitsConfig.getUserPermits();
         for (PermitConfig userPermit: userPermits) {
             if (userId.equals(userPermit.getOwner())) {
-                permits.add(userPermit.asPermit());
+                permits.add(userPermit.asPermit(properties));
             }
         }
     }
 
-    private void collectGroupPermits(List<String> groups, PermitsConfig permitsConfig, PermitSet permits) {
+    private void collectGroupPermits(List<String> groups,  Map<String,String> properties,
+            PermitsConfig permitsConfig, PermitSet permits) {
         List<PermitConfig> groupPermits = permitsConfig.getGroupPermits();
         for (PermitConfig groupPermit: groupPermits) {
             if (groups.contains(groupPermit.getOwner())) {
-                permits.add(groupPermit.asPermit());
+                permits.add(groupPermit.asPermit(properties));
             }
         }
     }
@@ -351,11 +354,12 @@ public class PermitServiceImpl implements PermitService, EventListener<EventCust
         }
     }
 
-    private void collectTemplatePermits(String templateId, PermitsConfig permitsConfig, PermitSet permits) {
+    private void collectTemplatePermits(String templateId, Map<String,String> properties,
+            PermitsConfig permitsConfig, PermitSet permits) {
         List<PermitConfig> templatePermits = permitsConfig.getTemplatePermits();
         for (PermitConfig templatePermit: templatePermits) {
             if (templateId.equals(templatePermit.getOwner())) {
-                permits.add(templatePermit.asPermit());
+                permits.add(templatePermit.asPermit(properties));
             }
         }
     }
