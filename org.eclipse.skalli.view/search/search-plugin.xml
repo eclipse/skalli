@@ -8,12 +8,11 @@
     Contributors:
         SAP AG - initial API and implementation
  -->
-<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/" xmlns:moz="http://www.mozilla.org/2006/browser/search/">
-    <ShortName>Project Portal</ShortName>
-    <Description>Search for projects on ProjectPortal</Description>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+    <ShortName>${searchPluginTitle}</ShortName>
+    <Description>${searchPluginDescription}</Description>
     <InputEncoding>UTF-8</InputEncoding>
     <Image width="16" height="16" type="image/x-icon">favicon.ico</Image>
-    <Url type="text/html" method="get" template="https://projectportal.wdf.sap.corp/projects?query={searchTerms}"></Url>
-    <Url type="application/opensearchdescription+xml" rel="self" template="search-plugin.xml" />
-    <moz:SearchForm>https://projectportal.wdf.sap.corp</moz:SearchForm>
+    <Url type="text/html" method="GET" template="${webLocator}/projects?query={searchTerms}"></Url>
+    <Url type="application/opensearchdescription+xml" rel="self" template="/search-plugin.xml" />
 </OpenSearchDescription>

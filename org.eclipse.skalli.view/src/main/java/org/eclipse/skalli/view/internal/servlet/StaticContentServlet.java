@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,8 +35,13 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.RandomUtils;
+import org.apache.commons.lang.text.StrSubstitutor;
+import org.eclipse.skalli.services.FilterMode;
+import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
+import org.eclipse.skalli.view.Consts;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -95,8 +102,35 @@ public class StaticContentServlet extends HttpServlet {
                 }
                 return;
             }
+        } else if (requestURI.equals(Consts.URL_SEARCH_PLUGIN)) {
+            URL searchPluginXML = getSearchPluginXML();
+            if (searchPluginXML != null) {
+                response.setContentType("application/opensearchdescription+xml"); //$NON-NLS-1$
+                Properties properties = new Properties();
+                properties.put(Consts.ATTRIBUTE_SEARCH_PLUGIN_TITLE,
+                        request.getAttribute(Consts.ATTRIBUTE_SEARCH_PLUGIN_TITLE));
+                properties.put(Consts.ATTRIBUTE_SEARCH_PLUGIN_DESCRIPTION,
+                        request.getAttribute(Consts.ATTRIBUTE_SEARCH_PLUGIN_DESCRIPTION));
+                properties.put(Consts.ATTRIBUTE_WEBLOCATOR, StringUtils.removeEnd(request.getRequestURL().toString(), requestURI));
+                InputStream in = searchPluginXML.openStream();
+                try {
+                    String content = IOUtils.toString(in, "UTF-8"); //$NON-NLS-1$
+                    StrSubstitutor subst = new StrSubstitutor(properties);
+                    content = subst.replace(content);
+                    OutputStream out = response.getOutputStream();
+                    IOUtils.write(content, out, "UTF-8"); //$NON-NLS-1$
+                } finally {
+                    IOUtils.closeQuietly(in);
+                }
+                return;
+            }
         }
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
+    }
+
+    private URL getSearchPluginXML() {
+        List<URL> urls = Services.findResources("/search", "search-plugin.xml", false, FilterMode.FIRST_MATCHING);
+        return urls.size() == 1 ? urls.get(0) : null;
     }
 
     /**

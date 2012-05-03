@@ -15,18 +15,32 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("branding")
 public class BrandingConfig {
 
-  private String pageTitle;
+    private String pageTitle;
+    private String searchPluginTitle;
+    private String searchPluginDescription;
 
-  public BrandingConfig(String pageTitle) {
-    super();
-    this.pageTitle = pageTitle;
-  }
+    public String getPageTitle() {
+        return pageTitle;
+    }
 
-  public String getPageTitle() {
-    return pageTitle;
-  }
-  public void setPageTitle(String pageTitle) {
-    this.pageTitle = pageTitle;
-  }
+    public void setPageTitle(String pageTitle) {
+        this.pageTitle = pageTitle;
+    }
+
+    public String getSearchPluginTitle() {
+        return searchPluginTitle;
+    }
+
+    public void setSearchPluginTitle(String searchPluginTitle) {
+        this.searchPluginTitle = searchPluginTitle;
+    }
+
+    public String getSearchPluginDescription() {
+        return searchPluginDescription;
+    }
+
+    public void setSearchPluginDescription(String searchPluginDescription) {
+        this.searchPluginDescription = searchPluginDescription;
+    }
 }
 

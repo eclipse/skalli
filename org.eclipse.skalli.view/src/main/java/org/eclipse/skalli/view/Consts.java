@@ -58,6 +58,9 @@ public class Consts {
     public static final String ATTRIBUTE_BRANDINGCONFIG = "brandingConfig";
     public static final String ATTRIBUTE_USERDETAILSCONFIG = "userDetailsConfig";
     public static final String ATTRIBUTE_PAGETITLE = "pagetitle";
+    public static final String ATTRIBUTE_SEARCH_PLUGIN_TITLE = "searchPluginTitle";
+    public static final String ATTRIBUTE_SEARCH_PLUGIN_DESCRIPTION = "searchPluginDescription";
+    public static final String ATTRIBUTE_WEBLOCATOR = "webLocator";
     public static final String ATTRIBUTE_EXCEPTION = "exception";
     public static final String ATTRIBUTE_QUERY = "query";
     public static final String ATTRIBUTE_TAGQUERY = "tagquery";
@@ -108,4 +111,5 @@ public class Consts {
     public static final String PROPERTY_STORAGE_SERVICE = "skalli.storageService";
 
     public static final String DEFAULT_PAGETITLE = "Skalli";
+    public static final String DEFAULT_SEARCH_PLUGIN_DESCRIPTION = "Search Projects with Skalli";
 }

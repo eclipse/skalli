@@ -247,6 +247,7 @@
         <servlet-name>StaticContent</servlet-name>
         <url-pattern>/content/*</url-pattern>
         <url-pattern>/schemas/*</url-pattern>
+        <url-pattern>/search-plugin.xml</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>DispatcherServlet</servlet-name>
@@ -257,7 +258,6 @@
         <url-pattern>/reindex</url-pattern>
         <url-pattern>/create</url-pattern>
         <url-pattern>/favicon.ico</url-pattern>
-        <url-pattern>/search-plugin.xml</url-pattern>
         <url-pattern>/myprojects</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -436,6 +436,7 @@
             <url-pattern>/VAADIN/*</url-pattern>
             <url-pattern>/schemas/*</url-pattern>
             <url-pattern>/favicon.ico</url-pattern>
+            <url-pattern>/search-plugin.xml</url-pattern>
             <url-pattern>/</url-pattern>
             <url-pattern>/tags</url-pattern>
             <url-pattern>/hierarchy</url-pattern>

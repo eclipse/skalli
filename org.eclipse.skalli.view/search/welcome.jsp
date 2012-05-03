@@ -30,7 +30,7 @@ function focusSearch()
     document.getElementById("query").focus();
 }
 </script>
-<link rel="search" type="application/opensearchdescription+xml" title="Project Portal" href="search-plugin.xml">
+<link rel="search" type="application/opensearchdescription+xml" title="${searchPluginTitle}" href="/search-plugin.xml">
 </head>
 <body class="welcomepage" onload="focusSearch()">
 

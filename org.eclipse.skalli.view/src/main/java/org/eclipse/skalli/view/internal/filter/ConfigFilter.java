@@ -45,6 +45,8 @@ public class ConfigFilter implements Filter {
             ServletException {
 
         request.setAttribute(Consts.ATTRIBUTE_PAGETITLE, Consts.DEFAULT_PAGETITLE);
+        request.setAttribute(Consts.ATTRIBUTE_SEARCH_PLUGIN_TITLE, Consts.DEFAULT_PAGETITLE);
+        request.setAttribute(Consts.ATTRIBUTE_SEARCH_PLUGIN_DESCRIPTION, Consts.DEFAULT_SEARCH_PLUGIN_DESCRIPTION);
 
         ConfigurationService confService = Services.getService(ConfigurationService.class);
         if (confService != null) {
@@ -67,6 +69,12 @@ public class ConfigFilter implements Filter {
                 request.setAttribute(Consts.ATTRIBUTE_BRANDINGCONFIG, brandingConfig);
                 if (StringUtils.isNotBlank(brandingConfig.getPageTitle())) {
                     request.setAttribute(Consts.ATTRIBUTE_PAGETITLE, brandingConfig.getPageTitle());
+                }
+                if (StringUtils.isNotBlank(brandingConfig.getSearchPluginTitle())) {
+                    request.setAttribute(Consts.ATTRIBUTE_SEARCH_PLUGIN_TITLE, brandingConfig.getSearchPluginTitle());
+                }
+                if (StringUtils.isNotBlank(brandingConfig.getSearchPluginDescription())) {
+                    request.setAttribute(Consts.ATTRIBUTE_SEARCH_PLUGIN_DESCRIPTION, brandingConfig.getSearchPluginDescription());
                 }
             }
             UserDetailsConfig userDetailsConfig = confService.readCustomization(UserDetailsResource.KEY, UserDetailsConfig.class);
