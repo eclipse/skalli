@@ -30,8 +30,8 @@ import org.eclipse.skalli.view.component.InformationBox;
 import org.eclipse.skalli.view.ext.ExtensionStreamSource;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.IconProvider;
-import org.eclipse.skalli.view.ext.Navigator;
 import org.eclipse.skalli.view.ext.InfoBox;
+import org.eclipse.skalli.view.ext.Navigator;
 import org.eclipse.skalli.view.internal.application.ProjectApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +79,10 @@ public class ProjectViewPanel extends CssLayout {
         addComponent(rightLayout);
 
         renderContent();
+    }
+
+    public Project getProject() {
+        return project;
     }
 
     private void renderContent() {

@@ -162,6 +162,10 @@ public class ProjectEditPanel extends Panel implements Issuer {
         renderContent((VerticalLayout) getContent());
     }
 
+    public Project getProject() {
+        return project;
+    }
+
     /**
      * Loads persisted issues for the project.
      */

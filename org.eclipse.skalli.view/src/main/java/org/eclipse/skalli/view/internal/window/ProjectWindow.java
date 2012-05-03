@@ -71,7 +71,19 @@ public class ProjectWindow extends Window {
     }
 
     public Project getProject() {
-        return project;
+        if (project != null) {
+            return project;
+        }
+        if (isProjectEditView()) {
+            ProjectEditPanel editPanel = (ProjectEditPanel)mainContainer.getComponent(0);
+            return editPanel.getProject();
+        }
+        if (isProjectView()) {
+            ProjectViewPanel viewPanel = (ProjectViewPanel)mainContainer.getComponent(0);
+            return viewPanel.getProject();
+
+        }
+        return null;
     }
 
     public void refreshProject(Project project) {
