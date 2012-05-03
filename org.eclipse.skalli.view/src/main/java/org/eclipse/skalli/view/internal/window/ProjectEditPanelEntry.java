@@ -23,6 +23,8 @@ import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServices;
+import org.eclipse.skalli.services.permit.Permit;
+import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.view.ext.ExtensionFormService;
 import org.eclipse.skalli.view.ext.ExtensionStreamSource;
 import org.eclipse.skalli.view.ext.ProjectEditContext;
@@ -74,6 +76,8 @@ class ProjectEditPanelEntry extends CustomComponent {
     private static final String STYLE_TRAY_CLOSED = "closed"; //$NON-NLS-1$
     private static final String STYLE_BUTTON_SELECTED = "selected"; //$NON-NLS-1$
     private static final String STYLE_ISSUES = "prjedt-issues"; //$NON-NLS-1$
+
+    private static final String EXTENSIONS = "extensions"; //$NON-NLS-1$
 
     private static final Logger LOG = LoggerFactory.getLogger(ProjectEditPanelEntry.class);
 
@@ -167,6 +171,17 @@ class ProjectEditPanelEntry extends CustomComponent {
             setState(TrayState.DISABLED);
         }
 
+        String extensionShortName = extensionService.getShortName();
+        if (!Permits.isAllowed(Permit.ACTION_DELETE, project, EXTENSIONS, extensionShortName)) {
+            disableButton.setEnabled(false);
+        }
+        if (!Permits.isAllowed(Permit.ACTION_POST, project, EXTENSIONS, extensionShortName)) {
+            editButton.setEnabled(false);
+        }
+        if (!Permits.isAllowed(Permit.ACTION_PUT, project, EXTENSIONS, extensionShortName,
+                "properties", "inherited")) { //$NON-NLS-1$ //$NON-NLS-2$
+            inheritButton.setEnabled(false);
+        }
         setCompositionRoot(tray);
     }
 
