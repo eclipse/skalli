@@ -15,12 +15,6 @@ import java.util.Collection;
 
 import org.eclipse.skalli.commons.Link;
 
-/*
- *  TODO refactoring / componentization
- *  This entity belongs to the 'LinkGroups' extension, but
- *  cannot reside in model.ext.misc as it is needed in model
- *  and view implementations.
- */
 public class LinkGroup extends OrderableGroup<Link> implements Serializable {
 
     private static final long serialVersionUID = -3346783232437679492L;

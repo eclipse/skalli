@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.linkgroups;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -31,11 +33,6 @@ public class LinkGroupValidator extends HostReachableValidator {
     public SortedSet<Issue> validate(UUID entityId, Object value, Severity minSeverity) {
         final SortedSet<Issue> issues = new TreeSet<Issue>();
 
-        // Do not participate in checks with Severity.FATAL & ignore null
-        if (minSeverity.equals(Severity.FATAL) || value == null) {
-            return issues;
-        }
-
         if (value instanceof Collection) {
             int item = 0;
             for (Object collectionEntry : (Collection<?>) value) {
@@ -46,7 +43,14 @@ public class LinkGroupValidator extends HostReachableValidator {
                     if (groupEntry == null || !(groupEntry instanceof Link)) {
                         continue;
                     }
-                    validate(issues, entityId, groupEntry, minSeverity, item);
+                    Link link = (Link) groupEntry;
+                    try {
+                        new URL(link.getUrl());
+                    } catch (MalformedURLException e) {
+                        issues.add(newIssue(Severity.FATAL, entityId,
+                                item, "''{0}'' is not a valid URL", link.getUrl()));
+                    }
+                    validate(issues, entityId, link, minSeverity, item);
                     ++item;
                 }
             }

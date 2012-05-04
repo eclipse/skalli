@@ -282,14 +282,14 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
     /**
      * centralized issue generation (w/ message arguments)
      */
-    private Issue newIssue(Severity severity, UUID entityId, int item, String message, Object... messageArguments) {
+    protected Issue newIssue(Severity severity, UUID entityId, int item, String message, Object... messageArguments) {
         return newIssue(severity, entityId, item, MessageFormat.format(message, messageArguments));
     }
 
     /**
      * centralized issue generation
      */
-    private Issue newIssue(Severity severity, UUID entityId, int item, String message) {
-        return new Issue(severity, HostReachableValidator.class, entityId, extension, propertyId, item, message);
+    protected Issue newIssue(Severity severity, UUID entityId, int item, String message) {
+        return new Issue(severity, getClass(), entityId, extension, propertyId, item, message);
     }
 }
