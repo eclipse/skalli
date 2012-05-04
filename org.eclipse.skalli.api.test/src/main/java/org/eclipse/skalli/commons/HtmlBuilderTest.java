@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.commons;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -281,5 +284,22 @@ public class HtmlBuilderTest {
         assertEquals(MessageFormat.format(PATTERN_HEADER_NO_STYLES,
                 TEST_LEVEL, TEST_LABEL),
             html.appendHeader(TEST_LABEL, TEST_LEVEL));
+    }
+
+    @Test
+    public void testEndsWith() throws Exception {
+        html.append("xyz");
+        assertTrue(html.endsWith("xyz"));
+        assertTrue(html.endsWith("yz"));
+        assertTrue(html.endsWith("z"));
+        assertTrue(html.endsWith(""));
+        assertFalse(html.endsWith("abc"));
+        assertFalse(html.endsWith("x"));
+        assertFalse(html.endsWith("y"));
+        assertFalse(html.endsWith("xy"));
+        assertFalse(html.endsWith(null));
+
+        html.clear();
+        assertTrue(html.endsWith(""));
     }
 }

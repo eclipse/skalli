@@ -292,6 +292,30 @@ public class HtmlBuilder {
         return sb.length();
     }
 
+    public int indexOf(String str) {
+        return sb.indexOf(str);
+    }
+
+    public int indexOf(String str, int fromIndex) {
+        return sb.indexOf(str, fromIndex);
+    }
+
+    public int lastIndexOf(String str) {
+        return sb.lastIndexOf(str);
+    }
+
+    public int lastIndexOf(String str, int fromIndex) {
+        return sb.lastIndexOf(str, fromIndex);
+    }
+
+    public boolean endsWith(String str) {
+        if (str == null) {
+            return false;
+        }
+        int pos = sb.length() - str.length();
+        return sb.lastIndexOf(str, pos) == pos;
+    }
+
     public void clear() {
         sb.setLength(0);
     }
