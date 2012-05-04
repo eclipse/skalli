@@ -40,14 +40,16 @@ public class MultiLinkField extends CustomField implements ILinkAddedHandler, IL
     private static final String STYLE_BUTTON_ADD = "multilink-addlink"; //$NON-NLS-1$
 
     private GridLayout layout;
+    private String buttonCaption;
 
     private boolean modified;
     private boolean readOnly;
 
     private final OrderableGroup<LinkGroup> linkGroups;
 
-    public MultiLinkField(String caption, Collection<LinkGroup> linkGroups) {
+    public MultiLinkField(String caption, String buttonCaption, Collection<LinkGroup> linkGroups) {
         setCaption(caption);
+        this.buttonCaption = StringUtils.isNotBlank(buttonCaption)? buttonCaption : "Add Link";
         this.linkGroups = new OrderableGroup<LinkGroup>(linkGroups);
         layout = new GridLayout();
         // do not change the width! otherwise right border of table is hidden in IE!
@@ -225,7 +227,7 @@ public class MultiLinkField extends CustomField implements ILinkAddedHandler, IL
         }
 
         if (!readOnly) {
-            Button btnAddLink = new Button("Add Link", new Button.ClickListener() {
+            Button btnAddLink = new Button(buttonCaption, new Button.ClickListener() {
                 @Override
                 public void buttonClick(ClickEvent event) {
                     LinkWindow addLinkWindow = new LinkWindow(MultiLinkField.this, linkGroups.getItems(),

@@ -67,7 +67,7 @@ public class LinkGroupsProjectExtEditForm extends AbstractExtensionFormService<L
         protected Field createField(Object propertyId, String caption) {
             Field field = null;
             if (LinkGroupsProjectExt.PROPERTY_LINKGROUPS.equals(propertyId)) {
-                field = new MultiLinkField(caption, extension.getLinkGroups());
+                field = new MultiLinkField(caption, null, extension.getLinkGroups());
             }
             return field;
         }
