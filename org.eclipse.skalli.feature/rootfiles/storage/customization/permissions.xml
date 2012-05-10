@@ -1,0 +1,31 @@
+<org.eclipse.skalli.core.services.permit.PermitsConfig>
+  <globalPermits>
+    <org.eclipse.skalli.core.services.permit.PermitConfig>
+      <action>GET</action>
+      <path>/</path>
+      <level>1</level>
+    </org.eclipse.skalli.core.services.permit.PermitConfig>
+  </globalPermits>
+  <rolePermits>
+    <org.eclipse.skalli.core.services.permit.PermitConfig>
+      <action>PUT</action>
+      <path>/projects/${project}</path>
+      <level>1</level>
+      <owner>projectmember</owner>
+    </org.eclipse.skalli.core.services.permit.PermitConfig>
+    <org.eclipse.skalli.core.services.permit.PermitConfig>
+      <action>PUT</action>
+      <path>/projects/${project}</path>
+      <level>1</level>
+      <owner>projectlead</owner>
+    </org.eclipse.skalli.core.services.permit.PermitConfig>
+  </rolePermits>
+  <groupPermits>
+    <org.eclipse.skalli.core.services.permit.PermitConfig>
+      <action>**</action>
+      <path>/</path>
+      <level>1</level>
+      <owner>administrators</owner>
+    </org.eclipse.skalli.core.services.permit.PermitConfig>
+  </groupPermits>
+</org.eclipse.skalli.core.services.permit.PermitsConfig>
