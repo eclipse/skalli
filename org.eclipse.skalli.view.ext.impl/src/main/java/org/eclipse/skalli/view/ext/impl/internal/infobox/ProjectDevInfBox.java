@@ -23,6 +23,7 @@ import org.eclipse.skalli.ext.mapping.MapperUtil;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
 import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
@@ -116,7 +117,7 @@ public class ProjectDevInfBox extends InfoBoxBase implements InfoBox {
                 ScmLocationMapper mapper = new ScmLocationMapper();
                 for (String scmLocation : devInf.getScmLocations()) {
                     html.append("<li>"); //$NON-NLS-1$
-                    List<String> scmUrls = getScmUrls(scmLocation, mapper, project, util.getLoggedInUser().getUserId());
+                    List<String> scmUrls = getScmUrls(scmLocation, mapper, project, util.getLoggedInUser());
                     for (String scmUrl: scmUrls) {
                         html.append(copyToClipboardLink(scmUrl, scmUrl));
                     }
@@ -143,7 +144,8 @@ public class ProjectDevInfBox extends InfoBoxBase implements InfoBox {
      * available mapping. If no matching mapping could be found, the <tt>"scm:<provider>:"</tt> prefix
      * is truncated from the location and returned as sole result entry.
      */
-    private List<String> getScmUrls(String scmLocation, ScmLocationMapper mapper, Project project, String userId) {
+    private List<String> getScmUrls(String scmLocation, ScmLocationMapper mapper, Project project, User loggedInUser) {
+        String userId = loggedInUser != null? loggedInUser.getUserId() : null;
         List<String> scmUrls = new ArrayList<String>();
         List<ScmLocationMappingConfig> clipboardMappings = mapper.getMappings(configService,
                 null, ScmLocationMapper.PURPOSE_COPY_TO_CLIPBOARD);
