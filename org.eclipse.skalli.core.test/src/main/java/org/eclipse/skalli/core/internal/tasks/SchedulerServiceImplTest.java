@@ -53,7 +53,7 @@ public class SchedulerServiceImplTest {
         TestRunnable runnable = new TestRunnable();
 
         public TestRunnableSchedule(Schedule schedule) {
-            super(schedule);
+            super(schedule, "Test");
         }
 
         @Override

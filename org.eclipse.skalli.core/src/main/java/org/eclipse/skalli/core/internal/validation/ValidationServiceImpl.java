@@ -541,7 +541,7 @@ public class ValidationServiceImpl implements ValidationService, EventListener<E
         private ValidationConfig config;
 
         public ValidationSchedule(ValidationConfig config) {
-            super(config.getSchedule());
+            super(config.getSchedule(), "Validation");
             this.config = config;
         }
 

@@ -93,7 +93,7 @@ public class ValidationServiceImplTest {
 
     private static class TestRunnableSchedule extends RunnableSchedule {
         protected TestRunnableSchedule(String daysOfWeek, String hours, String minutes) {
-            super(new Schedule(daysOfWeek, hours, minutes));
+            super(new Schedule(daysOfWeek, hours, minutes), "Test");
         }
 
         @Override

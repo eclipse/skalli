@@ -12,6 +12,8 @@ package org.eclipse.skalli.core.internal.tasks;
 
 import java.text.MessageFormat;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
@@ -145,6 +147,11 @@ public class SchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
+    public synchronized Collection<RunnableSchedule> getSchedules() {
+        return Collections.unmodifiableCollection(schedules.values());
+    }
+
+    @Override
     public synchronized boolean isRegisteredSchedule(UUID scheduleId) {
         return schedules.get(scheduleId) != null;
     }
@@ -178,7 +185,9 @@ public class SchedulerServiceImpl implements SchedulerService {
                 Runnable runnable = schedule.getRunnable();
                 if (runnable != null) {
                     if (schedule.isDue(now, lastCronRun)) {
+                        schedule.setLastRun(now.getTimeInMillis());
                         singleShotExecutor.submit(runnable);
+                        LOG.info(MessageFormat.format("Schedule ''{0}'': submitted", schedule));
                     }
                 }
             }

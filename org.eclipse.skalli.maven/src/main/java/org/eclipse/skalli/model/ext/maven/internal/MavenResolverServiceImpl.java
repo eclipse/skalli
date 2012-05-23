@@ -108,7 +108,7 @@ public class MavenResolverServiceImpl implements MavenResolverService, EventList
                         MavenResolverResource.MAPPINGS_KEY, MavenResolverConfig.class);
                 if (resolverConfig != null) {
 
-                    RunnableSchedule runnableSchedule = new RunnableSchedule(resolverConfig.getSchedule()) {
+                    RunnableSchedule runnableSchedule = new RunnableSchedule(resolverConfig.getSchedule(), "Maven Resolver") {
                         @Override
                         public Runnable getRunnable() {
                             String userId = resolverConfig.getUserId();

@@ -10,8 +10,12 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.internal.admin;
 
+import org.eclipse.skalli.commons.FormatUtils;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.eclipse.skalli.services.scheduler.RunnableSchedule;
+import org.eclipse.skalli.services.scheduler.Schedule;
+import org.eclipse.skalli.services.scheduler.SchedulerService;
 import org.osgi.framework.Bundle;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -51,6 +55,22 @@ class StatusConverter extends RestConverterBase<Object> {
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         marshalNSAttributes(writer);
         marshalApiVersion(writer);
+        writer.startNode("schedules"); //$NON-NLS-1$
+        SchedulerService schedulerService = Services.getService(SchedulerService.class);
+        if (schedulerService != null) {
+            for (RunnableSchedule schedule : schedulerService.getSchedules()) {
+                writer.startNode("schedule"); //$NON-NLS-1$
+                writeNode(writer, "name", schedule.getCaption()); //$NON-NLS-1$
+                writeNode(writer, "runnable", schedule.getRunnable().getClass().getName()); //$NON-NLS-1$
+                writeNode(writer, "runAt", ((Schedule) schedule).toString()); //$NON-NLS-1$
+                long lastRun = schedule.getLastRun();
+                if (lastRun > 0) {
+                    writeNode(writer, "lastRun", FormatUtils.formatUTCWithMillis(lastRun)); //$NON-NLS-1$
+                }
+                writer.endNode();
+            }
+        }
+        writer.endNode();
         writer.startNode("bundles"); //$NON-NLS-1$
         for (Bundle bundle : Services.getBundles()) {
             writer.startNode("bundle"); //$NON-NLS-1$

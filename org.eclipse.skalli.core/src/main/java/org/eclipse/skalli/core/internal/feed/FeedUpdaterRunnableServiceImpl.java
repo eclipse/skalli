@@ -35,7 +35,7 @@ public class FeedUpdaterRunnableServiceImpl implements FeedUpdaterRunnableServic
     private UUID scheduleId;
 
     protected void bindSchedulerService(SchedulerService schedulerService) {
-        LOG.info(MessageFormat.format("bindSchedulerService({0})", schedulerService)); //$NON-NLS-1$LOG.info(MessageFormat.format("bindSchedulerService({0})", schedulerService)); //$NON-NLS-1$
+        LOG.info(MessageFormat.format("bindSchedulerService({0})", schedulerService)); //$NON-NLS-1$
         this.schedulerService = schedulerService;
         synchronizeAllTasks();
     }
@@ -87,20 +87,16 @@ public class FeedUpdaterRunnableServiceImpl implements FeedUpdaterRunnableServic
                 final FeedUpdaterConfig resolverConfig = configService.readCustomization(
                         FeedUpdaterResource.MAPPINGS_KEY, FeedUpdaterConfig.class);
                 if (resolverConfig != null) {
-
-                    RunnableSchedule runnableSchedule = new RunnableSchedule(resolverConfig.getSchedule()) {
+                    RunnableSchedule runnableSchedule = new RunnableSchedule(resolverConfig.getSchedule(), "Feed Updater") {
                         @Override
                         public Runnable getRunnable() {
                             return new Runnable() {
-
                                 @Override
                                 public void run() {
                                     if (feedManager != null) {
                                         feedManager.updateAllFeeds();
                                     }
-
                                 }
-
                             };
 
                         }

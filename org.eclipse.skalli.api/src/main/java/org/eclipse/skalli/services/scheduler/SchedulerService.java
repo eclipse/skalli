@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.scheduler;
 
+import java.util.Collection;
 import java.util.UUID;
 
 public interface SchedulerService {
@@ -89,4 +90,12 @@ public interface SchedulerService {
      *      by {@link #registerSchedule(RunnableSchedule)}.
      */
     public boolean isRegisteredSchedule(UUID scheduleId);
+
+    /**
+     * Returns all currently registered schedules.
+     *
+     * @return an (unmodifiable) collection of schedules, or
+     *         an empty collection if.
+     */
+    public Collection<RunnableSchedule> getSchedules();
 }
