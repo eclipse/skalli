@@ -66,7 +66,7 @@ public class LuceneIndexTest {
         entities.add(entity4);
         entities.add(entity5);
         idx = new LuceneIndexUT(new TestExtensionService(), new TestEntityService(entities));
-        idx.initialize();
+        idx.reindexAll();
     }
 
     @Test

@@ -155,7 +155,7 @@ public abstract class EntityServiceBase<T extends EntityBase> implements EntityS
     }
 
     @Override
-    public void persist(T entity, String userId) throws ValidationException {
+    public synchronized void persist(T entity, String userId) throws ValidationException {
         if (entity.getUuid() == null) {
             entity.setUuid(UUID.randomUUID());
         }

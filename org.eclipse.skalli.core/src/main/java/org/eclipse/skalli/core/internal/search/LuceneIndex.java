@@ -46,6 +46,7 @@ import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.similar.MoreLikeThis;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 import org.eclipse.skalli.commons.Statistics;
@@ -61,23 +62,27 @@ import org.eclipse.skalli.services.search.PagingInfo;
 import org.eclipse.skalli.services.search.QueryParseException;
 import org.eclipse.skalli.services.search.SearchHit;
 import org.eclipse.skalli.services.search.SearchResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LuceneIndex<T extends EntityBase> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(LuceneIndex.class);
 
     private static final SimpleHTMLFormatter formatter = new SimpleHTMLFormatter("<em>", "</em>"); //$NON-NLS-1$//$NON-NLS-2$
     private static final String FIELD_UUID = "_uuid"; //$NON-NLS-1$
     private static final int NUMBER_BEST_FRAGMENTS = 3; //TODO this is a candidate for configuration
-    private Directory directory;
-    private Analyzer analyzer;
+
+    private Directory directory = new RAMDirectory();
+    private Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_30);
+
     private final EntityService<T> entityService;
 
     public LuceneIndex(EntityService<T> entityService) {
         this.entityService = entityService;
     }
 
-    void initialize() {
-        directory = new RAMDirectory();
-        analyzer = new StandardAnalyzer(Version.LUCENE_30);
+    public void reindexAll() {
         reindex(entityService.getAll());
     }
 
@@ -147,19 +152,25 @@ public class LuceneIndex<T extends EntityBase> {
 
     private void addEntitiesToIndex(final Collection<T> entities) {
         try {
-            IndexWriter writer = new IndexWriter(directory, analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
-            for (T entity : entities) {
-                if (!entity.isDeleted()) {
-                    addEntityToIndex(writer, entity);
+            // writing to a Lucene index must be properly synchronized
+            synchronized (directory) {
+                IndexWriter writer = new IndexWriter(directory, analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
+                for (T entity : entities) {
+                    if (!entity.isDeleted()) {
+                        addEntityToIndex(writer, entity);
+                    }
                 }
+                writer.close();
             }
-            writer.close();
+        } catch (LockObtainFailedException e) {
+            LOG.error("Failed to add index entries due to Lucene lock: re-indexing all entities", e);
+            reindexAll();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void reindex(final Collection<T> entities) {
+    public synchronized void reindex(final Collection<T> entities) {
         directory = new RAMDirectory();
         addEntitiesToIndex(entities);
     }
@@ -203,14 +214,20 @@ public class LuceneIndex<T extends EntityBase> {
 
     public void remove(final Collection<T> entities) {
         try {
-            IndexSearcher searcher = new IndexSearcher(directory, false);
-            for (EntityBase entity : entities) {
-                ScoreDoc hit = getDocByUUID(searcher, entity.getUuid());
-                if (hit != null) {
-                    searcher.getIndexReader().deleteDocument(hit.doc);
+            // writing to a Lucene index must be properly synchronized
+            synchronized (directory) {
+                IndexSearcher searcher = new IndexSearcher(directory, false);
+                for (EntityBase entity : entities) {
+                    ScoreDoc hit = getDocByUUID(searcher, entity.getUuid());
+                    if (hit != null) {
+                        searcher.getIndexReader().deleteDocument(hit.doc);
+                    }
                 }
+                searcher.close();
             }
-            searcher.close();
+        } catch (LockObtainFailedException e) {
+            LOG.error("Failed to remove index entries due to Lucene lock: re-indexing all entities", e);
+            reindexAll();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

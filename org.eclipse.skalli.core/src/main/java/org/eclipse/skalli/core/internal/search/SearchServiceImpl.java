@@ -52,7 +52,7 @@ public class SearchServiceImpl implements SearchService {
         LOG.info("Project service injected into search service"); //$NON-NLS-1$
         try {
             luceneIndex = new LuceneIndex<Project>(srvc);
-            luceneIndex.initialize();
+            luceneIndex.reindexAll();
         } catch (RuntimeException e) {
             LOG.warn("Failed to initialize Lucene index", e);
         }
