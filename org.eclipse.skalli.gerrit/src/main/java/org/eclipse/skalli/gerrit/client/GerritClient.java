@@ -48,6 +48,17 @@ public interface GerritClient {
     public void disconnect();
 
     /**
+     * Returns the version identifier of the Gerrit server.
+     *
+     * @return the version of the Gerrit server, or {@link GerritVersion#GERRIT_UNKNOWN_VERSION}
+     * if the version could not be retrieved or identified.
+     *
+     * @throws ConnectionException      in case of connection / communication problems
+     * @throws CommandException         in case of unsuccessful commands
+     */
+    public GerritVersion getVersion() throws ConnectionException, CommandException;
+
+    /**
      * Creates a project according to <a href=
      * "http://gerrit.googlecode.com/svn/documentation/2.1.5/cmd-create-project.html"
      * >gerrit create-project</a> (<a href=

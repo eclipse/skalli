@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
+import org.eclipse.skalli.gerrit.client.GerritVersion;
 import org.eclipse.skalli.gerrit.client.exception.CommandException;
 import org.eclipse.skalli.gerrit.client.exception.ConnectionException;
 import org.eclipse.skalli.gerrit.client.exception.GerritClientException;
@@ -49,6 +50,7 @@ public class GerritClientTest {
   private static int TEST_PORT = 8080;
   private static String TEST_PRIVATEKEY_FILE = null;
   private static String TEST_PASSPHRASE = null;
+  private static String TEST_GERRIT_VERSION = null;
   private static final String TEST_ONBEHALFOF = "userId";
 
   // DO NOT MODIFY THIS DESCRIPTION - it is used in the clean up step to figure out which projects and groups have been created.
@@ -65,6 +67,7 @@ public class GerritClientTest {
     TEST_PORT = port != null ? new Integer(port).intValue() : TEST_PORT;
     TEST_PRIVATEKEY_FILE = System.getProperty("testPrivatekeyFile");
     TEST_PASSPHRASE = System.getProperty("testPassphrase");
+    TEST_GERRIT_VERSION = System.getProperty("testGerritVersion");
     String privateKey = FileUtils.readFileToString(new File(TEST_PRIVATEKEY_FILE));
     client = new GerritClientImpl(TEST_HOST, TEST_PORT, TEST_ADMIN_ACCOUNT, privateKey, TEST_PASSPHRASE,
         TEST_ONBEHALFOF);
@@ -129,6 +132,11 @@ public class GerritClientTest {
 
     evilClient.disconnect();
   }
+
+    @Test
+    public void testGetVersion() throws Exception {
+        Assert.assertEquals(GerritVersion.asGerritVersion(TEST_GERRIT_VERSION), client.getVersion());
+    }
 
   @Test
   public void testGroupExists() throws Exception {

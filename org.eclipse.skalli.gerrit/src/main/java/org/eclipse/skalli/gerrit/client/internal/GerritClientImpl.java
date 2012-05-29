@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,7 +30,10 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
+import org.eclipse.skalli.gerrit.client.GerritFeature;
+import org.eclipse.skalli.gerrit.client.GerritVersion;
 import org.eclipse.skalli.gerrit.client.JSONUtil;
 import org.eclipse.skalli.gerrit.client.exception.CommandException;
 import org.eclipse.skalli.gerrit.client.exception.ConnectionException;
@@ -53,6 +57,8 @@ public class GerritClientImpl implements GerritClient {
         ALL, PROJECTS, GROUPS
     }
 
+    private static final String GERRIT_VERSION_PREFIX = "gerrit version ";
+
     private final String ACCOUNTS_PREFIX = "username:";
     private final int ACCOUNTS_QUERY_BLOCKSIZE = 100;
 
@@ -70,6 +76,7 @@ public class GerritClientImpl implements GerritClient {
     JSch client = null;
     Session session = null;
     ChannelExec channel = null;
+    GerritVersion serverVersion = null;
 
     public GerritClientImpl(final String host, final int port, final String user, final String privateKey,
             final String password, String onBehalfOfUserId) {
@@ -93,7 +100,7 @@ public class GerritClientImpl implements GerritClient {
 
     @Override
     public void connect() throws ConnectionException {
-        LOG.info(String.format("Trying to connect GerritClient to %s:%s.", host, port));
+        LOG.info(String.format("Trying to connect to Gerrit %s:%s.", host, port));
 
         File privateKeyFile = null;
         try {
@@ -116,8 +123,33 @@ public class GerritClientImpl implements GerritClient {
                 privateKeyFile.delete();
             }
         }
+        LOG.info(String.format("Connected to Gerrit %s:%s (%s)", host, port, session.getServerVersion()));
+    }
 
-        LOG.info("GerritClient connected.");
+    @Override
+    public GerritVersion getVersion() throws ConnectionException, CommandException {
+        if (serverVersion == null) {
+            List<String> result = null;
+            try {
+                result = sshCommand("gerrit version");
+            } catch (CommandException e) {
+                throw andDisconnect(new CommandException("Failed to retrieve Gerrit version", e));
+            }
+            if (result.size() != 1) {
+                throw andDisconnect(new CommandException(MessageFormat.format(
+                        "Failed to retrieve Gerrit version: Invalid result size ({0})",
+                        CollectionUtils.toString(result, ','))));
+            }
+            String versionString = result.get(0);
+            if (StringUtils.isBlank(versionString)) {
+                return GerritVersion.GERRIT_UNKNOWN_VERSION;
+            }
+            if (!versionString.startsWith(GERRIT_VERSION_PREFIX)) {
+                return GerritVersion.GERRIT_UNKNOWN_VERSION;
+            }
+            serverVersion = GerritVersion.asGerritVersion(versionString.substring(GERRIT_VERSION_PREFIX.length()));
+        }
+        return serverVersion;
     }
 
     private File getPrivateKeyFile(String privateKey) {
@@ -146,7 +178,7 @@ public class GerritClientImpl implements GerritClient {
             session.disconnect();
             session = null;
         }
-        LOG.info("GerritClient disconnected");
+        LOG.info("Disconnected");
     }
 
     @Override
@@ -215,42 +247,60 @@ public class GerritClientImpl implements GerritClient {
 
     @Override
     public List<String> getGroups() throws ConnectionException, CommandException {
-        final List<String> result = new ArrayList<String>();
-
-        final List<String> gsqlResult = gsql("SELECT name FROM " + GSQL.Tables.ACCOUNT_GROUPS, ResultFormat.JSON);
-
-        for (final String entry : gsqlResult) {
-            if (isRow(entry)) {
-                result.add(JSONUtil.getString(entry, "columns.name"));
+        List<String> result = Collections.emptyList();
+        GerritVersion version = getVersion();
+        if (version.supports(GerritFeature.LS_GROUPS)) {
+            StringBuffer sb = new StringBuffer("gerrit ls-groups");
+            if (version.supports(GerritFeature.LS_GROUPS_VISIBLE_TO_ALL_ATTR)) {
+                appendArgument(sb, "visible-to-all", true);
+            }
+            result = sshCommand(sb.toString());
+        } else {
+            result = new ArrayList<String>();
+            List<String> gsqlResult = gsql("SELECT name FROM " + GSQL.Tables.ACCOUNT_GROUPS, ResultFormat.JSON);
+            for (final String entry : gsqlResult) {
+                if (isRow(entry)) {
+                    result.add(JSONUtil.getString(entry, "columns.name"));
+                }
             }
         }
-
         return result;
     }
 
     @Override
     public List<String> getGroups(String... projectNames) throws ConnectionException, CommandException {
-        final List<String> result = new ArrayList<String>();
+        List<String> result = Collections.emptyList();
 
         if (projectNames == null || projectNames.length == 0) {
             return result;
         }
 
-        final StringBuffer sb = new StringBuffer();
-        sb.append("SELECT name FROM ").append(GSQL.Tables.ACCOUNT_GROUP_NAMES)
-                .append(" WHERE group_id IN (SELECT group_id FROM ").append(GSQL.Tables.REF_RIGHTS).append(" WHERE");
+        GerritVersion version = getVersion();
+        if (version.supports(GerritFeature.LS_GROUPS_PROJECT_ATTR)) {
+            StringBuffer sb = new StringBuffer("gerrit ls-groups");
+            if (version.supports(GerritFeature.LS_GROUPS_VISIBLE_TO_ALL_ATTR)) {
+                appendArgument(sb, "visible-to-all", true);
+            }
+            for (String projectName : projectNames) {
+                appendArgument(sb, "project", projectName);
+            }
+            result = sshCommand(sb.toString());
+        } else if (version.supports(GerritFeature.REF_RIGHTS_TABLE)) {
+            result = new ArrayList<String>();
+            StringBuffer sb = new StringBuffer();
+            sb.append("SELECT name FROM ").append(GSQL.Tables.ACCOUNT_GROUP_NAMES)
+                    .append(" WHERE group_id IN (SELECT group_id FROM ").append(GSQL.Tables.REF_RIGHTS).append(" WHERE");
+            for (String projectName : projectNames) {
+                sb.append(" project_name='").append(projectName).append("' OR");
+            }
+            sb.replace(sb.length() - 3, sb.length(), "");
+            sb.append(");");
 
-        for (String projectName : projectNames) {
-            sb.append(" project_name='").append(projectName).append("' OR");
-        }
-        sb.replace(sb.length() - 3, sb.length(), "");
-        sb.append(");");
-
-        final List<String> gsqlResult = gsql(sb.toString(), ResultFormat.JSON);
-
-        for (final String entry : gsqlResult) {
-            if (isRow(entry)) {
-                result.add(JSONUtil.getString(entry, "columns.name"));
+            List<String> gsqlResult = gsql(sb.toString(), ResultFormat.JSON);
+            for (String entry : gsqlResult) {
+                if (isRow(entry)) {
+                    result.add(JSONUtil.getString(entry, "columns.name"));
+                }
             }
         }
 
@@ -262,17 +312,12 @@ public class GerritClientImpl implements GerritClient {
         if (name == null) {
             return false;
         }
-
-        final List<String> result = gsql("SELECT group_id FROM " + GSQL.Tables.ACCOUNT_GROUPS + " WHERE name = '"
-                + name
-                + "' LIMIT 1;", ResultFormat.JSON);
-
-        for (final String entry : result) {
-            if (isRow(entry)) {
+        List<String> groups = getGroups();
+        for (String group: groups) {
+            if (name.equals(group)) {
                 return true;
             }
         }
-
         return false;
     }
 

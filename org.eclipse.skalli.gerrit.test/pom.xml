@@ -34,6 +34,7 @@
                         <testPort><!-- enter the port--></testPort>
                         <testPrivatekeyFile><!-- enter privatekey file location url--></testPrivatekeyFile>
                         <testPassphrase><!-- enter the passphrase--></testPassphrase>
+                        <testGerritVersion><!-- enter the Gerrit version--></testGerritVersion>
                     </systemProperties>
                 </configuration>
             </plugin>
