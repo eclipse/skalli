@@ -71,7 +71,11 @@ public class MavenResolverRunnable implements Runnable {
         }
 
         int countUpdated = 0;
-        int countInvalid = 0;
+        int countInvalidPom = 0;
+        int countIOExceptions = 0;
+        int countUnexpectedException = 0;
+        int countPersistingProblem = 0;
+
         NexusVersionsResolver versionsResolver = new NexusVersionsResolver(nexusClient);
         for (int i = 0; i < projects.size(); i++) {
             if (i > 0) {
@@ -91,13 +95,19 @@ public class MavenResolverRunnable implements Runnable {
             try {
                 newReactor = resolveProject(project);
             } catch (ValidationException e) {
-                ++countInvalid;
+                ++countInvalidPom;
                 LOG.info(MessageFormat.format(
                         "Invalid Maven reactor information for project {0}:\n {1}",
                         project.getProjectId(), e.getMessage()));
                 continue;
+            } catch (IOException e) {
+                ++countIOExceptions;
+                LOG.info(MessageFormat.format(
+                        "can''t read Maven reactor for project {0}:\n {1}",
+                        project.getProjectId(), e.getMessage()));
+                continue;
             } catch (Throwable t) {
-                ++countInvalid;
+                ++countUnexpectedException;
                 LOG.error(MessageFormat.format(
                         "Failed to resolve Maven reactor information for project {0}",
                         project.getProjectId()), t);
@@ -111,6 +121,8 @@ public class MavenResolverRunnable implements Runnable {
                 LOG.error(MessageFormat.format(
                         "Can''t calculate Versions for project {0} . Unexpected Exception cought: {1}",
                         project.getProjectId(), e.getMessage()));
+                ++countUnexpectedException;
+                continue;
             }
 
             if (!ComparatorUtils.equals(newReactor, oldReactor)) {
@@ -119,7 +131,7 @@ public class MavenResolverRunnable implements Runnable {
                         projectService.persist(project, userId);
                         ++countUpdated;
                     } catch (ValidationException e) {
-                        ++countInvalid;
+                        ++countPersistingProblem;
                         LOG.warn(MessageFormat.format(
                                 "Failed to persist Maven reactor information for project {0}",
                                 project.getProjectId()), e);
@@ -127,15 +139,14 @@ public class MavenResolverRunnable implements Runnable {
                     }
                 }
             }
-
-            LOG.debug(MessageFormat.format(
-                    "MavenResolver: ({0} projects scanned: {1} updated, {2} invalid, {3} remaining)",
-                    projects.size(), countUpdated, countInvalid, projects.size() - countUpdated - countInvalid));
+            LOG.info(MessageFormat.format("MavenResolver: {0} projects processed, {1} remaining", i + 1,
+                    projects.size() - i));
 
         }
-        LOG.info(MessageFormat.format(
-                "MavenResolver: finished ({0} projects scanned: {1} updated, {2} invalid)",
-                projects.size(), countUpdated, countInvalid));
+        LOG.info(MessageFormat
+                .format("MavenResolver: finished ({0} projects scanned, {1} updated, {2} invalid Pom, {3} persisting problems, {4} i/o exceptions, {5} unexpected exceptions)",
+                        projects.size(), countUpdated, countInvalidPom, countPersistingProblem, countIOExceptions,
+                        countUnexpectedException));
     }
 
     /**
