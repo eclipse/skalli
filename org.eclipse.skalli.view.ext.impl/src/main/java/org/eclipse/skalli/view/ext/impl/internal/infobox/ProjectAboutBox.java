@@ -90,6 +90,8 @@ public class ProjectAboutBox extends InfoBoxBase implements InfoBox {
         // (it then cannot render a second project, throws ISE)
         layout.addComponent(new Label("<div id=" + DEBUG_ID + "></div>", Label.CONTENT_XHTML)); //$NON-NLS-1$ //$NON-NLS-2$
 
+        addLastModifiedInfo(layout, project);
+
         return layout;
     }
 

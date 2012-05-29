@@ -12,6 +12,8 @@ package org.eclipse.skalli.view.ext;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.HtmlBuilder;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Project;
 
 import com.vaadin.terminal.ExternalResource;
@@ -29,6 +31,8 @@ public abstract class InfoBoxBase implements InfoBox {
 
     protected static final String HSPACE = "&nbsp;&nbsp;&nbsp;&nbsp;"; //$NON-NLS-1$
     protected static final String DEFAULT_TARGET = HtmlBuilder.DEFAULT_TARGET;
+
+    private static final String LAST_MODIFIED ="last modified";
 
     protected void bindClipboard(Clipboard clipboard) {
         this.clipboard = clipboard;
@@ -77,6 +81,47 @@ public abstract class InfoBoxBase implements InfoBox {
             link.addStyleName(STYLE_LINK);
         }
         layout.addComponent(link);
+    }
+
+    protected void addLastModifiedInfo(Layout layout, String caption, String lastModified, String lastModifiedBy) {
+        if (lastModified == null) {
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<span style=\"font-size:x-small\">");
+
+        if (StringUtils.isNotBlank(caption)) {
+            sb.append(caption);
+        } else {
+            sb.append(LAST_MODIFIED);
+        }
+        sb.append(" ");
+        sb.append(lastModified);
+        if (StringUtils.isNotBlank(lastModifiedBy)) {
+            sb.append(" by ").append(lastModifiedBy);
+        }
+        sb.append("</span>");
+
+        Label label = asLabel(sb.toString());
+        label.setStyleName("light");
+        label.addStyleName(STYLE_LABEL);
+        layout.addComponent(label);
+    }
+
+    protected void addLastModifiedInfo(Layout layout, EntityBase entity) {
+        addLastModifiedInfo(layout, null, entity);
+    }
+
+    protected void addLastModifiedInfo(Layout layout, String caption, EntityBase entity) {
+        if (entity == null) {
+            return;
+        }
+        addLastModifiedInfo(layout, caption, entity.getLastModified(), entity.getLastModifiedBy());
+    }
+
+    protected void addLastModifiedInfo(Layout layout, ExtensionEntityBase ext) {
+        addLastModifiedInfo(layout, null, ext);
     }
 
     public Label asLabel(String s) {
