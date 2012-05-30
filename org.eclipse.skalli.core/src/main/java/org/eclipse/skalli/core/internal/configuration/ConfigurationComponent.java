@@ -111,7 +111,9 @@ public class ConfigurationComponent implements ConfigurationService {
             try {
                 customizationKeys = storageService.keys(CATEGORY_CUSTOMIZATION);
             } catch (StorageException e) {
-
+                LOG.error(MessageFormat.format("Failed to retrieve customization keys: storage service {0} not ready",
+                        storageService), e);
+                return;
             }
             for (String customizationKey: customizationKeys) {
                 eventService.fireEvent(new EventCustomizingUpdate(customizationKey));
