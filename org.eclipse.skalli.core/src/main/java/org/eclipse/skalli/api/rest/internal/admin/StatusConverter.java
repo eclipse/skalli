@@ -14,7 +14,6 @@ import org.eclipse.skalli.commons.FormatUtils;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 import org.eclipse.skalli.services.scheduler.RunnableSchedule;
-import org.eclipse.skalli.services.scheduler.Schedule;
 import org.eclipse.skalli.services.scheduler.SchedulerService;
 import org.osgi.framework.Bundle;
 
@@ -62,7 +61,7 @@ class StatusConverter extends RestConverterBase<Object> {
                 writer.startNode("schedule"); //$NON-NLS-1$
                 writeNode(writer, "name", schedule.getCaption()); //$NON-NLS-1$
                 writeNode(writer, "runnable", schedule.getRunnable().getClass().getName()); //$NON-NLS-1$
-                writeNode(writer, "runAt", ((Schedule) schedule).toString()); //$NON-NLS-1$
+                writeNode(writer, "runAt", schedule.getSchedule()); //$NON-NLS-1$
                 long lastRun = schedule.getLastRun();
                 if (lastRun > 0) {
                     writeNode(writer, "lastRun", FormatUtils.formatUTCWithMillis(lastRun)); //$NON-NLS-1$

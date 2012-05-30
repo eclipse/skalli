@@ -218,13 +218,17 @@ public class Schedule {
         initDaysOfWeekSet();
     }
 
-    @Override
-    public String toString() {
+    public String getSchedule() {
         StringBuilder sb = new StringBuilder();
         sb.append(getDaysOfWeek()).append(' ');
         sb.append(getHours()).append(' ');
         sb.append(getMinutes());
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return getSchedule();
     }
 
     @Override
