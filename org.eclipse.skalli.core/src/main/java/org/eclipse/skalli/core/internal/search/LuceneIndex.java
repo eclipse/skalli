@@ -152,16 +152,13 @@ public class LuceneIndex<T extends EntityBase> {
 
     private void addEntitiesToIndex(final Collection<T> entities) {
         try {
-            // writing to a Lucene index must be properly synchronized
-            synchronized (directory) {
-                IndexWriter writer = new IndexWriter(directory, analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
-                for (T entity : entities) {
-                    if (!entity.isDeleted()) {
-                        addEntityToIndex(writer, entity);
-                    }
+            IndexWriter writer = new IndexWriter(directory, analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
+            for (T entity : entities) {
+                if (!entity.isDeleted()) {
+                    addEntityToIndex(writer, entity);
                 }
-                writer.close();
             }
+            writer.close();
         } catch (LockObtainFailedException e) {
             LOG.error("Failed to add index entries due to Lucene lock: re-indexing all entities", e);
             reindexAll();
@@ -170,7 +167,7 @@ public class LuceneIndex<T extends EntityBase> {
         }
     }
 
-    public synchronized void reindex(final Collection<T> entities) {
+    public void reindex(final Collection<T> entities) {
         directory = new RAMDirectory();
         addEntitiesToIndex(entities);
     }
@@ -214,17 +211,14 @@ public class LuceneIndex<T extends EntityBase> {
 
     public void remove(final Collection<T> entities) {
         try {
-            // writing to a Lucene index must be properly synchronized
-            synchronized (directory) {
-                IndexSearcher searcher = new IndexSearcher(directory, false);
-                for (EntityBase entity : entities) {
-                    ScoreDoc hit = getDocByUUID(searcher, entity.getUuid());
-                    if (hit != null) {
-                        searcher.getIndexReader().deleteDocument(hit.doc);
-                    }
+            IndexSearcher searcher = new IndexSearcher(directory, false);
+            for (EntityBase entity : entities) {
+                ScoreDoc hit = getDocByUUID(searcher, entity.getUuid());
+                if (hit != null) {
+                    searcher.getIndexReader().deleteDocument(hit.doc);
                 }
-                searcher.close();
             }
+            searcher.close();
         } catch (LockObtainFailedException e) {
             LOG.error("Failed to remove index entries due to Lucene lock: re-indexing all entities", e);
             reindexAll();
