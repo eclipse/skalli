@@ -122,6 +122,18 @@ public class MavenModuleTest {
         assertEquals(left, right);
     }
 
+    @Test
+    public void testMultipleVersions() throws Exception {
+        MavenModule mm = new MavenModule(TEST_COORD);
+        mm.addVersion("1.0.0");
+        assertEquals(1, mm.getVersions().size());
+        mm.addVersion("2.0.0");
+        assertEquals(2, mm.getVersions().size());
+        mm.addVersion("2.0.0");
+        assertEquals(2, mm.getVersions().size());
+    }
+
+
     private void assertGreater(MavenModule left, MavenModule right) {
         assertTrue(left.compareTo(right) > 0);
         assertTrue(right.compareTo(left) < 0);

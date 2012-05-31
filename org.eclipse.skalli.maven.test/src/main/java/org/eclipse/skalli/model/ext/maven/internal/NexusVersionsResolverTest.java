@@ -42,7 +42,7 @@ public class NexusVersionsResolverTest {
             replay(createNexusArtifactSub);
         }
 
-        expect(mock.getArtifacts()).andReturn(artifacts);
+        expect(mock.getArtifacts()).andReturn(artifacts).anyTimes();
         return mock;
     }
 

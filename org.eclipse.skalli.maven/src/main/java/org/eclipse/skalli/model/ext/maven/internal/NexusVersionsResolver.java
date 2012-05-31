@@ -54,8 +54,13 @@ public class NexusVersionsResolver {
         try {
             NexusSearchResult searchResult = nexusClient.searchArtifactVersions(mavenCoordinate.getGroupId(),
                     mavenCoordinate.getArtefactId());
-            //we got a search Result, hence we can delete the old versions.
-            mavenCoordinate.getVersions().clear();
+            //mavenCoordinate.getVersions().clear(); //as the index of nexus is sometimes broken, we will no longer delete once fetched versions.
+            //Not clearing the list of previos got versions has only the risk, that versions deleted from nexus will stay in skalli
+
+            if (searchResult.getArtifacts().size()< mavenCoordinate.getVersions().size()) {
+                LOG.info("nexus did not response all expected version for groupID= " + mavenCoordinate.getGroupId() + " artifactId = "+ mavenCoordinate.getArtefactId()+". Nexus index might be broken." );
+            }
+
             for (NexusArtifact nexusArtifact : searchResult.getArtifacts()) {
                 mavenCoordinate.getVersions().add(nexusArtifact.getVersion());
             }
