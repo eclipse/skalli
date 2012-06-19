@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.persistence;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.skalli.model.EntityBase;
@@ -68,6 +70,11 @@ public class PersistenceServiceTest {
         @Override
         public <T extends EntityBase> int size(Class<T> entityClass) {
             return 0;
+        }
+
+        @Override
+        public <T extends EntityBase> Set<UUID> keySet(Class<T> entityClass) {
+            return Collections.emptySet();
         }
     }
 

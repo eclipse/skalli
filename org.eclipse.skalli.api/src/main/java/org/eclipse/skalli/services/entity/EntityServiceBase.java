@@ -140,6 +140,11 @@ public abstract class EntityServiceBase<T extends EntityBase> implements EntityS
     protected abstract SortedSet<Issue> validateEntity(T entity, Severity minSeverity);
 
     @Override
+    public Set<UUID> keySet() {
+        return getPersistenceService().keySet(getEntityClass());
+    }
+
+    @Override
     public T getByUUID(UUID uuid) {
         return getPersistenceService().getEntity(getEntityClass(), uuid);
     }

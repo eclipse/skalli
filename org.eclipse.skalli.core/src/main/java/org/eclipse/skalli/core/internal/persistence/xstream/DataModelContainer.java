@@ -169,6 +169,10 @@ class DataModelContainer {
         return result;
     }
 
+    synchronized <T extends EntityBase> Set<UUID> keySet(Class<T> entityClass) {
+        return getEntityMap(entityClass).keySet();
+    }
+
     synchronized Set<Class<? extends EntityBase>> getEntityTypes() {
         return cache.keySet();
     }

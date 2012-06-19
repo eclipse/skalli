@@ -68,6 +68,12 @@ public interface EntityService<T extends EntityBase> {
     public int size();
 
     /**
+     * Returns the unique identifiers of all existing entities.
+     * @return a list of unique identifiers, or an empty set.
+     */
+    public Set<UUID> keySet();
+
+    /**
      * Persists the given entity and {@link #scheduleForValidation(UUID, Severity, String) schedules}
      * a re-validation of the entity.
      *

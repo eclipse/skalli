@@ -11,6 +11,7 @@
 package org.eclipse.skalli.services.persistence;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.skalli.model.EntityBase;
@@ -38,6 +39,8 @@ public interface PersistenceService {
     public <T extends EntityBase> List<T> getEntities(Class<T> entityClass);
 
     public <T extends EntityBase> int size(Class<T> entityClass);
+
+    public <T extends EntityBase> Set<UUID> keySet(Class<T> entityClass);
 
     public <T extends EntityBase> T getEntity(Class<T> entityClass, EntityFilter<T> filter);
 

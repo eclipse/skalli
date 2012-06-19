@@ -384,6 +384,12 @@ public class PersistenceServiceXStream extends PersistenceServiceBase implements
     }
 
     @Override
+    public <T extends EntityBase> Set<UUID> keySet(Class<T> entityClass) {
+        loadModel(entityClass);
+        return cache.keySet(entityClass);
+    }
+
+    @Override
     public <T extends EntityBase> int size(Class<T> entityClass) {
         loadModel(entityClass);
         return cache.size(entityClass);
