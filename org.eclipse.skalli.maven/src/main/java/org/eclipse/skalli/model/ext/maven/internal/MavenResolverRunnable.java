@@ -13,7 +13,6 @@ package org.eclipse.skalli.model.ext.maven.internal;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -38,12 +37,13 @@ public class MavenResolverRunnable implements Runnable {
 
     private NexusClient nexusClient;
     private String userId;
-    private Project project;
+    private UUID uuid;
 
     /**
-     * @param configService
-     * @param nexusClient - if set versions are calculated via nexusClinet. If nexusClient is null the versions cant be calculated.
-     * @param userId
+     * Creates a Maven resolver runable.
+     *
+     * @param nexusClient the Nexus client to use for retrieving artifact versions, or <code>null</code>
+     * @param userId  the unique identifier of the user requesting the resolving of Maven artifacts
      */
     public MavenResolverRunnable(NexusClient nexusClient, String userId) {
         this.userId = userId;
@@ -51,36 +51,38 @@ public class MavenResolverRunnable implements Runnable {
 
     }
 
-    public MavenResolverRunnable(NexusClient nexusClient, String userId, Project project) {
+    /**
+     * Creates a Maven resolver runable.
+     *
+     * @param nexusClient the Nexus client to use for retrieving artifact versions, or <code>null</code>
+     * @param userId  the unique identifier of the user requesting the resolving of Maven artifacts
+     * @param uuid  the unique identifier of the project to evaluate, or <code>null</code>.
+     * If no project is specified, the {@link #run()} method will iterate over all existing projects.
+     */
+    public MavenResolverRunnable(NexusClient nexusClient, String userId, UUID uuid) {
         this(nexusClient, userId);
-        this.project = project;
+        this.uuid = uuid;
     }
 
     @Override
     public void run() {
         ProjectService projectService = getProjectService();
-        List<Project> projects;
-        if (project != null) {
-            projects = Collections.singletonList(project);
-            LOG.info(MessageFormat.format("MavenResolver: started 1 project ({0}) to scan", project.getProjectId()));
-        }
-        else {
-            //for each run we want to need the current project list
-            projects = projectService.getAll();
-            LOG.info(MessageFormat.format("MavenResolver: started ({0} projects to scan", projects.size()));
-        }
+        Set<UUID> uuids = uuid != null? Collections.singleton(uuid) : projectService.keySet();
+        LOG.info(MessageFormat.format("MavenResolver: started ({0} projects to scan)", uuids.size()));
 
+        NexusVersionsResolver versionsResolver = new NexusVersionsResolver(nexusClient);
+
+        int count = 0;
         int countUpdated = 0;
         int countInvalidPom = 0;
         int countIOExceptions = 0;
         int countUnexpectedException = 0;
         int countPersistingProblem = 0;
 
-        NexusVersionsResolver versionsResolver = new NexusVersionsResolver(nexusClient);
-        for (int i = 0; i < projects.size(); i++) {
-            if (i > 0) {
+        for (UUID uuid: uuids) {
+            if (count > 0) {
                 // delay the execution for 10 seconds, otherwise we may
-                // overcharge the remote systems like gitweb/gitblit/Nexus with out requests
+                // overcharge the remote systems with out requests;
                 // but not before the first project in the loop
                 try {
                     Thread.sleep(10000);
@@ -88,8 +90,13 @@ public class MavenResolverRunnable implements Runnable {
                     break;
                 }
             }
+            ++count;
 
-            Project project = projects.get(i);
+            Project project = projectService.getByUUID(uuid);
+            if (project == null) {
+                LOG.info(MessageFormat.format("Project {0} no longer exists", uuid));
+                continue;
+            }
             MavenReactor oldReactor = getMavenReactorProperty(project);
             MavenReactor newReactor = null;
             try {
@@ -139,14 +146,15 @@ public class MavenResolverRunnable implements Runnable {
                     }
                 }
             }
-            LOG.info(MessageFormat.format("MavenResolver: {0} projects processed, {1} remaining", i + 1,
-                    projects.size() - i));
+            LOG.info(MessageFormat.format("MavenResolver: {0} projects processed, {1} remaining", count,
+                    uuids.size() - count));
 
         }
-        LOG.info(MessageFormat
-                .format("MavenResolver: finished ({0} projects scanned, {1} updated, {2} invalid Pom, {3} persisting problems, {4} i/o exceptions, {5} unexpected exceptions)",
-                        projects.size(), countUpdated, countInvalidPom, countPersistingProblem, countIOExceptions,
-                        countUnexpectedException));
+        LOG.info(MessageFormat.format(
+                "MavenResolver: finished ({0} projects scanned, {1} updated, {2} invalid Pom, {3} persisting problems, " +
+                        "{4} i/o exceptions, {5} unexpected exceptions)",
+                uuids.size(), countUpdated, countInvalidPom, countPersistingProblem, countIOExceptions,
+                countUnexpectedException));
     }
 
     /**

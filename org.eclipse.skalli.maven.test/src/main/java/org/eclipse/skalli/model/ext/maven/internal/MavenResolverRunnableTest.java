@@ -33,6 +33,8 @@ import org.junit.Test;
 @SuppressWarnings("nls")
 public class MavenResolverRunnableTest {
 
+    private static final UUID PROJECT_UUID = UUID.fromString("e4d78581-08da-4f04-8a90-a7dac41f6247");
+
     private static final String GIT_SCM_LOCATION = "scm:git:git://git.example.org/myproject";
 
     private static final String REACTOR_POM_PATH = "pom.xml";
@@ -145,6 +147,7 @@ public class MavenResolverRunnableTest {
         resolverMock.setMavenReactor(mavenReactor);
 
         Project project = new Project();
+        project.setUuid(PROJECT_UUID);
         addScmLocation(project, GIT_SCM_LOCATION);
         addReactorPath(project, REACTOR_POM_PATH);
         Capture<Project> capturedProject = new Capture<Project>();
@@ -160,8 +163,10 @@ public class MavenResolverRunnableTest {
 
     private void setupProjectService(Project projectToPersist, Capture<Project> capturedProject) throws Exception {
         projectServiceMock = createNiceMock(ProjectService.class);
-        projectServiceMock.getAll();
-        expectLastCall().andReturn(Collections.singletonList(projectToPersist)).anyTimes();
+        projectServiceMock.keySet();
+        expectLastCall().andReturn(Collections.singleton(PROJECT_UUID)).anyTimes();
+        projectServiceMock.getByUUID(eq(PROJECT_UUID));
+        expectLastCall().andReturn(projectToPersist).anyTimes();
         projectServiceMock.persist(capture(capturedProject), eq(USERID));
         replay(projectServiceMock);
     }

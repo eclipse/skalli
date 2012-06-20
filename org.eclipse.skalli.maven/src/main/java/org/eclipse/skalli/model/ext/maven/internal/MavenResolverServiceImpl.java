@@ -95,7 +95,7 @@ public class MavenResolverServiceImpl implements MavenResolverService, EventList
 
     @Override
     public void queue(Project project, String userId) {
-        new MavenResolverRunnable(nexusClient, userId, project).run();
+        new MavenResolverRunnable(nexusClient, userId, project.getUuid()).run();
     }
 
     synchronized void startAllTasks() {
