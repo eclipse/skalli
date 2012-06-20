@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.ext.mapping.MapperUtil;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
+import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.maven.MavenPomResolver;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ public abstract class MavenPomResolverBase implements MavenPomResolver {
     }
 
 
-    protected MavenPom parse(InputStream pomInputStream) throws MavenValidationException, IOException {
+    protected MavenPom parse(InputStream pomInputStream) throws ValidationException, IOException {
         MavenPomParser parser = new MavenPomParserImpl();
         return parser.parse(pomInputStream);
     }

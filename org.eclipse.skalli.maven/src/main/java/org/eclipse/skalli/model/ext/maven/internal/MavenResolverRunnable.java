@@ -14,11 +14,16 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.ComparatorUtils;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenPomResolver;
@@ -31,7 +36,7 @@ import org.eclipse.skalli.services.project.ProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MavenResolverRunnable implements Runnable {
+public class MavenResolverRunnable implements Runnable, Issuer {
 
     private static final Logger LOG = LoggerFactory.getLogger(MavenResolverRunnable.class);
 
@@ -68,7 +73,7 @@ public class MavenResolverRunnable implements Runnable {
     public void run() {
         ProjectService projectService = getProjectService();
         Set<UUID> uuids = uuid != null? Collections.singleton(uuid) : projectService.keySet();
-        LOG.info(MessageFormat.format("MavenResolver: started ({0} projects to scan)", uuids.size()));
+        LOG.info(MessageFormat.format("MavenResolver: Started ({0} projects to scan)", uuids.size()));
 
         NexusVersionsResolver versionsResolver = new NexusVersionsResolver(nexusClient);
 
@@ -78,6 +83,7 @@ public class MavenResolverRunnable implements Runnable {
         int countIOExceptions = 0;
         int countUnexpectedException = 0;
         int countPersistingProblem = 0;
+        SortedSet<Issue> issues = new TreeSet<Issue>();
 
         for (UUID uuid: uuids) {
             if (count > 0) {
@@ -94,30 +100,34 @@ public class MavenResolverRunnable implements Runnable {
 
             Project project = projectService.getByUUID(uuid);
             if (project == null) {
-                LOG.info(MessageFormat.format("Project {0} no longer exists", uuid));
+                handleIssue(Severity.ERROR, uuid, MessageFormat.format(
+                        "MavenResolver: Unknown project {0}", uuid),
+                        null, issues);
                 continue;
             }
+            LOG.info(MessageFormat.format("MavenResolver: Processing {0}", project.getProjectId()));
+
             MavenReactor oldReactor = getMavenReactorProperty(project);
             MavenReactor newReactor = null;
             try {
-                newReactor = resolveProject(project);
+                newReactor = resolveProject(project, oldReactor, issues);
             } catch (ValidationException e) {
                 ++countInvalidPom;
-                LOG.info(MessageFormat.format(
-                        "Invalid Maven reactor information for project {0}:\n {1}",
-                        project.getProjectId(), e.getMessage()));
+                handleIssue(Severity.WARNING, uuid, MessageFormat.format(
+                        "MavenResolver: Invalid POM found for project {0}",
+                        project.getProjectId()), e, issues);
                 continue;
             } catch (IOException e) {
                 ++countIOExceptions;
-                LOG.info(MessageFormat.format(
-                        "can''t read Maven reactor for project {0}:\n {1}",
-                        project.getProjectId(), e.getMessage()));
+                handleIssue(Severity.ERROR, uuid, MessageFormat.format(
+                        "MavenResolver: Failed to retrieve POM for project {0}",
+                        project.getProjectId()), e, issues);
                 continue;
-            } catch (Throwable t) {
+            } catch (RuntimeException e) {
                 ++countUnexpectedException;
-                LOG.error(MessageFormat.format(
-                        "Failed to resolve Maven reactor information for project {0}",
-                        project.getProjectId()), t);
+                handleIssue(Severity.FATAL, uuid, MessageFormat.format(
+                        "MavenResolver: Unexpected exception when resolving POMs for project {0}",
+                        project.getProjectId()), e, issues);
                 continue;
             }
 
@@ -125,10 +135,10 @@ public class MavenResolverRunnable implements Runnable {
                 versionsResolver.addVersions(newReactor, oldReactor);
                 versionsResolver.setNexusVersions(newReactor);
             } catch (RuntimeException e) {
-                LOG.error(MessageFormat.format(
-                        "Can''t calculate Versions for project {0} . Unexpected Exception cought: {1}",
-                        project.getProjectId(), e.getMessage()));
                 ++countUnexpectedException;
+                handleIssue(Severity.FATAL, uuid, MessageFormat.format(
+                        "MavenResolver: Unexpected exception when retrieving artifact versions for project {0}",
+                        project.getProjectId()), e, issues);
                 continue;
             }
 
@@ -136,31 +146,38 @@ public class MavenResolverRunnable implements Runnable {
                 if (updateMavenReactorExtension(project, newReactor)) {
                     try {
                         projectService.persist(project, userId);
+                        handleIssue(Severity.INFO, uuid, MessageFormat.format(
+                                "MavenResolver: Updated project {0}",
+                                project.getProjectId()), null, issues);
                         ++countUpdated;
                     } catch (ValidationException e) {
                         ++countPersistingProblem;
-                        LOG.warn(MessageFormat.format(
-                                "Failed to persist Maven reactor information for project {0}",
-                                project.getProjectId()), e);
+                        handleIssue(Severity.FATAL, uuid, MessageFormat.format(
+                                "MavenResolver: Failed to persist project {0}",
+                                project.getProjectId()), e, issues);
                         continue;
                     }
                 }
             }
-            LOG.info(MessageFormat.format("MavenResolver: {0} projects processed, {1} remaining", count,
-                    uuids.size() - count));
-
+            LOG.info(MessageFormat.format("MavenResolver: Processed {0} ({1} projects processed, {2} remaining)",
+                    project.getProjectId(), count, uuids.size() - count));
         }
         LOG.info(MessageFormat.format(
-                "MavenResolver: finished ({0} projects scanned, {1} updated, {2} invalid Pom, {3} persisting problems, " +
+                "MavenResolver: Finished ({0} projects processed, {1} updated, {2} with invalid POM, {3} persisting problems, " +
                         "{4} i/o exceptions, {5} unexpected exceptions)",
                 uuids.size(), countUpdated, countInvalidPom, countPersistingProblem, countIOExceptions,
                 countUnexpectedException));
+        if (issues.size() > 0) {
+            LOG.info(Issue.getMessage("MavenResolver: Issue Summary", issues));
+        }
     }
 
     /**
      * Returns the Maven reactor information for a given project.
      *
      * @param project  the project to resolve.
+     * @param oldReactor  the Maven information from a previous run.
+     * @param issues  set of issues found during the resolving.
      * @return  the Maven reactor for the project, or <code>null</code> if
      * <ul>
      * <li>the reactor POM path ({@link MavenProjectExt#PROPERTY_REACTOR_POM}) is not specified,</li>
@@ -171,24 +188,50 @@ public class MavenResolverRunnable implements Runnable {
      *
      * @throws IOException  if an i/o error occured, e.g. the connection to the source repository
      * providing POM files cannot be established or is lost.
-     * @throws MavenValidationException  if any of the relevant POMs is invalid or cannot be parsed.
+     * @throws ValidationException  if any of the relevant POMs is invalid or cannot be parsed.
      */
-    public MavenReactor resolveProject(Project project)
-            throws IOException, MavenValidationException {
+    MavenReactor resolveProject(Project project, MavenReactor oldReactor, SortedSet<Issue> issues)
+            throws IOException, ValidationException {
         String reactorPomPath = getReactorPomPathProperty(project);
         if (reactorPomPath == null) {
+            if (oldReactor != null) {
+                handleIssue(Severity.WARNING, project.getUuid(), MessageFormat.format(
+                        "MavenResolver: Rector POM Path property has been removed from project {0}",
+                        project.getProjectId()), null, issues);
+            }
             return null;
         }
         String scmLocation = getScmLocationProperty(project);
         if (scmLocation == null) {
+            if (oldReactor != null) {
+                handleIssue(Severity.WARNING, project.getUuid(), MessageFormat.format(
+                        "MavenResolver: SCM Location property has been removed from project {0}",
+                        project.getProjectId()), null, issues);
+            }
             return null;
         }
         MavenPomResolver pomResolver = getMavenPomResolver(scmLocation);
         if (pomResolver == null) {
+            handleIssue(Severity.ERROR, project.getUuid(), MessageFormat.format(
+                    "MavenResolver: No mapping to source repository available for SCM location {0} of project {1}",
+                    scmLocation, project.getProjectId()), null, issues);
             return null;
         }
         MavenResolver resolver = getMavenResolver(project.getUuid(), pomResolver);
         return resolver.resolve(scmLocation, reactorPomPath);
+    }
+
+    private void handleIssue(Severity severity, UUID uuid, String message, Exception e, SortedSet<Issue> issues) {
+        if (e != null) {
+            LOG.error(message, e);
+            message = MessageFormat.format("{0} [{1}]", message, e.getMessage()); //$NON-NLS-1$
+            if (e instanceof ValidationException) {
+                issues.addAll(((ValidationException) e).getIssues());
+            }
+        } else {
+            LOG.error(message);
+        }
+        issues.add(new Issue(severity, MavenResolverRunnable.class, uuid, MavenReactorProjectExt.class, null, message));
     }
 
     private boolean updateMavenReactorExtension(Project project, MavenReactor mavenReactor) {

@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.skalli.model.Issuer;
+import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenPomResolver;
@@ -56,16 +57,16 @@ public class MavenResolver implements Issuer {
      *
      * @throws IOException  if an i/o error occured, e.g. the connection to the server
      * providing POM files cannot be established or is lost.
-     * @throws MavenValidationException  if any of the relevant POMs is invalid or cannot be parsed.
+     * @throws ValidationException  if any of the relevant POMs is invalid or cannot be parsed.
      * @throws IllegalArgumentException  if the given SCM location cannot be resolved by
      * the path resolver assigned to this <code>MavenResolver</code> instance.
      */
     public MavenReactor resolve(String scmLocation, String reactorPomPath)
-            throws IOException, MavenValidationException {
+            throws IOException, ValidationException {
         MavenReactor mavenReactor = new MavenReactor();
         MavenPom reactorPom = pomResolver.getMavenPom(project, scmLocation, reactorPomPath);
         if (reactorPom == null) {
-            throw new MavenValidationException(MessageFormat.format(
+            throw new ValidationException(MessageFormat.format(
                     "no pom for scm location {0} and reactorPomPath {1}", scmLocation, reactorPomPath));
         }
         MavenModule parent = reactorPom.getParent();
@@ -84,7 +85,7 @@ public class MavenResolver implements Issuer {
 
     private Set<MavenModule> getModules(List<String> visitedPaths, String scmLocation,
             String relativePath, MavenModule parent)
-            throws IOException, MavenValidationException {
+            throws IOException, ValidationException {
         TreeSet<MavenModule> result = new TreeSet<MavenModule>();
         MavenPom modulePom = pomResolver.getMavenPom(project, scmLocation, relativePath);
         if (modulePom == null) {

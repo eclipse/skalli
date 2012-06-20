@@ -16,6 +16,7 @@ import java.io.InputStream;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.skalli.commons.XMLUtils;
+import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -36,14 +37,14 @@ public class MavenPomParserImpl implements MavenPomParser {
     private static final String CLASSIFIER = "classifier"; //$NON-NLS-1$
 
     @Override
-    public MavenPom parse(InputStream in) throws IOException, MavenValidationException {
+    public MavenPom parse(InputStream in) throws IOException, ValidationException {
         Document document;
         try {
             document = XMLUtils.documentFromStream(in);
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
         } catch (SAXException e) {
-            throw new MavenValidationException(e);
+            throw new ValidationException(e);
         }
         return parse(document);
     }

@@ -13,8 +13,8 @@ package org.eclipse.skalli.model.ext.maven;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.maven.internal.MavenPom;
-import org.eclipse.skalli.model.ext.maven.internal.MavenValidationException;
 
 public interface MavenPomResolver {
 
@@ -24,7 +24,6 @@ public interface MavenPomResolver {
      */
     public boolean canResolve(String scmLocation);
 
-    public MavenPom getMavenPom(UUID project, String scmLocation, String relativePath) throws IOException,
-            MavenValidationException;
+    public MavenPom getMavenPom(UUID project, String scmLocation, String relativePath) throws IOException, ValidationException;
 
 }

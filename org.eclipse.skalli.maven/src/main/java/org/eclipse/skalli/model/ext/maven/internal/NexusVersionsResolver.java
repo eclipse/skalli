@@ -29,7 +29,7 @@ public class NexusVersionsResolver {
     public NexusVersionsResolver(NexusClient nexusClient) {
         this.nexusClient = nexusClient;
         if (this.nexusClient == null) {
-            LOG.warn("Can't calculate versions: No Nexus client available");
+            LOG.warn("Can't calculate artifact versions: No Nexus client available");
         }
     }
 
@@ -54,11 +54,11 @@ public class NexusVersionsResolver {
         try {
             NexusSearchResult searchResult = nexusClient.searchArtifactVersions(mavenCoordinate.getGroupId(),
                     mavenCoordinate.getArtefactId());
-            //mavenCoordinate.getVersions().clear(); //as the index of nexus is sometimes broken, we will no longer delete once fetched versions.
-            //Not clearing the list of previos got versions has only the risk, that versions deleted from nexus will stay in skalli
 
-            if (searchResult.getArtifacts().size()< mavenCoordinate.getVersions().size()) {
-                LOG.info("nexus did not response all expected version for groupID= " + mavenCoordinate.getGroupId() + " artifactId = "+ mavenCoordinate.getArtefactId()+". Nexus index might be broken." );
+            if (searchResult.getArtifacts().size() < mavenCoordinate.getVersions().size()) {
+                LOG.warn(MessageFormat.format(
+                        "Nexus returned less versions for artifact {0}:{1} than in previous runs. Nexus index might be broken.",
+                                mavenCoordinate.getGroupId(), mavenCoordinate.getArtefactId()));
             }
 
             for (NexusArtifact nexusArtifact : searchResult.getArtifacts()) {
@@ -66,7 +66,8 @@ public class NexusVersionsResolver {
             }
 
         } catch (Exception e) {
-            LOG.warn(MessageFormat.format("Can''t get Maven version for {0}: {1}", mavenCoordinate, e.getMessage()), e);
+            LOG.warn(MessageFormat.format("Failed to retrieve versions of artifact {0}:{1}: {2}",
+                    mavenCoordinate.getGroupId(), mavenCoordinate.getArtefactId(), e.getMessage()), e);
         }
     }
 

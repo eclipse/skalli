@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import org.easymock.Capture;
 import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenCoordinateUtil;
 import org.eclipse.skalli.model.ext.maven.MavenPomResolver;
@@ -82,7 +83,7 @@ public class MavenResolverRunnableTest {
 
         @Override
         public MavenReactor resolve(String scmLocation, String relativePath)
-                throws IOException, MavenValidationException {
+                throws IOException, ValidationException {
             isResolveCalled = true;
             return mavenReactor;
         }
@@ -113,14 +114,14 @@ public class MavenResolverRunnableTest {
         addScmLocation(project, GIT_SCM_LOCATION);
         addReactorPath(project, REACTOR_POM_PATH);
 
-        assertEquals(mavenReactor, classUnderTest.resolveProject(project));
+        assertEquals(mavenReactor, classUnderTest.resolveProject(project, null, null));
         assertTrue(resolverMock.isResolveCalled());
     }
 
     @Test
     public void testResolveProjectNoExtensions() throws Exception {
         Project project = new Project();
-        assertNull(classUnderTest.resolveProject(project));
+        assertNull(classUnderTest.resolveProject(project, null, null));
         assertFalse(resolverMock.isResolveCalled());
     }
 
@@ -128,7 +129,7 @@ public class MavenResolverRunnableTest {
     public void testResolveProjectBlankScmLocation() throws Exception {
         Project project = new Project();
         addScmLocation(project, null);
-        assertNull(classUnderTest.resolveProject(project));
+        assertNull(classUnderTest.resolveProject(project, null, null));
         assertFalse(resolverMock.isResolveCalled());
     }
 
@@ -136,7 +137,7 @@ public class MavenResolverRunnableTest {
     public void testResolveProjectBlankReactorPath() throws Exception {
         Project project = new Project();
         addReactorPath(project, null);
-        assertNull(classUnderTest.resolveProject(project));
+        assertNull(classUnderTest.resolveProject(project, null, null));
         assertFalse(resolverMock.isResolveCalled());
     }
 

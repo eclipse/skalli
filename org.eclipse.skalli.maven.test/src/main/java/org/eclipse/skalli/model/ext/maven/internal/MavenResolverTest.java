@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenPomResolver;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
@@ -43,7 +44,7 @@ public class MavenResolverTest {
 
         @Override
         public MavenPom getMavenPom(UUID project, String scmLocation, String relativePath) throws IOException,
-                MavenValidationException {
+                ValidationException {
             if (this.scmLocation.equals(scmLocation)) {
                 return pomMap.get(relativePath);
             } else {
