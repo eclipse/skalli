@@ -79,24 +79,33 @@ public class XStreamPersistence implements Issuer {
             throws MigrationException {
         Element newDocElement = newDoc.getDocumentElement();
         Element oldDocElement = oldDoc != null ? oldDoc.getDocumentElement() : null;
-        if (!XMLDiff.identical(newDocElement, oldDocElement)) {
-            setLastModifiedAttribute(newDocElement);
-            setLastModifiedByAttribute(newDocElement, userId);
-            SortedMap<String, Element> newExts = getExtensionsByAlias(newDoc, aliases);
-            SortedMap<String, Element> oldExts = oldDoc != null ? getExtensionsByAlias(oldDoc, aliases) : null;
-            for (String alias : newExts.keySet()) {
-                Element newExt = newExts.get(alias);
-                Element oldExt = oldExts != null ? oldExts.get(alias) : null;
-                if (!XMLDiff.identical(newExt, oldExt)) {
-                    setLastModifiedAttribute(newExt);
-                    setLastModifiedByAttribute(newExt, userId);
-                } else if (oldExt != null) {
-                    setLastModifiedAttribute(newExt, getLastModifiedAttribute(oldExt));
-                    setLastModifiedByAttribute(newExt, getLastModifiedByAttribute(oldExt));
-                }
-            }
+
+        boolean identical = XMLDiff.identical(newDocElement, oldDocElement);
+        setLastModifiedAttributes(newDocElement, identical? oldDocElement : null, userId);
+
+        SortedMap<String, Element> newExts = getExtensionsByAlias(newDoc, aliases);
+        SortedMap<String, Element> oldExts = oldDoc != null ? getExtensionsByAlias(oldDoc, aliases) : null;
+        for (String alias : newExts.keySet()) {
+            Element newExt = newExts.get(alias);
+            Element oldExt = oldExts != null ? oldExts.get(alias) : null;
+            setLastModifiedAttributes(newExt, (identical || XMLDiff.identical(newExt, oldExt))? oldExt : null, userId);
         }
         setVersionAttribute(newDoc, modelVersion);
+    }
+
+    void setLastModifiedAttributes(Element newElement, Element oldElement, String userId) {
+        String lastModified = oldElement != null? getLastModifiedAttribute(oldElement) : null;
+        if (lastModified != null) {
+            setLastModifiedAttribute(newElement, lastModified);
+        } else {
+            setLastModifiedAttribute(newElement);
+        }
+        String lastModifiedBy = oldElement != null? getLastModifiedByAttribute(oldElement) : null;
+        if (lastModifiedBy != null) {
+            setLastModifiedByAttribute(newElement, lastModifiedBy);
+        } else{
+            setLastModifiedByAttribute(newElement, userId);
+        }
     }
 
     void preProcessXML(Document doc, Set<DataMigration> migrations, Map<String, Class<?>> aliases, int modelVersion)
@@ -179,10 +188,6 @@ public class XStreamPersistence implements Issuer {
     }
 
     void setLastModifiedAttribute(Element element) {
-        if (element.hasAttribute(TAG_LAST_MODIFIED)) {
-            throw new RuntimeException(MessageFormat.format("<{0}> element already has a ''{1}'' attribute",
-                    element.getNodeName(), TAG_LAST_MODIFIED));
-        }
         Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ENGLISH); //$NON-NLS-1$
         String lastModified = DatatypeConverter.printDateTime(now);
         setLastModifiedAttribute(element, lastModified);
@@ -200,10 +205,6 @@ public class XStreamPersistence implements Issuer {
     }
 
     void setLastModifiedByAttribute(Element element, String userId) {
-        if (element.hasAttribute(TAG_MODIFIED_BY)) {
-            throw new RuntimeException(MessageFormat.format("<{0}> element already has a ''{1}'' attribute",
-                    element.getNodeName(), TAG_MODIFIED_BY));
-        }
         if (StringUtils.isNotBlank(userId)) {
             element.setAttribute(TAG_MODIFIED_BY, userId);
         }

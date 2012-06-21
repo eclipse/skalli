@@ -54,11 +54,23 @@ public class XStreamPersistenceTest {
     private static final String ALIAS_EXT1 = "ext1";
     private static final String ALIAS_EXT2 = "ext2";
     private static final String TIME0 = "2002-12-05T05:22:11Z";
+    private static final String UPDATED_TIME0 = ">" + TIME0;
     private static final String TIME1 = "2011-02-25T14:33:48";
     private static final String TIME2 = "2010-06-17T21:00:23Z";
     private static final String USER0 = "hugo";
     private static final String USER1 = "homer";
     private static final String USER2 = "marge";
+    private static final String PERSIST_USER = "skalli";
+
+    private static final String ANY_XSD_TIME = "ANY_XSD_TIME";
+    private static final String VALUE1 = "string";
+    private static final String VALUE2 = "another_string";
+    private static final String MODIFIED_VALUE = "modified_string";
+
+    private static final String[] ALIASES = { ALIAS_EXT1, ALIAS_EXT2 };
+    private static final String[] VALUES = { VALUE1, VALUE2 };
+    private static final String[] LAST_MODIFIED = { TIME1, TIME2 };
+    private static final String[] LAST_MODIFIED_BY = { USER1, USER2 };
 
     private static final String TEXT1 = "XStreamPersistenceTest greets the world!";
 
@@ -67,25 +79,7 @@ public class XStreamPersistenceTest {
     private static final String XML_WITHOUT_VERSION = "<bla><uuid>" + PropertyHelperUtils.TEST_UUIDS[0]
             + "</uuid><hello>world</hello><blubb>noop</blubb></bla>";
 
-    private static final String XML_WITH_MODIFIED_ATTRIBUTES =
-            "<root lastModified=\"" + TIME0 + "\" modifiedBy=\"" + USER0 + "\"><extensions>" +
-                    "<" + ALIAS_EXT1 + " lastModified=\"" + TIME1 + "\" modifiedBy=\"" + USER1 + "\"></" + ALIAS_EXT1
-                    + ">" +
-                    "<" + ALIAS_EXT2 + " lastModified=\"" + TIME2 + "\" modifiedBy=\"" + USER2 + "\"></" + ALIAS_EXT2
-                    + ">" +
-                    "</extensions></root>";
-
-    private static final String XML_WITH_EXTENSIONS =
-            "<root><extensions>" +
-                    "<" + ALIAS_EXT1 + "><string>string</string></" + ALIAS_EXT1 + ">" +
-                    "<" + ALIAS_EXT2 + "></" + ALIAS_EXT2 + ">" +
-                    "</extensions></root>";
-
-    private static final String XML_WITH_EXTENSIONS_MODIFIED =
-            "<root><extensions>" +
-                    "<" + ALIAS_EXT1 + "><string>modified_string</string></" + ALIAS_EXT1 + ">" +
-                    "<" + ALIAS_EXT2 + "></" + ALIAS_EXT2 + ">" +
-                    "</extensions></root>";
+    private static final String XML_WITH_EXTENSIONS = createXML(TIME0, USER0, ALIASES, VALUES, LAST_MODIFIED, LAST_MODIFIED_BY);
 
     private static Map<String, Class<?>> getAliases() {
         Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
@@ -217,36 +211,8 @@ public class XStreamPersistenceTest {
                 aliases);
         lastModifiedExt1 = xp.getLastModifiedAttribute(updatedExtensions.get(ALIAS_EXT1));
         assertLoadedEntityIsExpectedOne(updatedEntity, USER1, USER1, USER0, lastModified, lastModifiedExt1,
-                lastModifiedExt2, TEXT1
-                        + " is now updated",
-                false);
+                lastModifiedExt2, TEXT1 + " is now updated", false);
 
-    }
-
-    private void assertLoadedEntityIsExpectedOne(TestExtensibleEntityBase loadedEntity, String user, String userExt1,
-            String userExt2, String lastModified,
-            String lastModifiedExt1,
-            String lastModifiedExt2, String ext1Text, boolean ext1boolean) {
-        //the length, up to times should be the same
-        assertNotNull(loadedEntity);
-        assertLastModifiedDate(loadedEntity.getLastModified(), lastModified);
-        assertEquals(user, loadedEntity.getLastModifiedBy());
-        TestExtension ext1 = ((TestExtensibleEntityBase) loadedEntity).getExtension(TestExtension.class);
-        assertNotNull(ext1);
-        assertLastModifiedDate(ext1.getLastModified(), lastModifiedExt1);
-        assertEquals(ext1Text, ext1.getStr());
-        assertEquals(ext1boolean, ext1.isBool());
-        assertEquals(userExt1, ext1.getLastModifiedBy());
-        TestExtension1 ext2 = ((TestExtensibleEntityBase) loadedEntity).getExtension(TestExtension1.class);
-        assertNotNull(ext2);
-        assertLastModifiedDate(ext2.getLastModified(), lastModifiedExt2);
-    }
-
-    /**
-     * checks that in a range of seconds the dateString matches the expected one
-     */
-    private void assertLastModifiedDate(String dateString, String expectedDateString) {
-        assertThat(dateString, startsWith(expectedDateString.substring(0, "YYYY-MM-DDTHH:MM:SS".length())));
     }
 
     private Set<ClassLoader> getTestExtensibleEntityBaseClassLodades() {
@@ -275,7 +241,7 @@ public class XStreamPersistenceTest {
 
     @Test
     public void testPostProcessEntity() throws Exception {
-        Document doc = XMLUtils.documentFromString(XML_WITH_MODIFIED_ATTRIBUTES);
+        Document doc = XMLUtils.documentFromString(XML_WITH_EXTENSIONS);
         Map<String, Class<?>> aliases = getAliases();
         TestExtensibleEntityBase entity = getExtensibleEntity();
         XStreamPersistence xp = new TestXStreamPersistence();
@@ -293,40 +259,114 @@ public class XStreamPersistenceTest {
     }
 
     @Test
-    public void testPostProcessXML() throws Exception {
-        XStreamPersistence xp = new TestXStreamPersistence();
-        Document oldDoc = XMLUtils.documentFromString(XML_WITH_EXTENSIONS);
-        Document newDoc = XMLUtils.documentFromString(XML_WITH_EXTENSIONS_MODIFIED);
-        Map<String, Class<?>> aliases = getAliases();
-        xp.postProcessXML(newDoc, oldDoc, aliases, USER0, CURRENT_MODEL_VERSION);
-        Element documentElement = newDoc.getDocumentElement();
-        assertIsXsdDateTime(xp.getLastModifiedAttribute(documentElement));
-        assertEquals(USER0, xp.getLastModifiedByAttribute(documentElement));
-        SortedMap<String, Element> extensions = xp.getExtensionsByAlias(newDoc, aliases);
-        Element ext1 = extensions.get(ALIAS_EXT1);
-        assertIsXsdDateTime(xp.getLastModifiedAttribute(ext1));
-        assertEquals(USER0, xp.getLastModifiedByAttribute(ext1));
-        Element ext2 = extensions.get(ALIAS_EXT2);
-        assertNull(xp.getLastModifiedAttribute(ext2));
-        assertNull(xp.getLastModifiedByAttribute(ext2));
-        assertEquals(CURRENT_MODEL_VERSION, xp.getVersionAttribute(newDoc));
+    public void testPostProcessXMLUnmodifiedDocument() throws Exception {
+        Document doc = XMLUtils.documentFromString(XML_WITH_EXTENSIONS);
+        assertPostProcessedXML(doc, doc, PERSIST_USER, TIME0, USER0, ALIASES, LAST_MODIFIED, LAST_MODIFIED_BY);
+
+        // test initialization of missing lastModified and lastModifiedBy attributes
+        doc = XMLUtils.documentFromString(createXML(null, null, ALIASES, VALUES,
+                new String[] { null, null }, new String[] { null, null }));
+        assertPostProcessedXML(doc, doc, PERSIST_USER, ANY_XSD_TIME, PERSIST_USER, ALIASES,
+                new String[] { ANY_XSD_TIME, ANY_XSD_TIME }, new String[] { PERSIST_USER, PERSIST_USER });
+
+        // test initialization of missing lastModified attributes
+        doc = XMLUtils.documentFromString(createXML(TIME0, USER0, ALIASES, VALUES,
+                new String[] { null, null }, LAST_MODIFIED_BY));
+        assertPostProcessedXML(doc, doc, PERSIST_USER, TIME0, USER0, ALIASES,
+                new String[] { ANY_XSD_TIME, ANY_XSD_TIME }, LAST_MODIFIED_BY);
+
+        doc = XMLUtils.documentFromString(createXML(null, USER0, ALIASES, VALUES,
+                new String[] { TIME1, null }, LAST_MODIFIED_BY));
+        assertPostProcessedXML(doc, doc, PERSIST_USER, ANY_XSD_TIME, USER0, ALIASES,
+                new String[] { TIME1, ANY_XSD_TIME }, LAST_MODIFIED_BY);
+
+        doc = XMLUtils.documentFromString(createXML(null, USER0, ALIASES, VALUES,
+                new String[] { null, TIME2 }, LAST_MODIFIED_BY));
+        assertPostProcessedXML(doc, doc, PERSIST_USER, ANY_XSD_TIME, USER0, ALIASES,
+                new String[] { ANY_XSD_TIME, TIME2 }, LAST_MODIFIED_BY);
+
+        // test initialization of missing lastModifiedBy attributes
+        doc = XMLUtils.documentFromString(createXML(TIME0, null, ALIASES, VALUES, LAST_MODIFIED,
+                new String[] { null, null }));
+        assertPostProcessedXML(doc, doc, PERSIST_USER, TIME0, PERSIST_USER, ALIASES,
+                LAST_MODIFIED, new String[] { PERSIST_USER, PERSIST_USER });
+
+        doc = XMLUtils.documentFromString(createXML(TIME0, USER1, ALIASES, VALUES, LAST_MODIFIED,
+                new String[] { null, null }));
+        assertPostProcessedXML(doc, doc, PERSIST_USER, TIME0, USER1, ALIASES,
+                LAST_MODIFIED, new String[] { PERSIST_USER, PERSIST_USER });
+
+        doc = XMLUtils.documentFromString(createXML(TIME0, null, ALIASES, VALUES, LAST_MODIFIED,
+                new String[] { USER1, null }));
+        assertPostProcessedXML(doc, doc, PERSIST_USER, TIME0, PERSIST_USER, ALIASES,
+                LAST_MODIFIED, new String[] { USER1, PERSIST_USER });
+
+        doc = XMLUtils.documentFromString(createXML(TIME0, null, ALIASES, VALUES, LAST_MODIFIED,
+                new String[] { null, USER1 }));
+        assertPostProcessedXML(doc, doc, PERSIST_USER, TIME0, PERSIST_USER, ALIASES,
+                LAST_MODIFIED, new String[] { PERSIST_USER, USER1 });
     }
 
     @Test
-    public void testPostProcessXMLUnchangedDocument() throws Exception {
-        XStreamPersistence xp = new TestXStreamPersistence();
-        Document doc = XMLUtils.documentFromString(XML_WITH_EXTENSIONS);
-        Map<String, Class<?>> aliases = getAliases();
-        xp.postProcessXML(doc, doc, aliases, USER0, CURRENT_MODEL_VERSION);
-        Element documentElement = doc.getDocumentElement();
-        assertNull(xp.getLastModifiedAttribute(documentElement));
-        assertNull(xp.getLastModifiedByAttribute(documentElement));
-        SortedMap<String, Element> extensions = xp.getExtensionsByAlias(doc, aliases);
-        for (Element element : extensions.values()) {
-            assertNull(xp.getLastModifiedAttribute(element));
-            assertNull(xp.getLastModifiedByAttribute(element));
-        }
-        assertEquals(CURRENT_MODEL_VERSION, xp.getVersionAttribute(doc));
+    public void testPostProcessXMLModifiedExtension() throws Exception {
+        Document oldDoc = XMLUtils.documentFromString(createXML(TIME0, USER0, ALIASES,
+                new String[] { VALUE1, VALUE2 }, LAST_MODIFIED, LAST_MODIFIED_BY));
+        Document newDoc = XMLUtils.documentFromString(createXML(null, null, ALIASES,
+                new String[] { MODIFIED_VALUE, VALUE2 }, new String[] { null, null }, new String[] { null, null }));
+        assertPostProcessedXML(newDoc, oldDoc, PERSIST_USER, UPDATED_TIME0, PERSIST_USER, ALIASES,
+                new String[] { UPDATED_TIME0, TIME2 }, new String[] { PERSIST_USER, USER2 });
+
+        // test initialization of missing lastModified and lastModifiedBy attributes
+        oldDoc = XMLUtils.documentFromString(createXML(null, null, ALIASES,
+                new String[] { VALUE1, VALUE2 }, new String[] { null, null }, new String[] { null, null }));
+        newDoc = XMLUtils.documentFromString(createXML(null, null, ALIASES,
+                new String[] { MODIFIED_VALUE, VALUE2 }, new String[] { null, null }, new String[] { null, null }));
+        assertPostProcessedXML(newDoc, oldDoc, PERSIST_USER, ANY_XSD_TIME, PERSIST_USER, ALIASES,
+                new String[] { ANY_XSD_TIME, ANY_XSD_TIME }, new String[] { PERSIST_USER, PERSIST_USER });
+
+        // test initialization of missing lastModified attributes
+        oldDoc = XMLUtils.documentFromString(createXML(TIME0, USER0, ALIASES,
+                new String[] { VALUE1, VALUE2 }, new String[] { null, null }, LAST_MODIFIED_BY));
+        newDoc = XMLUtils.documentFromString(createXML(null, null, ALIASES,
+                new String[] { MODIFIED_VALUE, VALUE2 }, new String[] { null, null }, new String[] { null, null }));
+        assertPostProcessedXML(newDoc, oldDoc, PERSIST_USER, UPDATED_TIME0, PERSIST_USER, ALIASES,
+                new String[] { UPDATED_TIME0, ANY_XSD_TIME }, new String[] { PERSIST_USER, USER2 });
+
+        oldDoc = XMLUtils.documentFromString(createXML(null, USER0, ALIASES,
+                new String[] { VALUE1, VALUE2 }, new String[] { TIME0, null }, LAST_MODIFIED_BY));
+        newDoc = XMLUtils.documentFromString(createXML(null, null, ALIASES,
+                new String[] { MODIFIED_VALUE, VALUE2 }, new String[] { null, null }, new String[] { null, null }));
+        assertPostProcessedXML(newDoc, oldDoc, PERSIST_USER, UPDATED_TIME0, PERSIST_USER, ALIASES,
+                new String[] { UPDATED_TIME0, ANY_XSD_TIME }, new String[] { PERSIST_USER, USER2 });
+
+        oldDoc = XMLUtils.documentFromString(createXML(null, USER0, ALIASES,
+                new String[] { VALUE1, VALUE2 }, new String[] { null, TIME0 }, LAST_MODIFIED_BY));
+        newDoc = XMLUtils.documentFromString(createXML(null, null, ALIASES,
+                new String[] { MODIFIED_VALUE, VALUE2 }, new String[] { null, null }, new String[] { null, null }));
+        assertPostProcessedXML(newDoc, oldDoc, PERSIST_USER, UPDATED_TIME0, PERSIST_USER, ALIASES,
+                new String[] { UPDATED_TIME0, TIME0 }, new String[] { PERSIST_USER, USER2 });
+
+        // test initialization of missing lastModifiedBy attributes
+        oldDoc = XMLUtils.documentFromString(createXML(TIME0, null, ALIASES,
+                new String[] { VALUE1, VALUE2 }, LAST_MODIFIED, new String[] { null, null }));
+        newDoc = XMLUtils.documentFromString(createXML(null, null, ALIASES,
+                new String[] { MODIFIED_VALUE, VALUE2 }, new String[] { null, null }, new String[] { null, null }));
+        assertPostProcessedXML(newDoc, oldDoc, PERSIST_USER, UPDATED_TIME0, PERSIST_USER, ALIASES,
+                new String[] { UPDATED_TIME0, TIME2 }, new String[] { PERSIST_USER, PERSIST_USER });
+
+        oldDoc = XMLUtils.documentFromString(createXML(TIME0, null, ALIASES,
+                new String[] { VALUE1, VALUE2 }, LAST_MODIFIED, new String[] { USER0, null }));
+        newDoc = XMLUtils.documentFromString(createXML(null, null, ALIASES,
+                new String[] { MODIFIED_VALUE, VALUE2 }, new String[] { null, null }, new String[] { null, null }));
+        assertPostProcessedXML(newDoc, oldDoc, PERSIST_USER, UPDATED_TIME0, PERSIST_USER, ALIASES,
+                new String[] { UPDATED_TIME0, TIME2 }, new String[] { PERSIST_USER, PERSIST_USER });
+
+        oldDoc = XMLUtils.documentFromString(createXML(TIME0, null, ALIASES,
+                new String[] { VALUE1, VALUE2 }, LAST_MODIFIED, new String[] { null, USER0 }));
+        newDoc = XMLUtils.documentFromString(createXML(null, null, ALIASES,
+                new String[] { MODIFIED_VALUE, VALUE2 }, new String[] { null, null }, new String[] { null, null }));
+        assertPostProcessedXML(newDoc, oldDoc, PERSIST_USER, UPDATED_TIME0, PERSIST_USER, ALIASES,
+                new String[] { UPDATED_TIME0, TIME2 }, new String[] { PERSIST_USER, USER0 });
     }
 
     @Test
@@ -349,7 +389,7 @@ public class XStreamPersistenceTest {
     @Test
     public void testGetExtensionsByClassName() throws Exception {
         XStreamPersistence xp = new TestXStreamPersistence();
-        Document doc = XMLUtils.documentFromString(XML_WITH_MODIFIED_ATTRIBUTES);
+        Document doc = XMLUtils.documentFromString(XML_WITH_EXTENSIONS);
         Map<String, Class<?>> aliases = getAliases();
         SortedMap<String, Element> extensions = xp.getExtensionsByClassName(doc, aliases);
         assertEquals(2, extensions.size());
@@ -363,7 +403,7 @@ public class XStreamPersistenceTest {
     @Test
     public void testGetExtensionsNoMatchingAliases() throws Exception {
         XStreamPersistence xp = new TestXStreamPersistence();
-        Document doc = XMLUtils.documentFromString(XML_WITH_MODIFIED_ATTRIBUTES);
+        Document doc = XMLUtils.documentFromString(XML_WITH_EXTENSIONS);
         Map<String, Class<?>> notMatchingAliases = getNotMatchingAliases();
         SortedMap<String, Element> extensions = xp.getExtensionsByAlias(doc, notMatchingAliases);
         assertNotNull(extensions);
@@ -421,15 +461,6 @@ public class XStreamPersistenceTest {
         assertIsXsdDateTime(xp.getLastModifiedAttribute(documentElement));
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testCallSetLastModifiedTwice() throws Exception {
-        XStreamPersistence xp = new TestXStreamPersistence();
-        Document doc = XMLUtils.documentFromString(XML_WITHOUT_VERSION);
-        Element documentElement = doc.getDocumentElement();
-        xp.setLastModifiedAttribute(documentElement);
-        xp.setLastModifiedAttribute(documentElement);
-    }
-
     @Test
     public void testLastModifiedBy() throws Exception {
         XStreamPersistence xp = new TestXStreamPersistence();
@@ -437,20 +468,6 @@ public class XStreamPersistenceTest {
         Element documentElement = doc.getDocumentElement();
         xp.setLastModifiedByAttribute(documentElement, USER0);
         assertEquals(USER0, xp.getLastModifiedByAttribute(documentElement));
-    }
-
-    @Test
-    public void testCallSetLastModifiedByTwice() throws Exception {
-        XStreamPersistence xp = new TestXStreamPersistence();
-        Document doc = XMLUtils.documentFromString(XML_WITHOUT_VERSION);
-        Element documentElement = doc.getDocumentElement();
-        xp.setLastModifiedByAttribute(documentElement, USER0);
-        try {
-            xp.setLastModifiedByAttribute(documentElement, USER0);
-        } catch (RuntimeException e) {
-            assertTrue(e.getMessage().contains("element already has a 'modifiedBy' attribute"));
-        }
-
     }
 
     @Test
@@ -476,11 +493,6 @@ public class XStreamPersistenceTest {
         assertTrue(XMLDiff.identical(documentElement, documentElement));
     }
 
-    private void assertIsXsdDateTime(String lexicalXSDDateTime) {
-        assertTrue(StringUtils.isNotBlank(lexicalXSDDateTime));
-        DatatypeConverter.parseDateTime(lexicalXSDDateTime);
-    }
-
     @Test
     public void testStorageService() {
         StorageService storageService = new HashMapStorageService();
@@ -488,4 +500,100 @@ public class XStreamPersistenceTest {
         assertEquals(storageService, xp.getStorageService());
     }
 
+    private void assertPostProcessedXML(Document newDoc, Document oldDoc, String userId,
+            String expectedGlobalLastModified, String expectedGlobalLastModifiedBy, String[] expectedAliases,
+            String[] expectedExtLastModified, String[] expectedExtLastModifiedBy) throws Exception {
+        XStreamPersistence xp = new TestXStreamPersistence();
+        Map<String, Class<?>> aliases = getAliases();
+        xp.postProcessXML(newDoc, oldDoc, aliases, userId, CURRENT_MODEL_VERSION);
+        Element documentElement = newDoc.getDocumentElement();
+        assertLastModifiedTime(expectedGlobalLastModified, xp.getLastModifiedAttribute(documentElement));
+        assertEquals(expectedGlobalLastModifiedBy, xp.getLastModifiedByAttribute(documentElement));
+        SortedMap<String, Element> extensions = xp.getExtensionsByAlias(newDoc, aliases);
+        int i = 0;
+        for (Element ext: extensions.values()) {
+            assertEquals(expectedAliases[i], ext.getNodeName());
+            assertLastModifiedTime(expectedExtLastModified[i], xp.getLastModifiedAttribute(ext));
+            assertEquals(expectedExtLastModifiedBy[i], xp.getLastModifiedByAttribute(ext));
+            ++i;
+        }
+        assertEquals(CURRENT_MODEL_VERSION, xp.getVersionAttribute(newDoc));
+    }
+
+    private void assertLastModifiedTime(String expected, String actual) {
+        if (ANY_XSD_TIME.equals(expected)) {
+            assertIsXsdDateTime(actual);
+        } else if (expected.startsWith(">")) {
+            assertIsXsdDateTime(actual);
+            long actualMillis = DatatypeConverter.parseDateTime(actual).getTimeInMillis();
+            long expectedMillis = DatatypeConverter.parseDateTime(expected.substring(1)).getTimeInMillis();
+            assertTrue(actualMillis > expectedMillis);
+        } else {
+            assertEquals(actual, expected);
+        }
+    }
+
+    private void assertIsXsdDateTime(String lexicalXSDDateTime) {
+        assertTrue(StringUtils.isNotBlank(lexicalXSDDateTime));
+        DatatypeConverter.parseDateTime(lexicalXSDDateTime);
+    }
+
+
+    /**
+     * checks that in a range of seconds the dateString matches the expected one
+     */
+    private void assertLastModifiedDate(String dateString, String expectedDateString) {
+        assertThat(dateString, startsWith(expectedDateString.substring(0, "YYYY-MM-DDTHH:MM:SS".length())));
+    }
+
+    private void assertLoadedEntityIsExpectedOne(TestExtensibleEntityBase loadedEntity, String user, String userExt1,
+            String userExt2, String lastModified,
+            String lastModifiedExt1,
+            String lastModifiedExt2, String ext1Text, boolean ext1boolean) {
+        //the length, up to times should be the same
+        assertNotNull(loadedEntity);
+        assertLastModifiedDate(loadedEntity.getLastModified(), lastModified);
+        assertEquals(user, loadedEntity.getLastModifiedBy());
+        TestExtension ext1 = ((TestExtensibleEntityBase) loadedEntity).getExtension(TestExtension.class);
+        assertNotNull(ext1);
+        assertLastModifiedDate(ext1.getLastModified(), lastModifiedExt1);
+        assertEquals(ext1Text, ext1.getStr());
+        assertEquals(ext1boolean, ext1.isBool());
+        assertEquals(userExt1, ext1.getLastModifiedBy());
+        TestExtension1 ext2 = ((TestExtensibleEntityBase) loadedEntity).getExtension(TestExtension1.class);
+        assertNotNull(ext2);
+        assertLastModifiedDate(ext2.getLastModified(), lastModifiedExt2);
+    }
+
+    private static String createXML(String docLastModified, String docLastModifiedBy,
+            String[] aliases, String[] values, String[] extLastModified, String[] extLastModifiedBy) {
+         StringBuilder sb = new StringBuilder();
+         sb.append("<root");
+         appendModifiedAttributes(sb, docLastModified, docLastModifiedBy);
+         sb.append(">");
+         if (aliases != null) {
+             sb.append("<extensions>");
+             for (int i = 0; i < aliases.length; ++i) {
+                 sb.append("<").append(aliases[i]);
+                 appendModifiedAttributes(sb, extLastModified[i], extLastModifiedBy[i]);
+                 sb.append(">");
+                 if (values[i] != null) {
+                     sb.append("<string>").append(values[i]).append("</string>");
+                 }
+                 sb.append("</").append(aliases[i]).append(">");
+             }
+             sb.append("</extensions>");
+         }
+         sb.append("</root>");
+         return sb.toString();
+     }
+
+     private static void appendModifiedAttributes(StringBuilder sb, String lastModified, String lastModifiedBy) {
+         if (lastModified != null) {
+             sb.append(" lastModified=\"").append(lastModified).append("\"");
+         }
+         if (lastModifiedBy != null) {
+             sb.append(" modifiedBy=\"").append(lastModifiedBy).append("\"");
+         }
+     }
 }
