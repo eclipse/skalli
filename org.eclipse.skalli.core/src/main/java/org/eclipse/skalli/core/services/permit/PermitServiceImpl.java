@@ -58,6 +58,7 @@ public class PermitServiceImpl implements PermitService, EventListener<EventCust
             StringUtils.substringBetween(Permit.USER_WILDCARD, "{", "}"); //$NON-NLS-1$ //$NON-NLS-2$
 
     private static final PermitSet DEFAULT_PERMITS = new PermitSet(Permit.FORBID_ALL);
+    private static final PermitSet DEFAULT_ADMIN_PERMITS = new PermitSet(Permit.ALLOW_ALL);
 
     private static final String PATH_PROJECTS = "projects"; //$NON-NLS-1$
 
@@ -308,11 +309,14 @@ public class PermitServiceImpl implements PermitService, EventListener<EventCust
                     collectGroupPermits(groups, properties, permitsConfig, permits);
                 }
                 collectUserPermits(userId, properties, permitsConfig, permits);
+            } else {
+                // special handling for bootstrapping of a new instance or for
+                // instances where authorization is not relevant
+                permits.addAll(DEFAULT_ADMIN_PERMITS);
             }
         }
         if (permits.isEmpty()) {
             permits.addAll(DEFAULT_PERMITS);
-            LOG.debug("falling back to default permits for user " + userId);
         }
         return permits;
     }

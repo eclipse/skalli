@@ -115,9 +115,14 @@ public class Permit implements Comparable<Permit> {
     public static final String USER_WILDCARD = "${user}"; //$NON-NLS-1$
 
     /**
-     * Equivalent to <code>Permit valueOf("FORBID ALL /)"</code>.
+     * Permit set that forbids all actions on all resources.
      */
-    public static final Permit FORBID_ALL = new Permit();
+    public static final Permit FORBID_ALL = Permit.valueOf("FORBID ** /"); //$NON-NLS-1$
+
+    /**
+     * Permit set that allows all actions on all resources.
+     */
+    public static final Permit ALLOW_ALL = Permit.valueOf("ALLOW ** /"); //$NON-NLS-1$
 
 
     private String action = ALL_ACTIONS;
@@ -127,7 +132,7 @@ public class Permit implements Comparable<Permit> {
     private transient String[] segments;
 
     /**
-     * Creates a default permit equivalent to <tt>"FORBID ALL /"</tt>.
+     * Creates a default permit equivalent to <tt>"FORBID ** /"</tt>.
      */
     public Permit() {
     }
