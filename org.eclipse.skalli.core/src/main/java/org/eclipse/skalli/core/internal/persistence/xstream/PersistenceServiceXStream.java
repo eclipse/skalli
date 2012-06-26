@@ -11,6 +11,7 @@
 package org.eclipse.skalli.core.internal.persistence.xstream;
 
 import java.text.MessageFormat;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -422,7 +423,8 @@ public class PersistenceServiceXStream extends PersistenceServiceBase implements
 
     @Override
     public void refreshAll() {
-        Set<Class<? extends EntityBase>> entityClasses = cache.getEntityTypes();
+        Set<Class<? extends EntityBase>> entityClasses = new HashSet<Class<? extends EntityBase>>();
+        entityClasses.addAll(cache.getEntityTypes());
         entityClasses.addAll(deleted.getEntityTypes());
         cache.clearAll();
         deleted.clearAll();
