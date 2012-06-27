@@ -15,14 +15,19 @@ import org.restlet.resource.ServerResource;
 
 public class UpdateSitesRestExtension implements RestExtension {
 
+    private static final String UPDATESITES_USER_ID_ID = "/updatesites/{userId}/{id}";
+
     @Override
-    public String getResourcePath() {
-        return "/updatesites/{userId}/{id}"; //$NON-NLS-1$
+    public String[] getResourcePaths() {
+        return new String[] { UPDATESITES_USER_ID_ID }; //$NON-NLS-1$
     }
 
     @Override
-    public Class<? extends ServerResource> getServerResource() {
-        return UpdateSitesServerResource.class;
+    public Class<? extends ServerResource> getServerResource(String resourcePath) {
+        if (UPDATESITES_USER_ID_ID.equals(resourcePath)) {
+            return UpdateSitesServerResource.class;
+        }
+        return null;
     }
 
 }

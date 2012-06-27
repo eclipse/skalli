@@ -119,16 +119,22 @@ public class RestApplication extends Application {
 
     private void attachCustomResources(Router router) {
         for (RestExtension ext : extensions) {
-            String resourcePath = ext.getResourcePath();
-            if (!resourcePath.startsWith("/")) {
-                resourcePath = "/" + resourcePath;
+            String[] resourcePaths = ext.getResourcePaths();
+            if (resourcePaths == null  || resourcePaths.length == 0) {
+                LOG.warn("REST extension " + ext.getClass().getName() + " registers no resource paths at all");
+                continue;
             }
-            Class<? extends ServerResource> resource = ext.getServerResource();
-            if (resource != null) {
-                router.attach(resourcePath, resource);
-                LOG.info("Attached REST extension " + resource.getName() + " to path " + resourcePath);
-            } else {
-                LOG.warn("No REST resource provided for path " + resourcePath);
+            for (String resourcePath: resourcePaths) {
+                if (!resourcePath.startsWith("/")) { //$NON-NLS-1$
+                    resourcePath = "/" + resourcePath; //$NON-NLS-1$
+                }
+                Class<? extends ServerResource> resource = ext.getServerResource(resourcePath);
+                if (resource != null) {
+                    router.attach(resourcePath, resource);
+                    LOG.info("Attached REST extension " + resource.getName() + " to path " + resourcePath);
+                } else {
+                    LOG.warn("No REST resource provided for path " + resourcePath);
+                }
             }
         }
     }
