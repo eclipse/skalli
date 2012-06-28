@@ -70,8 +70,8 @@ public class Services {
      *          the OSGi service interface for which an instance is to be
      *          returned.
      * @param filter
-     *          the OSGi filter to use when looking up the filter.
-     *          It must contain the objectClass as well.
+     *          the OSGi {@link org.osgi.framework.Filter filter} to use when
+     *          looking up the service. It must contain the <code>objectClass</code> as well.
      * @return the registered instance of <code>service</code>, or
      *         <code>null</code>.
      * @throws IllegalStateException
@@ -152,7 +152,7 @@ public class Services {
      *
      * @param <T>
      *          type parameter representing an OSGi service interface.
-     * @param serviceClass
+     * @param service
      *          the OSGi service interface for which instances are to be returned.
      * @param filter
      *          a filter that determines which instances of the service to
@@ -163,7 +163,7 @@ public class Services {
      *        ordering} of the elements will be used.
      * @return a set of matching service instances.
      */
-    public static <T> Set<T> getServices(Class<T> serviceClass, ServiceFilter<T> filter,
+    public static <T> Set<T> getServices(Class<T> service, ServiceFilter<T> filter,
             Comparator<? super T> comparator) {
         if (comparator == null) {
             comparator = new Comparator<T>() {
@@ -175,10 +175,10 @@ public class Services {
         }
         BundleContext context = getBundleContext();
         Set<T> serviceInstances = new TreeSet<T>(comparator);
-        List<ServiceReference<?>> serviceRefs = getServiceReferences(serviceClass);
+        List<ServiceReference<?>> serviceRefs = getServiceReferences(service);
         if (serviceRefs != null) {
             for (ServiceReference<?> serviceRef : serviceRefs) {
-                T serviceInstance = serviceClass.cast(context.getService(serviceRef));
+                T serviceInstance = service.cast(context.getService(serviceRef));
                 if (serviceInstance != null && (filter == null || filter.accept(serviceInstance))) {
                     serviceInstances.add(serviceInstance);
                 }
@@ -197,10 +197,27 @@ public class Services {
      * @return a list of service references, or an empty list.
      */
     public static <T> List<ServiceReference<?>> getServiceReferences(Class<T> service) {
+        return getServiceReferences(service, null);
+    }
+
+    /**
+     * Returns references to all implementations of a given OSGi <code>service</code> matching
+     * the given filter expression;
+     *
+     * @param <T>
+     *          type parameter representing an OSGi service interface.
+     * @param service
+     *          the OSGi service interface for which instances are to be returned.
+     * @param filter
+     *          the OSGi {@link org.osgi.framework.Filter filter} to use when
+     *          looking up the service. It must contain the <code>objectClass</code> as well.
+     * @return a list of service references, or an empty list.
+     */
+    public static <T> List<ServiceReference<?>> getServiceReferences(Class<T> service, String filter) {
         List<ServiceReference<?>> ret = new ArrayList<ServiceReference<?>>();
         try {
             BundleContext context = getBundleContext();
-            ServiceReference<?>[] serviceRefs = context.getAllServiceReferences(service.getName(), null);
+            ServiceReference<?>[] serviceRefs = context.getAllServiceReferences(service.getName(), filter);
             if (serviceRefs != null) {
                 for (ServiceReference<?> serviceRef: serviceRefs) {
                     ret.add(serviceRef);
@@ -216,20 +233,20 @@ public class Services {
      * Returns an iterator for all implementations of the given OSGi <code>service</code>.
      *
      * @param <T> type parameter representing an OSGi service interface.
-     * @param serviceClass  the OSGi service interface for which implementations are
+     * @param service  the OSGi service interface for which implementations are
      * to be returned.
      */
-    public static <T> Iterator<T> getServiceIterator(Class<T> serviceClass) {
+    public static <T> Iterator<T> getServiceIterator(Class<T> service) {
         BundleContext context = getBundleContext();
         try {
-            ServiceReference<?>[] serviceRefs = context.getAllServiceReferences(serviceClass.getName(), null);
+            ServiceReference<?>[] serviceRefs = context.getAllServiceReferences(service.getName(), null);
             if (serviceRefs != null) {
-                return new ServiceIterator<T>(serviceClass, serviceRefs, context);
+                return new ServiceIterator<T>(service, serviceRefs, context);
             }
         } catch (InvalidSyntaxException e) {
             throw new IllegalArgumentException(e);
         }
-        return new ServiceIterator<T>(serviceClass, null, context);
+        return new ServiceIterator<T>(service, null, context);
     }
 
     /**
