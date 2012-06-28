@@ -11,9 +11,10 @@
 package org.eclipse.skalli.view.internal.config;
 
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
 import org.restlet.resource.ServerResource;
 
-public class BrandingConfigSection implements ConfigSection{
+public class BrandingConfigSection extends ConfigSectionBase implements ConfigSection{
 
   private static final String NAME = "view/branding"; //$NON-NLS-1$
 
@@ -23,7 +24,7 @@ public class BrandingConfigSection implements ConfigSection{
   }
 
   @Override
-  public Class<? extends ServerResource> getServerResource() {
+  public Class<? extends ServerResource> getServerResource(String resourePath) {
     return BrandingResource.class;
   }
 }

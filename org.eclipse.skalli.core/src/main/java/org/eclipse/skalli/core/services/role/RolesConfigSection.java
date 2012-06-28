@@ -11,9 +11,10 @@
 package org.eclipse.skalli.core.services.role;
 
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
 import org.restlet.resource.ServerResource;
 
-public class RolesConfigSection implements ConfigSection {
+public class RolesConfigSection extends ConfigSectionBase implements ConfigSection {
 
     private static final String NAME = "roles"; //$NON-NLS-1$
 
@@ -23,7 +24,7 @@ public class RolesConfigSection implements ConfigSection {
     }
 
     @Override
-    public Class<? extends ServerResource> getServerResource() {
+    public Class<? extends ServerResource> getServerResource(String resourePath) {
         return RolesResource.class;
     }
 

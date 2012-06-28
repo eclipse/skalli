@@ -11,9 +11,10 @@
 package org.eclipse.skalli.core.internal.feed;
 
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
 import org.restlet.resource.ServerResource;
 
-public class FeedUpdaterConfigSection implements ConfigSection {
+public class FeedUpdaterConfigSection extends ConfigSectionBase implements ConfigSection {
 
     private static final String NAME = "ext/feed/updater"; //$NON-NLS-1$
 
@@ -23,7 +24,7 @@ public class FeedUpdaterConfigSection implements ConfigSection {
     }
 
     @Override
-    public Class<? extends ServerResource> getServerResource() {
+    public Class<? extends ServerResource> getServerResource(String resourePath) {
         return FeedUpdaterResource.class;
     }
 

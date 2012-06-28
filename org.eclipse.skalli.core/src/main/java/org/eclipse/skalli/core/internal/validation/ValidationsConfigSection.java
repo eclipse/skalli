@@ -10,11 +10,11 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.validation;
 
+import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
 import org.restlet.resource.ServerResource;
 
-import org.eclipse.skalli.services.configuration.rest.ConfigSection;
-
-public class ValidationsConfigSection implements ConfigSection {
+public class ValidationsConfigSection extends ConfigSectionBase implements ConfigSection {
 
     private static final String NAME = "core/validations"; //$NON-NLS-1$
 
@@ -24,7 +24,7 @@ public class ValidationsConfigSection implements ConfigSection {
     }
 
     @Override
-    public Class<? extends ServerResource> getServerResource() {
+    public Class<? extends ServerResource> getServerResource(String resourePath) {
         return ValidationsResource.class;
     }
 }

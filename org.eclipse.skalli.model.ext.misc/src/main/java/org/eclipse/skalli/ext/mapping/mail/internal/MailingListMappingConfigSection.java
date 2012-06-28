@@ -11,9 +11,10 @@
 package org.eclipse.skalli.ext.mapping.mail.internal;
 
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
 import org.restlet.resource.ServerResource;
 
-public class MailingListMappingConfigSection implements ConfigSection {
+public class MailingListMappingConfigSection extends ConfigSectionBase implements ConfigSection {
 
     private static final String NAME = "info/mailingList"; //$NON-NLS-1$
 
@@ -23,7 +24,7 @@ public class MailingListMappingConfigSection implements ConfigSection {
     }
 
     @Override
-    public Class<? extends ServerResource> getServerResource() {
+    public Class<? extends ServerResource> getServerResource(String resourePath) {
         return MailingListMappingResource.class;
     }
 

@@ -11,13 +11,14 @@
 package org.eclipse.skalli.core.internal.users;
 
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
 import org.osgi.service.component.ComponentContext;
 import org.restlet.resource.ServerResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class UserStoreConfigSection implements ConfigSection {
+public class UserStoreConfigSection extends ConfigSectionBase implements ConfigSection {
     private static final Logger LOG = LoggerFactory.getLogger(UserStoreConfigSection.class);
 
     protected void activate(ComponentContext context) {
@@ -33,7 +34,7 @@ public class UserStoreConfigSection implements ConfigSection {
     }
 
     @Override
-    public Class<? extends ServerResource> getServerResource() {
+    public Class<? extends ServerResource> getServerResource(String resourePath) {
         return UserStoreResource.class;
     }
 

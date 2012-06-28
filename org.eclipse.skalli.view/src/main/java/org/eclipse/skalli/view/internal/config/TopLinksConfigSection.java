@@ -11,9 +11,10 @@
 package org.eclipse.skalli.view.internal.config;
 
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
 import org.restlet.resource.ServerResource;
 
-public class TopLinksConfigSection implements ConfigSection {
+public class TopLinksConfigSection extends ConfigSectionBase implements ConfigSection {
 
     private static final String NAME = "view/toplinks"; //$NON-NLS-1$
 
@@ -23,7 +24,7 @@ public class TopLinksConfigSection implements ConfigSection {
     }
 
     @Override
-    public Class<? extends ServerResource> getServerResource() {
+    public Class<? extends ServerResource> getServerResource(String resourePath) {
         return TopLinksResource.class;
     }
 

@@ -11,9 +11,10 @@
 package org.eclipse.skalli.model.ext.maven.internal.config;
 
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
 import org.restlet.resource.ServerResource;
 
-public class MavenResolverConfigSection implements ConfigSection {
+public class MavenResolverConfigSection extends ConfigSectionBase implements ConfigSection {
 
     private static final String NAME = "ext/maven/resolver"; //$NON-NLS-1$
 
@@ -23,7 +24,7 @@ public class MavenResolverConfigSection implements ConfigSection {
     }
 
     @Override
-    public Class<? extends ServerResource> getServerResource() {
+    public Class<? extends ServerResource> getServerResource(String resourePath) {
         return MavenResolverResource.class;
     }
 

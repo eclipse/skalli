@@ -11,9 +11,10 @@
 package org.eclipse.skalli.model.ext.devinf.internal.config;
 
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
 import org.restlet.resource.ServerResource;
 
-public class ScmLocationMappingConfigSection implements ConfigSection {
+public class ScmLocationMappingConfigSection extends ConfigSectionBase implements ConfigSection {
 
     private static final String NAME = "devInf/scmMappings"; //$NON-NLS-1$
 
@@ -23,7 +24,7 @@ public class ScmLocationMappingConfigSection implements ConfigSection {
     }
 
     @Override
-    public Class<? extends ServerResource> getServerResource() {
+    public Class<? extends ServerResource> getServerResource(String resourePath) {
         return ScmLocationMappingResource.class;
     }
 

@@ -11,9 +11,10 @@
 package org.eclipse.skalli.nexus.internal.config;
 
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
 import org.restlet.resource.ServerResource;
 
-public class NexusConfigSection implements ConfigSection {
+public class NexusConfigSection extends ConfigSectionBase implements ConfigSection {
 
     private static final String NAME = "ext/nexus"; //$NON-NLS-1$
 
@@ -23,7 +24,7 @@ public class NexusConfigSection implements ConfigSection {
     }
 
     @Override
-    public Class<? extends ServerResource> getServerResource() {
+    public Class<? extends ServerResource> getServerResource(String resourePath) {
         return NexusResource.class;
     }
 }

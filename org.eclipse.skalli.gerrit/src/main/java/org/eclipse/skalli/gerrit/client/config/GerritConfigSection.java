@@ -11,9 +11,10 @@
 package org.eclipse.skalli.gerrit.client.config;
 
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
 import org.restlet.resource.ServerResource;
 
-public class GerritConfigSection implements ConfigSection {
+public class GerritConfigSection extends ConfigSectionBase implements ConfigSection {
 
     private static final String NAME = "gerrit"; //$NON-NLS-1$
 
@@ -23,7 +24,7 @@ public class GerritConfigSection implements ConfigSection {
     }
 
     @Override
-    public Class<? extends ServerResource> getServerResource() {
+    public Class<? extends ServerResource> getServerResource(String resourePath) {
         return GerritResource.class;
     }
 

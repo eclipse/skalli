@@ -11,9 +11,10 @@
 package org.eclipse.skalli.core.services.permit;
 
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
 import org.restlet.resource.ServerResource;
 
-public class PermitsConfigSection implements ConfigSection {
+public class PermitsConfigSection extends ConfigSectionBase implements ConfigSection {
 
     private static final String NAME = "permissions"; //$NON-NLS-1$
 
@@ -23,7 +24,7 @@ public class PermitsConfigSection implements ConfigSection {
     }
 
     @Override
-    public Class<? extends ServerResource> getServerResource() {
+    public Class<? extends ServerResource> getServerResource(String resourePath) {
         return PermitsResource.class;
     }
 }

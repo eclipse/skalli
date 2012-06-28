@@ -11,9 +11,10 @@
 package org.eclipse.skalli.view.internal.config;
 
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
 import org.restlet.resource.ServerResource;
 
-public class FeedbackConfigSection implements ConfigSection {
+public class FeedbackConfigSection extends ConfigSectionBase implements ConfigSection {
 
     private static final String NAME = "view/feedback"; //$NON-NLS-1$
 
@@ -23,7 +24,7 @@ public class FeedbackConfigSection implements ConfigSection {
     }
 
     @Override
-    public Class<? extends ServerResource> getServerResource() {
+    public Class<? extends ServerResource> getServerResource(String resourePath) {
         return FeedbackResource.class;
     }
 

@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.internal;
 
+import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,9 +44,7 @@ public class RestApplication extends Application {
     public synchronized Restlet createInboundRoot() {
         Router router = new Router(getContext());
 
-        for (ConfigSection configSection : configSections) {
-            router.attach("/config/" + configSection.getName(), configSection.getServerResource()); //$NON-NLS-1$
-        }
+        attachConfigurationResources(router);
 
         router.attach("/admin/status", StatusResource.class); //$NON-NLS-1$
         router.attach("/admin/statistics", StatisticsResource.class); //$NON-NLS-1$
@@ -101,6 +100,30 @@ public class RestApplication extends Application {
         extensions.remove(restExtension);
     }
 
+    private void attachConfigurationResources(Router router) {
+        for (ConfigSection configSection : configSections) {
+            String[] resourcePaths = configSection.getResourcePaths();
+            if (resourcePaths == null || resourcePaths.length == 0) {
+                resourcePaths = new String[] { getName() };
+            }
+            for (String resourcePath: resourcePaths) {
+                if (!resourcePath.startsWith("/")) { //$NON-NLS-1$
+                    resourcePath = "/" + resourcePath; //$NON-NLS-1$
+                }
+                Class<? extends ServerResource> resource = configSection.getServerResource(resourcePath);
+                if (resource != null) {
+                    router.attach("/config" + resourcePath, resource); //$NON-NLS-1$
+                    LOG.info(MessageFormat.format(
+                            "Attached REST resource {0} to path {1} for configuration section ''{2}''",
+                            resource.getName(), resourcePath, configSection.getName()));
+                } else {
+                    LOG.warn(MessageFormat.format("No REST resource provided for path {0}", resourcePath));
+                }
+            }
+        }
+
+    }
+
     private void attachServiceMonitors(String basePath, Router router) {
         for (Monitorable serviceMonitor : serviceMonitors) {
             String servicePath = basePath + serviceMonitor.getServiceComponentName() + "/"; //$NON-NLS-1$
@@ -109,9 +132,9 @@ public class RestApplication extends Application {
                 Class<? extends ServerResource> monitorResource = serviceMonitor.getServerResource(resourceName);
                 if (monitorResource != null) {
                     router.attach(path, monitorResource);
-                    LOG.info("Attached service monitor to path " + path);
+                    LOG.info(MessageFormat.format("Attached service monitor to path {0}", path));
                 } else {
-                    LOG.warn("No monitor resource provided for path " + path);
+                    LOG.warn(MessageFormat.format("No monitor resource provided for path {0}", path));
                 }
             }
         }
@@ -121,7 +144,7 @@ public class RestApplication extends Application {
         for (RestExtension ext : extensions) {
             String[] resourcePaths = ext.getResourcePaths();
             if (resourcePaths == null  || resourcePaths.length == 0) {
-                LOG.warn("REST extension " + ext.getClass().getName() + " registers no resource paths at all");
+                LOG.warn(MessageFormat.format("REST extension {0} registers no resource paths at all", ext.getClass().getName()));
                 continue;
             }
             for (String resourcePath: resourcePaths) {
@@ -131,9 +154,9 @@ public class RestApplication extends Application {
                 Class<? extends ServerResource> resource = ext.getServerResource(resourcePath);
                 if (resource != null) {
                     router.attach(resourcePath, resource);
-                    LOG.info("Attached REST extension " + resource.getName() + " to path " + resourcePath);
+                    LOG.info(MessageFormat.format("Attached REST resource {0} to path {1}", resource.getName(), resourcePath));
                 } else {
-                    LOG.warn("No REST resource provided for path " + resourcePath);
+                    LOG.warn(MessageFormat.format("No REST resource provided for path {0}", resourcePath));
                 }
             }
         }

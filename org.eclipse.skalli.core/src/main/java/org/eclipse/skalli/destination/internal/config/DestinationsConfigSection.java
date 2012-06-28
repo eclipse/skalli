@@ -11,9 +11,10 @@
 package org.eclipse.skalli.destination.internal.config;
 
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
 import org.restlet.resource.ServerResource;
 
-public class DestinationsConfigSection implements ConfigSection {
+public class DestinationsConfigSection  extends ConfigSectionBase implements ConfigSection {
 
     private static final String NAME = "core/destinations"; //$NON-NLS-1$
 
@@ -23,7 +24,7 @@ public class DestinationsConfigSection implements ConfigSection {
     }
 
     @Override
-    public Class<? extends ServerResource> getServerResource() {
+    public Class<? extends ServerResource> getServerResource(String resourePath) {
         return DestinationsResource.class;
     }
 

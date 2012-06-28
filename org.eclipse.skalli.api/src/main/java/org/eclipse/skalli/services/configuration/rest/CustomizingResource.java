@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.configuration.rest;
 
-import org.eclipse.skalli.services.configuration.ConfigurationService;
+import java.util.Map;
 
-import com.thoughtworks.xstream.XStream;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
 
 /**
  * Representation of application customization parameters.
@@ -20,28 +20,18 @@ import com.thoughtworks.xstream.XStream;
 public abstract class CustomizingResource<T> extends ConfigResourceBase<T> {
 
     /**
-     * Defines the name which will be used to store the customizing entity in the file system.
-     * @return
+     * Returns the storage category that will be used to store the customizing entity
+     * in the storage service.
      */
     protected abstract String getKey();
 
     @Override
-    protected final XStream getXStream() {
-        XStream xstream = super.getXStream();
-        for (Class<?> additionalClass : getAdditionalConfigClasses()) {
-            xstream.processAnnotations(additionalClass);
-        }
-        return xstream;
-    }
-
-    @Override
-    protected final void storeConfig(ConfigurationService configService, T configObject) {
+    protected void storeConfig(ConfigurationService configService, T configObject, Map<String,Object> requestAttributes) {
         configService.writeCustomization(getKey(), configObject);
     }
 
     @Override
-    protected final T readConfig(ConfigurationService configService) {
+    protected T readConfig(ConfigurationService configService, Map<String,Object> requestAttributes) {
         return configService.readCustomization(getKey(), getConfigClass());
     }
-
 }

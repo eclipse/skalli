@@ -47,7 +47,7 @@ public abstract class ConfigResource<K extends ConfigKey, O> extends ConfigResou
     protected abstract K[] getAllKeys();
 
     @Override
-    protected void storeConfig(ConfigurationService configService, O configObject) {
+    protected void storeConfig(ConfigurationService configService, O configObject, Map<String,Object> requestAttributes) {
         ConfigTransaction tx = configService.startTransaction();
         for (Entry<ConfigKey, String> entry : configToMap(configObject).entrySet()) {
             configService.writeString(tx, entry.getKey(), entry.getValue());
@@ -56,7 +56,7 @@ public abstract class ConfigResource<K extends ConfigKey, O> extends ConfigResou
     }
 
     @Override
-    protected O readConfig(ConfigurationService configService) {
+    protected O readConfig(ConfigurationService configService, Map<String,Object> requestAttributes) {
         Map<K, String> values = new HashMap<K, String>();
         for (K key : getAllKeys()) {
             if (key.isEncrypted()) {

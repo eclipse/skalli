@@ -15,6 +15,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.ValidationException;
@@ -188,14 +189,17 @@ public abstract class ConfigResourceBase<T> extends ServerResource {
         return Collections.emptyList();
     };
 
-    protected abstract T readConfig(ConfigurationService configService);
+    protected abstract T readConfig(ConfigurationService configService, Map<String,Object> requestAttributes);
 
-    protected abstract void storeConfig(ConfigurationService configService, T configObject);
+    protected abstract void storeConfig(ConfigurationService configService, T configObject, Map<String,Object> requestAttributes);
 
     protected XStream getXStream() {
         XStream xstream = new XStream();
         xstream.setClassLoader(this.getClass().getClassLoader());
         xstream.processAnnotations(getConfigClass());
+        for (Class<?> additionalClass : getAdditionalConfigClasses()) {
+            xstream.processAnnotations(additionalClass);
+        }
         return xstream;
     }
 
@@ -219,61 +223,70 @@ public abstract class ConfigResourceBase<T> extends ServerResource {
 
     @Get
     public final Representation retrieve() {
-        Representation result = checkAuthorization(Permit.ACTION_GET, getReference().getPath());
+        String path = getReference().getPath();
+        Representation result = checkAuthorization(Permit.ACTION_GET, path);
         if (result != null) {
             return result;
         }
 
         ConfigurationService configService = getConfigService();
-        if (configService != null) {
-            T config = readConfig(configService);
-            try {
-                ProtectionHelper.protect(config, getAdditionalConfigClasses());
-            } catch (ProtectionException e) {
-                LOG.error("Problems protecting config:", e);
-                getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
-                return new StringRepresentation("Failed to retrieve configuration", MediaType.TEXT_PLAIN);
-            }
-            ResourceRepresentation<T> representation = new ResourceRepresentation<T>(config);
-            representation.setXStream(getXStream());
-            return representation;
-        } else {
-            String message = "Failed to read configuration (" + getConfigClass().getSimpleName()
-                    + ") - no instance of " + ConfigurationService.class.getName() + "available";
-            LOG.warn(message);
-            return new StringRepresentation(message, MediaType.TEXT_PLAIN);
+        if (configService == null) {
+            LOG.error(MessageFormat.format(
+                    "Failed to retrieve configuration {0}: no configuration service available", path));
+            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+            return new StringRepresentation(MessageFormat.format(
+                    "Failed to retrieve configuration {0}", path), MediaType.TEXT_PLAIN);
+
         }
+        T config = readConfig(configService, getRequestAttributes());
+        if (config == null) {
+            getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+            return new StringRepresentation(MessageFormat.format(
+                    "No configuration {0} found", path), MediaType.TEXT_PLAIN);
+        }
+        try {
+            ProtectionHelper.protect(config, getAdditionalConfigClasses());
+        } catch (ProtectionException e) {
+            LOG.error(MessageFormat.format("Failed to apply proper protection to configuration {0}", path), e);
+            getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+            return new StringRepresentation(MessageFormat.format(
+                    "Failed to retrieve configuration {0}", path), MediaType.TEXT_PLAIN);
+        }
+        ResourceRepresentation<T> representation = new ResourceRepresentation<T>(config);
+        representation.setXStream(getXStream());
+        return representation;
     }
 
     @Put
     public final Representation store(Representation entity) {
-        Representation result = checkAuthorization(Permit.ACTION_PUT, getReference().getPath());
+        String path = getReference().getPath();
+        Representation result = checkAuthorization(Permit.ACTION_PUT, path);
         if (result != null) {
             return result;
         }
 
         try {
             ConfigurationService configService = getConfigService();
-            if (configService != null) {
-                XStream xstream = getXStream();
-                @SuppressWarnings("unchecked")
-                T configObject = (T) xstream.fromXML(entity.getText());
-                ValidationException validationException = validate(configObject, getLoggedInUser());
-                if (validationException.hasFatalIssues()) {
-                    result = new StringRepresentation(validationException.getMessage(), MediaType.TEXT_PLAIN);
-                    getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-                } else {
-                    storeConfig(configService, configObject);
-                    StringBuilder msg = new StringBuilder("Configuration successfully stored");
-                    if (validationException.hasIssues()) {
-                        msg.append(". But had following issues: ").append(validationException.getMessage());
-                    }
-                    result = new StringRepresentation(msg.toString(), MediaType.TEXT_PLAIN);
-                }
-            } else {
-                LOG.warn("Failed to store configuration - no instance of " + ConfigurationService.class.getName() + "available"); //$NON-NLS-1$
-                result = new StringRepresentation("Failed to store configuration", MediaType.TEXT_PLAIN);
+            if (configService == null) {
+                LOG.error(MessageFormat.format(
+                        "Failed to store configuration {0}: no configuration service available", path));
                 getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
+                return new StringRepresentation("Failed to store configuration", MediaType.TEXT_PLAIN);
+            }
+            XStream xstream = getXStream();
+            @SuppressWarnings("unchecked")
+            T configObject = (T) xstream.fromXML(entity.getText());
+            ValidationException validationException = validate(configObject, getLoggedInUser());
+            if (validationException.hasFatalIssues()) {
+                getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+                result = new StringRepresentation(validationException.getMessage(), MediaType.TEXT_PLAIN);
+            } else {
+                storeConfig(configService, configObject, getRequestAttributes());
+                StringBuilder msg = new StringBuilder("Configuration successfully stored");
+                if (validationException.hasIssues()) {
+                    msg.append(". But had following issues: ").append(validationException.getMessage());
+                }
+                result = new StringRepresentation(msg.toString(), MediaType.TEXT_PLAIN);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
