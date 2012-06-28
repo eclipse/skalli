@@ -16,33 +16,32 @@ import java.util.TreeSet;
 
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.Group;
-import org.eclipse.skalli.services.group.GroupService;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
- * Class for user groups. To work with groups use the {@link GroupService}.
+ * Configuration of a single user group.
  */
 @XStreamAlias("group")
-public class SkalliCoreGroup {
+public class GroupConfig {
 
     private String groupId;
 
     @XStreamImplicit(itemFieldName = "member")
     private TreeSet<String> groupMembers = new TreeSet<String>();
 
-    public SkalliCoreGroup() {
+    public GroupConfig() {
     }
 
-    public SkalliCoreGroup(String groupId, Collection<String> groupMembers) {
+    public GroupConfig(String groupId, Collection<String> groupMembers) {
         this.groupId = groupId;
         if (CollectionUtils.isNotBlank(groupMembers)) {
             this.groupMembers.addAll(groupMembers);
         }
     }
 
-    public SkalliCoreGroup(org.eclipse.skalli.model.Group group) {
+    public GroupConfig(org.eclipse.skalli.model.Group group) {
         this(group.getGroupId(), group.getGroupMembers());
     }
 

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.skalli.core.internal.groups.GroupResource;
+import org.eclipse.skalli.core.internal.groups.GroupsResource;
 import org.eclipse.skalli.core.internal.groups.GroupsConfig;
 import org.eclipse.skalli.model.Group;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
@@ -107,7 +107,7 @@ public class LocalGroupServiceImpl implements GroupService, EventListener<EventC
         if (configService == null) {
             return Collections.emptyList();
         }
-        GroupsConfig groupsConfig = configService.readCustomization(GroupResource.MAPPINGS_KEY, GroupsConfig.class);
+        GroupsConfig groupsConfig = configService.readCustomization(GroupsResource.MAPPINGS_KEY, GroupsConfig.class);
         if (groupsConfig == null) {
             return Collections.emptyList();
         }

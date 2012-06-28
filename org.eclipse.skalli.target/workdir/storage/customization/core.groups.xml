@@ -1,11 +1,11 @@
 <org.eclipse.skalli.core.internal.groups.GroupsConfig>
     <groups>
-        <org.eclipse.skalli.core.internal.groups.SkalliCoreGroup>
+        <org.eclipse.skalli.core.internal.groups.GroupConfig>
             <groupId>administrators</groupId>
             <groupMembers>
                 <no-comparator />
                 <string>admin</string>
             </groupMembers>
-        </org.eclipse.skalli.core.internal.groups.SkalliCoreGroup>
+        </org.eclipse.skalli.core.internal.groups.GroupConfig>
     </groups>
 </org.eclipse.skalli.core.internal.groups.GroupsConfig>

@@ -13,17 +13,17 @@ import org.junit.Test;
 
 public class GroupResourceTest {
 
-    private static GroupResource groupResource;
+    private static GroupsResource groupResource;
 
     @Before
     public void before() {
-        groupResource = new GroupResource();
+        groupResource = new GroupsResource();
     }
 
     @Test
     public void testValidate_emptyGroupId() {
         ValidationException exceptions = groupResource.validate(
-                new GroupsConfig(Arrays.asList(new SkalliCoreGroup("", Arrays.asList("jon")))), "admin");
+                new GroupsConfig(Arrays.asList(new GroupConfig("", Arrays.asList("jon")))), "admin");
         assertTrue(exceptions.hasFatalIssues());
 
     }
@@ -40,7 +40,7 @@ public class GroupResourceTest {
         //no admin group
         exceptions = groupResource.validate(
                 new GroupsConfig(Arrays.asList(
-                        new SkalliCoreGroup("dummy", Arrays.asList(loggedInUser)))),
+                        new GroupConfig("dummy", Arrays.asList(loggedInUser)))),
                 loggedInUser);
         assertFalse(exceptions.hasFatalIssues());
         assertTrue(exceptions.hasIssues());
@@ -52,8 +52,8 @@ public class GroupResourceTest {
 
         ValidationException exceptions = groupResource.validate(
                 new GroupsConfig(Arrays.asList(
-                        new SkalliCoreGroup(GroupService.ADMIN_GROUP, Arrays.asList(loggedInUser)),
-                        new SkalliCoreGroup("myDummyGroup", Arrays.asList(loggedInUser)))),
+                        new GroupConfig(GroupService.ADMIN_GROUP, Arrays.asList(loggedInUser)),
+                        new GroupConfig("myDummyGroup", Arrays.asList(loggedInUser)))),
                 loggedInUser);
         assertFalse(exceptions.hasIssues());
     }
@@ -63,7 +63,7 @@ public class GroupResourceTest {
         final String loggedInUser = "admin";
 
         ValidationException exceptions = groupResource.validate(
-                new GroupsConfig(Arrays.asList(new SkalliCoreGroup(GroupService.ADMIN_GROUP, Arrays
+                new GroupsConfig(Arrays.asList(new GroupConfig(GroupService.ADMIN_GROUP, Arrays
                         .asList(loggedInUser, "")))),
                 loggedInUser);
         assertTrue(exceptions.hasFatalIssues());
@@ -75,8 +75,8 @@ public class GroupResourceTest {
 
         ValidationException exceptions = groupResource.validate(
                 new GroupsConfig(Arrays.asList(//
-                        new SkalliCoreGroup(GroupService.ADMIN_GROUP, Arrays.asList(loggedInUser)), //
-                        new SkalliCoreGroup("emptyGroup", new ArrayList<String>())
+                        new GroupConfig(GroupService.ADMIN_GROUP, Arrays.asList(loggedInUser)), //
+                        new GroupConfig("emptyGroup", new ArrayList<String>())
                         )),
                 loggedInUser);
         assertFalse(exceptions.hasFatalIssues());
@@ -89,9 +89,9 @@ public class GroupResourceTest {
 
         ValidationException exceptions = groupResource.validate(
                 new GroupsConfig(Arrays.asList(//
-                        new SkalliCoreGroup(GroupService.ADMIN_GROUP, Arrays.asList(loggedInUser)), //
-                        new SkalliCoreGroup("myDummyGroup", Arrays.asList("user1", "user2")),
-                        new SkalliCoreGroup("myDummyGroup", Arrays.asList("user4", "user6"))
+                        new GroupConfig(GroupService.ADMIN_GROUP, Arrays.asList(loggedInUser)), //
+                        new GroupConfig("myDummyGroup", Arrays.asList("user1", "user2")),
+                        new GroupConfig("myDummyGroup", Arrays.asList("user4", "user6"))
                         )),
                 loggedInUser);
         assertTrue(exceptions.hasFatalIssues());

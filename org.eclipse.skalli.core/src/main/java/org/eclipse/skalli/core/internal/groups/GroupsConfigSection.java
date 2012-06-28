@@ -13,6 +13,9 @@ package org.eclipse.skalli.core.internal.groups;
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
 import org.restlet.resource.ServerResource;
 
+/**
+ * Configuration API for user groups located at <tt>/api/config/groups</tt>.
+ */
 public class GroupsConfigSection implements ConfigSection {
 
     private static final String NAME = "groups"; //$NON-NLS-1$
@@ -24,7 +27,7 @@ public class GroupsConfigSection implements ConfigSection {
 
     @Override
     public Class<? extends ServerResource> getServerResource() {
-        return GroupResource.class;
+        return GroupsResource.class;
     }
 
 }

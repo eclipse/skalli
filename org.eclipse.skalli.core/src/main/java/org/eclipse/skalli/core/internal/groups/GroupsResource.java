@@ -21,7 +21,7 @@ import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
 import org.eclipse.skalli.services.group.GroupService;
 
-public class GroupResource extends CustomizingResource<GroupsConfig> implements Issuer {
+public class GroupsResource extends CustomizingResource<GroupsConfig> implements Issuer {
 
     public static final String MAPPINGS_KEY = "core.groups"; //$NON-NLS-1$
 
@@ -44,7 +44,7 @@ public class GroupResource extends CustomizingResource<GroupsConfig> implements 
         boolean adminGroupExists = false;
         boolean memberEmptyErrorFound = false;
 
-        for (SkalliCoreGroup group : configObject.getGroups()) {
+        for (GroupConfig group : configObject.getGroups()) {
 
             //goupId is mandatory
             if (StringUtils.isBlank(group.getGroupId())) {
@@ -83,11 +83,11 @@ public class GroupResource extends CustomizingResource<GroupsConfig> implements 
         }
 
         //check that groups Ids are unique
-        List<SkalliCoreGroup> groups = configObject.getGroups();
+        List<GroupConfig> groups = configObject.getGroups();
         if (groups.size() > 1) {
             boolean unique = true;
             for (int i = 0; i < groups.size() && unique; i++) {
-                SkalliCoreGroup group = groups.get(i);
+                GroupConfig group = groups.get(i);
                 String groupId = group.getGroupId();
                 if (StringUtils.isNotBlank(groupId)) {
 

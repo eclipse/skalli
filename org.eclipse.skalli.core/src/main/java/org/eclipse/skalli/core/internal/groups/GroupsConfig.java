@@ -18,29 +18,32 @@ import org.eclipse.skalli.model.Group;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
+/**
+ * Configuration of a collection of user groups.
+ */
 @XStreamAlias("groups")
 public class GroupsConfig {
 
     public GroupsConfig() {
     }
 
-    GroupsConfig(List<SkalliCoreGroup> groups) {
+    GroupsConfig(List<GroupConfig> groups) {
         getGroups().addAll(groups);
     }
 
     @XStreamImplicit
-    private ArrayList<SkalliCoreGroup> groups = new ArrayList<SkalliCoreGroup>();
+    private ArrayList<GroupConfig> groups = new ArrayList<GroupConfig>();
 
-    public List<SkalliCoreGroup> getGroups() {
+    public List<GroupConfig> getGroups() {
         if (groups == null) {
-            groups = new ArrayList<SkalliCoreGroup>();
+            groups = new ArrayList<GroupConfig>();
         }
         return groups;
     }
 
     public List<Group> getModelGroups() {
         ArrayList<Group> modelGroups = new ArrayList<Group>();
-        for (SkalliCoreGroup skalliCoreGroup : getGroups()) {
+        for (GroupConfig skalliCoreGroup : getGroups()) {
             modelGroups.add(skalliCoreGroup.getAsModelGroup());
         }
         return modelGroups;
