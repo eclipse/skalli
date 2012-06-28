@@ -41,7 +41,7 @@ public class GroupConfig {
         }
     }
 
-    public GroupConfig(org.eclipse.skalli.model.Group group) {
+    public GroupConfig(Group group) {
         this(group.getGroupId(), group.getGroupMembers());
     }
 
@@ -54,6 +54,10 @@ public class GroupConfig {
             groupMembers = new TreeSet<String>();
         }
         return groupMembers;
+    }
+
+    public synchronized void setGroupMembers(Collection<String> groupMembers) {
+        groupMembers = new TreeSet<String>(groupMembers);
     }
 
     public boolean hasGroupMember(String userId) {

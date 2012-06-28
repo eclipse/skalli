@@ -11,6 +11,7 @@
 package org.eclipse.skalli.core.internal.groups;
 
 import java.text.MessageFormat;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -33,6 +34,13 @@ public class GroupsResource extends CustomizingResource<GroupsConfig> implements
     @Override
     protected Class<GroupsConfig> getConfigClass() {
         return GroupsConfig.class;
+    }
+
+    @Override
+    protected List<Class<?>> getAdditionalConfigClasses() {
+        List<Class<?>> ret = new LinkedList<Class<?>>();
+        ret.add(GroupConfig.class);
+        return ret;
     }
 
     @Override
