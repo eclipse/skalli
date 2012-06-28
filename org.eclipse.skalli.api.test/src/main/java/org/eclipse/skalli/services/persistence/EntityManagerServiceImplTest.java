@@ -2,12 +2,15 @@ package org.eclipse.skalli.services.persistence;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.Cache;
 import javax.persistence.EntityManager;
@@ -25,12 +28,17 @@ import javax.persistence.metamodel.Metamodel;
 import org.apache.commons.lang.NotImplementedException;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.junit.Test;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 
 @SuppressWarnings("nls")
 public class EntityManagerServiceImplTest {
 
     private static final String TEST_JPA_UNIT_NAME = "EntityManagerServiceImplTestJpaUnitName";
+    private static final Map<Object,Object> TEST_JPA_SERVICE_PROPS =
+            Collections.singletonMap((Object)"osgi.unit.name", (Object)TEST_JPA_UNIT_NAME);
 
     private static final String TEST_DRIVER = "MyDriver";
     private static final String TEST_URL = "MyUrl";
@@ -291,7 +299,6 @@ public class EntityManagerServiceImplTest {
     private class EntityManagerFactoryBuilderMock implements EntityManagerFactoryBuilder {
         private EntityManagerFactory emfMock;
 
-        @SuppressWarnings("unchecked")
         @Override
         public EntityManagerFactory createEntityManagerFactory(Map props) {
             this.emfMock = new EntityManagerFactoryMock(props);
@@ -299,70 +306,93 @@ public class EntityManagerServiceImplTest {
         }
     }
 
-    private Map<String, Object> getPropertiesOfGetEntityManagerCall() throws StorageException {
-        EntityManagerServiceBase ems = new EntityManagerServiceBase();
-        EntityManagerFactoryBuilderMock emfbMock = new EntityManagerFactoryBuilderMock();
-        EntityManagerMock emMock = (EntityManagerMock) ems.createEntityManagerFromConfiguration(
-                emfbMock, TEST_JPA_UNIT_NAME);
-        Map<String, Object> aktualProps = emMock.getProperties();
-        return aktualProps;
-    }
-
-    @Test
-    public void testGetEntityManagerReturnsDefaultDerby() throws StorageException {
-        Map<String, Object> aktualProps = getPropertiesOfGetEntityManagerCall();
-
-        assertThat(aktualProps.get(PersistenceUnitProperties.JDBC_DRIVER).toString(),
-                is("org.apache.derby.jdbc.EmbeddedDriver"));
-        assertThat(aktualProps.get(PersistenceUnitProperties.JDBC_URL).toString(),
-                is("jdbc:derby:memory:SkalliDB;create=true"));
-        assertThat(aktualProps.get(PersistenceUnitProperties.JDBC_USER).toString(), is("skalli"));
-        assertThat(aktualProps.get(PersistenceUnitProperties.JDBC_PASSWORD).toString(), is("skalli"));
-        assertThat(aktualProps.get(PersistenceUnitProperties.TARGET_DATABASE).toString(), is("Derby"));
-        assertThat(aktualProps.get(EntityManagerFactoryBuilder.JPA_UNIT_NAME).toString(), is(TEST_JPA_UNIT_NAME));
-
-        assertThat(aktualProps.size(), is(6));
-    }
-
     @Test
     public void testGetEntityManagerReturnsConfiguredProps() throws StorageException {
-
-        System.setProperty(EntityManagerServiceBase.SKALLI_PERSISTENCE + PersistenceUnitProperties.JDBC_DRIVER,
-                TEST_DRIVER);
-
-        for (Entry<String, String> entry : getExplicitProperties().entrySet()) {
-            System.setProperty(entry.getKey(), entry.getValue());
-        }
-
-        Map<String, Object> aktualProps = getPropertiesOfGetEntityManagerCall();
-
-        assertThat(aktualProps.get(PersistenceUnitProperties.JDBC_DRIVER).toString(), is(TEST_DRIVER));
-        assertThat(aktualProps.get(PersistenceUnitProperties.JDBC_URL).toString(), is(TEST_URL));
-        assertThat(aktualProps.get(PersistenceUnitProperties.JDBC_USER).toString(), is(TEST_USER));
-        assertThat(aktualProps.get(PersistenceUnitProperties.JDBC_PASSWORD).toString(), is(TEST_PWD));
-        assertThat(aktualProps.get(PersistenceUnitProperties.TARGET_DATABASE).toString(), is(TEST_TARGET_DB));
-        assertThat(aktualProps.get(EntityManagerFactoryBuilder.JPA_UNIT_NAME).toString(), is(TEST_JPA_UNIT_NAME));
-
-        assertThat(aktualProps.size(), is(6));
-
-        //clean the system properties
-        for (Entry<String, String> entry : getExplicitProperties().entrySet()) {
-            System.setProperty(entry.getKey(), "");
-        }
-
+        Map<String, Object> expectedProps = getDefaultPersistenceProperties();
+        Map<String, Object> aktualProps = getPropertiesOfGetEntityManagerCall(expectedProps);
+        assertPersistenceProperties(aktualProps);
     }
 
-    private HashMap<String, String> getExplicitProperties() {
-        HashMap<String, String> properties = new HashMap<String, String>();
-        properties.put(EntityManagerServiceBase.SKALLI_PERSISTENCE + TEST_JPA_UNIT_NAME + "."
-                + PersistenceUnitProperties.JDBC_URL, TEST_URL);
-        properties.put(EntityManagerServiceBase.SKALLI_PERSISTENCE + PersistenceUnitProperties.JDBC_URL, "ERROR");
+    @Test
+    public void testGetEntityManagerMissingConfigProperties() throws StorageException {
+        for (String property: EntityManagerServiceBase.REQUIRED_PROPERTIES) {
+            Map<String, Object> expectedProps = getDefaultPersistenceProperties();
+            expectedProps.remove(property);
+            try {
+                getPropertiesOfGetEntityManagerCall(expectedProps);
+                fail("StorageException expected due to missing property " + property);
+            } catch (StorageException e) {
+                // expected
+            }
+        }
+    }
 
-        properties.put(EntityManagerServiceBase.SKALLI_PERSISTENCE + PersistenceUnitProperties.JDBC_USER, TEST_USER);
-        properties.put(EntityManagerServiceBase.SKALLI_PERSISTENCE + PersistenceUnitProperties.JDBC_PASSWORD, TEST_PWD);
-        properties.put(EntityManagerServiceBase.SKALLI_PERSISTENCE + PersistenceUnitProperties.TARGET_DATABASE,
-                TEST_TARGET_DB);
-        return properties;
+    @Test
+    public void testGetEntityManagerFromInjectedFactory() throws StorageException {
+        Hashtable<String, String> serviceProps = new Hashtable<String, String>();
+        serviceProps.put("osgi.unit.name", TEST_JPA_UNIT_NAME);
+
+        BundleContext context = FrameworkUtil.getBundle(EntityManagerServiceImplTest.class).getBundleContext();
+        ServiceRegistration<EntityManagerFactory> registration = null;
+        try {
+            registration = context.registerService(EntityManagerFactory.class, new EntityManagerFactoryMock(
+                    getDefaultPersistenceProperties()), serviceProps);
+
+            Map<String, Object> aktualProps = getPropertiesOfGetEntityManagerCall(null);
+            assertPersistenceProperties(aktualProps);
+        } finally {
+            registration.unregister();
+        }
+    }
+
+    @Test
+    public void testGetEntityManagerLazyFactoryAppearsWithinTimeout() throws Exception {
+        // factory appears with delay of 250 milliseconds, client is willing to wait for 1 second => success
+        assertLazyFactory(1000, 250, 1000);
+    }
+
+    @Test(expected=StorageException.class)
+    public void testGetEntityManagerLazyFactoryAppearsTooLate() throws Exception {
+        // factory appears with delay of 250 millisecond, client is willing to wait for 100 millisecond only => failure
+        assertLazyFactory(100, 250, 1000);
+    }
+
+    @Test(expected=StorageException.class)
+    public void testGetEntityManagerNoWait() throws Exception {
+        // factory appears with delay of 10 milliseconds only, client is not willing to wait at all => failure
+        assertLazyFactory(-1, 10, 1000);
+    }
+
+    private void assertLazyFactory(long timeout, long initialDelay, long awaitDone) throws Exception {
+        CountDownLatch latchStart = new CountDownLatch(1);
+        CountDownLatch latchDone = new CountDownLatch(1);
+
+        // thread that registers the entity manager factory: waits on latchStart, then registers the service with
+        // a delay of initialDelay millisecond, then waits on latchDone for max. awaitDone milliseconds;
+        // asserts that latchDone has been triggered before the timeout elapsed; then it terminates
+        RegisterRunnable registerRunnable = new RegisterRunnable(latchStart, latchDone, initialDelay, awaitDone);
+        Thread registerThread = new Thread(registerRunnable);
+
+        // thread that waits on a entity manager factory to appear within the timeout milliseconds;
+        // if a factory appears, asserts that the entity manager has the expected
+        // properties; then it triggers latchDone before terminating
+        ClientRunnable clientRunnable = new ClientRunnable(latchStart, latchDone, timeout);
+        Thread clientThread = new Thread(clientRunnable);
+
+        registerThread.start();
+        clientThread.start();
+
+        registerThread.join();
+        clientThread.join();
+
+        if (registerRunnable.failure != null) {
+            throw registerRunnable.failure;
+        }
+        if (clientRunnable.failure != null) {
+            throw clientRunnable.failure;
+        }
+        assertTrue(registerRunnable.done);
+        assertTrue(clientRunnable.done);
     }
 
     @Test
@@ -375,5 +405,105 @@ public class EntityManagerServiceImplTest {
                 PersistenceUnitProperties.JDBC_USER,
                 PersistenceUnitProperties.JDBC_PASSWORD,
                 PersistenceUnitProperties.TARGET_DATABASE));
+    }
+
+    private static Map<String, Object> getDefaultPersistenceProperties() {
+        Map<String, Object> properties = new HashMap<String, Object>(5);
+        properties.put(PersistenceUnitProperties.JDBC_DRIVER, TEST_DRIVER);
+        properties.put(PersistenceUnitProperties.JDBC_URL, TEST_URL);
+        properties.put(PersistenceUnitProperties.JDBC_USER, TEST_USER);
+        properties.put(PersistenceUnitProperties.JDBC_PASSWORD, TEST_PWD);
+        properties.put(PersistenceUnitProperties.TARGET_DATABASE, TEST_TARGET_DB);
+        return properties;
+    }
+
+    private void assertPersistenceProperties(Map<String, Object> aktualProps) {
+        assertThat(aktualProps.get(PersistenceUnitProperties.JDBC_DRIVER).toString(), is(TEST_DRIVER));
+        assertThat(aktualProps.get(PersistenceUnitProperties.JDBC_URL).toString(), is(TEST_URL));
+        assertThat(aktualProps.get(PersistenceUnitProperties.JDBC_USER).toString(), is(TEST_USER));
+        assertThat(aktualProps.get(PersistenceUnitProperties.JDBC_PASSWORD).toString(), is(TEST_PWD));
+        assertThat(aktualProps.get(PersistenceUnitProperties.TARGET_DATABASE).toString(), is(TEST_TARGET_DB));
+        assertThat(aktualProps.size(), is(5));
+    }
+
+    private Map<String, Object> getPropertiesOfGetEntityManagerCall(Map<String, Object> expectedProps) throws StorageException {
+        EntityManagerServiceBase ems = new EntityManagerServiceBase();
+        ems.bindEntityManagerFactoryBuilder(new EntityManagerFactoryBuilderMock(), TEST_JPA_SERVICE_PROPS);
+        EntityManagerMock emMock = (EntityManagerMock) ems.getEntityManager(expectedProps);
+        Map<String, Object> aktualProps = emMock.getProperties();
+        return aktualProps;
+    }
+
+    private class RegisterRunnable implements Runnable {
+        public boolean done;
+        public Exception failure;
+
+        private CountDownLatch latchStart;
+        private CountDownLatch latchDone;
+        private long initialDelay;
+        private long awaitDone;
+
+        public RegisterRunnable(CountDownLatch latchStart, CountDownLatch latchDone, long initialDelay, long awaitDone) {
+            this.latchStart = latchStart;
+            this.latchDone = latchDone;
+            this.initialDelay = initialDelay;
+            this.awaitDone = awaitDone;
+        }
+
+        @Override
+        public void run() {
+            try {
+                latchStart.await();
+                Thread.sleep(initialDelay);
+            } catch (InterruptedException e) {
+                failure = e;
+                return;
+            }
+
+            Hashtable<String, String> serviceProps = new Hashtable<String, String>();
+            serviceProps.put("osgi.unit.name", TEST_JPA_UNIT_NAME);
+            BundleContext context = FrameworkUtil.getBundle(EntityManagerServiceImplTest.class).getBundleContext();
+            ServiceRegistration<EntityManagerFactory> registration = null;
+            try {
+                registration = context.registerService(EntityManagerFactory.class, new EntityManagerFactoryMock(
+                        getDefaultPersistenceProperties()), serviceProps);
+                done = latchDone.await(awaitDone, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                failure = e;
+            } finally {
+                registration.unregister();
+            }
+        }
+    }
+
+
+    private class ClientRunnable implements Runnable {
+        public boolean done;
+        public Exception failure;
+
+        private CountDownLatch latchStart;
+        private CountDownLatch latchDone;
+        private long timeout;
+
+        public ClientRunnable(CountDownLatch latchStart, CountDownLatch latchDone, long timeout) {
+            this.latchStart = latchStart;
+            this.latchDone = latchDone;
+            this.timeout = timeout;
+        }
+        @Override
+        public void run() {
+            try {
+                System.setProperty(EntityManagerServiceBase.SKALLI_EMF_TIMEOUT, Long.toString(timeout));
+                latchStart.countDown();
+                Map<String, Object> aktualProps = getPropertiesOfGetEntityManagerCall(null);
+                assertPersistenceProperties(aktualProps);
+                latchDone.countDown();
+                done = true;
+            } catch (StorageException e) {
+                failure = e;
+            } finally {
+                System.clearProperty(EntityManagerServiceBase.SKALLI_EMF_TIMEOUT);
+            }
+        }
     }
 }

@@ -5,13 +5,12 @@ import javax.persistence.EntityManager;
 public interface EntityManagerService {
 
     /**
-     * Creates an <code>EntityManager</code>
+     * Retrieves an {@link EntityManager}.
      *
-     * @return an entity manager instance.
+     * @return an entity manager instance, never <code>null</code>.
      *
      * @throws StorageException
      *             if no entity manager could be created.
      */
     public EntityManager getEntityManager() throws StorageException;
-
 }
