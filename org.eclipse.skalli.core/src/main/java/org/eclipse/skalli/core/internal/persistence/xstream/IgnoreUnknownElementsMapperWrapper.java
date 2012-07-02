@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.persistence.xstream;
 
+import java.text.MessageFormat;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,11 +19,14 @@ import com.thoughtworks.xstream.mapper.CannotResolveClassException;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
 
 /**
- * Special mapper so that unknown XML elements are ignored, as XStream does not
- * support that yet. See http://pvoss.wordpress.com/2009/01/08/xstream and JIRA
+ * Special mapper that ignored unknown XML fields and collection entries, as XStream does not
+ * support that yet. Collection entries that cannot be mapped to a suitable class are ignored.
+ * Instead a {@link Noop} instance is put into the collection.
+ *
+ * @see http://pvoss.wordpress.com/2009/01/08/xstream and JIRA
  * entry http://jira.codehaus.org/browse/XSTR-30
  */
-public class IgnoreUnknownElementsMapperWrapper extends MapperWrapper {
+public class IgnoreUnknownElementsMapperWrapper extends IgnoreUnknownFieldsMapperWrapper {
     private static final Logger LOG = LoggerFactory.getLogger(IgnoreUnknownElementsMapperWrapper.class);
 
     public IgnoreUnknownElementsMapperWrapper(MapperWrapper next) {
@@ -29,19 +34,13 @@ public class IgnoreUnknownElementsMapperWrapper extends MapperWrapper {
     }
 
     @Override
-    public boolean shouldSerializeMember(Class definedIn, String fieldName) {
-        if (definedIn == Object.class) {
-            return false;
-        }
-        return super.shouldSerializeMember(definedIn, fieldName);
-    }
-
-    @Override
     public Class realClass(String elementName) {
         try {
             return super.realClass(elementName);
         } catch (CannotResolveClassException e) {
-            LOG.warn("No class for element named '" + elementName + "' found during entity deserialization.");
+            LOG.warn(MessageFormat.format(
+                    "No class for element named ''{0}'' found during entity deserialization: returning Noop instead",
+                    elementName));
             return Noop.class;
         }
     }

@@ -22,7 +22,7 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
 
 /**
  * Specialized XStream for our needs: MapperWrapperIgnoreUnknownElements to
- * ignore unknown fields.
+ * ignore unknown fields and inner classes.
  */
 public class IgnoreUnknownElementsXStream extends XStream {
 

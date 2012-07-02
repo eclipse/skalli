@@ -25,7 +25,7 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.core.internal.persistence.CompositeEntityClassLoader;
 import org.eclipse.skalli.core.internal.persistence.xstream.FileStorageService;
-import org.eclipse.skalli.core.internal.persistence.xstream.IgnoreUnknownElementsMapperWrapper;
+import org.eclipse.skalli.core.internal.persistence.xstream.IgnoreUnknownFieldsMapperWrapper;
 import org.eclipse.skalli.services.configuration.ConfigKey;
 import org.eclipse.skalli.services.configuration.ConfigTransaction;
 import org.eclipse.skalli.services.configuration.ConfigurationProperties;
@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
 
 public class ConfigurationComponent implements ConfigurationService {
@@ -222,7 +223,7 @@ public class ConfigurationComponent implements ConfigurationService {
         XStream xstream = new XStream() {
             @Override
             protected MapperWrapper wrapMapper(MapperWrapper next) {
-                return new IgnoreUnknownElementsMapperWrapper(next);
+                return new IgnoreUnknownFieldsMapperWrapper(next);
             }
         };
         ClassLoader classLoader = customizationClass.getClassLoader();
@@ -257,7 +258,9 @@ public class ConfigurationComponent implements ConfigurationService {
     @Override
     public <T> T readCustomization(String customizationKey, Class<T> customizationClass) {
         if (storageService == null) {
-            LOG.warn("Cannot load customization for key " + customizationKey + ": StorageService not available");
+            LOG.warn(MessageFormat.format(
+                    "Cannot load customization for key {0}: StorageService not available",
+                    customizationKey));
             return null;
         }
         InputStream is = null;
@@ -266,10 +269,17 @@ public class ConfigurationComponent implements ConfigurationService {
             if (is == null) {
                 return null;
             }
-            T ret = customizationClass.cast(getXStream(customizationClass).fromXML(is));
-            return ret;
+            return customizationClass.cast(getXStream(customizationClass).fromXML(is));
+        } catch (XStreamException e) {
+            LOG.error(MessageFormat.format(
+                    "Failed to unmarshal customization of type ''{0}'' for key ''{1}'' ",
+                    customizationClass.getName(), customizationKey), e);
+            return null;
         } catch (StorageException e) {
-            throw new RuntimeException(e);
+            LOG.error(MessageFormat.format(
+                    "Failed to retrieve customization for key ''{0}'' from storage service",
+                    customizationKey), e);
+            return null;
         } finally {
             IOUtils.closeQuietly(is);
         }

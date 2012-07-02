@@ -49,7 +49,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.ConversionException;
+import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.converters.Converter;
 
 /**
@@ -310,7 +310,7 @@ public class XStreamPersistence implements Issuer {
         EntityBase entity = null;
         try {
              entity = (EntityBase) xstream.fromXML(xml);
-        } catch (ConversionException e) {
+        } catch (XStreamException e) {
             LOG.warn(MessageFormat.format("Failed to convert XML document to entity: {0}", xml), e);
         }
         return entity;
