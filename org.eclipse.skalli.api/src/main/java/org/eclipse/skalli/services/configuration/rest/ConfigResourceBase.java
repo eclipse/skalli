@@ -17,13 +17,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.permit.Permit;
-import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.user.LoginUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -32,13 +31,12 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Put;
-import org.restlet.resource.ServerResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 
-public abstract class ConfigResourceBase<T> extends ServerResource {
+public abstract class ConfigResourceBase<T> extends ResourceBase {
 
     static class ProtectionException extends Exception {
 
@@ -206,19 +204,6 @@ public abstract class ConfigResourceBase<T> extends ServerResource {
     protected ConfigurationService getConfigService() {
         ConfigurationService configService = Services.getService(ConfigurationService.class);
         return configService;
-    }
-
-    private final Representation checkAuthorization(String action, String path) {
-        if (!Permits.isAllowed(action, path)) {
-            String loggedInUser = Permits.getLoggedInUser();
-            String msg = StringUtils.isBlank(loggedInUser)?
-                    "Access denied for anonymous users" :
-                    MessageFormat.format("Access denied for user {0}", loggedInUser);
-            Representation result = new StringRepresentation(msg, MediaType.TEXT_PLAIN);
-            setStatus(Status.CLIENT_ERROR_FORBIDDEN, msg);
-            return result;
-        }
-        return null;
     }
 
     @Get

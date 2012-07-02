@@ -31,6 +31,7 @@ import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationProperties;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
+import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.persistence.PersistenceService;
 import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
@@ -62,6 +63,11 @@ public class ProjectBackupResource extends ResourceBase {
 
     @Get
     public Representation backup() {
+        String path = getReference().getPath();
+        Representation result = checkAuthorization(Permit.ACTION_GET, path);
+        if (result != null) {
+            return result;
+        }
         StorageService storageService = getStorageService();
         if (storageService == null) {
             return createStatusMessage(Status.SERVER_ERROR_INTERNAL, "No storage service available");
@@ -77,6 +83,11 @@ public class ProjectBackupResource extends ResourceBase {
 
     @Put
     public Representation restore(Representation entity) {
+        String path = getReference().getPath();
+        Representation result = checkAuthorization(Permit.ACTION_PUT, path);
+        if (result != null) {
+            return result;
+        }
         StorageService storageService = getStorageService();
         if (storageService == null) {
             return createStatusMessage(Status.SERVER_ERROR_INTERNAL, "No storage service available");

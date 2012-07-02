@@ -10,15 +10,21 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.internal.admin;
 
+import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
+import org.eclipse.skalli.services.permit.Permit;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
-import org.restlet.resource.ServerResource;
 
-public class StatusResource extends ServerResource {
+public class StatusResource extends ResourceBase {
 
     @Get
     public Representation retrieve() {
+        String path = getReference().getPath();
+        Representation result = checkAuthorization(Permit.ACTION_GET, path);
+        if (result != null) {
+            return result;
+        }
         return new ResourceRepresentation<Object>(new Object(),
                 new StatusConverter(getRequest().getResourceRef().getHostIdentifier()));
     }
