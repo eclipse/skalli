@@ -19,7 +19,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -50,14 +52,16 @@ public class FeedManagerImplTest {
 
         //bindProjectService
         ProjectService projectServiceMock = createMock(ProjectService.class);
-        List<Project> projects = new ArrayList<Project>();
+        Set<UUID> projectIds = new HashSet<UUID>();
+        projectIds.add(PROJECT1_UUID);
+        projectIds.add(PROJECT2_UUID);
         Project p1 = new Project();
         p1.setUuid(PROJECT1_UUID);
         Project p2 = new Project();
         p2.setUuid(PROJECT2_UUID);
-        projects.add(p1);
-        projects.add(p2);
-        expect(projectServiceMock.getAll()).andReturn(projects);
+        expect(projectServiceMock.keySet()).andReturn(projectIds);
+        expect(projectServiceMock.getByUUID(PROJECT1_UUID)).andReturn(p1);
+        expect(projectServiceMock.getByUUID(PROJECT2_UUID)).andReturn(p2);
         replay(projectServiceMock);
         feedManagerImpl.bindProjectService(projectServiceMock);
 

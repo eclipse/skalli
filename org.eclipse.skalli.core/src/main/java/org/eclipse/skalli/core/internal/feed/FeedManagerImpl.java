@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
@@ -34,19 +35,21 @@ import org.slf4j.LoggerFactory;
 public class FeedManagerImpl implements FeedManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(FeedManagerImpl.class);
-    private boolean doSleep = true;
+
+    private static final String UNKNOWN_SOURCE = "unknown"; //$NON-NLS-1$
 
     private ProjectService projectService;
+    private FeedPersistenceService feedPersistenceService;
     private Set<FeedProvider> feedProviders = new HashSet<FeedProvider>();
 
-    private FeedPersistenceService feedPersistenceService;
+    private boolean doSleep = true;
 
     public FeedManagerImpl() {
         super();
     }
 
     /**
-     * Constructor to avoid sleeping, eg. to speed up the test.
+     * Constructor to avoid sleeping, e.g. to speed up the test.
      */
     FeedManagerImpl(boolean doSleep) {
         super();
@@ -87,45 +90,27 @@ public class FeedManagerImpl implements FeedManager {
         this.feedPersistenceService = null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.skalli.api.java.feeds.FeedManager#updateAllFeeds()
-     */
     @Override
     public void updateAllFeeds() {
+        if (projectService == null) {
+            LOG.error("Failed to update feeds since no project service is available");
+            return;
+        }
         if (feedPersistenceService== null) {
-            LOG.error("Can't updatate all projects feeds, as no feedPersistenceService bound!");
+            LOG.warn("Failed to update feeds since no feed persistence service is available");
             return;
         }
         LOG.info("Updating all project feeds...");
-        List<Project> projects = projectService.getAll();
-        for (Project project : projects) {
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("updating feeds for project: " + project.getProjectId());
+        Set<UUID> projectIds = projectService.keySet();
+        for (UUID projectId : projectIds) {
+            Project project = projectService.getByUUID(projectId);
+            if (project == null) {
+                LOG.warn(MessageFormat.format(
+                        "Failed to update feeds: A project with unique identifier ''{0}'' does not exist",
+                        projectId));
+                return;
             }
-            for (FeedProvider feedProvider : feedProviders) {
-                List<FeedUpdater> feedUpdaters = feedProvider.getFeedUpdaters(project);
-                for (FeedUpdater feedUpdater : feedUpdaters) {
-                    try {
-                        List<FeedEntry> entries = feedUpdater.updateFeed(feedPersistenceService);
-                        if (!entries.isEmpty()) {
-                            try {
-                                for (FeedEntry entry : entries) {
-                                    setSource(entry, feedUpdater);
-                                    entry.setProjectId(project.getUuid());
-                                    setEntryId(entry);
-                                }
-                                feedPersistenceService.merge(entries);
-                            } catch (FeedServiceException e) {
-                                LOG.error("Failed to merge feed entries", e);
-                            }
-                        }
-                    } catch (RuntimeException e) {
-                        LOG.error("Failed to update the feed", e);
-                    }
-                }
-            }
-
+            updateFeeds(project);
             if (doSleep) {
                 try {
                     // delay the execution for 10 seconds, otherwise we may overload the remote systems
@@ -135,7 +120,63 @@ public class FeedManagerImpl implements FeedManager {
                 }
             }
         }
-        LOG.info("Updating all project feeds: done");
+        LOG.info("Updated all project feeds");
+    }
+
+    @Override
+    public void updateFeeds(UUID projectId) {
+        if (projectService == null) {
+            LOG.error(MessageFormat.format(
+                    "Failed to update feeds for project {0} since no project service is available",
+                    projectId));
+            return;
+        }
+        Project project = projectService.getByUUID(projectId);
+        if (project == null) {
+            LOG.warn(MessageFormat.format(
+                    "Failed to update feeds: A project with unique identifier ''{0}'' does not exist",
+                    projectId));
+            return;
+        }
+        updateFeeds(project);
+    }
+
+    private void updateFeeds(Project project) {
+        if (feedPersistenceService == null) {
+            LOG.warn(MessageFormat.format(
+                    "Failed to update feeds for project {0} since no project service is available",
+                    project.getProjectId()));
+            return;
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(MessageFormat.format("updating feeds for project: {0}", project.getProjectId()));
+        }
+        for (FeedProvider feedProvider : feedProviders) {
+            List<FeedUpdater> feedUpdaters = feedProvider.getFeedUpdaters(project);
+            for (FeedUpdater feedUpdater : feedUpdaters) {
+                try {
+                    List<FeedEntry> entries = feedUpdater.updateFeed(feedPersistenceService);
+                    if (!entries.isEmpty()) {
+                        try {
+                            for (FeedEntry entry : entries) {
+                                setSource(entry, feedUpdater);
+                                entry.setProjectId(project.getUuid());
+                                setEntryId(entry);
+                            }
+                            feedPersistenceService.merge(entries);
+                        } catch (FeedServiceException e) {
+                            LOG.error(MessageFormat.format(
+                                    "Failed to merge feed entries for project {0}",
+                                    project.getProjectId()), e);
+                        }
+                    }
+                } catch (RuntimeException e) {
+                    LOG.error(MessageFormat.format(
+                            "Failed to update the feed for project {0}",
+                            project.getProjectId()), e);
+                }
+            }
+        }
     }
 
     private void setSource(FeedEntry entry, FeedUpdater feedUpdater) {
@@ -143,7 +184,7 @@ public class FeedManagerImpl implements FeedManager {
         if (StringUtils.isBlank(source)) {
             source = feedUpdater.getSource();
             if (StringUtils.isBlank(source)) {
-                source = "unknown"; //$NON-NLS-1$
+                source = UNKNOWN_SOURCE;
             }
             entry.setSource(source);
         }
