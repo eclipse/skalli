@@ -28,8 +28,23 @@ import com.vaadin.ui.Component;
  */
 public interface InfoBox extends IconProvider {
 
+    /** The infobox should appear in the left column of a project's detail page. */
     public static final int COLUMN_WEST = 1;
+
+    /** The infobox should appear in the right column of a project's detail page. */
     public static final int COLUMN_EAST = 2;
+
+    /**
+     * Action attribute that triggers a refresh of the infobox content. For example, if
+     * the infobox shows content of a remote system, the action should synchronize the
+     * content of the infobox with the remote system.
+     *
+     * Usage: <tt>/projects/&lt;projectId&gt;/infoboxes?action=refresh</tt> or
+     * <tt>/projects/&lt;projectId&gt;/infoboxes/&lt;shortName&gt;?action=refresh</tt>, respectively.
+     *
+     * @see #perform(String, Project, String)
+     */
+    public static final String REFRESH_ACTION = "refresh"; //$NON-NLS-1$
 
     /**
      * Returns the caption of the info box.
@@ -94,7 +109,7 @@ public interface InfoBox extends IconProvider {
      * For example, an info box might trigger a refresh of remote content that it displays.
      * This method is called before rendering of the project's detail page for URLs of the
      * form <tt>/projects/&lt;projectId&gt;/infoboxes?action=&lt;action&gt;</tt>
-     * and <tt>/projects/&lt;projectId&gt;/infoboxes/<shortName>?action=&lt;action&gt;</tt>, respectively.
+     * and <tt>/projects/&lt;projectId&gt;/infoboxes/&lt;shortName>&gt;action=&lt;action&gt;</tt>, respectively.
      * @param action the action to perform
      * @param project the project for which to perform the action
      * @param userId the unique identifier of the user that triggered the action

@@ -269,23 +269,20 @@ public class ProjectMavenBox extends InfoBoxBase implements InfoBox {
 
     @Override
     public String getShortName() {
-        return "maven";
+        return "maven"; //$NON-NLS-1$
     }
 
     @Override
     public void perform(String action, Project project, String userId) {
-        if ("refresh".equalsIgnoreCase(action)) {
+        if (REFRESH_ACTION.equalsIgnoreCase(action)) {
             try {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("performing action = \'" + action + "\' project = \'"+ project.getUuid()+ " \' user = \'"+ userId+ "\'.");
-                }
-
                 MavenResolverService mavenService = Services.getService(MavenResolverService.class);
                 if (mavenService != null) {
                     mavenService.queue(project, userId);
                 }
             } catch (Exception e) {
-                LOG.error("could not perform action = \'" + action + "\' project = \'"+ project.getUuid()+ " \' user = \'"+ userId+ "\'.");
+                LOG.error(MessageFormat.format("Failed to perform \''{0}\'' action on project \''{1}\'' for user \''{2}\''",
+                        action, project.getUuid(), userId));
             }
         }
     }
