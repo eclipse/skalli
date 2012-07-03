@@ -28,8 +28,10 @@ import org.eclipse.skalli.commons.HtmlBuilder;
 import org.eclipse.skalli.commons.Link;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.feed.Entry;
+import org.eclipse.skalli.services.feed.FeedManager;
 import org.eclipse.skalli.services.feed.FeedProvider;
 import org.eclipse.skalli.services.feed.FeedService;
 import org.eclipse.skalli.services.feed.FeedServiceException;
@@ -357,4 +359,22 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
         return author.toString();
     }
 
+    @Override
+    public void perform(String action, Project project, String userId) {
+        if (REFRESH_ACTION.equalsIgnoreCase(action)) {
+            try {
+                FeedManager feedManager = Services.getService(FeedManager.class);
+                if (feedManager != null) {
+                    feedManager.updateFeeds(project.getUuid());
+                } else {
+                    LOG.error(MessageFormat.format(
+                        "Failed to perform \''{0}\'' action on project \''{1}\'' for user \''{2}\'': No feed manager available",
+                         action, project.getUuid(), userId));
+                }
+            } catch (Exception e) {
+                LOG.error(MessageFormat.format("Failed to perform \''{0}\'' action on project \''{1}\'' for user \''{2}\''",
+                    action, project.getUuid(), userId), e);
+            }
+        }
+    }
 }
