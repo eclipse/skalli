@@ -31,10 +31,21 @@ public class Projects {
     }
 
     public Set<Project> getProjects() {
+        if (projects == null) {
+            projects = new HashSet<Project>();
+        }
         return projects;
     }
 
-    public void setProjects(Set<Project> projects) {
-        this.projects = projects;
+    public void setProjects(Collection<Project> projects) {
+        this.projects = new HashSet<Project>(projects);
+    }
+
+    public void addProject(Project project) {
+        getProjects().add(project);
+    }
+
+    public void addProjects(Collection<Project> projects) {
+        getProjects().addAll(projects);
     }
 }

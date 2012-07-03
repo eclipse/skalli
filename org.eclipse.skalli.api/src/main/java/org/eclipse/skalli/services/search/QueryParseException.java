@@ -13,6 +13,18 @@ package org.eclipse.skalli.services.search;
 public class QueryParseException extends Exception {
     private static final long serialVersionUID = 1L;
 
+    public QueryParseException() {
+        super();
+    }
+
+    public QueryParseException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public QueryParseException(String message) {
+        super(message);
+    }
+
     public QueryParseException(final Throwable cause) {
         super(cause);
     }

@@ -24,6 +24,7 @@ import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.search.SearchQuery;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -66,10 +67,10 @@ public class SubprojectsResource extends ResourceBase {
         List<Project> subprojectList = projectService.getSubProjects(project.getUuid(), comparator, depth);
         subprojects.addAll(subprojectList);
 
-        String extensionParam = getQuery().getValues(RestUtils.PARAM_EXTENSIONS);
+        String extensionParam = getQuery().getValues(SearchQuery.PARAM_EXTENSIONS);
         String[] extensions = new String[] {};
         if (extensionParam != null) {
-            extensions = extensionParam.split(RestUtils.PARAM_LIST_SEPARATOR);
+            extensions = extensionParam.split(SearchQuery.PARAM_LIST_SEPARATOR);
         }
 
         return new ResourceRepresentation<Subprojects>(subprojects,

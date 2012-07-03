@@ -10,23 +10,25 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.search;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
 
 public class SearchUtils {
 
-    public static SearchResult<Project> searchProjects(String query, String tag, String user, PagingInfo pagingInfo)
+    public static SearchResult<Project> searchProjects(SearchQuery searchQuery)
             throws QueryParseException {
 
         SearchService searchService = Services.getService(SearchService.class);
         SearchResult<Project> result = null;
 
-        if (query != null) {
-            result = searchService.findProjectsByQuery(query, pagingInfo);
-        } else if (tag != null) {
-            result = searchService.findProjectsByTag(tag, pagingInfo);
-        } else if (user != null) {
-            result = searchService.findProjectsByUser(user, pagingInfo);
+        PagingInfo pagingInfo = searchQuery.getPagingInfo();
+        if (StringUtils.isNotBlank(searchQuery.getQuery())) {
+            result = searchService.findProjectsByQuery(searchQuery.getQuery(), pagingInfo);
+        } else if (StringUtils.isNotBlank(searchQuery.getTag())) {
+            result = searchService.findProjectsByTag(searchQuery.getTag(), pagingInfo);
+        } else if (StringUtils.isNotBlank(searchQuery.getUser())) {
+            result = searchService.findProjectsByUser(searchQuery.getUser(), pagingInfo);
         } else {
             result = searchService.findProjectsByQuery("*", pagingInfo); //$NON-NLS-1$
         }

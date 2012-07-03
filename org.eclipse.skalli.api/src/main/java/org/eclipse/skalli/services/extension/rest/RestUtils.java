@@ -43,19 +43,9 @@ public class RestUtils {
     public final static String URL_ISSUES = "/issues"; //$NON-NLS-1$
     public final static String URL_BROWSE = "/projects/"; //$NON-NLS-1$
 
-    public static final String PARAM_EXTENSIONS = "extensions"; //$NON-NLS-1$
-    public static final String PARAM_LIST_SEPARATOR = ","; //$NON-NLS-1$
-
     public static final String PARAM_ID = "id"; //$NON-NLS-1$
     public static final String PARAM_DEPTH = "depth"; //$NON-NLS-1$
-    public static final String PARAM_QUERY = "query"; //$NON-NLS-1$
-    public static final String PARAM_START = "start"; //$NON-NLS-1$
-    public static final String PARAM_COUNT = "count"; //$NON-NLS-1$
-    public static final String PARAM_USER = "user"; //$NON-NLS-1$
-    public static final String PARAM_TAG = "tag"; //$NON-NLS-1$
-    public static final String PARAM_PERSIST = "persist"; //$NON-NLS-1$
-    public static final String PARAM_PROPERTY = "property"; //$NON-NLS-1$
-    public static final String PARAM_PATTERN = "pattern"; //$NON-NLS-1$
+
 
 
     /**

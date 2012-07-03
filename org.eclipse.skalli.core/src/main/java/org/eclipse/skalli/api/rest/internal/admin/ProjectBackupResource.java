@@ -30,11 +30,11 @@ import org.eclipse.skalli.services.ServiceFilter;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationProperties;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
-import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.persistence.PersistenceService;
 import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
+import org.eclipse.skalli.services.search.SearchQuery;
 import org.restlet.data.Disposition;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -187,7 +187,7 @@ public class ProjectBackupResource extends ResourceBase {
         String[] categories = null;
         String ignoreAttribute = getQuery().getValues(paramId);
         if (ignoreAttribute != null) {
-            categories = StringUtils.split(ignoreAttribute, RestUtils.PARAM_LIST_SEPARATOR);
+            categories = StringUtils.split(ignoreAttribute, SearchQuery.PARAM_LIST_SEPARATOR);
         }
         return CollectionUtils.asSet(categories);
     }
