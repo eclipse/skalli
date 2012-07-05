@@ -72,13 +72,7 @@ public class SearchQuery {
         }
 
         int start = NumberUtils.toInt(params.get(PARAM_START), 0);
-        if (start < 0) {
-            start = 0;
-        }
         int count = NumberUtils.toInt(params.get(PARAM_COUNT), Integer.MAX_VALUE);
-        if (count < 0) {
-            count = Integer.MAX_VALUE;
-        }
         setPagingInfo(start, count);
 
         String extensionParam = params.get(PARAM_EXTENSIONS);

@@ -50,12 +50,13 @@ public class SearchFilter extends AbstractSearchFilter {
 
     @Override
     protected SearchResult<Project> getSearchHits(User user, ServletRequest request, ServletResponse response,
-            int start, int viewSize) throws IOException, ServletException {
+            int start, int count) throws IOException, ServletException {
 
         SearchQuery searchQuery = null;
         SearchResult<Project> result = null;
         try {
             searchQuery = new SearchQuery(request);
+            searchQuery.setPagingInfo(start, count);
             result = SearchUtils.searchProjects(searchQuery);
         } catch (Exception e) {
             FilterUtil.handleException(request, response, e);

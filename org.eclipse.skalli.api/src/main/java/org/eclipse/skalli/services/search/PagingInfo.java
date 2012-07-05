@@ -15,10 +15,21 @@ public class PagingInfo {
     private final int start;
     private final int count;
 
+    /**
+     * Creates a paging info. Adjusts the given parameters if necessary:
+     * <ol>
+     * <li>the sum of <tt>start</tt> and </tt>count</tt> is lower or equal {@link Integer#MAX_VALUE}</li>
+     * <li><tt>start</tt> is at greater equal zero</li>
+     * <li><tt>count</tt> lower zero is interpreted as the maximum possible number of page elements</li>
+     * </ol>
+     *
+     * @param start  the first page element.
+     * @param count  the number of page elements.
+     */
     public PagingInfo(int start, int count) {
-        super();
-        this.start = start;
-        this.count = count;
+        this.start = start < 0 ? 0 : start;
+        int maxCount = Integer.MAX_VALUE - this.start;
+        this.count = count < 0? maxCount : Math.min(count, maxCount);
     }
 
     public int getStart() {

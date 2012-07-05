@@ -69,11 +69,11 @@ public abstract class AbstractSearchFilter implements Filter {
 
         // calculate start param
         int start = toInt(request.getParameter(Consts.PARAM_START), 0, -1);
-        // calculate view size param
-        int viewSize = toInt(request.getParameter(Consts.PARAM_COUNT), 10, 50);
+        // calculate count size param
+        int count = toInt(request.getParameter(Consts.PARAM_COUNT), 10, 50);
 
         // retrieve search hits and based on that parent projects and subprojects
-        SearchResult<Project> searchResult = getSearchHits(user, request, response, start, viewSize);
+        SearchResult<Project> searchResult = getSearchHits(user, request, response, start, count);
         List<SearchHit<Project>> searchHits = searchResult.getResult();
         Map<String, String> natures = getProjectNatures(searchHits);
         Map<String, Project> parents = getParents(searchHits);
@@ -85,8 +85,8 @@ public abstract class AbstractSearchFilter implements Filter {
 
         // calculate params for pager
         int resultSize = searchResult.getResultCount();
-        int pages = (int) Math.ceil((double) resultSize / (double) viewSize);
-        int currentPage = (int) Math.floor((double) start / (double) viewSize) + 1;
+        int pages = (int) Math.ceil((double) resultSize / (double) count);
+        int currentPage = (int) Math.floor((double) start / (double) count) + 1;
         long duration = searchResult.getDuration();
 
         // set the request attributes
@@ -99,7 +99,7 @@ public abstract class AbstractSearchFilter implements Filter {
         request.setAttribute(Consts.ATTRIBUTE_FAVORITES, favorites.asMap());
         request.setAttribute(ATTRIBUTE_DURATION, duration);
         request.setAttribute(ATTRIBUTE_START, start);
-        request.setAttribute(ATTRIBUTE_VIEWSIZE, viewSize);
+        request.setAttribute(ATTRIBUTE_VIEWSIZE, count);
         request.setAttribute(ATTRIBUTE_RESULTSIZE, resultSize);
         request.setAttribute(ATTRIBUTE_CURRENTPAGE, currentPage);
         request.setAttribute(ATTRIBUTE_PAGES, pages);
@@ -126,11 +126,11 @@ public abstract class AbstractSearchFilter implements Filter {
      *            the  servlet response (can be used for error handling).
      * @param start
      *            the index of the first search hit to return.
-     * @param viewSize
+     * @param count
      *            the number of search hits to return.
      */
     protected abstract SearchResult<Project> getSearchHits(User user, ServletRequest request, ServletResponse response,
-            int start, int viewSize) throws IOException, ServletException;
+            int start, int count) throws IOException, ServletException;
 
     /**
      * Returns <code>true</code> if for components the nearest project in
