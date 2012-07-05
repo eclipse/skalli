@@ -17,16 +17,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.eclipse.skalli.commons.CollectionUtils;
-import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationProperties;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jpa.EntityManagerFactoryBuilder;
-import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,22 +61,28 @@ public class EntityManagerServiceBase implements EntityManagerService {
     static final String SKALLI_EMF_TIMEOUT = SKALLI_PERSISTENCE + "timeout"; //$NON-NLS-1$
     static final long SKALLI_EMF_DEFAULT_TIMEOUT = -1L; // no timeout
 
+    private ComponentContext context;
     private EntityManagerFactoryBuilder emfb;
     private String persistenceUnitName;
-    private String filter;
 
     // Available JPA properties
     // key: persistenceUnitName value: the property map for the persistenceUnitName
     private Map<String, Map<String, Object>> propertiesCache = new HashMap<String, Map<String, Object>>();
 
     protected void activate(ComponentContext context) {
+        this.context = context;
         LOG.info(MessageFormat.format("[EntityManagerService] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
     protected void deactivate(ComponentContext context) {
+        this.context = null;
         LOG.info(MessageFormat.format("[EntityManagerService] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
+    }
+
+    protected EntityManagerFactory locateEntityManagerFactory() {
+        return (EntityManagerFactory)context.locateService("EntityManagerFactory"); //$NON-NLS-1$
     }
 
     protected void bindEntityManagerFactoryBuilder(EntityManagerFactoryBuilder emfb, Map<Object, Object> properties) {
@@ -91,8 +91,6 @@ public class EntityManagerServiceBase implements EntityManagerService {
         Object value = properties.get("osgi.unit.name"); //$NON-NLS-1$
         if (value != null) {
             persistenceUnitName = value.toString();
-            filter = MessageFormat.format("(&({0}={1})(osgi.unit.name={2}))", //$NON-NLS-1$
-                    Constants.OBJECTCLASS, EntityManagerFactory.class.getName(), persistenceUnitName);
         }
     }
 
@@ -171,34 +169,32 @@ public class EntityManagerServiceBase implements EntityManagerService {
         long timeout = NumberUtils.toLong(ConfigurationProperties.getProperty(SKALLI_EMF_TIMEOUT),
                 SKALLI_EMF_DEFAULT_TIMEOUT);
         try {
-            entityManagerFactory = waitFactory(timeout);
+            entityManagerFactory = waitEntityManagerFactory(timeout);
         } catch (InterruptedException e) {
             LOG.warn("Thread has been interrupted while waiting for an entity manager factory to appear", e);
         }
         return entityManagerFactory;
     }
 
-    private EntityManagerFactory waitFactory(long timeout) throws InterruptedException {
-        if (timeout < 0) {
-            return Services.getService(EntityManagerFactory.class) ;
-        }
-        BundleContext context = FrameworkUtil.getBundle(Services.class).getBundleContext();
-        ServiceTracker<EntityManagerFactory,EntityManagerFactory> serviceTracker = null;
-        if (StringUtils.isNotBlank(filter)) {
-            try {
-                serviceTracker = new ServiceTracker<EntityManagerFactory,EntityManagerFactory>(context, context.createFilter(filter), null);
-            } catch (InvalidSyntaxException e) {
-                throw new IllegalArgumentException(e);
+    private EntityManagerFactory waitEntityManagerFactory(long timeout) throws InterruptedException {
+        long sleep = 0;
+        long waited = 0;
+        EntityManagerFactory instance = locateEntityManagerFactory();
+        if (timeout > 0) {
+            while (instance == null && waited < timeout) {
+                if (sleep == 0) {
+                    sleep = timeout;
+                    while (sleep > 10) {
+                        sleep >>= 1;
+                    }
+                }
+                if (sleep > 0) {
+                    Thread.sleep(sleep);
+                    waited += sleep;
+                    sleep <<= 1;
+                }
+                instance = locateEntityManagerFactory();
             }
-        } else {
-            serviceTracker = new ServiceTracker<EntityManagerFactory,EntityManagerFactory>(context, EntityManagerFactory.class.getName(), null);
-        }
-        EntityManagerFactory instance = null;
-        try {
-            serviceTracker.open();
-            instance = serviceTracker.waitForService(timeout);
-        } finally {
-            serviceTracker.close();
         }
         return instance;
     }
@@ -208,7 +204,7 @@ public class EntityManagerServiceBase implements EntityManagerService {
             return entityManagerFactory.createEntityManager();
         } catch (IllegalStateException e) {
             throw new StorageException(MessageFormat.format("Failed to create an entity manager using factory {0}",
-                    entityManagerFactory), e);
+                    entityManagerFactory.getClass()), e);
         }
     }
 

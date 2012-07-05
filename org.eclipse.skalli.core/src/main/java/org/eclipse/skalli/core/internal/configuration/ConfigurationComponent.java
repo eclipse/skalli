@@ -23,6 +23,7 @@ import java.util.TreeMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.ThreadPool;
 import org.eclipse.skalli.core.internal.persistence.CompositeEntityClassLoader;
 import org.eclipse.skalli.core.internal.persistence.xstream.FileStorageService;
 import org.eclipse.skalli.core.internal.persistence.xstream.IgnoreUnknownFieldsMapperWrapper;
@@ -106,20 +107,25 @@ public class ConfigurationComponent implements ConfigurationService {
         }
     }
 
-    private void notifyCustomizationChanged(StorageService storageService) {
-        if (eventService != null) {
-            List<String> customizationKeys = Collections.emptyList();
-            try {
-                customizationKeys = storageService.keys(CATEGORY_CUSTOMIZATION);
-            } catch (StorageException e) {
-                LOG.error(MessageFormat.format("Failed to retrieve customization keys: storage service {0} not ready",
-                        storageService), e);
-                return;
+    private void notifyCustomizationChanged(final StorageService storageService) {
+        ThreadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                if (eventService != null) {
+                    List<String> customizationKeys = Collections.emptyList();
+                    try {
+                        customizationKeys = storageService.keys(CATEGORY_CUSTOMIZATION);
+                    } catch (StorageException e) {
+                        LOG.error(MessageFormat.format("Failed to retrieve customization keys: storage service {0} not ready",
+                                storageService), e);
+                        return;
+                    }
+                    for (String customizationKey: customizationKeys) {
+                        eventService.fireEvent(new EventCustomizingUpdate(customizationKey));
+                    }
+                }
             }
-            for (String customizationKey: customizationKeys) {
-                eventService.fireEvent(new EventCustomizingUpdate(customizationKey));
-            }
-        }
+        });
     }
 
     @Override

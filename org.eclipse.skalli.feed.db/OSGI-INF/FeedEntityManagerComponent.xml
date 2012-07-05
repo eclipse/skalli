@@ -11,4 +11,10 @@
         cardinality="1..1"
         bind="bindEntityManagerFactoryBuilder"
         unbind="unbindEntityManagerFactoryBuilder"/>
+    <reference
+        target="(osgi.unit.name=feed)"
+        interface="javax.persistence.EntityManagerFactory"
+        name="EntityManagerFactory"
+        policy="dynamic"
+        cardinality="0..1" />
 </scr:component>

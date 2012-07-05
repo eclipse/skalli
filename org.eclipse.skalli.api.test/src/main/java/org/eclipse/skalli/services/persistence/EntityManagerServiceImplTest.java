@@ -27,6 +27,7 @@ import javax.persistence.metamodel.Metamodel;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
+import org.eclipse.skalli.services.Services;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -427,7 +428,12 @@ public class EntityManagerServiceImplTest {
     }
 
     private Map<String, Object> getPropertiesOfGetEntityManagerCall(Map<String, Object> expectedProps) throws StorageException {
-        EntityManagerServiceBase ems = new EntityManagerServiceBase();
+        EntityManagerServiceBase ems = new EntityManagerServiceBase() {
+            @Override
+            protected EntityManagerFactory locateEntityManagerFactory() {
+                return Services.getService(EntityManagerFactory.class);
+            }
+        };
         ems.bindEntityManagerFactoryBuilder(new EntityManagerFactoryBuilderMock(), TEST_JPA_SERVICE_PROPS);
         EntityManagerMock emMock = (EntityManagerMock) ems.getEntityManager(expectedProps);
         Map<String, Object> aktualProps = emMock.getProperties();
