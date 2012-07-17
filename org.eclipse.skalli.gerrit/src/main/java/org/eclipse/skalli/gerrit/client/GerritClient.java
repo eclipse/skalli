@@ -59,37 +59,35 @@ public interface GerritClient {
     public GerritVersion getVersion() throws ConnectionException, CommandException;
 
     /**
-     * Creates a project according to <a href=
-     * "http://gerrit.googlecode.com/svn/documentation/2.1.5/cmd-create-project.html"
-     * >gerrit create-project</a> (<a href=
-     * "http://gerrit.googlecode.com/svn/documentation/2.1.5/cmd-create-project.html#options"
-     * >options</a>).
+     * Creates a project with a given name and assigns an initial set of members to it.
      *
      * @param name
-     *            required, no whitespaces
+     *            required, no whitespaces.
      * @param branch
-     *            optional. defaults to <code>master</code>
+     *            optional, defaults to <code>master</code>.
      * @param ownerList
      *            optional. group must exist. defaults to
      *            <code>repository.ownerGroup</code>,
      *            <code>repository.createGroup</code> or finally
      *            <code>Administrators</code>
      * @param parent
-     *            optional. defaults to <code>-- All Projects --</code>
+     *            optional, defaults to <code>-- All Projects --</code>
      * @param permissionsOnly
-     *            optional. defaults to <code>false</code>
+     *            optional, defaults to <code>false</code>
      * @param description
      *            optional
      * @param submitType
-     *            optional. defaults to <code>MERGE_IF_NECESSARY</code>
+     *            optional, defaults to <code>MERGE_IF_NECESSARY</code>
      * @param useContributorAgreements
-     *            optional. defaults to <code>false</code>
+     *            optional, defaults to <code>false</code>
      * @param useSignedOffBy
-     *            optional. defaults to <code>false</code>
+     *            optional, defaults to <code>false</code>
      *
      * @throws ConnectionException      in case of connection / communication problems
      * @throws CommandException         in case of unsuccessful commands
      * @throws IllegalArgumentException in case an invalid name is passed
+     *
+     * @see <tt>gerrit create-project</tt>
      */
     public void createProject(final String name, final String branch, final Set<String> ownerList, final String parent,
             final boolean permissionsOnly, final String description, final SubmitType submitType,
@@ -97,64 +95,77 @@ public interface GerritClient {
             CommandException;
 
     /**
-     * @return a list of all project names
+     * Returns the list of all globally visible projects.
      *
-     * @throws GerritClientException in case of unforeseen communication problems
+     * @return a list of all project names, or an empty list.
+     *
+     * @throws ConnectionException in case of connection / communication problems
+     * @throws CommandException    in case of unsuccessful commands
      */
     public List<String> getProjects() throws ConnectionException, CommandException;
 
     /**
+     * Checks if a given project exists.
+     *
      * @param name
-     *            name of the project to lookup
+     *            name of the project to look up.
      *
      * @return <code>true</code> if the project exists, otherwise
      *         <code>false</code>
      *
      * @throws ConnectionException in case of connection / communication problems
      * @throws CommandException    in case of unsuccessful commands
+     *
+     * @see <tt>gerrit ls-projects</tt>
      */
     public boolean projectExists(final String name) throws ConnectionException, CommandException;
 
     /**
-     * Creates a group according to <a href=
-     * "http://gerrit.googlecode.com/svn/documentation/2.1.5/cmd-create-group.html"
-     * >gerrit create-group</a> (<a href=
-     * "http://gerrit.googlecode.com/svn/documentation/2.1.5/cmd-create-group.html#options"
-     * >options</a>).
-     *
-     * Note that the members need to exist on the Gerrit and unknown members won't be added.
-     * This needs to happen manually and individually via Gerrit's web UI.
+     * Creates a group with a given name, owner, description and initial set of members.
+     * <p>
+     * Note: Since Gerrit release 2.1.7 an account check before creating a group is not necessary
+     * anymore, when Gerrit is connected to LDAP for user authentication (see <tt>--member</tt> option
+     * of the <tt>gerrit create-group</tt> command.
      *
      * @param name
      *            required, no whitespaces
      * @param owner
-     *            optional. defaults to self-owning
+     *            optional
      * @param description
      *            optional
-     * @param memberList
-     *            optional, members need to exist on Gerrit
+     * @param members
+     *            optional, in Gerrit versions before 2.1.7  members must already have
+     *            an account on Gerrit
      *
      * @throws ConnectionException      in case of connection / communication problems
      * @throws CommandException         in case of unsuccessful commands
      * @throws IllegalArgumentException in case an invalid name is passed
+     *
+     * @see <tt>gerrit create-group</tt>
      */
     public void createGroup(final String name, final String owner, final String description,
-            final Set<String> memberList)
+            final Set<String> members)
             throws ConnectionException, CommandException;
 
     /**
-     * @return a list of all group names
+     * Returns a list of all globally visible projects.
+     *
+     * @return a list of all group names, or an empty list.
      *
      * @throws ConnectionException in case of connection / communication problems
      * @throws CommandException    in case of unsuccessful commands
+     *
+     * @see <tt>gerrit ls-groups</tt>
      */
     public List<String> getGroups() throws ConnectionException, CommandException;
 
     /**
+     * Retrieves the groups associated with the given projects.
+     *
      * @param projectName
      *            the project name to look for
      *
-     * @return a list of all groups related to the project
+     * @return a list of all groups related to the project, or an empty list.
      *
      * @throws ConnectionException in case of connection / communication problems
      * @throws CommandException    in case of unsuccessful commands
@@ -162,11 +173,12 @@ public interface GerritClient {
     public List<String> getGroups(String... projectNames) throws ConnectionException, CommandException;
 
     /**
+     * Checks if a group with the given name exists.
      * @param name
-     *            name of the group to lookup
+     *            name of the group to look up.
      *
      * @return <code>true</code> if the group exists, otherwise
-     *         <code>false</code>
+     *         <code>false</code>.
      *
      * @throws ConnectionException in case of connection / communication problems
      * @throws CommandException    in case of unsuccessful commands
@@ -174,10 +186,18 @@ public interface GerritClient {
     public boolean groupExists(final String name) throws ConnectionException, CommandException;
 
     /**
-     * @param variousAccounts
-     *          the accounts to check
+     * Filters the given collection of user identifiers and sorts out those that have
+     * no valid account on Gerrit. This method requires administrators privileges on Gerrit.
+     * <p>
+     * Note: Since Gerrit release 2.1.7 an account check before creating a group is not necessary
+     * anymore, when Gerrit is connected to LDAP for user authentication (see <tt>--member</tt> option
+     * of the <tt>gerrit create-group</tt> command.
      *
-     * @return a subset of the passed in accounts that are known to Gerrit
+     * @param variousAccounts
+     *          the accounts to check.
+     *
+     * @return a subset of the passed in accounts that are known to Gerrit, or just
+     * the collection passed in for Gerrit releases beyond 2.1.7.
      *
      * @throws ConnectionException in case of connection / communication problems
      * @throws CommandException    in case of unsuccessful commands

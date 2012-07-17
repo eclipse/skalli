@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
+import org.eclipse.skalli.gerrit.client.GerritFeature;
 import org.eclipse.skalli.gerrit.client.GerritVersion;
 import org.eclipse.skalli.gerrit.client.exception.CommandException;
 import org.eclipse.skalli.gerrit.client.exception.ConnectionException;
@@ -288,20 +289,26 @@ public class GerritClientTest {
     Set<String> variousAccounts = new HashSet<String>(Arrays.asList(TEST_ADMIN_ACCOUNT, "", null, unknownAccount));
     Set<String> knownAccounts = client.getKnownAccounts(variousAccounts);
 
-    Assert.assertEquals(1, knownAccounts.size());
-    Assert.assertTrue(knownAccounts.contains(TEST_ADMIN_ACCOUNT));
-    Assert.assertFalse(knownAccounts.contains(unknownAccount));
+    GerritVersion version = GerritVersion.asGerritVersion(TEST_GERRIT_VERSION);
+    if (version.supports(GerritFeature.ACCOUNT_CHECK_OBSOLETE)) {
+        Assert.assertEquals(2, knownAccounts.size());
+        Assert.assertTrue(knownAccounts.contains(TEST_ADMIN_ACCOUNT));
+        Assert.assertTrue(knownAccounts.contains(unknownAccount));
+    } else {
+        Assert.assertEquals(1, knownAccounts.size());
+        Assert.assertTrue(knownAccounts.contains(TEST_ADMIN_ACCOUNT));
+        Assert.assertFalse(knownAccounts.contains(unknownAccount));
+    }
   }
 
   @Test
   public void testGetKnownAccountsEmpty() throws Exception {
     Set<String> knownAccounts = client.getKnownAccounts(Collections.<String> emptySet());
-
     Assert.assertEquals(0, knownAccounts.size());
   }
 
   @Test
-  public void testGetALotOfKnownAccounts() throws Exception {
+  public void testALotOfUnknownAccounts() throws Exception {
     Set<String> variousAccounts = new HashSet<String>();
     // don't use an even number. challenge the system :)
     for (int i = 0; i < 123; i++) {
@@ -311,8 +318,12 @@ public class GerritClientTest {
     variousAccounts.add(TEST_ADMIN_ACCOUNT);
 
     Set<String> knownAccounts = client.getKnownAccounts(variousAccounts);
-
-    Assert.assertEquals(1, knownAccounts.size());
+    GerritVersion version = GerritVersion.asGerritVersion(TEST_GERRIT_VERSION);
+    if (version.supports(GerritFeature.ACCOUNT_CHECK_OBSOLETE)) {
+        Assert.assertEquals(variousAccounts.size(), knownAccounts.size());
+    } else {
+        Assert.assertEquals(1, knownAccounts.size());
+    }
   }
 
   // null and empty configurations are already checked by GerritService

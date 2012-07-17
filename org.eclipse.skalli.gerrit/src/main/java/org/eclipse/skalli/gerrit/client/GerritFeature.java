@@ -11,5 +11,6 @@ public enum GerritFeature {
     LS_GROUPS_TYPE_ATTR,                // ls-groups --type attribute available
     LS_GROUPS_USER_ATTR,                // ls-groups --user attribute available
     RENAME_GROUP,                       // rename-group command available
-    CREATE_PROJECT_SUGGEST_PARENT       // create-project --suggest-parents attribute available
+    CREATE_PROJECT_SUGGEST_PARENT,      // create-project --suggest-parents attribute available
+    ACCOUNT_CHECK_OBSOLETE              // account check for --member options of create-group obsolete
 }

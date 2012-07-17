@@ -228,17 +228,17 @@ public class GerritClientImpl implements GerritClient {
 
     @Override
     public void createGroup(final String name, final String owner, final String description,
-            final Set<String> memberList)
+            final Set<String> members)
             throws ConnectionException, CommandException {
-        final StringBuffer sb = new StringBuffer("gerrit create-group");
-
         if (name == null) {
             throw andDisconnect(new IllegalArgumentException("'name' is required"));
         }
 
+
+        final StringBuffer sb = new StringBuffer("gerrit create-group");
         appendArgument(sb, "owner", owner);
         appendArgument(sb, "description", description);
-        appendArgument(sb, "member", getKnownAccounts(memberList).toArray(new String[0]));
+        appendArgument(sb, "member", getKnownAccounts(members).toArray(new String[0]));
         appendArgument(sb, "visible-to-all", true);
         appendArgument(sb, name);
 
@@ -323,21 +323,28 @@ public class GerritClientImpl implements GerritClient {
 
     @Override
     public Set<String> getKnownAccounts(Set<String> variousAccounts) throws ConnectionException, CommandException {
-        final Set<String> result = new HashSet<String>();
-
         if (variousAccounts == null || variousAccounts.isEmpty()) {
-            return result;
+            return Collections.emptySet();
         }
 
-        int variousAccountsSize = variousAccounts.size();
-        int blocks = (int) Math.ceil((float) variousAccountsSize / ACCOUNTS_QUERY_BLOCKSIZE);
-        for (int i = 0; i < blocks; i++) {
-            List<String> worklist = new ArrayList<String>(variousAccounts);
-            int startIndex = i * ACCOUNTS_QUERY_BLOCKSIZE;
-            int endIndex = Math.min((i + 1) * ACCOUNTS_QUERY_BLOCKSIZE, variousAccountsSize);
-            result.addAll(queryKnownAccounts(worklist.subList(startIndex, endIndex)));
+        Set<String> result = new HashSet<String>();
+        GerritVersion version = getVersion();
+        if (version.supports(GerritFeature.ACCOUNT_CHECK_OBSOLETE)) {
+            for (String account: variousAccounts) {
+                if (StringUtils.isNotBlank(account)) {
+                    result.add(account);
+                }
+            }
+        } else {
+            int variousAccountsSize = variousAccounts.size();
+            int blocks = (int) Math.ceil((float) variousAccountsSize / ACCOUNTS_QUERY_BLOCKSIZE);
+            for (int i = 0; i < blocks; i++) {
+                List<String> worklist = new ArrayList<String>(variousAccounts);
+                int startIndex = i * ACCOUNTS_QUERY_BLOCKSIZE;
+                int endIndex = Math.min((i + 1) * ACCOUNTS_QUERY_BLOCKSIZE, variousAccountsSize);
+                result.addAll(queryKnownAccounts(worklist.subList(startIndex, endIndex)));
+            }
         }
-
         return result;
     }
 

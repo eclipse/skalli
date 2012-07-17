@@ -5,7 +5,7 @@ import org.apache.commons.lang.StringUtils;
 
 public enum GerritVersion {
     GERRIT_UNKNOWN_VERSION,
-    GERRIT_2_0_X, GERRIT_2_1_X, GERRIT_2_1_8, GERRIT_2_2_X,
+    GERRIT_2_0_X, GERRIT_2_1_X, GERRIT_2_1_7, GERRIT_2_1_8, GERRIT_2_2_X,
     GERRIT_2_2_2, GERRIT_2_3_X, GERRIT_2_4_X, GERRIT_2_5_X;
 
     @SuppressWarnings("nls")
@@ -13,10 +13,13 @@ public enum GerritVersion {
         if (StringUtils.isBlank(s)) {
             return GERRIT_UNKNOWN_VERSION;
         }
-        if (s.equals("2.1.8") || s.startsWith("2.1.8.")) {
+        if (s.equals("2.1.7") || s.startsWith("2.1.7.") || s.startsWith("2.1.7-")) {
+            return GERRIT_2_1_7;
+        }
+        if (s.equals("2.1.8") || s.startsWith("2.1.8.") || s.startsWith("2.1.8-")) {
             return GERRIT_2_1_8;
         }
-        if (s.equals("2.2.2") || s.startsWith("2.2.2.")) {
+        if (s.equals("2.2.2") || s.startsWith("2.2.2.") || s.startsWith("2.2.2-")) {
             return GERRIT_2_2_2;
         }
         if (s.equals("2.0") || s.startsWith("2.0.") || s.startsWith("2.0-")) {
@@ -56,6 +59,8 @@ public enum GerritVersion {
         case RENAME_GROUP:
         case CREATE_PROJECT_SUGGEST_PARENT:
             return compareTo(GERRIT_2_3_X) >= 0 ;
+        case ACCOUNT_CHECK_OBSOLETE:
+            return compareTo(GERRIT_2_1_7) >= 0 ;
         default:
             return false;
         }
