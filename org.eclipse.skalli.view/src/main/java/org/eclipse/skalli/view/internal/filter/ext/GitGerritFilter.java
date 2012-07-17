@@ -69,6 +69,7 @@ public class GitGerritFilter implements Filter {
     public static final String ACTION_CHECK = "check"; //$NON-NLS-1$
     public static final String ACTION_SAVE = "save"; //$NON-NLS-1$
     public static final String ACTION_CANCEL = "cancel"; //$NON-NLS-1$
+    public static final String ACTION_TOGGLE = "toggle"; //$NON-NLS-1$
 
     public static final String ATTRIBUTE_GERRITHOST = "gerritHost"; //$NON-NLS-1$
     public static final String ATTRIBUTE_GERRITCONTACT = "gerritContact"; //$NON-NLS-1$
@@ -153,7 +154,7 @@ public class GitGerritFilter implements Filter {
             request.setAttribute(ATTRIBUTE_GERRITCONTACT, fromConfig(ConfigKeyGerrit.CONTACT));
 
             // (1) INITIAL (input proposals for group and repo)
-            if (StringUtils.isBlank(action)) {
+            if (StringUtils.isBlank(action) || ACTION_TOGGLE.equals(action)) {
                 request.setAttribute(ATTRIBUTE_GERRITHOST, fromConfig(ConfigKeyGerrit.HOST));
                 request.setAttribute(ATTRIBUTE_PROPOSED_GROUP,
                         StringUtils.isNotBlank(group) ? group : generateName(project, "_", "_committers")); //$NON-NLS-1$ //$NON-NLS-2$
