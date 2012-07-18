@@ -86,6 +86,7 @@ public class GitGerritFilter implements Filter {
 
     public static final String ATTRIBUTE_NO_GERRIT_CLIENT = "noGerritClient"; //$NON-NLS-1$
     public static final String ATTRIBUTE_NO_GERRIT_USER = "noGerritUser"; //$NON-NLS-1$
+    public static final String ATTRIBUTE_NO_PROJECT_MEMBER = "noProjectMember"; //$NON-NLS-1$
     public static final String ATTRIBUTE_EXCEPTION = "exception"; //$NON-NLS-1$
     public static final String ATTRIBUTE_ERROR_MESSAGE = "errormessage"; //$NON-NLS-1$
 
@@ -188,12 +189,16 @@ public class GitGerritFilter implements Filter {
                 // checks only relevant for group creation
                 Set<String> knownAccounts = Collections.emptySet();
                 boolean actingUserHasAccount = false;
+                boolean actingUserIsProjectMember = false;
                 if (createGroup) {
-                    knownAccounts = getKnownGerritAccountsForProject(client, project);
+                    Set<String> projectMembers = getProposedProjectMembers(project);
+                    actingUserIsProjectMember = projectMembers.contains(user.getUserId());
+                    knownAccounts = client.getKnownAccounts(projectMembers);
                     request.setAttribute(ATTRIBUTE_KNOWN_ACCOUNTS, knownAccounts);
                     actingUserHasAccount = knownAccounts.contains(user.getUserId());
                 }
-                request.setAttribute(ATTRIBUTE_NO_GERRIT_USER, !actingUserHasAccount);
+                request.setAttribute(ATTRIBUTE_NO_PROJECT_MEMBER, !actingUserIsProjectMember);
+                request.setAttribute(ATTRIBUTE_NO_GERRIT_USER, actingUserIsProjectMember && !actingUserHasAccount);
 
                 // (3) SAVE (if validation is OK)
                 if (ACTION_SAVE.equals(action)) {
@@ -287,13 +292,8 @@ public class GitGerritFilter implements Filter {
         return sb.toString();
     }
 
-    /**
-     * Returns all accounts known to Gerrit based on the users (IDs) of the project.
-     */
-    private Set<String> getKnownGerritAccountsForProject(final GerritClient client, final Project project)
-            throws GerritClientException {
+    private Set<String> getProposedProjectMembers(final Project project) {
         PeopleExtension peopleExt = project.getExtension(PeopleExtension.class);
-
         if (peopleExt == null) {
             return Collections.emptySet();
         }
@@ -301,12 +301,11 @@ public class GitGerritFilter implements Filter {
         Set<Member> projectMembers = new HashSet<Member>();
         projectMembers.addAll(peopleExt.getLeads());
         projectMembers.addAll(peopleExt.getMembers());
-
-        Set<String> accountIds = new HashSet<String>();
+        Set<String> userIds = new HashSet<String>();
         for (Member projectMember : projectMembers) {
-            accountIds.add(projectMember.getUserID());
+            userIds.add(projectMember.getUserID());
         }
-        return client.getKnownAccounts(accountIds);
+        return userIds;
     }
 
     /**

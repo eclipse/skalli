@@ -185,7 +185,14 @@
           <c:when test="${groupExists && repoExists}">
             <p class="hint">Click 'Proceed' to add the existing SCM location to your project.</p>
           </c:when>
+          <c:when test="${!groupExists && !repoExists && empty knownAccounts}">
+            <p class="errormessage">No one of your team has a known Gerrit account. You will not be able to administer the project.</p>
+            <p class="hint">Log on once to Gerrit to create your account and then try again.</p>
+          </c:when>
           <c:when test="${!groupExists && !repoExists && not empty knownAccounts}">
+            <c:if test="${noProjectMember}">
+              <p class="warningmessage">You will not be assigned to the group to be created since you are not a project member. You will not be able to administer the project.</p>
+            </c:if>
             <c:if test="${noGerritUser}">
               <p class="warningmessage">Your account is not known to Gerrit. You will not be able to administer the project.</p>
             </c:if>
@@ -196,10 +203,6 @@
           </c:when>
           <c:when test="${!groupExists && repoExists}">
             <p class="errormessage">It is not possible to assign new groups to existing repositories.</p>
-          </c:when>
-          <c:when test="${!groupExists && !repoExists && empty knownAccounts}">
-            <p class="errormessage">No one of your team has a known Gerrit account. You will not be able to administer the project.</p>
-            <p class="hint">Log on once to Gerrit to create your account and then try again.</p>
           </c:when>
         </c:choose>
       </c:if>
