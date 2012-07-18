@@ -57,6 +57,7 @@ public class ProjectIndexer extends IndexerBase<Project> {
     @Override
     public Set<String> getDefaultSearchFields() {
         Set<String> ret = new HashSet<String>();
+        ret.add(Project.PROPERTY_UUID);
         ret.add(Project.PROPERTY_PROJECTID);
         ret.add(Project.PROPERTY_NAME);
         ret.add(Project.PROPERTY_DESCRIPTION);
