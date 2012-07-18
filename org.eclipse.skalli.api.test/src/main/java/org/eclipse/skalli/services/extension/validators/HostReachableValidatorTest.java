@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.extension.validators;
 
-import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -118,16 +117,6 @@ public class HostReachableValidatorTest {
     @Test
     public void testIssuesFATAL() throws Exception {
         testIssues(Severity.FATAL);
-    }
-
-    @Test
-    public void testEncodeURL() throws Exception {
-        Assert.assertEquals("http://host:8080/first%20second",
-                HostReachableValidator.encodeURL(new URL("http://host:8080/first second")).toExternalForm());
-        Assert.assertEquals("http://host:8080/first%20second/third",
-                HostReachableValidator.encodeURL(new URL("http://host:8080/first second/third")).toExternalForm());
-        Assert.assertEquals("http://host:8080/=$%20%25:%C3%A4",
-                HostReachableValidator.encodeURL(new URL("http://host:8080/=$ %:ä")).toExternalForm());
     }
 
     private void testIssues(final Severity minSeverity) throws Exception {

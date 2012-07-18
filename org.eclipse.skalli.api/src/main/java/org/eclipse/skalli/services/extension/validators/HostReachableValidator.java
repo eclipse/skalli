@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.MessageFormat;
@@ -34,6 +32,7 @@ import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.params.HttpParams;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.commons.Link;
+import org.eclipse.skalli.commons.URLUtils;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
@@ -116,19 +115,19 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
         URL url = null;
         String label = null;
         if (value instanceof URL) {
-            url = (URL) value;
+            url = (URL)value;
             label = url.toExternalForm();
         } else if (value instanceof Link) {
             Link link = (Link) value;
             try {
-                url = new URL(link.getUrl());
+                url = URLUtils.stringToURL(link.getUrl());
                 label = link.getLabel();
             } catch (MalformedURLException e) {
                 CollectionUtils.addSafe(issues, getIssueByReachableHost(minSeverity, entityId, item, link.getUrl()));
             }
         } else {
             try {
-                url = new URL(value.toString());
+                url = URLUtils.stringToURL(value.toString());
                 label = url.toExternalForm();
             } catch (MalformedURLException e) {
                 CollectionUtils.addSafe(issues, getIssueByReachableHost(minSeverity, entityId, item, value.toString()));
@@ -143,7 +142,6 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
         if (client != null) {
             HttpResponse response = null;
             try {
-                url = encodeURL(url);
                 HttpParams params = client.getParams();
                 HttpClientParams.setRedirecting(params, false); // we want to find 301 MOVED PERMANTENTLY
                 HttpGet method = new HttpGet(url.toExternalForm());
@@ -168,17 +166,6 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
             }
         } else {
             CollectionUtils.addSafe(issues, getIssueByReachableHost(minSeverity, entityId, item, url.getHost()));
-        }
-    }
-
-    // use URI to properly encode the given URL
-    static URL encodeURL(URL url) throws MalformedURLException {
-        try {
-            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(),
-                    url.getPath(), url.getQuery(), url.getRef());
-            return new URL(uri.toASCIIString());
-        } catch (URISyntaxException e) {
-            throw new MalformedURLException(url.toString());
         }
     }
 
