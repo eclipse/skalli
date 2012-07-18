@@ -126,8 +126,8 @@
         </p>
       </form>
       <p class="hint">Your values must not be blank and must not contain whitespace.</p>
-      <p class="hint">Click 'Check' to contact Gerrit and find out whether the group and/or the repository already exist.</p>
-      <p class="hint">This action won't change anything.</p>
+      <p class="hint">Click 'Check' to contact Gerrit and find out whether the repository and/or the related group already exist.</p>
+      <p class="hint">Afterwards you may proceed and actually create the repository and/or the related group, or come back to this page and amend your settings.</p>
     </c:when>
     <c:when test="${param.action == 'check'}">
       <p>Your input has been checked:</p>
@@ -135,10 +135,9 @@
           <tr valign="top" align="left">
             <td>Gerrit Group:</td>
             <td>
-              <strong>'${param.group}'</strong>
-              <c:if test="${invalidGroup}">must not be blank</c:if>
-              <c:if test="${!invalidGroup && groupExists}">already exists</c:if>
-              <c:if test="${!invalidGroup && !groupExists}">will be created</c:if>
+              <c:if test="${invalidGroup}">Group name must not be blank.</c:if>
+              <c:if test="${!invalidGroup && groupExists}"><strong>'${param.group}'</strong> already exists.</c:if>
+              <c:if test="${!invalidGroup && !groupExists}"><strong>'${param.group}'</strong> will be created.</c:if>
             </td>
           </tr>
           <c:if test="${!invalidGroup && !groupExists && not empty knownAccounts}">
@@ -158,9 +157,9 @@
             <td>Git Repository:</td>
             <td>
               <strong>'${param.repo}'</strong>
-              <c:if test="${invalidRepo}">is invalid<br />(must not be blank and must not contain whitespace)</c:if>
-              <c:if test="${!invalidRepo && repoExists}">already exists</c:if>
-              <c:if test="${!invalidRepo && !repoExists}">will be created</c:if>
+              <c:if test="${invalidRepo}">is invalid<br />(must not be blank and must not contain whitespace).</c:if>
+              <c:if test="${!invalidRepo && repoExists}">already exists.</c:if>
+              <c:if test="${!invalidRepo && !repoExists}">will be created.</c:if>
             </td>
           </tr>
         </table>
