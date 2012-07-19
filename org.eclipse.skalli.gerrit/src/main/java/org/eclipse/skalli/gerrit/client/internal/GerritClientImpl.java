@@ -497,16 +497,21 @@ public class GerritClientImpl implements GerritClient {
         } catch (IOException e) {
             throw andDisconnect(new ConnectionException("Failed to read errors from channel.", e));
         } finally {
+            closeQuietly(channel, baisIn, baosOut, baosErr, manuallyConnected);
+        }
+    }
+
+    private void closeQuietly(ChannelExec channel, ByteArrayInputStream baisIn, ByteArrayOutputStream baosOut,
+            ByteArrayOutputStream baosErr, boolean forceDisconnect) {
+        if (channel != null) {
             IOUtils.closeQuietly(baisIn);
             IOUtils.closeQuietly(baosOut);
             IOUtils.closeQuietly(baosErr);
             channel.disconnect();
-            channel = null;
-            if (manuallyConnected) {
+            if (forceDisconnect) {
                 disconnect();
             }
         }
-
     }
 
     /**
