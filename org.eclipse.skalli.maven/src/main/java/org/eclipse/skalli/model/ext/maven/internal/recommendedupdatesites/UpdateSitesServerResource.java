@@ -19,6 +19,7 @@ import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.group.GroupUtils;
+import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.user.LoginUtils;
 import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
@@ -33,7 +34,11 @@ public class UpdateSitesServerResource extends ResourceBase {
 
     @Get
     public Representation retrieve() {
-
+        String path = getReference().getPath();
+        Representation result = checkAuthorization(Permit.ACTION_GET, path);
+        if (result != null) {
+            return result;
+        }
         String id = (String) getRequestAttributes().get("id");//$NON-NLS-1$
         String userId = (String) getRequestAttributes().get("userId");//$NON-NLS-1$
         RecommendedUpdateSitesService service = Services.getRequiredService(RecommendedUpdateSitesService.class);
@@ -50,6 +55,11 @@ public class UpdateSitesServerResource extends ResourceBase {
 
     @Put
     public Representation store(Representation entity) {
+        String path = getReference().getPath();
+        Representation result = checkAuthorization(Permit.ACTION_PUT, path);
+        if (result != null) {
+            return result;
+        }
         ResourceRepresentation<RecommendedUpdateSites> representation = new ResourceRepresentation<RecommendedUpdateSites>();
         String host = getRequest().getResourceRef().getHostIdentifier();
         representation.setConverters(new UpdateSitesConverter(host));

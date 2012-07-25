@@ -35,6 +35,7 @@ import org.eclipse.skalli.services.extension.PropertyLookup;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.group.GroupUtils;
+import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.search.QueryParseException;
 import org.eclipse.skalli.services.search.SearchResult;
@@ -61,6 +62,11 @@ public class ProjectsResource extends ResourceBase {
      */
     @Get
     public Representation retrieve() {
+        String path = getReference().getPath();
+        Representation result = checkAuthorization(Permit.ACTION_GET, path);
+        if (result != null) {
+            return result;
+        }
         try {
             Statistics.getDefault().trackUsage("api.rest.projects.get"); //$NON-NLS-1$
             Form form = getRequest().getResourceRef().getQueryAsForm();
@@ -135,6 +141,11 @@ public class ProjectsResource extends ResourceBase {
 
     @Put
     public Representation update(Representation entity) throws ResourceException {
+        String path = getReference().getPath();
+        Representation result = checkAuthorization(Permit.ACTION_PUT, path);
+        if (result != null) {
+            return result;
+        }
         Form form = getRequest().getResourceRef().getQueryAsForm();
         RestSearchQuery queryParams = null;
         try {

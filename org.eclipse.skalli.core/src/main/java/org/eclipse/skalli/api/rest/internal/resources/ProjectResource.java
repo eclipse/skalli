@@ -21,6 +21,7 @@ import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.group.GroupUtils;
+import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.user.LoginUtils;
 import org.restlet.data.Status;
@@ -33,6 +34,11 @@ public class ProjectResource extends ResourceBase {
 
     @Get
     public Representation retrieve() {
+        String path = getReference().getPath();
+        Representation result = checkAuthorization(Permit.ACTION_GET, path);
+        if (result != null) {
+            return result;
+        }
         Statistics.getDefault().trackUsage("api.rest.project.get"); //$NON-NLS-1$
 
         String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
@@ -55,6 +61,11 @@ public class ProjectResource extends ResourceBase {
 
     @Put
     public Representation store(Representation entity) {
+        String path = getReference().getPath();
+        Representation result = checkAuthorization(Permit.ACTION_PUT, path);
+        if (result != null) {
+            return result;
+        }
         ResourceRepresentation<Project> representation = new ResourceRepresentation<Project>();
         representation.setConverters(new ProjectConverter(getRequest().getResourceRef().getHostIdentifier(), false));
         representation.setAnnotatedClasses(Project.class);

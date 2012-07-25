@@ -23,6 +23,7 @@ import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
+import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.search.SearchQuery;
 import org.restlet.data.Status;
@@ -33,6 +34,11 @@ public class SubprojectsResource extends ResourceBase {
 
     @Get
     public Representation retrieve() {
+        String path = getReference().getPath();
+        Representation result = checkAuthorization(Permit.ACTION_GET, path);
+        if (result != null) {
+            return result;
+        }
         Statistics.getDefault().trackUsage("api.rest.subprojects.get"); //$NON-NLS-1$
         Subprojects subprojects = new Subprojects();
         subprojects.setSubprojects(new LinkedHashSet<Project>());
