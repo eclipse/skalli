@@ -128,7 +128,7 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
         } else {
             try {
                 url = URLUtils.stringToURL(value.toString());
-                label = url.toExternalForm();
+                label = url != null ? url.toExternalForm() : value.toString();
             } catch (MalformedURLException e) {
                 CollectionUtils.addSafe(issues, getIssueByReachableHost(minSeverity, entityId, item, value.toString()));
             }
