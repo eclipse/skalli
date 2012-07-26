@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.internal.resources;
 
-import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
@@ -30,7 +29,6 @@ public class UserResource extends ResourceBase {
         if (result != null) {
             return result;
         }
-        Statistics.getDefault().trackUsage("api.rest.user.get"); //$NON-NLS-1$
 
         String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
 

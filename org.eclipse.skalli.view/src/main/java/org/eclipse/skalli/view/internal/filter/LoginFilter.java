@@ -11,6 +11,7 @@
 package org.eclipse.skalli.view.internal.filter;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.UUID;
 
 import javax.servlet.Filter;
@@ -22,6 +23,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
@@ -38,6 +40,7 @@ import org.eclipse.skalli.view.Consts;
 /**
  * This filter determines the user and requested project from the servlet request
  * and performs a login of the user with the {@link PermitService permit service}.
+ * Furthermore, the filter is the basis for {@link Statistics statistics} tracking.
  *
  * This  filter sets the following boolean attributes:
  * <ul>
@@ -136,10 +139,11 @@ public class LoginFilter implements Filter {
         // determine the user and login
         PermitService permitService = Services.getRequiredService(PermitService.class);
         String userId = permitService.login(httpRequest, project);
+        User user = null;
         boolean isAnonymousUser = StringUtils.isBlank(userId);
         if (!isAnonymousUser) {
             request.setAttribute(Consts.ATTRIBUTE_USERID, userId);
-            User user = UserUtils.getUser(userId);
+            user = UserUtils.getUser(userId);
             if (user != null) {
                 request.setAttribute(Consts.ATTRIBUTE_USER, user);
             }
@@ -153,6 +157,31 @@ public class LoginFilter implements Filter {
         request.setAttribute(Consts.ATTRIBUTE_ANONYMOUS_USER, isAnonymousUser);
         request.setAttribute(Consts.ATTRIBUTE_PROJECTADMIN, isProjectAdmin);
         request.setAttribute(Consts.ATTRIBUTE_PARENTPROJECTADMIN, isProjectAdminInParentChain);
+
+        // track the access
+        Statistics statistics = Statistics.getDefault();
+        if (user != null) {
+            statistics.trackUser(userId, user.getDepartment(), user.getLocation());
+        } else if (StringUtils.isNotBlank(userId)) {
+            statistics.trackUser(userId, null, null);
+        }
+        String referer = httpRequest.getHeader("Referer"); //$NON-NLS-1$
+        if (StringUtils.isBlank(referer)) {
+            referer = request.getParameter("referer"); //$NON-NLS-1$
+        }
+        if (StringUtils.isNotBlank(referer)) {
+            statistics.trackReferer(userId, referer);
+        }
+        statistics.trackUsage(userId, MessageFormat.format("{0} {1}", //$NON-NLS-1$
+                httpRequest.getMethod(), httpRequest.getRequestURI()), referer);
+        if (project != null) {
+            statistics.trackUsage(userId, MessageFormat.format("{0} /projects/{1}", //$NON-NLS-1$
+                    httpRequest.getMethod(), project.getProjectId()), referer);
+        }
+        String browser = httpRequest.getHeader("User-Agent"); //$NON-NLS-1$
+        if (StringUtils.isNotBlank(browser)) {
+            statistics.trackBrowser(userId, browser);
+        }
 
         // proceed along the chain
         chain.doFilter(request, response);

@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
@@ -39,7 +38,7 @@ public class SubprojectsResource extends ResourceBase {
         if (result != null) {
             return result;
         }
-        Statistics.getDefault().trackUsage("api.rest.subprojects.get"); //$NON-NLS-1$
+
         Subprojects subprojects = new Subprojects();
         subprojects.setSubprojects(new LinkedHashSet<Project>());
 

@@ -25,6 +25,7 @@ public class StatusResource extends ResourceBase {
         if (result != null) {
             return result;
         }
+
         return new ResourceRepresentation<Object>(new Object(),
                 new StatusConverter(getRequest().getResourceRef().getHostIdentifier()));
     }

@@ -49,7 +49,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
-import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.services.Services;
@@ -314,7 +313,6 @@ public class LuceneIndex<T extends EntityBase> {
 
     public SearchResult<T> search(final String[] fields, final String queryString, PagingInfo pagingInfo)
             throws QueryParseException {
-        Statistics.getDefault().trackSearch(queryString);
         SearchResult<T> ret = new SearchResult<T>();
         search(fields, null, queryString, pagingInfo, ret);
         return ret;

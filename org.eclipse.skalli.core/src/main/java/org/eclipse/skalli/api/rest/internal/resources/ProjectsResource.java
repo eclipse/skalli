@@ -36,6 +36,7 @@ import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.group.GroupUtils;
 import org.eclipse.skalli.services.permit.Permit;
+import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.search.QueryParseException;
 import org.eclipse.skalli.services.search.SearchResult;
@@ -67,9 +68,9 @@ public class ProjectsResource extends ResourceBase {
         if (result != null) {
             return result;
         }
+
+        Form form = getRequest().getResourceRef().getQueryAsForm();
         try {
-            Statistics.getDefault().trackUsage("api.rest.projects.get"); //$NON-NLS-1$
-            Form form = getRequest().getResourceRef().getQueryAsForm();
             RestSearchQuery queryParams = new RestSearchQuery(form);
             Projects projects = getProjectsToUpdate(queryParams);
 
@@ -84,11 +85,14 @@ public class ProjectsResource extends ResourceBase {
     }
 
     private Projects getProjectsToUpdate(RestSearchQuery queryParams) throws QueryParseException {
-        SearchResult<Project> projectList = SearchUtils.searchProjects(queryParams);
+        SearchResult<Project> searchResult = SearchUtils.searchProjects(queryParams);
+        Statistics.getDefault().trackSearch(Permits.getLoggedInUser(), searchResult.getQueryString(),
+                searchResult.getResultCount(), searchResult.getDuration());
+
         Projects projects = new Projects();
         projects.setProjects(new HashSet<Project>());
         String shortName = queryParams.getShortName();
-        for (Project project : projectList.getEntities()) {
+        for (Project project : searchResult.getEntities()) {
             if (shortName != null) {
                 if ("project".equals(shortName)) {
                     projects = matchByProperty(projects, project, project, queryParams);
@@ -146,6 +150,7 @@ public class ProjectsResource extends ResourceBase {
         if (result != null) {
             return result;
         }
+
         Form form = getRequest().getResourceRef().getQueryAsForm();
         RestSearchQuery queryParams = null;
         try {

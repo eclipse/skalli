@@ -167,10 +167,6 @@
        <filter-class>org.eclipse.skalli.view.internal.filter.LoginFilter</filter-class>
     </filter>
     <filter>
-       <filter-name>StatisticsFilter</filter-name>
-       <filter-class>org.eclipse.skalli.view.internal.filter.StatisticsFilter</filter-class>
-    </filter>
-    <filter>
        <filter-name>RestFilter</filter-name>
        <filter-class>org.eclipse.skalli.view.internal.filter.RestFilter</filter-class>
     </filter>
@@ -346,19 +342,7 @@
        <url-pattern>/myfavorites</url-pattern>
        <url-pattern>/myprojects</url-pattern>
        <url-pattern>/create/*</url-pattern>
-       <dispatcher>REQUEST</dispatcher>
-       <dispatcher>FORWARD</dispatcher>
-    </filter-mapping>
-    <filter-mapping>
-       <filter-name>StatisticsFilter</filter-name>
-       <url-pattern>/</url-pattern>
-       <url-pattern>/projects/*</url-pattern>
-       <url-pattern>/tags</url-pattern>
-       <url-pattern>/hierarchy</url-pattern>
-       <url-pattern>/favorites</url-pattern>
-       <url-pattern>/myfavorites</url-pattern>
-       <url-pattern>/myprojects</url-pattern>
-       <url-pattern>/create/*</url-pattern>
+       <url-pattern>/reindex</url-pattern>
        <dispatcher>REQUEST</dispatcher>
        <dispatcher>FORWARD</dispatcher>
     </filter-mapping>

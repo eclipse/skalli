@@ -12,7 +12,6 @@ package org.eclipse.skalli.api.rest.internal.resources;
 
 import java.util.UUID;
 
-import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
@@ -35,7 +34,6 @@ public class IssuesResource extends ResourceBase {
         if (result != null) {
             return result;
         }
-        Statistics.getDefault().trackUsage("api.rest.issues.get"); //$NON-NLS-1$
 
         String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
 

@@ -10,14 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.internal.servlet;
 
-import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.skalli.commons.Statistics;
-import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.user.LoginUtils;
 import org.eclipse.skalli.view.internal.application.ProjectApplication;
 
@@ -26,7 +21,8 @@ import com.vaadin.terminal.gwt.server.AbstractApplicationServlet;
 
 /**
  * Extends the Vaadin application servlet to prevent class loading issue in OSGi
- * container, use project portal application by default
+ * container: Overrides {@link AbstractApplicationServlet#getNewApplication(HttpServletRequest)}
+ * to instantiate and return a {@link ProjectApplication}.
  */
 @SuppressWarnings("serial")
 public class ProjectServlet extends AbstractApplicationServlet {
@@ -40,18 +36,4 @@ public class ProjectServlet extends AbstractApplicationServlet {
     protected Application getNewApplication(HttpServletRequest request) throws ServletException {
         return new ProjectApplication(new LoginUtils(request).getLoggedInUser());
     }
-
-    @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String browser = request.getHeader("User-Agent"); //$NON-NLS-1$
-        LoginUtils loginUtil = new LoginUtils(request);
-        User loggedInUser = loginUtil.getLoggedInUser();
-        Statistics.getDefault().trackBrowser(loginUtil.getLoggedInUserId(), browser,
-                (loggedInUser != null) ? loggedInUser.getDepartment() : null,
-                (loggedInUser != null) ? loggedInUser.getLocation() : null);
-
-        super.service(request, response);
-    }
-
 }

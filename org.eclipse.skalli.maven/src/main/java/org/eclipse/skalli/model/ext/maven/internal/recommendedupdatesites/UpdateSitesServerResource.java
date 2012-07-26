@@ -39,6 +39,7 @@ public class UpdateSitesServerResource extends ResourceBase {
         if (result != null) {
             return result;
         }
+
         String id = (String) getRequestAttributes().get("id");//$NON-NLS-1$
         String userId = (String) getRequestAttributes().get("userId");//$NON-NLS-1$
         RecommendedUpdateSitesService service = Services.getRequiredService(RecommendedUpdateSitesService.class);
@@ -60,6 +61,7 @@ public class UpdateSitesServerResource extends ResourceBase {
         if (result != null) {
             return result;
         }
+
         ResourceRepresentation<RecommendedUpdateSites> representation = new ResourceRepresentation<RecommendedUpdateSites>();
         String host = getRequest().getResourceRef().getHostIdentifier();
         representation.setConverters(new UpdateSitesConverter(host));

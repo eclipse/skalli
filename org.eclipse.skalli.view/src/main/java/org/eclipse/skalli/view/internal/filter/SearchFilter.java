@@ -19,6 +19,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.search.QueryParseException;
@@ -61,6 +62,8 @@ public class SearchFilter extends AbstractSearchFilter {
         } catch (Exception e) {
             FilterUtil.handleException(request, response, e);
         }
+        Statistics.getDefault().trackSearch(user.getUserId(), result.getQueryString(),
+                result.getResultCount(), result.getDuration());
 
         request.setAttribute(Consts.ATTRIBUTE_QUERY, searchQuery.getQuery());
         request.setAttribute(Consts.ATTRIBUTE_USERQUERY, searchQuery.getUser());

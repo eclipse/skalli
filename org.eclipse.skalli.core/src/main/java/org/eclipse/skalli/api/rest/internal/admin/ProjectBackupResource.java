@@ -68,6 +68,7 @@ public class ProjectBackupResource extends ResourceBase {
         if (result != null) {
             return result;
         }
+
         StorageService storageService = getStorageService();
         if (storageService == null) {
             return createStatusMessage(Status.SERVER_ERROR_INTERNAL, "No storage service available");

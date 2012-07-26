@@ -13,7 +13,6 @@ package org.eclipse.skalli.api.rest.internal.resources;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.Services;
@@ -39,7 +38,6 @@ public class ProjectResource extends ResourceBase {
         if (result != null) {
             return result;
         }
-        Statistics.getDefault().trackUsage("api.rest.project.get"); //$NON-NLS-1$
 
         String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
         ProjectService projectService = Services.getRequiredService(ProjectService.class);
@@ -66,6 +64,7 @@ public class ProjectResource extends ResourceBase {
         if (result != null) {
             return result;
         }
+
         ResourceRepresentation<Project> representation = new ResourceRepresentation<Project>();
         representation.setConverters(new ProjectConverter(getRequest().getResourceRef().getHostIdentifier(), false));
         representation.setAnnotatedClasses(Project.class);
