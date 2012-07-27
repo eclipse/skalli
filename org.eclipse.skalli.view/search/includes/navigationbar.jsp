@@ -25,6 +25,7 @@
       <div style="font-weight: bold; padding-bottom: 2px">User Links</div>
       <a id="linkMyProjects" href="<%=Consts.URL_MYPROJECTS%>" target="_top">My Projects</a><br />
       <a id="linkMyFavorites" href="<%=Consts.URL_MYFAVORITES%>" target="_top">My Favorites</a><br />
+      <a id="linkCreateProject" href="<%=Consts.URL_CREATEPROJECT%>" target="_top">Create Project</a><br />
       <br />
     </c:if>
     <c:if test="${isProjectAdmin == true && editmode == false}">
