@@ -21,24 +21,27 @@ import java.util.Map.Entry;
  * This cache remembers the point in time when each entry was read for the last time.
  * The entry which was not accessed for the longest period of time will be discarded,
  * if there is a need to do so.
- * </p>
  * <p>
  * Furthermore, this cache remembers its data only for the current day.
  * The next day it starts over empty again.
+ * <p>
  * For more details ask Phil Connors (a.k.a. Bill Murray).
- * </p>
- * @author d049863 (simon)
  *
- * @param <T_KEY>
- * @param <T_VALUE>
+ * @param <K>
+ * @param <V>
  */
-public class GroundhogCache<T_KEY, T_VALUE> extends AbstractCache<T_KEY, T_VALUE, Long> {
+public class GroundhogCache<K, V> extends AbstractCache<K, V, Long> {
 
     private int activeDayOfYear;
     private int activeYear;
 
-    public GroundhogCache(int maxSize) {
-        super(maxSize);
+    public GroundhogCache(int cacheSize) {
+        super(cacheSize);
+        initializeIfNeeded();
+    }
+
+    public GroundhogCache(int cacheSize, Cache<K, V> cache) {
+        super(cacheSize, cache);
         initializeIfNeeded();
     }
 
@@ -58,25 +61,25 @@ public class GroundhogCache<T_KEY, T_VALUE> extends AbstractCache<T_KEY, T_VALUE
     }
 
     @Override
-    protected Long createMetaInfo(T_KEY key) {
+    protected Long createMetaInfo(K key) {
         return System.nanoTime();
     }
 
     @Override
-    protected void beforeAccess(T_KEY key) {
+    protected void beforeAccess(K key) {
         initializeIfNeeded();
     };
 
     @Override
-    protected Long onAccess(T_KEY key, Long metaInfo) {
+    protected Long onAccess(K key, Long metaInfo) {
         return System.nanoTime();
     }
 
     @Override
-    protected T_KEY calcEntryToDiscard(Map<T_KEY, Long> metaInfos) {
+    protected K calcEntryToDiscard(Map<K, Long> metaInfos) {
         long oldest = System.nanoTime();
-        T_KEY oldestEntryKey = null;
-        for (Entry<T_KEY, Long> entry : metaInfos.entrySet()) {
+        K oldestEntryKey = null;
+        for (Entry<K, Long> entry : metaInfos.entrySet()) {
             if (entry.getValue() < oldest) {
                 oldestEntryKey = entry.getKey();
                 oldest = entry.getValue();

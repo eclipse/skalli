@@ -112,7 +112,7 @@ public class LDAPUserServiceImpl implements UserService, EventListener<EventConf
 
     @Override
     public synchronized List<User> getUsers() {
-        return new LinkedList<User>(cache.getAll());
+        return new LinkedList<User>(cache.values());
     }
 
     @Override

@@ -52,12 +52,12 @@ public class GroundhogCacheTest {
 
         // put an entry into the cache
         cache.put("key1", "value1");
-        Assert.assertEquals(1, cache.getAll().size());
+        Assert.assertEquals(1, cache.values().size());
         Assert.assertEquals("value1", cache.get("key1"));
 
         // now change the date and verify there is nothing in anymore
         cache.time += 24 * 60 * 60 * 1000;
-        Assert.assertEquals(0, cache.getAll().size());
+        Assert.assertEquals(0, cache.values().size());
     }
 
     @Test
@@ -67,7 +67,7 @@ public class GroundhogCacheTest {
 
         // put an entry into the cache
         cache.put("key1", "value1");
-        Assert.assertEquals(1, cache.getAll().size());
+        Assert.assertEquals(1, cache.values().size());
         Assert.assertEquals("value1", cache.get("key1"));
 
         // now change the date and verify there is nothing in anymore
@@ -83,7 +83,7 @@ public class GroundhogCacheTest {
         cache.put("key1", "value1");
         cache.put("key2", "value2");
         cache.put("key3", "value3");
-        Assert.assertEquals(2, cache.getAll().size());
+        Assert.assertEquals(2, cache.values().size());
         Assert.assertEquals("value2", cache.get("key2"));
         Assert.assertEquals("value3", cache.get("key3"));
         Assert.assertNull(cache.get("key1"));
@@ -98,7 +98,7 @@ public class GroundhogCacheTest {
         cache.put("key2", "value2");
         cache.get("key1");
         cache.put("key3", "value3");
-        Assert.assertEquals(2, cache.getAll().size());
+        Assert.assertEquals(2, cache.values().size());
         Assert.assertEquals("value1", cache.get("key1"));
         Assert.assertEquals("value3", cache.get("key3"));
         Assert.assertNull(cache.get("key2"));
