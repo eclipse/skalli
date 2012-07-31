@@ -21,6 +21,7 @@ import org.eclipse.skalli.services.extension.ExtensionService;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * Utility class to start bundles for plugin tests.
@@ -109,5 +110,26 @@ public class BundleManager {
     public static <T> T getRequiredService(Class<T> serviceClass) throws BundleException {
         startBundles(serviceClass);
         return Services.getRequiredService(serviceClass);
+    }
+
+    /**
+     * Registers a service for testing purposes.
+     *
+     * @param <S> type of the service.
+     * @param serviceClass  the service interface class under which the service instance should be registered.
+     * @param serviceInstance  the actual service instance.
+     * @param properties optional properties for this service, or <code>null</code>.
+     *
+     * @param the <code>ServiceRegistration</code> which should be used to unregister the test service
+     * after the test finished. Make sure to unregister the service properly (finally block!), otherwise
+     * other tests might get affected by a messy service registry.
+     *
+     * @throws BundleException  if starting the bundles failed.
+     */
+    public static <S> ServiceRegistration<S> registerService(Class<S> serviceClass, S serviceInstance,
+            Dictionary<String,? >properties) throws BundleException {
+        startBundles(serviceClass);
+        Bundle bundle = FrameworkUtil.getBundle(serviceClass);
+        return bundle.getBundleContext().registerService(serviceClass, serviceInstance, properties);
     }
 }
