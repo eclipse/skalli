@@ -36,6 +36,7 @@ public class LDAPResource extends ConfigResource<ConfigKeyLDAP, LDAPConfig> {
         ret.put(ConfigKeyLDAP.USERNAME, configObject.getUsername());
         ret.put(ConfigKeyLDAP.PASSWORD, configObject.getPassword());
         ret.put(ConfigKeyLDAP.USERS_GROUP, configObject.getUsersGroup());
+        ret.put(ConfigKeyLDAP.CACHE_SIZE, configObject.getCacheSize());
         return ret;
     }
 
@@ -47,6 +48,7 @@ public class LDAPResource extends ConfigResource<ConfigKeyLDAP, LDAPConfig> {
         ret.setUsername(values.get(ConfigKeyLDAP.USERNAME));
         ret.setPassword(values.get(ConfigKeyLDAP.PASSWORD));
         ret.setUsersGroup(values.get(ConfigKeyLDAP.USERS_GROUP));
+        ret.setCacheSize(values.get(ConfigKeyLDAP.CACHE_SIZE));
         return ret;
     }
 

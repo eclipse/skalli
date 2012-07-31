@@ -18,7 +18,8 @@ public enum ConfigKeyLDAP implements ConfigKey {
     USERNAME("ldap.username", "", false),
     HOSTNAME("ldap.hostname", "", false),
     FACTORY("ldap.ctxFactory", "", false),
-    USERS_GROUP("ldap.usersGroup", "", false);
+    USERS_GROUP("ldap.usersGroup", "", false),
+    CACHE_SIZE("ldap.cacheSize", "", false);
 
     private final String key;
     private final String defaultValue;

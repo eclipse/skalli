@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.skalli.core.internal.cache.Cache;
 import org.eclipse.skalli.core.internal.cache.GroundhogCache;
 import org.eclipse.skalli.model.User;
-import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.event.EventConfigUpdate;
 import org.eclipse.skalli.services.event.EventListener;
@@ -32,18 +32,22 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of {@link UserService} accessing an LDAP server.
  * It relies on the {@link ConfigurationService} for LDAP authentication
- * and localtion information.<br>
- * This service implementation is the default and is enabled during
- * portal startup automatically.
+ * and location information.
  */
 public class LDAPUserServiceImpl implements UserService, EventListener<EventConfigUpdate> {
 
     private static final Logger LOG = LoggerFactory.getLogger(LDAPUserServiceImpl.class);
-    private final Cache<String, User> cache = new GroundhogCache<String, User>(2000);
+
+    private static final int DEFAULT_CACHE_SIZE = 100;
+
+    private Cache<String, User> cache;
+
     private EventService eventService;
+    private ConfigurationService configurationService;
 
     protected void activate(ComponentContext context) {
         eventService.registerListener(EventConfigUpdate.class, this);
+        initializeCache();
         LOG.info("LDAP User Service activated");
     }
 
@@ -59,19 +63,35 @@ public class LDAPUserServiceImpl implements UserService, EventListener<EventConf
         this.eventService = null;
     }
 
+    protected void bindConfigurationService(ConfigurationService configurationService) {
+        this.configurationService = configurationService;
+        initializeCache();
+    }
+
+    protected void unbindEventService(ConfigurationService configurationService) {
+        this.configurationService = null;
+    }
+
+    private synchronized void initializeCache() {
+        int cacheSize = DEFAULT_CACHE_SIZE;
+        if (configurationService != null) {
+            cacheSize = NumberUtils.toInt(configurationService.readString(ConfigKeyLDAP.CACHE_SIZE), DEFAULT_CACHE_SIZE);
+        }
+        cache = new GroundhogCache<String, User>(cacheSize, cache);
+    }
+
     private LDAPClient getLDAPClient() {
         String password = null;
         String username = null;
         String hostname = null;
         String factory = null;
         String usersGroup = null;
-        ConfigurationService configService = Services.getService(ConfigurationService.class);
-        if (configService != null) {
-            password = configService.readString(ConfigKeyLDAP.PASSWORD);
-            username = configService.readString(ConfigKeyLDAP.USERNAME);
-            hostname = configService.readString(ConfigKeyLDAP.HOSTNAME);
-            factory = configService.readString(ConfigKeyLDAP.FACTORY);
-            usersGroup = configService.readString(ConfigKeyLDAP.USERS_GROUP);
+        if (configurationService != null) {
+            password = configurationService.readString(ConfigKeyLDAP.PASSWORD);
+            username = configurationService.readString(ConfigKeyLDAP.USERNAME);
+            hostname = configurationService.readString(ConfigKeyLDAP.HOSTNAME);
+            factory = configurationService.readString(ConfigKeyLDAP.FACTORY);
+            usersGroup = configurationService.readString(ConfigKeyLDAP.USERS_GROUP);
         } else {
             LOG.warn("Failed to read LDAP configuration - no instance of "
                     + ConfigurationService.class.getName() + "available. Either provide a suitable "
@@ -145,7 +165,7 @@ public class LDAPUserServiceImpl implements UserService, EventListener<EventConf
 
     @Override
     public synchronized void onEvent(EventConfigUpdate event) {
-        cache.clear();
+        initializeCache();
     }
 
 }

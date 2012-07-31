@@ -20,6 +20,7 @@ public class LDAPConfig {
     private String hostname;
     private String ctxFactory;
     private String usersGroup;
+    private String cacheSize;
 
     public String getPassword() {
         return password;
@@ -61,4 +62,11 @@ public class LDAPConfig {
         this.usersGroup = usersGroup;
     }
 
+    public String getCacheSize() {
+        return cacheSize;
+    }
+
+    public void setCacheSize(String cacheSize) {
+        this.cacheSize = cacheSize;
+    }
 }
