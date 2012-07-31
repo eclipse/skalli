@@ -46,11 +46,13 @@ public class ProjectIndexer extends IndexerBase<Project> {
         }
         addField(Project.PROPERTY_TEMPLATEID, project.getProjectTemplateId(), true, true);
 
+        Set<String> userIds = new HashSet<String>();
         for (Member member : members) {
-            User user = userService.getUserById(member.getUserID());
-            if (user != null) {
-                addField(MEMBERS_DISPLAY_NAME, user.getDisplayName(), false, true);
-            }
+            userIds.add(member.getUserID());
+        }
+        Set<User> users =  userService.getUsersById(userIds);
+        for (User user: users) {
+            addField(MEMBERS_DISPLAY_NAME, user.getDisplayName(), false, true);
         }
     }
 
