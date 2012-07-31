@@ -686,7 +686,7 @@ public class ProjectEditPanel extends Panel implements Issuer {
             List<String> warnings = new ArrayList<String>();
             for (ExtensionEntityBase extension : project.getAllExtensions()) {
                 Class<? extends ExtensionEntityBase> extensionClass = extension.getClass();
-                ExtensionService<?> extensionService = ExtensionServices.getExtensionService(extensionClass);
+                ExtensionService<?> extensionService = ExtensionServices.getByExtensionClass(extensionClass);
                 if (extensionService != null) {
                     warnings.addAll(extensionService.getConfirmationWarnings(project, modifiedProject, modifier));
                 }

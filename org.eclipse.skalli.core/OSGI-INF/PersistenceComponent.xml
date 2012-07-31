@@ -22,16 +22,4 @@
         policy="dynamic"
         bind="bindStorageService"
         unbind="unbindStorageService" />
-    <reference
-        name="ExtensionService"
-        interface="org.eclipse.skalli.services.extension.ExtensionService"
-        cardinality="0..n"
-        policy="dynamic"
-        bind="bindExtensionService"
-        unbind="unbindExtensionService" />
-    <reference
-        name="EntityService"
-        interface="org.eclipse.skalli.services.entity.EntityService"
-        cardinality="0..n"
-        policy="dynamic" />
 </scr:component>

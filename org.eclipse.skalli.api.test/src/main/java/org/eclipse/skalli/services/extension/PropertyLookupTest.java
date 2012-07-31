@@ -1,34 +1,44 @@
-package org.eclipse.skalli.model.ext.mapping;
+/*******************************************************************************
+ * Copyright (c) 2010, 2011 SAP AG and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     SAP AG - initial API and implementation
+ *******************************************************************************/
+package org.eclipse.skalli.services.extension;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.skalli.model.EntityBase;
-import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.services.extension.ExtensionService;
-import org.eclipse.skalli.services.extension.PropertyLookup;
+import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.eclipse.skalli.testutil.TestExtensionService;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.osgi.framework.ServiceRegistration;
 
 @SuppressWarnings("nls")
 public class PropertyLookupTest {
 
-    private static class TestPropertyLookup extends PropertyLookup {
+    @SuppressWarnings("rawtypes")
+    private ServiceRegistration<ExtensionService> serviceRegistration;
 
-        public TestPropertyLookup(EntityBase entity) {
-            super(entity);
-        }
+    @Before
+    public void setup() throws Exception {
+        serviceRegistration = BundleManager.registerService(ExtensionService.class,  new TestExtensionService(), null);
+        Assert.assertNotNull(serviceRegistration);
+    }
 
-        public TestPropertyLookup(EntityBase entity, Map<String, Object> customProperties) {
-            super(entity, customProperties);
-        }
-
-        @Override
-        protected ExtensionService<?> getExtensionService(ExtensionEntityBase extension) {
-            return new TestExtensionService();
+    @After
+    public void tearDown() {
+        if (serviceRegistration != null) {
+            serviceRegistration.unregister();
         }
     }
 
@@ -37,7 +47,7 @@ public class PropertyLookupTest {
         Project project = createProject();
         Map<String,Object> props = new HashMap<String,Object>();
         props.put("userId", "hugo");
-        TestPropertyLookup lookup = new TestPropertyLookup(project, props);
+        PropertyLookup lookup = new PropertyLookup(project, props);
         Assert.assertEquals("bla.blubb", lookup.lookup(Project.PROPERTY_PROJECTID));
         Assert.assertEquals("Blubber", lookup.lookup(Project.PROPERTY_NAME));
         Assert.assertEquals("foobar", lookup.lookup("testext." + TestExtension.PROPERTY_STR));
@@ -53,7 +63,7 @@ public class PropertyLookupTest {
     public void testLookUpNoProject() throws Exception {
         Map<String,Object> props = new HashMap<String,Object>();
         props.put("userId", "hugo");
-        TestPropertyLookup lookup = new TestPropertyLookup(null, props);
+        PropertyLookup lookup = new PropertyLookup(null, props);
         Assert.assertEquals("hugo", lookup.lookup("userId"));
         Assert.assertNull(lookup.lookup(Project.PROPERTY_PROJECTID));
         Assert.assertNull(lookup.lookup("testext.abc"));
@@ -64,7 +74,7 @@ public class PropertyLookupTest {
     @Test
     public void testLookUpNoCustomProps() throws Exception {
         Project project = createProject();
-        TestPropertyLookup lookup = new TestPropertyLookup(project);
+        PropertyLookup lookup = new PropertyLookup(project);
         Assert.assertNull(lookup.lookup("userId"));
         Assert.assertEquals("bla.blubb", lookup.lookup(Project.PROPERTY_PROJECTID));
         Assert.assertNull(lookup.lookup("testext.abc"));

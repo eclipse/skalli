@@ -133,7 +133,7 @@ class ProjectEditPanelEntry extends CustomComponent {
         if (!project.isInherited(extensionClass)) {
             extension = project.getExtension(extensionClass);
         }
-        extensionService = ExtensionServices.getExtensionService(extensionClass);
+        extensionService = ExtensionServices.getByExtensionClass(extensionClass);
         if (extensionService == null) {
             throw new IllegalStateException(MessageFormat.format(
                     "ExtensionFormService{0} has no corresponding ExtensionService", formService.getClass()));

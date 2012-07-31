@@ -10,18 +10,11 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.persistence.xstream;
 
-import org.eclipse.skalli.services.entity.EntityService;
-import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.persistence.StorageService;
 
 public class PersistenceServiceXStreamMock extends PersistenceServiceXStream {
 
-    public PersistenceServiceXStreamMock(StorageService storageService, EntityService<?> entityService,
-            ExtensionService<?>... extensionServices) {
+    public PersistenceServiceXStreamMock(StorageService storageService) {
         super(new XStreamPersistence(storageService));
-        bindEntityService(entityService);
-        for (ExtensionService<?> extensionService : extensionServices) {
-            bindExtensionService(extensionService);
-        }
     }
 }

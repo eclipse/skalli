@@ -377,7 +377,7 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
 
     private ExtensionService<?> validateExtensionService(UUID projectUUID, ExtensionEntityBase ext, Set<Issue> issues) {
         Class<? extends ExtensionEntityBase> extensionClass = ext.getClass();
-        ExtensionService<?> extensionService = ExtensionServices.getExtensionService(extensionClass);
+        ExtensionService<?> extensionService = ExtensionServices.getByExtensionClass(extensionClass);
         if (extensionService == null) {
             issues.add(new Issue(Severity.FATAL, ProjectService.class, projectUUID,
                     MessageFormat.format("Project references model extension ''{0}'' but there is no " +

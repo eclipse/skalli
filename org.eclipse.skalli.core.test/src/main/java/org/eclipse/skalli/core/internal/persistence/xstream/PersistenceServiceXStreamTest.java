@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.persistence.xstream;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +19,9 @@ import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.services.entity.EntityService;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.HashMapStorageService;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
 import org.eclipse.skalli.testutil.TestEntityBase1;
@@ -26,9 +30,11 @@ import org.eclipse.skalli.testutil.TestExtensibleEntityEntityService;
 import org.eclipse.skalli.testutil.TestExtensibleEntityExtensionService;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.eclipse.skalli.testutil.TestExtension1;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.osgi.framework.ServiceRegistration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -40,11 +46,24 @@ public class PersistenceServiceXStreamTest {
     private PersistenceServiceXStreamMock persistenceService;
     private HashMapStorageService hashMapStorageService;
 
+    private List<ServiceRegistration<?>> serviceRegistrations = new ArrayList<ServiceRegistration<?>>();
+
     @Before
     public void setup() throws Exception {
+        serviceRegistrations.add(BundleManager.registerService(ExtensionService.class,
+                new TestExtensibleEntityExtensionService(), null));
+        serviceRegistrations.add(BundleManager.registerService(EntityService.class,
+                new TestExtensibleEntityEntityService(0), null));
+        Assert.assertEquals(2, serviceRegistrations.size());
         hashMapStorageService = new HashMapStorageService();
-        persistenceService = new PersistenceServiceXStreamMock(hashMapStorageService,
-                new TestExtensibleEntityEntityService(0), new TestExtensibleEntityExtensionService());
+        persistenceService = new PersistenceServiceXStreamMock(hashMapStorageService);
+    }
+
+    @After
+    public void tearDown() {
+        for (ServiceRegistration<?> serviceRegistration : serviceRegistrations) {
+            serviceRegistration.unregister();
+        }
     }
 
     @Test

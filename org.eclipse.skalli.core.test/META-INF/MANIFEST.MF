@@ -14,7 +14,7 @@ Import-Package: javax.persistence.criteria,
  org.easymock,
  org.eclipse.skalli.testutil,
  org.eclipse.skalli.testutil.feeds,
- org.hamcrest,
  org.junit,
  org.w3c.dom
+Require-Bundle: org.hamcrest
 

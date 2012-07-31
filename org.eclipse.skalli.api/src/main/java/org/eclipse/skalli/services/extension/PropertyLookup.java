@@ -39,7 +39,7 @@ public class PropertyLookup extends StrLookup {
 
     private void putAllProperties(ExtensibleEntityBase extensible, String prefix) {
         for (ExtensionEntityBase extension : extensible.getAllExtensions()) {
-            ExtensionService<?> extensionService = getExtensionService(extension);
+            ExtensionService<?> extensionService = ExtensionServices.getByExtensionClass(extension.getClass());
             if (extensionService != null) {
                 prefix = concat(prefix, extensionService.getShortName());
                 putAllProperties(extension, prefix);
@@ -69,9 +69,5 @@ public class PropertyLookup extends StrLookup {
             return CollectionUtils.toString((Collection<?>) o, ',');
         }
         return o.toString();
-    }
-
-    protected ExtensionService<?> getExtensionService(ExtensionEntityBase extension) {
-        return ExtensionServices.getExtensionService(extension.getClass());
     }
 }

@@ -100,7 +100,7 @@ public class ProjectsResource extends ResourceBase {
                     SortedSet<ExtensionEntityBase> allExtensions = project.getAllExtensions();
                     for (ExtensionEntityBase extensionEntity : allExtensions) {
                         ExtensionService<? extends ExtensionEntityBase> extensionService = ExtensionServices
-                                .getExtensionService(extensionEntity.getClass());
+                                .getByExtensionClass(extensionEntity.getClass());
                         if (extensionService.getShortName().equals(shortName)) {
                             projects = matchByProperty(projects, project, extensionEntity, queryParams);
                         }
@@ -189,7 +189,7 @@ public class ProjectsResource extends ResourceBase {
                             SortedSet<ExtensionEntityBase> allExtensions = loadedProject.getAllExtensions();
                             for (ExtensionEntityBase extensionEntity : allExtensions) {
                                 ExtensionService<? extends ExtensionEntityBase> extensionService = ExtensionServices
-                                        .getExtensionService(extensionEntity.getClass());
+                                        .getByExtensionClass(extensionEntity.getClass());
                                 if (extensionService.getShortName().equals(shortName)) {
                                     updateProperty(dataChange, loadedProject, extensionEntity, queryParams);
                                 }

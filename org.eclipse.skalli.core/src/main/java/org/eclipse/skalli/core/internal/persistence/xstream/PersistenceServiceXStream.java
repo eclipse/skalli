@@ -21,7 +21,7 @@ import org.eclipse.skalli.core.internal.persistence.PersistenceServiceBase;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.services.configuration.ConfigurationProperties;
 import org.eclipse.skalli.services.entity.EntityService;
-import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.MigrationException;
 import org.eclipse.skalli.services.persistence.EntityFilter;
 import org.eclipse.skalli.services.persistence.PersistenceService;
@@ -43,7 +43,6 @@ public class PersistenceServiceXStream extends PersistenceServiceBase implements
     private final DataModelContainer deleted = new DataModelContainer();
 
     private XStreamPersistence xstreamPersistence;
-
     private String storageServiceClassName;
 
     /**
@@ -63,49 +62,17 @@ public class PersistenceServiceXStream extends PersistenceServiceBase implements
         this.xstreamPersistence = xstreamPersistence;
     }
 
-    @Override
     protected void activate(ComponentContext context) {
-        super.activate(context);
-        LOG.info(MessageFormat.format("[PersistenceService] {0} : activated",
+        LOG.info(MessageFormat.format("[PersistenceService][xstream] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
-    @Override
     protected void deactivate(ComponentContext context) {
         xstreamPersistence = null;
         cache.clearAll();
         deleted.clearAll();
-        super.deactivate(context);
-        LOG.info(MessageFormat.format("[PersistenceService] {0} : deactivated",
+        LOG.info(MessageFormat.format("[PersistenceService][xstream] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
-    }
-
-    @Override
-    protected synchronized void bindExtensionService(ExtensionService<?> extensionService) {
-        super.bindExtensionService(extensionService);
-        cache.clearAll();
-        deleted.clearAll();
-    }
-
-    @Override
-    protected synchronized void unbindExtensionService(ExtensionService<?> extensionService) {
-        super.unbindExtensionService(extensionService);
-        cache.clearAll();
-        deleted.clearAll();
-    }
-
-    @Override
-    protected void bindEntityService(EntityService<?> entityService) {
-        super.bindEntityService(entityService);
-        cache.clearAll(entityService.getEntityClass());
-        deleted.clearAll(entityService.getEntityClass());
-    }
-
-    @Override
-    protected void unbindEntityService(EntityService<?> entityService) {
-        super.unbindEntityService(entityService);
-        cache.clearAll(entityService.getEntityClass());
-        deleted.clearAll(entityService.getEntityClass());
     }
 
     protected void bindStorageService(StorageService storageService) {
@@ -143,7 +110,7 @@ public class PersistenceServiceXStream extends PersistenceServiceBase implements
             LOG.warn(MessageFormat.format("Cannot load entities of type {0}: StorageService not available", entityClass));
             return;
         }
-        EntityService<T> entityService = getEntityService(entityClass);
+        EntityService<T> entityService = EntityServices.getByEntityClass(entityClass);
         if (entityService == null) {
             LOG.warn(MessageFormat.format("No entity service registered for entities of type {0}", entityClass.getName()));
             return;
@@ -202,7 +169,7 @@ public class PersistenceServiceXStream extends PersistenceServiceBase implements
             }
         }
 
-        EntityService<?> entityService = getEntityService(entityClass);
+        EntityService<?> entityService = EntityServices.getByEntityClass(entityClass);
         if (entityService == null) {
             LOG.warn(MessageFormat.format(
                     "Cannot persist entity {0}:  No entity service registered for entities of type {1}",
@@ -321,7 +288,7 @@ public class PersistenceServiceXStream extends PersistenceServiceBase implements
             LOG.warn(MessageFormat.format("Cannot load entity {0}/{1}: StorageService not available", entityClass, uuid));
             return null;
         }
-        EntityService<T> entityService = getEntityService(entityClass);
+        EntityService<T> entityService = EntityServices.getByEntityClass(entityClass);
         if (entityService == null) {
             LOG.warn(MessageFormat.format("No entity service registered for entities of type {0}", entityClass.getName()));
             return null;

@@ -23,10 +23,11 @@ import org.eclipse.skalli.core.internal.persistence.xstream.NoopConverter;
 import org.eclipse.skalli.core.internal.persistence.xstream.UUIDListConverter;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.services.entity.EntityService;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.DataMigration;
 import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.persistence.PersistenceService;
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,97 +39,13 @@ public abstract class PersistenceServiceBase implements PersistenceService {
 
     private static final String ENTITY_PREFIX = "entity-"; //$NON-NLS-1$
 
-    private ComponentContext context;
-    private Map<Class<?>, EntityService<?>> entityServices = new HashMap<Class<?>, EntityService<?>>();
-    private Set<ExtensionService<?>> extensionServices = new HashSet<ExtensionService<?>>();
-    private Set<String> shortNames = new HashSet<String>();
-
-    protected void activate(ComponentContext context) {
-        this.context = context;
-    }
-
-    protected void deactivate(ComponentContext context) {
-        this.context = null;
-    }
-
-    protected void bindExtensionService(ExtensionService<?> extensionService) {
-        String shortName = extensionService.getShortName();
-        if (shortNames.contains(shortName)) {
-            throw new RuntimeException(MessageFormat.format(
-                    "There is already an extension registered with the short name ''{0}''", shortName)); //$NON-NLS-1$
-        }
-        shortNames.add(shortName);
-        extensionServices.add(extensionService);
-        LOG.debug(MessageFormat.format("Registered model extension {0}", //$NON-NLS-1$
-                extensionService.getExtensionClass().getName()));
-    }
-
-    protected void unbindExtensionService(ExtensionService<?> extensionService) {
-        shortNames.remove(extensionService.getShortName());
-        extensionServices.remove(extensionService);
-        LOG.debug(MessageFormat.format("Unregistered model extension class {0}", //$NON-NLS-1$
-                extensionService.getExtensionClass().getName()));
-    }
-
-    protected void bindEntityService(EntityService<?> entityService) {
-        entityServices.put(entityService.getEntityClass(), entityService);
-        LOG.debug(MessageFormat.format("Registered entity service {0} for entities of type {1}", //$NON-NLS-1$
-                entityService, entityService.getEntityClass().getSimpleName()));
-    }
-
-    protected void unbindEntityService(EntityService<?> entityService) {
-        entityServices.remove(entityService.getEntityClass());
-        LOG.debug(MessageFormat.format("Unregistered entity service {0} for entities of type {1}", //$NON-NLS-1$
-                entityService, entityService.getEntityClass().getSimpleName()));
-    }
-
-    protected Set<ExtensionService<?>> getExtensionServices() {
-        return extensionServices;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <T extends EntityBase> EntityService<T> getEntityService(Class<T> entityClass) {
-        EntityService<?> entityService = entityServices.get(entityClass);
-        if (entityService == null) {
-            initializeEntityServices();
-            entityService = entityServices.get(entityClass);
-        }
-        return (EntityService<T>) entityService;
-    }
-
-    private synchronized void initializeEntityServices() {
-        Map<Class<?>, EntityService<?>> availableEntityServices = locateEntityServices();
-        for (Class<?> entityClass: availableEntityServices.keySet()) {
-            EntityService<?> entityService = availableEntityServices.get(entityClass);
-            if (entityServices.containsKey(entityClass) &&
-                    !entityServices.get(entityClass).equals(entityService)) {
-                unbindEntityService(entityServices.get(entityClass));
-            }
-            if (!entityServices.containsKey(entityClass)) {
-                bindEntityService(entityService);
-            }
-        }
-    }
-
-    private Map<Class<?>, EntityService<?>> locateEntityServices() {
-        Map<Class<?>, EntityService<?>> availableEntityServices = new HashMap<Class<?>, EntityService<?>>();
-        Object[] services = context != null? context.locateServices("EntityService") : null; //$NON-NLS-1$
-        if (services != null) {
-            for (Object service: services) {
-                EntityService<?> entityService = (EntityService<?>) service;
-                availableEntityServices.put(entityService.getEntityClass(), entityService);
-            }
-        }
-        return availableEntityServices;
-    }
-
     protected <T extends EntityBase> Set<DataMigration> getMigrations(Class<T> entityClass) {
         Set<DataMigration> migrations = new HashSet<DataMigration>();
-        EntityService<?> entityService = getEntityService(entityClass);
+        EntityService<?> entityService = EntityServices.getByEntityClass(entityClass);
         if (entityService != null) {
             migrations.addAll(entityService.getMigrations());
         }
-        for (ExtensionService<?> extensionService : extensionServices) {
+        for (ExtensionService<?> extensionService : ExtensionServices.getAll()) {
             if (extensionService.getMigrations() != null) {
                 migrations.addAll(extensionService.getMigrations());
             }
@@ -138,7 +55,7 @@ public abstract class PersistenceServiceBase implements PersistenceService {
 
     protected <T extends EntityBase> Map<String, Class<?>> getAliases(Class<T> entityClass) {
         Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
-        EntityService<?> entityService = getEntityService(entityClass);
+        EntityService<?> entityService = EntityServices.getByEntityClass(entityClass);
         if (entityService != null) {
             aliases.putAll(entityService.getAliases());
         }
@@ -147,7 +64,7 @@ public abstract class PersistenceServiceBase implements PersistenceService {
     }
 
     private void addExtensionAliases(Map<String, Class<?>> aliases) {
-        for (ExtensionService<?> extensionService : extensionServices) {
+        for (ExtensionService<?> extensionService : ExtensionServices.getAll()) {
             Class<?> extensionClass = extensionService.getExtensionClass();
             String shortName = extensionService.getShortName();
             Map<String, Class<?>> extensionAliases = extensionService.getAliases();
@@ -182,7 +99,7 @@ public abstract class PersistenceServiceBase implements PersistenceService {
         // if an EntityService is matching the given entity class,
         // add the classloader of the entity service and all additional
         // classloaders provided by the entity service
-        EntityService<?> entityService = getEntityService(entityClass);
+        EntityService<?> entityService = EntityServices.getByEntityClass(entityClass);
         if (entityService != null) {
             classLoaders.add(entityService.getClass().getClassLoader());
             Set<ClassLoader> additionalClassLoaders = entityService.getClassLoaders();
@@ -193,7 +110,7 @@ public abstract class PersistenceServiceBase implements PersistenceService {
 
         // add the classloaders of all extension services and the additional
         // classloaders provided by the extension services
-        for (ExtensionService<?> extensionService : extensionServices) {
+        for (ExtensionService<?> extensionService : ExtensionServices.getAll()) {
             classLoaders.add(extensionService.getClass().getClassLoader());
             Set<ClassLoader> additionalClassLoaders = extensionService.getClassLoaders();
             if (additionalClassLoaders != null) {

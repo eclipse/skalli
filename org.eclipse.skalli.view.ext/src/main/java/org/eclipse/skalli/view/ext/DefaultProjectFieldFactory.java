@@ -50,7 +50,7 @@ public abstract class DefaultProjectFieldFactory<T extends ExtensionEntityBase> 
     public DefaultProjectFieldFactory(Project project, Class<T> extensionClass, ProjectEditContext context) {
         this.project = project;
         this.extensionClassName = extensionClass.getName();
-        this.extensionService = ExtensionServices.getExtensionService(extensionClass);
+        this.extensionService = ExtensionServices.getByExtensionClass(extensionClass);
         this.projectTemplate = context.getProjectTemplate();
         this.isAdmin = context.isAdministrator();
         this.mode = context.getProjectEditMode();
