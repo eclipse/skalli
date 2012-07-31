@@ -11,6 +11,7 @@
 package org.eclipse.skalli.core.internal.event;
 
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,7 +31,7 @@ import org.slf4j.LoggerFactory;
 public class EventComponent implements EventService {
     private static final Logger LOG = LoggerFactory.getLogger(EventComponent.class);
 
-    private final Map<String, Set> listeners = new HashMap<String, Set>();
+    private final Map<String, Set> listeners = Collections.synchronizedMap(new HashMap<String, Set>());
 
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[EventService] {0} : activated",
