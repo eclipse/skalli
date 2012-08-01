@@ -115,9 +115,9 @@ public class Statistics {
     }
 
     public static class SearchInfo extends StatisticsInfo {
-        private String queryString;
-        private int resultCount;
-        private long duration;
+        private final String queryString;
+        private final int resultCount;
+        private final long duration;
 
         public SearchInfo(String userId, String queryString, int resultCount, long duration) {
             super(userId);
@@ -136,6 +136,23 @@ public class Statistics {
         }
     }
 
+    public static class ResponseTimeInfo extends StatisticsInfo {
+        private final String path;
+        private final long responseTime; // in milliseconds
+
+        public ResponseTimeInfo(String userId, String path, long responseTime) {
+            super(userId);
+            this.path = path;
+            this.responseTime = responseTime > 0 ? responseTime : 1L;
+        }
+        public String getPath() {
+            return path;
+        }
+        public long getResponseTime() {
+            return responseTime;
+        }
+    }
+
     public static final String ANONYMOUS = "anonymous"; //$NON-NLS-1$
 
     private static final SortedSet<UserInfo> users = new TreeSet<UserInfo>();
@@ -143,6 +160,8 @@ public class Statistics {
     private static final SortedSet<RefererInfo> referers = new TreeSet<RefererInfo>();
     private static final SortedSet<BrowserInfo> browsers = new TreeSet<BrowserInfo>();
     private static final SortedSet<SearchInfo> searches = new TreeSet<SearchInfo>();
+    private static final SortedSet<ResponseTimeInfo> responseTimes = new TreeSet<ResponseTimeInfo>();
+
     private long startTimestamp;
 
     private Statistics() {
@@ -182,6 +201,10 @@ public class Statistics {
         referers.add(new RefererInfo(userId, referer));
     }
 
+    public synchronized void trackResponseTime(String userId, String path, long responseTime) {
+        responseTimes.add(new ResponseTimeInfo(userId, path, responseTime));
+    }
+
     public synchronized void retain(long startDate, long endDate) {
         retain(usages, startDate, endDate);
         retain(users, startDate, endDate);
@@ -190,13 +213,13 @@ public class Statistics {
         retain(referers, startDate, endDate);
     }
 
-    public Map<String, Integer> getUserCount(long startDate, long endDate) {
-        Map<String, Integer> result = new HashMap<String, Integer>();
+    public Map<String, Long> getUserCount(long startDate, long endDate) {
+        Map<String, Long> result = new HashMap<String, Long>();
         for (UserInfo userInfo : users) {
             if (userInfo.inRange(startDate, endDate)) {
-                Integer count = result.get(userInfo.getUserHash());
+                Long count = result.get(userInfo.getUserHash());
                 if (count == null) {
-                    count = 0;
+                    count = 0L;
                 }
                 ++count;
                 result.put(userInfo.getUserHash(), count);
@@ -205,14 +228,14 @@ public class Statistics {
         return sortedByFrequencyDescending(result);
     }
 
-    public Map<String, Integer> getDepartmentCount(long startDate, long endDate) {
-        Map<String, Integer> result = new TreeMap<String, Integer>();
+    public Map<String, Long> getDepartmentCount(long startDate, long endDate) {
+        Map<String, Long> result = new TreeMap<String, Long>();
         for (UserInfo userInfo : users) {
             String department = userInfo.getDepartment();
             if (userInfo.inRange(startDate, endDate) && StringUtils.isNotBlank(department)) {
-                Integer count = result.get(department);
+                Long count = result.get(department);
                 if (count == null) {
-                    count = 0;
+                    count = 0L;
                 }
                 ++count;
                 result.put(department, count);
@@ -221,14 +244,14 @@ public class Statistics {
         return sortedByFrequencyDescending(result);
     }
 
-    public Map<String, Integer> getLocationCount(long startDate, long endDate) {
-        Map<String, Integer> result = new TreeMap<String, Integer>();
+    public Map<String, Long> getLocationCount(long startDate, long endDate) {
+        Map<String, Long> result = new TreeMap<String, Long>();
         for (UserInfo userInfo : users) {
             String location = userInfo.getLocation();
             if (userInfo.inRange(startDate, endDate) && StringUtils.isNotBlank(location)) {
-                Integer count = result.get(location);
+                Long count = result.get(location);
                 if (count == null) {
-                    count = 0;
+                    count = 0L;
                 }
                 ++count;
                 result.put(location, count);
@@ -237,13 +260,13 @@ public class Statistics {
         return sortedByFrequencyDescending(result);
     }
 
-    public Map<String, Integer> getBrowserCount(long startDate, long endDate) {
-        Map<String, Integer> result = new TreeMap<String, Integer>();
+    public Map<String, Long> getBrowserCount(long startDate, long endDate) {
+        Map<String, Long> result = new TreeMap<String, Long>();
         for (BrowserInfo browserInfo: browsers) {
             if (browserInfo.inRange(startDate, endDate)) {
-                Integer count = result.get(browserInfo.getUserAgent());
+                Long count = result.get(browserInfo.getUserAgent());
                 if (count == null) {
-                    count = 0;
+                    count = 0L;
                 }
                 ++count;
                 result.put(browserInfo.getUserAgent(), count);
@@ -252,13 +275,13 @@ public class Statistics {
         return sortedByFrequencyDescending(result);
     }
 
-    public Map<String, Integer> getRefererCount(long startDate, long endDate) {
-        Map<String, Integer> result = new TreeMap<String, Integer>();
+    public Map<String, Long> getRefererCount(long startDate, long endDate) {
+        Map<String, Long> result = new TreeMap<String, Long>();
         for (RefererInfo refererInfo: referers) {
             if (refererInfo.inRange(startDate, endDate)) {
-                Integer count = result.get(refererInfo.getReferer());
+                Long count = result.get(refererInfo.getReferer());
                 if (count == null) {
-                    count = 0;
+                    count = 0L;
                 }
                 ++count;
                 result.put(refererInfo.getReferer(), count);
@@ -267,13 +290,13 @@ public class Statistics {
         return sortedByFrequencyDescending(result);
     }
 
-    public Map<String, Integer> getUsageCount(long startDate, long endDate) {
-        Map<String, Integer> result = new TreeMap<String, Integer>();
+    public Map<String, Long> getUsageCount(long startDate, long endDate) {
+        Map<String, Long> result = new TreeMap<String, Long>();
         for (UsageInfo usageInfo: usages) {
             if (usageInfo.inRange(startDate, endDate)) {
-                Integer count = result.get(usageInfo.getPath());
+                Long count = result.get(usageInfo.getPath());
                 if (count == null) {
-                    count = 0;
+                    count = 0L;
                 }
                 ++count;
                 result.put(usageInfo.getPath(), count);
@@ -282,17 +305,47 @@ public class Statistics {
         return sortedByFrequencyDescending(result);
     }
 
-    public Map<String, Integer> getSearchCount(long startDate, long endDate) {
-        Map<String, Integer> result = new TreeMap<String, Integer>();
+    public Map<String, Long> getSearchCount(long startDate, long endDate) {
+        Map<String, Long> result = new TreeMap<String, Long>();
         for (SearchInfo searchInfo: searches) {
             if (searchInfo.inRange(startDate, endDate)) {
-                Integer count = result.get(searchInfo.getQueryString());
+                Long count = result.get(searchInfo.getQueryString());
                 if (count == null) {
-                    count = 0;
+                    count = 0L;
                 }
                 ++count;
                 result.put(searchInfo.getQueryString(), count);
             }
+        }
+        return sortedByFrequencyDescending(result);
+    }
+
+    public Map<String, Long> getAverageResponseTimes(long startDate, long endDate) {
+        Map<String, Long> result = new TreeMap<String, Long>();
+        Map<String, Integer> counts = new TreeMap<String, Integer>();
+
+        for (ResponseTimeInfo responseTimeInfo: responseTimes) {
+            if (responseTimeInfo.inRange(startDate, endDate)) {
+                String path = responseTimeInfo.getPath();
+
+                Long sumResponseTime = result.get(path);
+                if (sumResponseTime == null) {
+                    sumResponseTime = 0L;
+                }
+                sumResponseTime += responseTimeInfo.getResponseTime();
+                result.put(path, sumResponseTime);
+
+                Integer count = counts.get(path);
+                if (count == null) {
+                    count = 0;
+                }
+                ++count;
+                counts.put(path, count);
+            }
+        }
+        for (Entry<String,Long> entry: result.entrySet()) {
+            Integer count = counts.get(entry.getKey());
+            entry.setValue(entry.getValue() / count);
         }
         return sortedByFrequencyDescending(result);
     }
@@ -330,14 +383,14 @@ public class Statistics {
         }
     }
 
-    private Map<String,Integer> sortedByFrequencyDescending(Map<String,Integer> map) {
+    private Map<String,Long> sortedByFrequencyDescending(Map<String,Long> map) {
         if (map == null || map.size() <= 1) {
             return map;
         }
-        List<Entry<String,Integer>> list = new ArrayList<Entry<String,Integer>>(map.entrySet());
-        Collections.sort(list, new Comparator<Entry<String,Integer>>() {
+        List<Entry<String,Long>> list = new ArrayList<Entry<String,Long>>(map.entrySet());
+        Collections.sort(list, new Comparator<Entry<String,Long>>() {
             @Override
-            public int compare(Entry<String,Integer> o1, Entry<String,Integer> o2) {
+            public int compare(Entry<String,Long> o1, Entry<String,Long> o2) {
                 int result = -Integer.signum(o1.getValue().compareTo(o2.getValue()));
                 if (result == 0) {
                     result = o1.getKey().compareTo(o2.getKey());
@@ -345,8 +398,8 @@ public class Statistics {
                 return result;
             }
         });
-        LinkedHashMap<String,Integer> sortedMap = new LinkedHashMap<String,Integer>();
-        for (Entry<String,Integer> entry: list) {
+        LinkedHashMap<String,Long> sortedMap = new LinkedHashMap<String,Long>();
+        for (Entry<String,Long> entry: list) {
             sortedMap.put(entry.getKey(), entry.getValue());
         }
         return sortedMap;

@@ -59,49 +59,60 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         writer.endNode();
 
         writer.startNode("users"); //$NON-NLS-1$
-        Map<String,Integer> users = statistics.getUserCount(startDate, endDate);
+        Map<String,Long> users = statistics.getUserCount(startDate, endDate);
         appendUniqueCount(writer, users);
         appendTotalCount(writer, users);
         writeEntries(writer, "user", users); //$NON-NLS-1$
         writer.endNode();
 
+        Map<String,Long> avgResponseTimes = statistics.getAverageResponseTimes(startDate, endDate);
+
         writer.startNode("usages"); //$NON-NLS-1$
-        Map<String,Integer> usages = statistics.getUsageCount(startDate, endDate);
+        Map<String,Long> usages = statistics.getUsageCount(startDate, endDate);
         appendUniqueCount(writer, usages);
         appendTotalCount(writer, usages);
-        writeEntries(writer, "usage", usages); //$NON-NLS-1$
+        writeUsageEntries(writer, usages, avgResponseTimes);
+        writer.endNode();
+
+        writer.startNode("avgResponseTimes"); //$NON-NLS-1$
+        for (Entry<String, Long> entry : avgResponseTimes.entrySet()) {
+            writer.startNode("avgResponseTime"); //$NON-NLS-1$
+            writer.addAttribute("path", entry.getKey()); //$NON-NLS-1$
+            writer.setValue(Long.toString(entry.getValue()));
+            writer.endNode();
+        }
         writer.endNode();
 
         writer.startNode("searches"); //$NON-NLS-1$
-        Map<String,Integer> searches = statistics.getSearchCount(startDate, endDate);
+        Map<String,Long> searches = statistics.getSearchCount(startDate, endDate);
         appendUniqueCount(writer, searches);
         appendTotalCount(writer, searches);
         writeEntries(writer, "search", searches); //$NON-NLS-1$
         writer.endNode();
 
         writer.startNode("locations"); //$NON-NLS-1$
-        Map<String,Integer> locations = statistics.getLocationCount(startDate, endDate);
+        Map<String,Long> locations = statistics.getLocationCount(startDate, endDate);
         appendUniqueCount(writer, locations);
         appendTotalCount(writer, locations);
         writeEntries(writer, "location", locations); //$NON-NLS-1$
         writer.endNode();
 
         writer.startNode("departments"); //$NON-NLS-1$
-        Map<String,Integer> departments = statistics.getDepartmentCount(startDate, endDate);
+        Map<String,Long> departments = statistics.getDepartmentCount(startDate, endDate);
         appendUniqueCount(writer, departments);
         appendTotalCount(writer, departments);
         writeEntries(writer, "department", departments); //$NON-NLS-1$
         writer.endNode();
 
         writer.startNode("browsers"); //$NON-NLS-1$
-        Map<String,Integer> browsers = statistics.getBrowserCount(startDate, endDate);
+        Map<String,Long> browsers = statistics.getBrowserCount(startDate, endDate);
         appendUniqueCount(writer, browsers);
         appendTotalCount(writer, browsers);
         writeEntries(writer, "browser", browsers); //$NON-NLS-1$
         writer.endNode();
 
         writer.startNode("referers"); //$NON-NLS-1$
-        Map<String,Integer> referers = statistics.getRefererCount(startDate, endDate);
+        Map<String,Long> referers = statistics.getRefererCount(startDate, endDate);
         appendUniqueCount(writer, referers);
         appendTotalCount(writer, referers);
         writeEntries(writer, "referer", referers); //$NON-NLS-1$
@@ -121,14 +132,30 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         writer.endNode();
     }
 
-    private void writeEntries(HierarchicalStreamWriter writer, String nodeName, Map<String,Integer> entries) {
-        for (Entry<String, Integer> entry : entries.entrySet()) {
+    private void writeEntries(HierarchicalStreamWriter writer, String nodeName, Map<String,Long> entries) {
+        for (Entry<String, Long> entry : entries.entrySet()) {
             writer.startNode(nodeName);
             writer.addAttribute("count", entry.getValue().toString()); //$NON-NLS-1$
             writer.setValue(entry.getKey() != null ? entry.getKey() : ""); //$NON-NLS-1$
             writer.endNode();
         }
     }
+
+    private void writeUsageEntries(HierarchicalStreamWriter writer,
+            Map<String,Long> usages, Map<String,Long> avgResponseTimes) {
+        for (Entry<String, Long> usage : usages.entrySet()) {
+            writer.startNode("usage"); //$NON-NLS-1$
+            writer.addAttribute("count", usage.getValue().toString()); //$NON-NLS-1$
+            Long avgResponseTime = avgResponseTimes.get(usage.getKey());
+            if (avgResponseTime != null) {
+                writer.addAttribute("avgResponseTime", Long.toString(avgResponseTime)); //$NON-NLS-1$
+            }
+            writer.setValue(usage.getKey() != null ? usage.getKey() : ""); //$NON-NLS-1$
+            writer.endNode();
+        }
+    }
+
+
 
     private void writeEntry(HierarchicalStreamWriter writer, StatisticsInfo info) {
         if (info instanceof UsageInfo) {
@@ -147,12 +174,12 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         }
     }
 
-    private void appendUniqueCount(HierarchicalStreamWriter writer, Map<String,Integer> entries) {
+    private void appendUniqueCount(HierarchicalStreamWriter writer, Map<String,Long> entries) {
         writer.addAttribute("uniqueCount", Integer.toString(entries.size())); //$NON-NLS-1$
     }
 
-    private void appendTotalCount(HierarchicalStreamWriter writer, Map<String,Integer> entries) {
-        Iterator<Integer> it = entries.values().iterator();
+    private void appendTotalCount(HierarchicalStreamWriter writer, Map<String,Long> entries) {
+        Iterator<Long> it = entries.values().iterator();
         int count = 0;
         for (; it.hasNext(); count += it.next()) {
         }

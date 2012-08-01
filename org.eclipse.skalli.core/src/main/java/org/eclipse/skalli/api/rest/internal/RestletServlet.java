@@ -69,13 +69,13 @@ public class RestletServlet extends ServerServlet {
     @Override
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        String pathInfo = request.getPathInfo();
+        long timeBeginnProcessing = System.currentTimeMillis();
 
-        // determine the project from the URL
+        // determine the project from the pathInfo, if available
         Project project = null;
         ProjectService projectService = Services.getRequiredService(ProjectService.class);
 
-        // first check if project can be deduced from pathInfo
+        String pathInfo = request.getPathInfo();
         if (StringUtils.isNotBlank(pathInfo)) {
             if (pathInfo.startsWith("/")) { //$NON-NLS-1$
                 pathInfo = pathInfo.replaceFirst("/", StringUtils.EMPTY); //$NON-NLS-1$
@@ -105,31 +105,44 @@ public class RestletServlet extends ServerServlet {
             user = UserUtils.getUser(userId);
         }
 
+        // track the request statistics
         Statistics statistics = Statistics.getDefault();
         if (user != null) {
             statistics.trackUser(userId, user.getDepartment(), user.getLocation());
         } else if (StringUtils.isNotBlank(userId)) {
             statistics.trackUser(userId, null, null);
         }
+
         String referer = request.getHeader("Referer"); //$NON-NLS-1$
         if (StringUtils.isBlank(referer)) {
             referer = request.getParameter("referer"); //$NON-NLS-1$
         }
+
         if (StringUtils.isNotBlank(referer)) {
             statistics.trackReferer(userId, referer);
         }
-        statistics.trackUsage(userId, MessageFormat.format("{0} {1}", //$NON-NLS-1$
-                request.getMethod(), request.getRequestURI()), referer);
+
+        String requestLine = MessageFormat.format("{0} {1}", //$NON-NLS-1$
+                request.getMethod(), request.getRequestURI());
         if (project != null) {
-            statistics.trackUsage(userId, MessageFormat.format("{0} /api/projects/{0}", //$NON-NLS-1$
-                    request.getMethod(), project.getProjectId()), referer);
+            requestLine = MessageFormat.format("{0} /api/projects/{0}", //$NON-NLS-1$
+                    request.getMethod(), project.getProjectId());
         }
+        statistics.trackUsage(userId, requestLine, referer);
+
         String browser = request.getHeader("User-Agent"); //$NON-NLS-1$
         if (StringUtils.isNotBlank(browser)) {
             statistics.trackBrowser(userId, browser);
         }
 
+        // perform the request
         super.service(request, response);
+
+        // track the overall response time
+        long responseTime = System.currentTimeMillis() - timeBeginnProcessing;
+        statistics.trackResponseTime(userId, requestLine, responseTime);
+        LOG.info(MessageFormat.format("{0}: responseTime={1} milliseconds)", requestLine, Long.toString(responseTime)));
+
     }
 
 }

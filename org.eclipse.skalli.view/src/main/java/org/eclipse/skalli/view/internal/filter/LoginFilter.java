@@ -36,6 +36,8 @@ import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.project.ProjectUtils;
 import org.eclipse.skalli.services.user.UserUtils;
 import org.eclipse.skalli.view.Consts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This filter determines the user and requested project from the servlet request
@@ -71,6 +73,8 @@ import org.eclipse.skalli.view.Consts;
  */
 public class LoginFilter implements Filter {
 
+    private static final Logger LOG = LoggerFactory.getLogger(LoginFilter.class);
+
     @Override
     public void init(FilterConfig arg0) throws ServletException {
     }
@@ -82,6 +86,8 @@ public class LoginFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
             ServletException {
+
+        long timeBeginnProcessing = System.currentTimeMillis();
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String pathInfo = httpRequest.getPathInfo();
@@ -165,19 +171,24 @@ public class LoginFilter implements Filter {
         } else if (StringUtils.isNotBlank(userId)) {
             statistics.trackUser(userId, null, null);
         }
+
         String referer = httpRequest.getHeader("Referer"); //$NON-NLS-1$
         if (StringUtils.isBlank(referer)) {
             referer = request.getParameter("referer"); //$NON-NLS-1$
         }
+
         if (StringUtils.isNotBlank(referer)) {
             statistics.trackReferer(userId, referer);
         }
-        statistics.trackUsage(userId, MessageFormat.format("{0} {1}", //$NON-NLS-1$
-                httpRequest.getMethod(), httpRequest.getRequestURI()), referer);
+
+        String requestLine = MessageFormat.format("{0} {1}", //$NON-NLS-1$
+                httpRequest.getMethod(), httpRequest.getRequestURI());
         if (project != null) {
-            statistics.trackUsage(userId, MessageFormat.format("{0} /projects/{1}", //$NON-NLS-1$
-                    httpRequest.getMethod(), project.getProjectId()), referer);
+            requestLine = MessageFormat.format("{0} /api/projects/{0}", //$NON-NLS-1$
+                    httpRequest.getMethod(), project.getProjectId());
         }
+        statistics.trackUsage(userId, requestLine, referer);
+
         String browser = httpRequest.getHeader("User-Agent"); //$NON-NLS-1$
         if (StringUtils.isNotBlank(browser)) {
             statistics.trackBrowser(userId, browser);
@@ -185,5 +196,10 @@ public class LoginFilter implements Filter {
 
         // proceed along the chain
         chain.doFilter(request, response);
+
+        // track the overall response time
+        long responseTime = System.currentTimeMillis() - timeBeginnProcessing;
+        statistics.trackResponseTime(userId, requestLine, responseTime);
+        LOG.info(MessageFormat.format("{0}: responseTime={1} milliseconds)", requestLine, Long.toString(responseTime)));
     }
 }
