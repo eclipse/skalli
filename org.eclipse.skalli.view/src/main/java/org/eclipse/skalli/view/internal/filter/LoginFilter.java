@@ -149,10 +149,13 @@ public class LoginFilter implements Filter {
         boolean isAnonymousUser = StringUtils.isBlank(userId);
         if (!isAnonymousUser) {
             request.setAttribute(Consts.ATTRIBUTE_USERID, userId);
+            String userDisplayName = userId;
             user = UserUtils.getUser(userId);
             if (user != null) {
+                userDisplayName = user.getDisplayName();
                 request.setAttribute(Consts.ATTRIBUTE_USER, user);
             }
+            request.setAttribute(Consts.ATTRIBUTE_USER_DISPLAY_NAME, userDisplayName);
         }
 
         boolean isProjectAdmin = !isAnonymousUser && project != null &&

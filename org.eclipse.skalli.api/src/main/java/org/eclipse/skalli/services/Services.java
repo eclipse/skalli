@@ -23,20 +23,37 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.eclipse.skalli.commons.URLUtils;
+import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.Version;
 
 /**
- * Utiliy class that provides various methods to retrieve,
- * filter and iterate OSGi service instances.
+ * Utility class that provides various methods to retrieve,
+ * filter and iterate OSGi service instances, retrieve bundles
+ * and find resources in bundles.
+ * <p>
+ * Note: For retrieving {@link ExtensionService extension services} use
+ * the helper methods in {@link ExtensionServices}, which provide
+ * caching and a direct mapping from extension classes to the
+ * corresponding extension services.
  */
 public class Services {
 
-    /** Regular expression to search for Skalli bundles, see {@link #getBundlesMatching(String)}. */
+    /**
+     * Regular expression to search for Skalli bundles, see {@link #getBundlesMatching(String)}.
+     */
     public static final String SKALLI_BUNDLE_PATTERN = "org\\.eclipse\\.skalli\\..*";  //$NON-NLS-1$
+
+    /**
+     * The API version of Skalli, which is by definition the bundle version of the
+     * <tt>org.eclipse.skalli.api</tt> bundle<tt>.
+     */
+    public static final Version API_VERSION = getBundleVersion(Services.class);
 
     // no instances, please!
     private Services() {
@@ -296,6 +313,20 @@ public class Services {
     }
 
     /**
+     * Returns the version of the bundle to which the given class belongs.
+     * <p>
+     * Note: In order to retrieve the API version of Skalli use
+     * the constant {@link #API_VERSION}.
+     *
+     * @param clazz  the class for which to resolve the bundle version.
+     * @return  the version of a bundle, or {@link Version#emptyVersion}.
+     */
+    public static Version getBundleVersion(Class<?> clazz) {
+        Bundle bundle = FrameworkUtil.getBundle(clazz);
+        return bundle != null? bundle.getVersion() : Version.emptyVersion;
+    }
+
+    /**
      * Scans bundles for resources matching the given <code>path</code>
      * and <code>pattern</code>. Searches bundles based on a given list
      * of bundle filters and in the order defined by their symbolic names.
@@ -392,18 +423,6 @@ public class Services {
                     serviceClass.getName()));
         }
         return serviceInstance;
-    }
-
-    private static boolean matchesAnyOf(Bundle bundle, BundleFilter... filters) {
-        if (filters == null || filters.length == 0) {
-            return true;
-        }
-        for (BundleFilter filter: filters) {
-            if (filter.accept(bundle)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private static class ServiceIterator<T> implements Iterator<T> {

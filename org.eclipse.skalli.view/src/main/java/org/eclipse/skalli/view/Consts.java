@@ -38,6 +38,7 @@ public class Consts {
 
     public static final String ATTRIBUTE_USERID = "userId";
     public static final String ATTRIBUTE_USER = "user";
+    public static final String ATTRIBUTE_USER_DISPLAY_NAME = "userDisplayName";
     public static final String ATTRIBUTE_PROJECT = "project";
     public static final String ATTRIBUTE_PROJECTID = "projectId";
     public static final String ATTRIBUTE_PROJECTUUID = "projectUUID";

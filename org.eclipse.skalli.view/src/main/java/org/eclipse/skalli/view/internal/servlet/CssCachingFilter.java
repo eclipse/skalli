@@ -22,8 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-
-import org.eclipse.skalli.view.internal.ViewBundleUtil;
+import org.eclipse.skalli.services.Services;
 
 /**
  * <strong>Temporary</strong> solution to avoid caching of CSS files.
@@ -55,7 +54,7 @@ public class CssCachingFilter implements Filter {
 
         String queryString = httpServletRequest.getQueryString();
         if (StringUtils.isBlank(queryString)) {
-            httpServletResponse.sendRedirect(httpServletRequest.getRequestURI() + "?" + ViewBundleUtil.getBundleVersion());
+            httpServletResponse.sendRedirect(httpServletRequest.getRequestURI() + "?" + Services.API_VERSION);
         } else {
             chain.doFilter(request, response);
         }

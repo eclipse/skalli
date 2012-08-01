@@ -19,7 +19,6 @@ import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.view.ext.InfoBox;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.Version;
 
 public class ViewBundleUtil {
 
@@ -59,9 +58,5 @@ public class ViewBundleUtil {
                 // and finally all bundles
                 new BundleFilter.AcceptAll()
          );
-    }
-
-    public static Version getBundleVersion() {
-        return FrameworkUtil.getBundle(ViewBundleUtil.class).getVersion();
     }
 }

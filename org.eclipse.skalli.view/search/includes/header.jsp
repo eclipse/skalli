@@ -11,25 +11,11 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="org.eclipse.skalli.view.component.TagCloud" %>
-<%@ page import="org.eclipse.skalli.model.User" %>
+<%@ page import="org.eclipse.skalli.services.Services" %>
 <%@ page import="org.osgi.framework.Version" %>
-<%@ page import="org.eclipse.skalli.view.internal.ViewBundleUtil" %>
 <%@ page import="org.eclipse.skalli.view.Consts" %>
-<%@ page import="org.eclipse.skalli.services.user.LoginUtils" %>
 
 <div class="mainheader">
-<%
-    LoginUtils util = new LoginUtils(request);
-    User user = util.getLoggedInUser();
-    TagCloud tagCloud = TagCloud.getInstance(25);
-    Version version = ViewBundleUtil.getBundleVersion();
-    if (version!=null) {
-        request.setAttribute("version", version);
-    }
-%>
-
     <div class="mainheader-left">
        <c:forEach var="toplinkConfig" items="${toplinksConfig.topLinks}" >
          <a href ="${toplinkConfig.url}">${toplinkConfig.displayName}</a>
@@ -40,7 +26,7 @@
         <c:choose>
           <c:when test="${user!=null}">
             Welcome
-            <a href="<%=Consts.URL_MYPROJECTS%>"><%=user.getDisplayName()%></a>
+            <a href="<%=Consts.URL_MYPROJECTS%>">${userDisplayName}</a>
             <c:if test="${feedbackConfig != null }">
               <span class="vertical_separator"><img src="/VAADIN/themes/simple/images/separator.png" alt="separator"></span>
               <a title="${feedbackConfig.displayName}" href="${feedbackConfig.url}">${feedbackConfig.displayName}</a>
@@ -51,23 +37,13 @@
           </c:otherwise>
         </c:choose>
         <c:choose>
-          <c:when test="${version!=null}">
-            <c:choose>
-              <c:when test="${newsConfig != null}">
-                <span class="vertical_separator"><img src="/VAADIN/themes/simple/images/separator.png" alt="separator"></span>
-                <a href="${newsConfig.url}">Version <%= version.getQualifier() %></a>
-              </c:when>
-              <c:otherwise>
-                <span class="vertical_separator"><img src="/VAADIN/themes/simple/images/separator.png" alt="separator"></span>
-                Version <%= version.getQualifier() %>
-              </c:otherwise>
-            </c:choose>
+          <c:when test="${newsConfig != null}">
+            <span class="vertical_separator"><img src="/VAADIN/themes/simple/images/separator.png" alt="separator"></span>
+            <a href="${newsConfig.url}">Version <%= Services.API_VERSION.getQualifier() %></a>
           </c:when>
           <c:otherwise>
-            <c:if test="${newsConfig != null}">
-              <span class="vertical_separator"><img src="/VAADIN/themes/simple/images/separator.png" alt="separator"></span>
-              <a href="${newsConfig.url}">Latest News</a>
-            </c:if>
+            <span class="vertical_separator"><img src="/VAADIN/themes/simple/images/separator.png" alt="separator"></span>
+            Version <%= Services.API_VERSION.getQualifier() %>
           </c:otherwise>
         </c:choose>
       </div>
