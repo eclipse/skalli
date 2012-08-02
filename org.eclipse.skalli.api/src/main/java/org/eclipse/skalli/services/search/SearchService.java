@@ -14,107 +14,106 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.extension.Indexer;
 
 /**
- * Service that provides access to the search engine.
- *
+ * Service that provides access to the search and indexing capabilities.
  * <p>
- * This interface exposes methods specific to the {@link Project} entity.
- * </p>
+ * The default implementation of this service is based on
+ * <a href="http://lucene.apache.org/core/">Lucene</a>.
  */
 public interface SearchService {
 
     /**
-     * Updates the search index entry for the given {@link Project}.
-     *
+     * Updates the search index entry for the given {@link Project project},
+     * or adds a new index entry, if the project has not been indexed before.
      * <p>
-     * The {@link Project} does not necessarily need to be known to the index already.
-     * </p>
-     * <p>
-     * A {@link Project} marked as deleted is removed from the index,
-     * hence will not be included in search results anymore.
-     * </p>
+     * A project marked as {@link Project#isDeleted() deleted} is removed from
+     * the index, hence will not show up in search results anymore.
      *
-     * @param project
+     * @param project  the project to index.
      */
     public void update(Project project);
 
     /**
-     * Updates the search index entries for the given {@link Project}s.
-     *
+     * Updates the search index entries for the given collection of
+     * {@link Project projects}, or add new index entries for projects
+     * that have not previously been indexed.
      * <p>
-     * The {@link Project}s do not necessarily need to be known to the index already.
-     * </p>
-     * <p>
-     * {@link Project}s marked as deleted are removed from the index,
-     * hence will not be included in search results anymore.
-     * </p>
+     * Projects marked as {@link Project#isDeleted() deleted} are removed from
+     * the index, hence will not show up in search results anymore.
      *
-     * @param project
+     * @param projects  the projects to index.
      */
     public void update(Collection<Project> projects);
 
     /**
-     * Searches for {@link Project}s using the given queryString.
-     *
+     * Searches for {@link Project projects} based on a given query string.
      * <p>
-     * All major fields (e.g. Project Name, Description, Members, Tags,...) will be used to
-     * determine the search result and the ranking of each {@link Project}.
-     * </p>
+     * All {@link Indexer#getDefaultSearchFields() default search fields} (e.g. project name,
+     * description, members, tags,...) of the projects and their extensions will be used to
+     * determine the search result and the ranking of the individual search hits.
      *
-     * @param queryString
-     * @param pagingInfo (if required, null allowed)
-     * @return the {@link SearchResult}. It be empty but never returns null.
+     * @param queryString  the query string to search for.
+     * @param pagingInfo optional start and count parameters to filter the result, or <code>null</code>.
+     *
+     * @return the {@link SearchResult search result}, which is basically a list of
+     * {@link SearchHit search hits}.
      */
     public SearchResult<Project> findProjectsByQuery(String queryString, PagingInfo pagingInfo)
             throws QueryParseException;
 
     /**
-     * Searches for {@link Project}s that the given user is member of.
+     * Searches for {@link Project projects} of which the given user is member of.
      *
-     * @param queryString
-     * @param pagingInfo (if required, null allowed)
-     * @return the {@link SearchResult}. It be empty but never returns null.
+     * @param userId  the unique identifier of the user to search for.
+     * @param pagingInfo optional start and count parameters to filter the result, or <code>null</code>.
+     *
+     * @return the {@link SearchResult search result}, which is basically a list of
+     * {@link SearchHit search hits}.
      */
-    public SearchResult<Project> findProjectsByUser(String queryString, PagingInfo pagingInfo)
+    public SearchResult<Project> findProjectsByUser(String userId, PagingInfo pagingInfo)
             throws QueryParseException;
 
     /**
-     * Searches for {@link Project}s that have the given tag.
+     * Searches for {@link Project projects} with a given tag
      *
-     * @param queryString
-     * @param pagingInfo (if required, null allowed)
-     * @return the {@link SearchResult}. It be empty but never returns null.
+     * @param tag  the tag so search for.
+     * @param pagingInfo optional start and count parameters to filter the result, or <code>null</code>.
+     *
+     * @return the {@link SearchResult search result}, which is basically a list of
+     * {@link SearchHit search hits}.
      */
-    public SearchResult<Project> findProjectsByTag(String queryString, PagingInfo pagingInfo)
+    public SearchResult<Project> findProjectsByTag(String tag, PagingInfo pagingInfo)
             throws QueryParseException;
 
     /**
-     * Rebuilds the index with the given {@link Project}s.
+     * Rebuilds the index for the given collection of {@link Project projects} from scratch.
+     * All previously existing index entries for these projects will be dropped.
      *
-     * <p>
-     * All existing index entries will be dropped.
-     * </p>
-     *
-     * @param projects
+     * @param projects  the projects to re-index.
      */
     public void reindex(Collection<Project> projects);
 
     /**
-     * Uses a fuzzy search to find {@link Project}s that have similarities to the given {@link Project} ("More like this").
-     *
+     * Uses a fuzzy search to find {@link Project projects} that have similarities to the
+     * given projects ("More Like This" search).
      * <p>
-     * The content of fields like Project Name, Description and Tags is used to infer the relation of {@link Project}s.
-     * </p>
+     * All {@link Indexer#getDefaultSearchFields() default search fields} (e.g. project name,
+     * description, members, tags,...) of the projects and their extensions will be used to
+     * determine the search result and the ranking of the individual search hits.
      *
-     * @param project
-     * @param count
-     * @return the {@link SearchResult}. It be empty but never returns null.
+     * @param project  the project for which to find related projects.
+     * @param count maximum number of results to return.
+     *
+     * @return the {@link SearchResult search result}, which is basically a list of
+     * {@link SearchHit search hits}.
      */
     public SearchResult<Project> getRelatedProjects(Project project, int count);
 
     /**
-     * Converts a list of projects into a list of search hits.
+     * Converts a given list of projects into a list of search hits.
+     *
      * @param projects  the projects to convert.
      * @return the list of search hits, or an empty list.
      */
