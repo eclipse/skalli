@@ -12,31 +12,31 @@ package org.eclipse.skalli.model;
 
 import java.text.MessageFormat;
 
-public class NoSuchPropertyException extends RuntimeException {
+public class PropertyUpdateException extends RuntimeException {
 
     private static final long serialVersionUID = -5333642036204491847L;
 
-    public NoSuchPropertyException() {
+    public PropertyUpdateException() {
         super();
     }
 
-    public NoSuchPropertyException(String message, Throwable cause) {
+    public PropertyUpdateException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public NoSuchPropertyException(String message) {
+    public PropertyUpdateException(String message) {
         super(message);
     }
 
-    public NoSuchPropertyException(Throwable cause) {
+    public PropertyUpdateException(Throwable cause) {
         super(cause);
     }
 
-    public NoSuchPropertyException(EntityBase entity, String propertyName) {
+    public PropertyUpdateException(EntityBase entity, String propertyName) {
         this(entity, propertyName, null);
     }
 
-    public NoSuchPropertyException(EntityBase entity, String propertyName, Throwable cause) {
-        super(MessageFormat.format("Failed to retrieve property {0} of {1}", propertyName, entity.getClass().getName()), cause);
+    public PropertyUpdateException(EntityBase entity, String propertyName, Throwable cause) {
+        super(MessageFormat.format("Failed to update property {0} of {1}", propertyName, entity.getClass().getName()), cause);
     }
 }

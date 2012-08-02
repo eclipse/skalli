@@ -280,14 +280,14 @@ public abstract class EntityBase implements Comparable<Object> {
      * Sets the value for the given property, if that property exists.
      *
      * @param propertyName  the identifier of the property.
-     * @param propertyValue  value of the property.
-     * @throws Exception
-     * @throws NoSuchPropertyException  if no property with the given name
-     * exists.
+     * @param propertyValue  the new value of the property.
+
+     * @throws NoSuchPropertyException  if no property with the given name exists.
+     * @throws PropertyUpdateException  if the property value could not be changed.
      *
      * @see org.eclipse.skalli.services.projects.PropertyName
      */
-    public void setProperty(String propertyName, Object propertyValue) throws Exception {
+    public void setProperty(String propertyName, Object propertyValue) {
         Class<? extends Object> paramType = (propertyValue instanceof Collection) ? Collection.class : String.class;
         Method method = getMethod("set", propertyName, new Class[] { paramType }); //$NON-NLS-1$
         if (method == null) {
@@ -296,7 +296,7 @@ public abstract class EntityBase implements Comparable<Object> {
         try {
             method.invoke(this, propertyValue);
         } catch (Exception e) {
-           throw new Exception(MessageFormat.format("Property {0} could not be updated", propertyName), e);
+           throw new PropertyUpdateException(MessageFormat.format("Property {0} could not be updated", propertyName), e);
         }
     }
 
@@ -305,8 +305,8 @@ public abstract class EntityBase implements Comparable<Object> {
         try {
             return getClass().getMethod(methodName, methodArgs);
         } catch (NoSuchMethodException e) {
-            LOG.debug(MessageFormat.format("Entity of type {0} does not have a {1}ter {2} for property {3}", getClass()
-                    .getName(), methodPrefix, methodName, propertyName));
+            LOG.debug(MessageFormat.format("Entity of type {0} does not have a {1}ter {2} for property {3}",
+                    getClass().getName(), methodPrefix, methodName, propertyName));
         }
         return null;
     }
