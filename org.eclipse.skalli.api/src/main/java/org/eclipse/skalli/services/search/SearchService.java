@@ -96,6 +96,11 @@ public interface SearchService {
     public void reindex(Collection<Project> projects);
 
     /**
+     * Rebuilds the index from scratch.
+     */
+    public void reindexAll();
+
+    /**
      * Uses a fuzzy search to find {@link Project projects} that have similarities to the
      * given projects ("More Like This" search).
      * <p>

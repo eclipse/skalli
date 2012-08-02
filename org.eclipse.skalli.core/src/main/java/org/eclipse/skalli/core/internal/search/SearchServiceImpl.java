@@ -69,6 +69,11 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
+    public void reindexAll() {
+        luceneIndex.reindexAll();
+    }
+
+    @Override
     public void update(final Project project) {
         update(Collections.singleton(project));
     }
