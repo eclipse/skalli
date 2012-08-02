@@ -425,10 +425,29 @@ public class Permit implements Comparable<Permit> {
         return compareTo((Permit)obj) == 0;
     }
 
-    @SuppressWarnings("nls")
     @Override
     public String toString() {
-        return "Permit [" +getLevel() + " " + getAction() + " " + getPath() + "]";
+        return toString(action, path, level);
+    }
+
+    public static String toString(String action, String path, Level level) {
+        return toString(action, path, level.intValue());
+    }
+
+    public static String toString(String action, String path, int level) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(action).append(' ').append(path).append(' ');
+        switch (level) {
+        case 0:
+            sb.append(Level.FORBID);
+            break;
+        case 1:
+            sb.append(Level.ALLOW);
+            break;
+        default:
+            sb.append(level);
+        }
+        return sb.toString();
     }
 
     private static String[] split(String path) {
