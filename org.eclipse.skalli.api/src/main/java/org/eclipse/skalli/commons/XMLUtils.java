@@ -40,6 +40,10 @@ public class XMLUtils {
     private XMLUtils() {
     }
 
+    public static Document newDocument() throws ParserConfigurationException {
+        return getDocumentBuilder().newDocument();
+    }
+
     public static Document documentFromFile(File file) throws SAXException, IOException, ParserConfigurationException {
         DocumentBuilder docBuilder = getDocumentBuilder();
         Document doc = docBuilder.parse(file);
