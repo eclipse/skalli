@@ -38,13 +38,6 @@
         bind="bindIssuesService"
         unbind="unbindIssuesService"/>
     <reference
-        name="EntityService"
-        interface="org.eclipse.skalli.services.entity.EntityService"
-        cardinality="0..n"
-        policy="dynamic"
-        bind="bindEntityService"
-        unbind="unbindEntityService"/>
-    <reference
         name="SchedulerService"
         interface="org.eclipse.skalli.services.scheduler.SchedulerService"
         cardinality="0..1"

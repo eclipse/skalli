@@ -33,6 +33,7 @@ import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.entity.EntityService;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.event.EventCustomizingUpdate;
 import org.eclipse.skalli.services.event.EventListener;
 import org.eclipse.skalli.services.event.EventService;
@@ -59,9 +60,6 @@ public class ValidationServiceImpl implements ValidationService, EventListener<E
     private static final long DEFAULT_QUEUED_INITIAL_DELAY = TimeUnit.SECONDS.toMillis(10);
     private static final long DEFAULT_QUEUED_PERIOD = TimeUnit.SECONDS.toMillis(10);
 
-    /** All currently known implementations of EntityService, managed by bindEntityService/unbindEntityService */
-    private final Map<String, EntityService<?>> entityServices = new HashMap<String, EntityService<?>>();
-
     private IssuesService issuesService;
     private SchedulerService schedulerService;
     private ConfigurationService configService;
@@ -84,24 +82,6 @@ public class ValidationServiceImpl implements ValidationService, EventListener<E
     protected void deactivate(ComponentContext context) {
         LOG.info(MessageFormat.format("[ValidationService] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
-    }
-
-    @SuppressWarnings("rawtypes")
-    protected void bindEntityService(EntityService entityService) {
-        synchronized (entityServices) {
-            String entityServiceName = entityService.getEntityClass().getName();
-            entityServices.put(entityServiceName, entityService);
-            LOG.info(MessageFormat.format("bindEntityService({0})", entityServiceName)); //$NON-NLS-1$
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
-    protected void unbindEntityService(EntityService entityService) {
-        synchronized (entityServices) {
-            String entityServiceName = entityService.getEntityClass().getName();
-            entityServices.remove(entityServiceName);
-            LOG.info(MessageFormat.format("unbindEntityService({0})", entityServiceName)); //$NON-NLS-1$
-        }
     }
 
     protected void bindIssuesService(IssuesService issuesService) {
@@ -160,7 +140,7 @@ public class ValidationServiceImpl implements ValidationService, EventListener<E
 
     @Override
     public synchronized <T extends EntityBase> void queueAll(Class<T> entityClass, Severity minSeverity, String userId) {
-        EntityService<T> entityService = getEntityService(entityClass);
+        EntityService<T> entityService = EntityServices.getByEntityClass(entityClass);
         if (entityService != null) {
             Map<Validation<T>, Validation<T>> validations = new HashMap<Validation<T>, Validation<T>>();
             List<T> enitites = entityService.getAll();
@@ -222,7 +202,7 @@ public class ValidationServiceImpl implements ValidationService, EventListener<E
 
     @Override
     public <T extends EntityBase> void validate(Class<T> entityClass, UUID entityId, Severity minSeverity, String userId) {
-        EntityService<T> entityService = getEntityService(entityClass);
+        EntityService<T> entityService = EntityServices.getByEntityClass(entityClass);
         if (entityService != null) {
             T entity = entityService.getByUUID(entityId);
             validateAndPersist(entityService, entity, minSeverity, userId);
@@ -231,7 +211,7 @@ public class ValidationServiceImpl implements ValidationService, EventListener<E
 
     @Override
     public <T extends EntityBase> void validateAll(Class<T> entityClass, Severity minSeverity, String userId) {
-        EntityService<T> entityService = getEntityService(entityClass);
+        EntityService<T> entityService = EntityServices.getByEntityClass(entityClass);
         if (entityService != null) {
             List<T> entities = entityService.getAll();
             for (T entity : entities) {
@@ -242,7 +222,7 @@ public class ValidationServiceImpl implements ValidationService, EventListener<E
 
 
     private <T extends EntityBase> void validateAndPersist(Validation<T> entry, Severity defaultSeverity) {
-        EntityService<T> entityService = getEntityService(entry.getEntityClass());
+        EntityService<T> entityService = EntityServices.getByEntityClass(entry.getEntityClass());
         if (entityService != null) {
             T entity = entityService.getByUUID(entry.getEntityId());
             if (entity != null) {
@@ -308,11 +288,6 @@ public class ValidationServiceImpl implements ValidationService, EventListener<E
                 }
             }
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T extends EntityBase> EntityService<T> getEntityService(Class<T> entityClass) {
-        return (EntityService<T>) entityServices.get(entityClass.getName());
     }
 
     // package protected for monitoring and testing purposes
@@ -430,7 +405,7 @@ public class ValidationServiceImpl implements ValidationService, EventListener<E
 
         @Override
         public void run() {
-            for (EntityService<?> entityService : entityServices.values()) {
+            for (EntityService<?> entityService : EntityServices.getAll()) {
                 Class<?> entityClass = entityService.getEntityClass();
                 if (entityClass.getName().equals(entityClassName)
                         || entityClass.getSimpleName().equals(entityClassName)) {
@@ -462,7 +437,7 @@ public class ValidationServiceImpl implements ValidationService, EventListener<E
 
         @Override
         public void run() {
-            for (EntityService<?> entityService : entityServices.values()) {
+            for (EntityService<?> entityService : EntityServices.getAll()) {
                 Class<? extends EntityBase> entityClass = entityService.getEntityClass();
                 if (!Issues.class.isAssignableFrom(entityClass)) {
                     queueAll(entityClass, minSeverity, userId);
@@ -495,7 +470,7 @@ public class ValidationServiceImpl implements ValidationService, EventListener<E
 
         @Override
         public void run() {
-            for (EntityService<?> entityService : entityServices.values()) {
+            for (EntityService<?> entityService : EntityServices.getAll()) {
                 Class<?> entityClass = entityService.getEntityClass();
                 if (entityClass.getName().equals(entityClassName)
                         || entityClass.getSimpleName().equals(entityClassName)) {
@@ -527,7 +502,7 @@ public class ValidationServiceImpl implements ValidationService, EventListener<E
 
         @Override
         public void run() {
-            for (EntityService<?> entityService : entityServices.values()) {
+            for (EntityService<?> entityService : EntityServices.getAll()) {
                 validateAll(entityService.getEntityClass(), minSeverity, userId);
             }
         }

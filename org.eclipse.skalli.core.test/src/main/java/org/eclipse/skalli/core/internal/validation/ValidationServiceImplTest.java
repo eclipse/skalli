@@ -14,6 +14,9 @@ import static org.easymock.EasyMock.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.UUID;
@@ -25,7 +28,6 @@ import org.eclipse.skalli.core.internal.validation.ValidationServiceImpl.Validat
 import org.eclipse.skalli.core.internal.validation.ValidationServiceImpl.ValidateRunnable;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.Issue;
-import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.entity.EntityService;
@@ -41,9 +43,12 @@ import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
 import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.eclipse.skalli.testutil.TestEntityBase2;
+import org.eclipse.skalli.testutil.TestEntityService;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.osgi.framework.ServiceRegistration;
 
 @SuppressWarnings("nls")
 public class ValidationServiceImplTest {
@@ -52,12 +57,20 @@ public class ValidationServiceImplTest {
     private static final String USERID1 = "foobar";
 
     private static final SortedSet<Issue> ISSUES1 = CollectionUtils.asSortedSet(
-            new Issue(Severity.ERROR, EntityService1.class, PropertyHelperUtils.TEST_UUIDS[0]),
-            new Issue(Severity.WARNING, EntityService1.class, PropertyHelperUtils.TEST_UUIDS[0]));
+            new Issue(Severity.ERROR, TestEntityService.class, PropertyHelperUtils.TEST_UUIDS[0]),
+            new Issue(Severity.WARNING, TestEntityService.class, PropertyHelperUtils.TEST_UUIDS[0]));
+    private static final Map<UUID,SortedSet<Issue>> ISSUES_MAP = new HashMap<UUID,SortedSet<Issue>>();
+    static {
+        for (int i = 0; i < PropertyHelperUtils.TEST_UUIDS.length; ++i) {
+            ISSUES_MAP.put(PropertyHelperUtils.TEST_UUIDS[i], ISSUES1);
+        }
+    }
+
+    private List<ServiceRegistration<?>> serviceRegistrations = new ArrayList<ServiceRegistration<?>>();
 
     private IssuesService mockISS;
-    private EntityService1 mockES1;
-    private EntityService2 mockES2;
+    private TestEntityService<TestEntityBase1> mockES1;
+    private TestEntityService<TestEntityBase2> mockES2;
     private ConfigurationService mockCS;
     private SchedulerService mockSS;
     private Object[] mocks;
@@ -70,23 +83,11 @@ public class ValidationServiceImplTest {
     private ValidationConfig[] configs;
     private ValidationsConfig config;
 
-    private static interface EntityService1 extends EntityService<TestEntityBase1>, Issuer {
-    }
-
-    private static interface EntityService2 extends EntityService<TestEntityBase2>, Issuer {
-    }
-
     private static class TestValidationService extends ValidationServiceImpl {
-        @SuppressWarnings("rawtypes")
         public TestValidationService(IssuesService issuesService, ConfigurationService configService,
-                SchedulerService schedulerService, EntityService... entityServices) {
-            // do not change the binding order!
-            // it simulates the binding order in ValidationComponent.xml!
+                SchedulerService schedulerService) {
             bindConfigurationService(configService);
             bindIssuesService(issuesService);
-            for (EntityService entityService : entityServices) {
-                bindEntityService(entityService);
-            }
             bindSchedulerService(schedulerService);
         }
     }
@@ -108,8 +109,6 @@ public class ValidationServiceImplTest {
 
     @Before
     public void setup() throws Exception {
-        BundleManager.startBundles();
-
         entities1 = new ArrayList<TestEntityBase1>();
         issues1 = new ArrayList<Issues>();
         for (int i = 0; i < PropertyHelperUtils.TEST_UUIDS.length; ++i) {
@@ -153,23 +152,20 @@ public class ValidationServiceImplTest {
         config = new ValidationsConfig(Arrays.asList(configs));
 
         mockISS = createNiceMock(IssuesService.class);
-        mockES1 = createNiceMock(EntityService1.class);
-        mockES2 = createNiceMock(EntityService2.class);
+        mockES1 = new TestEntityService<TestEntityBase1>(TestEntityBase1.class, entities1, ISSUES_MAP);
+        serviceRegistrations.add(BundleManager.registerService(EntityService.class, mockES1, null));
+        mockES2 = new TestEntityService<TestEntityBase2>(TestEntityBase2.class, entities2);
+        serviceRegistrations.add(BundleManager.registerService(EntityService.class, mockES2, null));
         mockSS = createNiceMock(SchedulerService.class);
         mockCS = createNiceMock(ConfigurationService.class);
-
-        mocks = new Object[] { mockISS, mockES1, mockES2, mockCS, mockSS };
+        mocks = new Object[] { mockISS, mockCS, mockSS };
     }
 
-    private void initEntityServiceMocks() {
-        mockES1.getEntityClass();
-        expectLastCall().andReturn(TestEntityBase1.class).anyTimes();
-        mockES2.getEntityClass();
-        expectLastCall().andReturn(TestEntityBase2.class).anyTimes();
-        mockES1.getAll();
-        expectLastCall().andReturn(entities1).anyTimes();
-        mockES2.getAll();
-        expectLastCall().andReturn(entities2).anyTimes();
+    @After
+    public void tearDown() {
+        for (ServiceRegistration<?> serviceRegistration : serviceRegistrations) {
+            serviceRegistration.unregister();
+        }
     }
 
     private void initQueueMocks() throws Exception {
@@ -201,10 +197,6 @@ public class ValidationServiceImplTest {
         expectLastCall().andReturn(issues1.get(0)).anyTimes();
         mockISS.persist(eq(PropertyHelperUtils.TEST_UUIDS[0]), eq(ISSUES1), eq(USERID));
         expectLastCall().times(1);
-        mockES1.getByUUID(eq(PropertyHelperUtils.TEST_UUIDS[0]));
-        expectLastCall().andReturn(entities1.get(0)).times(1);
-        mockES1.validate(eq(entities1.get(0)), eq(Severity.WARNING));
-        expectLastCall().andReturn(ISSUES1).times(1);
     }
 
     private void initValidateAllMocks() throws Exception {
@@ -213,8 +205,6 @@ public class ValidationServiceImplTest {
             expectLastCall().andReturn(issues1.get(i)).anyTimes();
             mockISS.persist(eq(PropertyHelperUtils.TEST_UUIDS[i]), eq(ISSUES1), eq(USERID));
             expectLastCall().times(1);
-            mockES1.validate(eq(entities1.get(i)), eq(Severity.WARNING));
-            expectLastCall().andReturn(ISSUES1).times(1);
         }
     }
 
@@ -249,11 +239,10 @@ public class ValidationServiceImplTest {
     @Test
     public void testQueue() throws Exception {
         reset(mocks);
-        initEntityServiceMocks();
         initQueueMocks();
         replay(mocks);
 
-        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS, mockES1, mockES2);
+        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS);
         Validation<TestEntityBase1> validation1 = new Validation<TestEntityBase1>(
                 TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[0], Severity.WARNING, USERID);
         Validation<TestEntityBase2> validation2 = new Validation<TestEntityBase2>(
@@ -282,11 +271,10 @@ public class ValidationServiceImplTest {
     @Test
     public void testQueueAll() throws Exception {
         reset(mocks);
-        initEntityServiceMocks();
         initQueueAllMocks();
         replay(mocks);
 
-        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS, mockES1, mockES2);
+        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS);
         validationService.queueAll(TestEntityBase1.class, Severity.ERROR, USERID);
 
         for (int i = 0; i < PropertyHelperUtils.TEST_UUIDS.length; ++i) {
@@ -309,11 +297,10 @@ public class ValidationServiceImplTest {
     @Test
     public void testValidate() throws Exception {
         reset(mocks);
-        initEntityServiceMocks();
         initValidateMocks();
         replay(mocks);
 
-        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS, mockES1, mockES2);
+        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS);
         validationService.validate(TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[0], Severity.WARNING, USERID);
 
         verify(mocks);
@@ -322,11 +309,10 @@ public class ValidationServiceImplTest {
     @Test
     public void testValidateAll() throws Exception {
         reset(mocks);
-        initEntityServiceMocks();
         initValidateAllMocks();
         replay(mocks);
 
-        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS, mockES1, mockES2);
+        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS);
         validationService.validateAll(TestEntityBase1.class, Severity.WARNING, USERID);
 
         verify(mocks);
@@ -335,12 +321,11 @@ public class ValidationServiceImplTest {
     @Test
     public void testStartValidationTasks() {
         reset(mocks);
-        initEntityServiceMocks();
         initConfigurationServiceMock();
         initSchedulerServiceMock();
         replay(mocks);
 
-        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS, mockES1, mockES2);
+        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS);
         Assert.assertEquals(configs.length, validationService.getRegisteredSchedules().size());
         Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[3], validationService.getTaskIdQueueValidator());
         validationService.stopAllTasks();
@@ -353,12 +338,11 @@ public class ValidationServiceImplTest {
     @Test
     public void testBindUnbindConfigService() {
         reset(mocks);
-        initEntityServiceMocks();
         initConfigurationServiceMock();
         initSchedulerServiceMock();
         replay(mocks);
 
-        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS, mockES1, mockES2);
+        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS);
         Assert.assertEquals(configs.length, validationService.getRegisteredSchedules().size());
 
         validationService.unbindConfigurationService(mockCS);
@@ -372,12 +356,11 @@ public class ValidationServiceImplTest {
     @Test
     public void testBindUnbindSchedulerService() {
         reset(mocks);
-        initEntityServiceMocks();
         initConfigurationServiceMock();
         initSchedulerServiceMock();
         replay(mocks);
 
-        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS, mockES1, mockES2);
+        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS);
         Assert.assertEquals(configs.length, validationService.getRegisteredSchedules().size());
 
         validationService.unbindSchedulerService(mockSS);
@@ -391,10 +374,9 @@ public class ValidationServiceImplTest {
     @Test
     public void testGetRunnableFromConfig() throws Exception {
         reset(mocks);
-        initEntityServiceMocks();
         replay(mocks);
 
-        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS, mockES1, mockES2);
+        TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS);
 
         Runnable runnable = validationService.getRunnableFromConfig(configs[0]);
         Assert.assertEquals(QueueRunnable.class, runnable.getClass());
