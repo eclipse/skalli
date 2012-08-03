@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.internal.resources;
 
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -20,6 +19,7 @@ import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.eclipse.skalli.services.role.RoleProvider;
 
@@ -100,7 +100,6 @@ class ProjectConverter extends CommonProjectConverter {
         }
     }
 
-    @SuppressWarnings("rawtypes")
     private Set<ExtensionEntityBase> iterateExtensions(HierarchicalStreamReader reader,
             UnmarshallingContext context) {
         Set<ExtensionEntityBase> extensions = new TreeSet<ExtensionEntityBase>();
@@ -108,9 +107,7 @@ class ProjectConverter extends CommonProjectConverter {
         while (reader.hasMoreChildren()) {
             reader.moveDown();
             String field = reader.getNodeName();
-            Iterator<ExtensionService> extensionServices = Services.getServiceIterator(ExtensionService.class);
-            while (extensionServices.hasNext()) {
-                ExtensionService extensionService = extensionServices.next();
+            for (ExtensionService<?> extensionService: ExtensionServices.getAll()) {
                 if (extensionService.getExtensionClass().equals(Project.class)) {
                     continue;
                 }

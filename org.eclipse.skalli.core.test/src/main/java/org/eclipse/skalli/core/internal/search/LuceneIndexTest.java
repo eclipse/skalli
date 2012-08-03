@@ -14,20 +14,25 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.search.FacetedSearchResult;
 import org.eclipse.skalli.services.search.PagingInfo;
 import org.eclipse.skalli.services.search.SearchResult;
+import org.eclipse.skalli.testutil.BundleManager;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.osgi.framework.ServiceRegistration;
 
 public class LuceneIndexTest {
 
     public static final String FIELD = "value"; //$NON-NLS-1$
     public static final String FACET = "facet"; //$NON-NLS-1$
+
+    @SuppressWarnings("rawtypes")
+    private ServiceRegistration<ExtensionService> serviceRegistration;
 
     private TestEntity entity1;
     private TestEntity entity2;
@@ -37,23 +42,11 @@ public class LuceneIndexTest {
     private List<TestEntity> entities;
     private LuceneIndex<TestEntity> idx;
 
-    private static class LuceneIndexUT extends LuceneIndex<TestEntity> {
-        private final ExtensionService<?> extMock;
-
-        public LuceneIndexUT(ExtensionService<?> extMock, TestEntityService mockPS) {
-            super(mockPS);
-            this.extMock = extMock;
-        }
-
-        @SuppressWarnings("rawtypes")
-        @Override
-        Set<ExtensionService> getExtensionServices() {
-            return Collections.singleton((ExtensionService) extMock);
-        }
-    }
-
     @Before
-    public void setup() {
+    public void setup() throws Exception {
+        serviceRegistration = BundleManager.registerService(ExtensionService.class, new TestExtensionService(), null);
+        Assert.assertNotNull(serviceRegistration);
+
         entity1 = new TestEntity("bob", "firstname"); //$NON-NLS-1$ //$NON-NLS-2$
         entity2 = new TestEntity("alice", "firstname"); //$NON-NLS-1$ //$NON-NLS-2$
         entity3 = new TestEntity("alice smith", "fullname"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -65,8 +58,15 @@ public class LuceneIndexTest {
         entities.add(entity3);
         entities.add(entity4);
         entities.add(entity5);
-        idx = new LuceneIndexUT(new TestExtensionService(), new TestEntityService(entities));
+        idx = new LuceneIndex<TestEntity>(new TestEntityService(entities));
         idx.reindexAll();
+    }
+
+    @After
+    public void tearDown() {
+        if (serviceRegistration != null) {
+            serviceRegistration.unregister();
+        }
     }
 
     @Test

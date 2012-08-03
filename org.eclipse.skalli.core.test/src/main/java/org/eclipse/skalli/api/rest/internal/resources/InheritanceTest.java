@@ -11,8 +11,6 @@
 package org.eclipse.skalli.api.rest.internal.resources;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.skalli.model.ExtensionEntityBase;
@@ -21,13 +19,18 @@ import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.TestExtension;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleException;
+import org.osgi.framework.ServiceRegistration;
 
 @SuppressWarnings("nls")
 public class InheritanceTest {
+
+    @SuppressWarnings("rawtypes")
+    private ServiceRegistration<ExtensionService> serviceRegistration;
 
     private UUID uuidParent;
     private UUID uuidProject;
@@ -35,11 +38,9 @@ public class InheritanceTest {
     private Project parent;
     private Project project;
     private ExtensionEntityBase extension;
-    protected Set<ExtensionService> testExtensionServices;
 
     @Before
     public void setup() throws BundleException {
-        BundleManager.startBundles();
         uuidParent = UUID.randomUUID();
         uuidProject = UUID.randomUUID();
         uuidExtension = UUID.randomUUID();
@@ -58,18 +59,20 @@ public class InheritanceTest {
 
         parent.addExtension(extension);
 
-        testExtensionServices = new HashSet<ExtensionService>();
-        testExtensionServices.add(new TestExtensionService());
+        serviceRegistration = BundleManager.registerService(ExtensionService.class, new TestExtensionService(), null);
+        Assert.assertNotNull(serviceRegistration);
+    }
+
+    @After
+    public void tearDown() {
+        if (serviceRegistration != null) {
+            serviceRegistration.unregister();
+        }
     }
 
     @Test
     public void test() throws IOException {
-        ProjectConverter projectConverter = new ProjectConverter("localhost", false) {
-            @Override
-            Set<ExtensionService> getExtensionServices() {
-                return testExtensionServices;
-            }
-        };
+        ProjectConverter projectConverter = new ProjectConverter("localhost", false);
 
         // Verify that the parent has the extension, but not inherited
         ResourceRepresentation<Project> rep1 = new ResourceRepresentation<Project>(

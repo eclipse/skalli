@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.UUID;
 
@@ -25,6 +24,7 @@ import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
@@ -112,8 +112,7 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
     private void marshalExtensions(ExtensibleEntityBase extensibleEntity, HierarchicalStreamWriter writer,
             MarshallingContext context) {
         writer.startNode("extensions"); //$NON-NLS-1$
-        Set<ExtensionService> extensionServices = getExtensionServices();
-        for (ExtensionService extensionService : extensionServices) {
+        for (ExtensionService<?> extensionService : ExtensionServices.getAll()) {
             if (allExtensions || extensions.contains(extensionService.getShortName())) {
                 marshalExtension(extensibleEntity, extensionService, writer, context);
             }
@@ -138,9 +137,5 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
             context.convertAnother(extension, converter);
             writer.endNode();
         }
-    }
-
-    Set<ExtensionService> getExtensionServices() {
-        return Services.getServices(ExtensionService.class);
     }
 }

@@ -19,8 +19,8 @@ import java.util.Set;
 
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Taggable;
-import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.Indexer;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.search.PagingInfo;
@@ -82,7 +82,7 @@ public class SearchServiceImpl implements SearchService {
     public SearchResult<Project> findProjectsByQuery(String queryString, PagingInfo pagingInfo)
             throws QueryParseException {
         Set<String> fieldSet = new HashSet<String>();
-        for (ExtensionService<?> ext : Services.getServices(ExtensionService.class)) {
+        for (ExtensionService<?> ext : ExtensionServices.getAll()) {
             Indexer<?> indexer = ext.getIndexer();
             if (indexer != null) {
                 Set<String> fields = indexer.getDefaultSearchFields();

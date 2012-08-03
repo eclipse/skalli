@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
@@ -51,9 +50,9 @@ import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
-import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.entity.EntityService;
 import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.Indexer;
 import org.eclipse.skalli.services.search.FacetedSearchResult;
 import org.eclipse.skalli.services.search.IndexEntry;
@@ -85,12 +84,7 @@ public class LuceneIndex<T extends EntityBase> {
         reindex(entityService.getAll());
     }
 
-    @SuppressWarnings("rawtypes")
-    Set<ExtensionService> getExtensionServices() {
-        return Services.getServices(ExtensionService.class);
-    }
-
-    private List<IndexEntry> entityToIndexEntries(final T entity) {
+    private List<IndexEntry> indexEntity(T entity) {
         List<IndexEntry> fields = new LinkedList<IndexEntry>();
 
         Queue<EntityBase> queue = new LinkedList<EntityBase>();
@@ -99,9 +93,9 @@ public class LuceneIndex<T extends EntityBase> {
         while (!queue.isEmpty()) {
             EntityBase currentEntity = queue.poll();
 
-            for (ExtensionService<?> ext : getExtensionServices()) {
-                if (currentEntity.getClass().equals(ext.getExtensionClass())) {
-                    Indexer<?> indexer = ext.getIndexer();
+            for (ExtensionService<?> extensionService : ExtensionServices.getAll()) {
+                if (currentEntity.getClass().equals(extensionService.getExtensionClass())) {
+                    Indexer<?> indexer = extensionService.getIndexer();
                     if (indexer != null) {
                         indexer.indexEntity(fields, currentEntity);
                     }
@@ -115,8 +109,9 @@ public class LuceneIndex<T extends EntityBase> {
         return fields;
     }
 
-    private void addEntityToIndex(final IndexWriter writer, final T entity) throws IOException {
-        List<IndexEntry> fields = entityToIndexEntries(entity);
+    private void addEntityToIndex(IndexWriter writer, T entity)
+            throws IOException {
+        List<IndexEntry> fields = indexEntity(entity);
 
         Document doc = LuceneUtil.fieldsToDocument(fields);
         doc.add(new Field(FIELD_UUID, entity.getUuid().toString(), Store.YES, Index.NOT_ANALYZED));
@@ -135,7 +130,7 @@ public class LuceneIndex<T extends EntityBase> {
         if (entity == null) {
             return null;
         }
-        List<IndexEntry> fields = entityToIndexEntries(entity);
+        List<IndexEntry> fields = indexEntity(entity);
         Map<String, List<String>> storedValues = new HashMap<String, List<String>>();
         for (IndexEntry entry : fields) {
             List<String> list = storedValues.get(entry.getFieldName());
@@ -149,7 +144,7 @@ public class LuceneIndex<T extends EntityBase> {
         return ret;
     }
 
-    private void addEntitiesToIndex(final Collection<T> entities) {
+    private void addEntitiesToIndex(Collection<T> entities) {
         try {
             IndexWriter writer = new IndexWriter(directory, analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
             for (T entity : entities) {

@@ -15,7 +15,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -31,8 +30,8 @@ import javax.xml.validation.SchemaFactory;
 
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
-import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.junit.Assert;
@@ -161,8 +160,7 @@ public class SchemaValidationUtils {
     private static <T extends ExtensionEntityBase>
             boolean marshalExtension(ExtensibleEntityBase extensible, T extension, HierarchicalStreamWriter writer) {
         boolean done = false;
-        Set<ExtensionService> extensionServices = Services.getServices(ExtensionService.class);
-        for (ExtensionService extensionService : extensionServices) {
+        for (ExtensionService extensionService : ExtensionServices.getAll()) {
             RestConverter converter = extensionService.getRestConverter("https://localhost");
             Class<T> extensionClass = (Class<T>) extension.getClass();
             if (converter != null && extensionClass.equals(converter.getConversionClass())) {

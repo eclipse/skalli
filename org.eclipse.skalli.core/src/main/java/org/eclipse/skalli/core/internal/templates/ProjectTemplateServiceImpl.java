@@ -18,9 +18,9 @@ import java.util.Set;
 
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.services.ServiceFilter;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
 import org.osgi.service.component.ComponentConstants;
@@ -96,11 +96,8 @@ public class ProjectTemplateServiceImpl implements ProjectTemplateService {
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public Set<Class<? extends ExtensionEntityBase>> getSelectableExtensions(final ProjectTemplate template,
-            final Project project) {
-        final Set<Class<? extends ExtensionEntityBase>> selectableExtensions = new HashSet<Class<? extends ExtensionEntityBase>>();
-
+    public Set<Class<? extends ExtensionEntityBase>> getSelectableExtensions(ProjectTemplate template, Project project) {
+        Set<Class<? extends ExtensionEntityBase>> selectableExtensions = new HashSet<Class<? extends ExtensionEntityBase>>();
         if (project != null) {
             for (ExtensionEntityBase extension : project.getAllExtensions()) {
                 selectableExtensions.add(extension.getClass());
@@ -109,31 +106,22 @@ public class ProjectTemplateServiceImpl implements ProjectTemplateService {
 
         final Set<String> included = template.getIncludedExtensions();
         final Set<String> excluded = template.getExcludedExtensions();
-        Services.getServices(ExtensionService.class,
-                new ServiceFilter<ExtensionService>() {
-                    @Override
-                    public boolean accept(ExtensionService instance) {
-                        // 1) ask the extension, whether it can work with the given template
-                        // 2) if so, check if we have an exclude list and the extension is excluded
-                        // 3) if so, reject the extensions, otherwise check if we have an include
-                        //    list and the extension is included
-                        // 4) if so, accept it, otherwise reject it
-                        Set<String> allowedTemplates = ((ExtensionService<?>) instance).getProjectTemplateIds();
-                        if (allowedTemplates == null || allowedTemplates.contains(template.getId())) {
-                            Class<? extends ExtensionEntityBase> extensionClass = instance.getExtensionClass();
-                            String extensionClassName = extensionClass.getName();
-
-                            if (excluded != null && excluded.contains(extensionClassName)
-                                    || included != null && !included.contains(extensionClassName)) {
-                                return false;
-                            }
-
-                            selectableExtensions.add(extensionClass);
-                            return true;
-                        }
-                        return false;
-                    }
-                });
+        for (ExtensionService<?> extensionService: ExtensionServices.getAll()) {
+            // 1) can the extension work with the given template?
+            // 2) if so, check if we have an exclude list and the extension is excluded
+            // 3) if so, reject the extensions, otherwise check if we have an include
+            //    list and the extension is included
+            // 4) if so, accept it, otherwise reject it
+            Set<String> allowedTemplates = extensionService.getProjectTemplateIds();
+            if (allowedTemplates == null || allowedTemplates.contains(template.getId())) {
+                Class<? extends ExtensionEntityBase> extensionClass = extensionService.getExtensionClass();
+                String extensionClassName = extensionClass.getName();
+                if ( (excluded == null || !excluded.contains(extensionClassName))
+                        && (included == null || included.contains(extensionClassName))) {
+                    selectableExtensions.add(extensionClass);
+                }
+            }
+        }
 
         return selectableExtensions;
     }
