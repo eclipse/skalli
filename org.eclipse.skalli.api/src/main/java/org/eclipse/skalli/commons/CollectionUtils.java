@@ -99,27 +99,6 @@ public class CollectionUtils {
         return result;
     }
 
-    public static class MapBuilder<T> {
-        private Map<String, T> map;
-
-        public MapBuilder() {
-            map = new HashMap<String, T>();
-        }
-
-        public MapBuilder(Map<String, T> map) {
-            this.map = map;
-        }
-
-        public MapBuilder<T> put(String key, T value) {
-            map.put(key, value);
-            return this;
-        }
-
-        public Map<String, T> toMap() {
-            return map;
-        }
-    }
-
     public static boolean isNotBlank(Collection<?> c) {
         return c != null && !c.isEmpty();
     }

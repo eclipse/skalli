@@ -13,14 +13,15 @@ package org.eclipse.skalli.model;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.MapBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,19 @@ public abstract class EntityBase implements Comparable<Object> {
     @Derived
     @PropertyName
     public static final String PROPERTY_LAST_MODIFIED_BY = "lastModifiedBy"; //$NON-NLS-1$
+
+
+    private static final Map<Class<?>,Class<?>> PRIMITIVES_MAP =
+            new MapBuilder<Class<?>,Class<?>>()
+                .put(Boolean.class, boolean.class)
+                .put(Character.class, char.class)
+                .put(Byte.class, byte.class)
+                .put(Short.class, short.class)
+                .put(Integer.class, int.class)
+                .put(Long.class, long.class)
+                .put(Float.class, float.class)
+                .put(Double.class, double.class)
+                .toMap();
 
     /**
      * The unique identifier of a project - created once, never changed!
@@ -221,17 +235,33 @@ public abstract class EntityBase implements Comparable<Object> {
     }
 
     /**
-     * Returns the identifiers of the properties this extension provides.
+     * Returns the identifiers of the properties this entity provides.
      * A property is declared by defining a String constant with the
      * identifier of the property as value and annotating this constant
      * with {@link PropertyName}.
      *
-     * @return  a set of property identifiers, or an empty set, if the extension
+     * @return  a set of property identifiers, or an empty set, if the entity
      * provides no properties.
      */
     public Set<String> getPropertyNames() {
+        return getPropertyNames(getClass());
+    }
+
+    /**
+     * Returns the identifiers of the properties of a given entity class.
+     * A property is declared by defining a String constant with the
+     * identifier of the property as value and annotating this constant
+     * with {@link PropertyName}.
+     *
+     * @return  a set of property identifiers, or an empty set, if the entity
+     * provides no properties, or <code>entityClass</code> was <code>null</code>.
+     */
+    public static Set<String> getPropertyNames(Class<? extends EntityBase> entityClass) {
         Set<String> propertyNames = new HashSet<String>();
-        for (Field field : getClass().getFields()) {
+        if (entityClass == null) {
+            return propertyNames;
+        }
+        for (Field field : entityClass.getFields()) {
             if (field.getAnnotation(PropertyName.class) != null) {
                 try {
                     propertyNames.add((String) field.get(null));
@@ -269,9 +299,9 @@ public abstract class EntityBase implements Comparable<Object> {
     }
 
     private Method getMethod(String propertyName) {
-        Method getter = getMethod("get", propertyName, new Class[] {}); //$NON-NLS-1$
+        Method getter = getMethod("get", propertyName, null); //$NON-NLS-1$
         if (getter == null) {
-            getter = getMethod("is", propertyName, new Class[] {}); //$NON-NLS-1$
+            getter = getMethod("is", propertyName, null); //$NON-NLS-1$
         }
         return getter;
     }
@@ -288,27 +318,63 @@ public abstract class EntityBase implements Comparable<Object> {
      * @see org.eclipse.skalli.services.projects.PropertyName
      */
     public void setProperty(String propertyName, Object propertyValue) {
-        Class<? extends Object> paramType = (propertyValue instanceof Collection) ? Collection.class : String.class;
-        Method method = getMethod("set", propertyName, new Class[] { paramType }); //$NON-NLS-1$
+        Method method = getMethod("set", propertyName, propertyValue.getClass()); //$NON-NLS-1$
         if (method == null) {
             throw new NoSuchPropertyException(this, propertyName);
         }
         try {
             method.invoke(this, propertyValue);
         } catch (Exception e) {
-           throw new PropertyUpdateException(MessageFormat.format("Property {0} could not be updated", propertyName), e);
+           throw new PropertyUpdateException(MessageFormat.format("Property \"{0}\" could not be updated", propertyName), e);
         }
     }
 
-    private Method getMethod(String methodPrefix, String propertyName, Class[] methodArgs) {
+    private Method getMethod(String methodPrefix, String propertyName, Class<?> propertyType) {
+        Class<? extends EntityBase> entityClass = getClass();
         String methodName = methodPrefix + StringUtils.capitalize(propertyName);
-        try {
-            return getClass().getMethod(methodName, methodArgs);
-        } catch (NoSuchMethodException e) {
-            LOG.debug(MessageFormat.format("Entity of type {0} does not have a {1}ter {2} for property {3}",
-                    getClass().getName(), methodPrefix, methodName, propertyName));
+        if (propertyType != null && PRIMITIVES_MAP.containsKey(propertyType)) {
+            propertyType = PRIMITIVES_MAP.get(propertyType);
         }
-        return null;
+        Class<?>[] argumentTypes = propertyType != null? new Class<?>[] { propertyType } : null;
+        Method method = null;
+        try {
+            method = entityClass.getMethod(methodName, argumentTypes);
+        } catch (NoSuchMethodException e) {
+            if (propertyType != null) {
+                method = findSetterMethod(entityClass, propertyName, methodName, argumentTypes);
+            }
+        }
+        return method;
+    }
+
+    private Method findSetterMethod(Class<? extends EntityBase> entityClass, String propertyName,
+            String methodName,  Class<?>[] argumentTypes) throws PropertyUpdateException {
+        Method method = null;
+        try {
+            for (Method candidate: entityClass.getMethods()) {
+                if (methodName.equals(candidate.getName())) {
+                    Class<?>[] parameterTypes = candidate.getParameterTypes();
+                    if (parameterTypes.length == 1) {
+                        if (parameterTypes[0].isAssignableFrom(argumentTypes[0])) {
+                            argumentTypes[0] = parameterTypes[0];
+                        } else {
+                            throw new PropertyUpdateException(MessageFormat.format(
+                                    "Argument of type \"{0}\" cannot be assigned to property \"{1}\" of type \"{2}\"",
+                                    argumentTypes[0], propertyName, parameterTypes[0]));
+                        }
+                    }
+                    method = entityClass.getMethod(methodName, argumentTypes);
+                    break;
+                }
+            }
+        } catch (NoSuchMethodException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(MessageFormat.format(
+                        "Entity of type {0} has no setter method matching the signature \"{1}({2})",
+                        entityClass.getName(), methodName, argumentTypes[0].getName()));
+            }
+        }
+        return method;
     }
 
     @Override
