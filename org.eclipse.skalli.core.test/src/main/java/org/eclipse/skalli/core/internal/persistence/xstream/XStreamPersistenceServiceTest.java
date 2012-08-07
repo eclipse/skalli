@@ -41,9 +41,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @SuppressWarnings("nls")
-public class PersistenceServiceXStreamTest {
+public class XStreamPersistenceServiceTest {
 
-    private PersistenceServiceXStreamMock persistenceService;
+    private XStreamPersistenceServiceMock persistenceService;
     private HashMapStorageService hashMapStorageService;
 
     private List<ServiceRegistration<?>> serviceRegistrations = new ArrayList<ServiceRegistration<?>>();
@@ -56,7 +56,7 @@ public class PersistenceServiceXStreamTest {
                 new TestExtensibleEntityEntityService(0), null));
         Assert.assertEquals(2, serviceRegistrations.size());
         hashMapStorageService = new HashMapStorageService();
-        persistenceService = new PersistenceServiceXStreamMock(hashMapStorageService);
+        persistenceService = new XStreamPersistenceServiceMock(hashMapStorageService);
     }
 
     @After
@@ -123,7 +123,7 @@ public class PersistenceServiceXStreamTest {
 
     @Test
     public void testResolveParentEntities() throws Exception {
-        PersistenceServiceXStream p = new PersistenceServiceXStream();
+        XStreamPersistenceService p = new XStreamPersistenceService();
         p.registerEntityClass(TestEntityBase1.class);
 
         EntityBase parent1 = new TestEntityBase1(PropertyHelperUtils.TEST_UUIDS[0]);

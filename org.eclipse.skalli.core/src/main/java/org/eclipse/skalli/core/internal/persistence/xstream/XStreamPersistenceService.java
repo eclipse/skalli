@@ -35,9 +35,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of {@link PersistenceService} based on XStream.
  */
-public class PersistenceServiceXStream extends PersistenceServiceBase implements PersistenceService {
+public class XStreamPersistenceService extends PersistenceServiceBase implements PersistenceService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PersistenceServiceXStream.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XStreamPersistenceService.class);
 
     private final EntityCache cache = new EntityCache();
     private final EntityCache deleted = new EntityCache();
@@ -48,7 +48,7 @@ public class PersistenceServiceXStream extends PersistenceServiceBase implements
     /**
      * Creates a new, uninitialized <code>PersistenceServiceXStream</code>.
      */
-    public PersistenceServiceXStream() {
+    public XStreamPersistenceService() {
         storageServiceClassName = ConfigurationProperties.getProperty(ConfigurationProperties.PROPERTY_STORAGE_SERVICE,
                 FileStorageService.class.getName());
     }
@@ -58,7 +58,7 @@ public class PersistenceServiceXStream extends PersistenceServiceBase implements
      * Note, this constructor should not be used to instantiate instances of this service directly except
      * for testing purposes.
      */
-    PersistenceServiceXStream(XStreamPersistence xstreamPersistence) {
+    XStreamPersistenceService(XStreamPersistence xstreamPersistence) {
         this.xstreamPersistence = xstreamPersistence;
     }
 
