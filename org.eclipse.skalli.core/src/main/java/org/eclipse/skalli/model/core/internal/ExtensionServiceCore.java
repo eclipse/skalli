@@ -16,11 +16,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.UUID;
 
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.DataMigration;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServiceBase;
@@ -28,6 +34,7 @@ import org.eclipse.skalli.services.extension.Indexer;
 import org.eclipse.skalli.services.extension.PropertyValidator;
 import org.eclipse.skalli.services.extension.validators.RegularExpressionValidator;
 import org.eclipse.skalli.services.extension.validators.StringLengthValidator;
+import org.eclipse.skalli.services.project.ProjectService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,7 +190,24 @@ public class ExtensionServiceCore
             validators.add(new RegularExpressionValidator(Severity.FATAL, getExtensionClass(), propertyName,
                     MessageFormat.format("{0} must contain letters and digits only", caption),
                     null, SHORT_NAME_REGEX));
+        } else if (Project.PROPERTY_DELETED.equals(propertyName)) {
+            validators.add(new NoSubprojectsValidator());
         }
         return validators;
+    }
+
+    private static class NoSubprojectsValidator implements PropertyValidator, Issuer {
+        @Override
+        public SortedSet<Issue> validate(UUID entity, Object value, Severity minSeverity) {
+            TreeSet<Issue> issues = new TreeSet<Issue>();
+            Boolean deleted = (Boolean)value;
+            ProjectService projectService = Services.getRequiredService(ProjectService.class);
+            if (deleted && projectService.getSubProjects(entity).size() > 0) {
+                issues.add(new Issue(Severity.FATAL, getClass(), entity, Project.class, Project.PROPERTY_DELETED,
+                    "Projects with subprojects cannot be deleted - first delete all subprojects " +
+                    "or assign them to other projects. Then try again."));
+            }
+            return issues;
+        }
     }
 }

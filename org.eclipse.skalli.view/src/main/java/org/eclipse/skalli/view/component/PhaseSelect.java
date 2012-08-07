@@ -15,8 +15,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.services.Services;
-import org.eclipse.skalli.services.project.ProjectService;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.CheckBox;
@@ -106,31 +104,6 @@ public class PhaseSelect extends CustomField {
         cb.commit();
         project.setDeleted(isDeleted());
         project.setPhase((String) cb.getValue());
-    }
-
-    @Override
-    public boolean isValid() {
-        boolean isValid = super.isValid();
-        if (isValid && isDeleted()) {
-            ProjectService projectService = Services.getRequiredService(ProjectService.class);
-            if (!projectService.getSubProjects(project.getUuid()).isEmpty()) {
-                isValid = false;
-            }
-        }
-        return isValid;
-    }
-
-    @Override
-    public void validate() throws InvalidValueException {
-        if (!isValid()) {
-            throw new InvalidValueException(
-                    "Project \""
-                            + project.getName()
-                            + "\" has subprojects and "
-                            +
-                            "cannot be deleted - first delete all subprojects or assign them to other projects. Then try again.");
-        }
-        super.validate();
     }
 
     @Override
