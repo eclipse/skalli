@@ -326,13 +326,22 @@
      -->
 
     <filter-mapping>
-       <filter-name>ConfigFilter</filter-name>
-       <url-pattern>*</url-pattern>
+       <filter-name>LoginFilter</filter-name>
+       <url-pattern>/</url-pattern>
+       <url-pattern>/projects</url-pattern>
+       <url-pattern>/projects/*</url-pattern>
+       <url-pattern>/tags</url-pattern>
+       <url-pattern>/hierarchy</url-pattern>
+       <url-pattern>/favorites</url-pattern>
+       <url-pattern>/myfavorites</url-pattern>
+       <url-pattern>/myprojects</url-pattern>
+       <url-pattern>/create/*</url-pattern>
+       <url-pattern>/reindex</url-pattern>
        <dispatcher>REQUEST</dispatcher>
        <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
     <filter-mapping>
-       <filter-name>LoginFilter</filter-name>
+       <filter-name>ConfigFilter</filter-name>
        <url-pattern>/</url-pattern>
        <url-pattern>/projects</url-pattern>
        <url-pattern>/projects/*</url-pattern>
