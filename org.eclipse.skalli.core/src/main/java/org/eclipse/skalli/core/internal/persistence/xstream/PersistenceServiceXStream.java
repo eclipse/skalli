@@ -39,8 +39,8 @@ public class PersistenceServiceXStream extends PersistenceServiceBase implements
 
     private static final Logger LOG = LoggerFactory.getLogger(PersistenceServiceXStream.class);
 
-    private final DataModelContainer cache = new DataModelContainer();
-    private final DataModelContainer deleted = new DataModelContainer();
+    private final EntityCache cache = new EntityCache();
+    private final EntityCache deleted = new EntityCache();
 
     private XStreamPersistence xstreamPersistence;
     private String storageServiceClassName;
@@ -115,6 +115,7 @@ public class PersistenceServiceXStream extends PersistenceServiceBase implements
             LOG.warn(MessageFormat.format("No entity service registered for entities of type {0}", entityClass.getName()));
             return;
         }
+        registerEntityClass(entityClass);
 
         List<T> loadedEntities;
         try {
@@ -308,11 +309,20 @@ public class PersistenceServiceXStream extends PersistenceServiceBase implements
         if (entity == null) {
             return null;
         }
-
+        registerEntityClass(entityClass);
         resolveParentEntity(entityClass, entity);
         updateParentEntityInCache(entityClass, uuid, entity);
 
         return entity;
+    }
+
+    <T extends EntityBase> void registerEntityClass(Class<T> entityClass) {
+        if (!cache.isRegistered(entityClass)) {
+            cache.registerEntityClass(entityClass);
+        }
+        if (!deleted.isRegistered(entityClass)) {
+            deleted.registerEntityClass(entityClass);
+        }
     }
 
     private <T extends EntityBase> void updateParentEntityInCache(Class<T> entityClass, UUID uuid, T entity) {

@@ -18,7 +18,7 @@ import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class DataModelContainerTest {
+public class EntityCacheTest {
 
     private class TestEntity extends EntityBase {
     }
@@ -27,12 +27,8 @@ public class DataModelContainerTest {
     }
 
     @Test
-    public void testPutEntity() {
-    }
-
-    @Test
     public void testGetAllEntities_empty() {
-        DataModelContainer cont = new DataModelContainer();
+        EntityCache cont = new EntityCache();
         List<TestEntity> res = cont.getEntities(TestEntity.class);
         Assert.assertNotNull(res);
         Assert.assertEquals(0, res.size());
@@ -45,7 +41,8 @@ public class DataModelContainerTest {
         e1.setUuid(UUID.randomUUID());
         e2.setUuid(UUID.randomUUID());
         Assert.assertFalse(e1.equals(e2));
-        DataModelContainer cont = new DataModelContainer();
+        EntityCache cont = new EntityCache();
+        cont.registerEntityClass(TestEntity.class);
         cont.putEntity(e1);
 
         List<TestEntity> res = cont.getEntities(TestEntity.class);
@@ -61,7 +58,8 @@ public class DataModelContainerTest {
         TestEntity e2 = new TestEntity();
         e1.setUuid(UUID.randomUUID());
         e2.setUuid(UUID.randomUUID());
-        DataModelContainer cont = new DataModelContainer();
+        EntityCache cont = new EntityCache();
+        cont.registerEntityClass(TestEntity.class);
         cont.putEntity(e1);
         cont.putEntity(e2);
 
@@ -72,10 +70,44 @@ public class DataModelContainerTest {
     }
 
     @Test
+    public void testDerivedTypes() {
+        TestEntity e1 = new TestEntity();
+        TestEntity e2 = new TestEntityDerived();
+        e1.setUuid(UUID.randomUUID());
+        e2.setUuid(UUID.randomUUID());
+        EntityCache cont = new EntityCache();
+        cont.registerEntityClass(TestEntity.class);
+        cont.putEntity(e1);
+        cont.putEntity(e2);
+
+        List<TestEntity> res = cont.getEntities(TestEntity.class);
+        Assert.assertNotNull(res);
+        Assert.assertEquals(2, res.size());
+        Assert.assertNotSame(res.get(1), res.get(0));
+    }
+
+    // cache supports storage of derived types together with
+    // the base type, but access does only work
+    @Test(expected = ClassCastException.class)
+    public void testDerivedTypesClassCastException() {
+        TestEntity e1 = new TestEntity();
+        TestEntity e2 = new TestEntityDerived();
+        e1.setUuid(UUID.randomUUID());
+        e2.setUuid(UUID.randomUUID());
+        EntityCache cont = new EntityCache();
+        cont.registerEntityClass(TestEntity.class);
+        cont.putEntity(e1);
+        cont.putEntity(e2);
+
+        cont.getEntities(TestEntityDerived.class);
+    }
+
+    @Test
     public void testPutEntity_double() {
         TestEntity e1 = new TestEntity();
         e1.setUuid(UUID.randomUUID());
-        DataModelContainer cont = new DataModelContainer();
+        EntityCache cont = new EntityCache();
+        cont.registerEntityClass(TestEntity.class);
         cont.putEntity(e1);
         cont.putEntity(e1);
 
@@ -91,7 +123,8 @@ public class DataModelContainerTest {
         TestEntity e2 = new TestEntity();
         e1.setUuid(UUID.randomUUID());
         e2.setUuid(e1.getUuid());
-        DataModelContainer cont = new DataModelContainer();
+        EntityCache cont = new EntityCache();
+        cont.registerEntityClass(TestEntity.class);
         cont.putEntity(e1);
         cont.putEntity(e2);
 
@@ -109,7 +142,8 @@ public class DataModelContainerTest {
         TestEntity e2 = new TestEntity();
         e1.setUuid(UUID.randomUUID());
         e2.setUuid(UUID.randomUUID());
-        DataModelContainer cont = new DataModelContainer();
+        EntityCache cont = new EntityCache();
+        cont.registerEntityClass(TestEntity.class);
         cont.putEntity(e1);
         cont.putEntity(e2);
 
@@ -131,7 +165,8 @@ public class DataModelContainerTest {
         TestEntity e2 = new TestEntity();
         e1.setUuid(UUID.randomUUID());
         e2.setUuid(UUID.randomUUID());
-        DataModelContainer cont = new DataModelContainer();
+        EntityCache cont = new EntityCache();
+        cont.registerEntityClass(TestEntity.class);
         cont.putEntity(e1);
 
         cont.removeEntity(e2);
@@ -149,7 +184,9 @@ public class DataModelContainerTest {
         e1.setUuid(UUID.randomUUID());
         e2.setUuid(UUID.randomUUID());
         e3.setUuid(UUID.randomUUID());
-        DataModelContainer cont = new DataModelContainer();
+        EntityCache cont = new EntityCache();
+        cont.registerEntityClass(TestEntity.class);
+        cont.registerEntityClass(TestEntityBase1.class);
         cont.putEntity(e1);
         cont.putEntity(e2);
         cont.putEntity(e3);

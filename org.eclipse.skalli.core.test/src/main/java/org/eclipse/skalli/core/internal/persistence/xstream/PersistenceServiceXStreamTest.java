@@ -124,6 +124,7 @@ public class PersistenceServiceXStreamTest {
     @Test
     public void testResolveParentEntities() throws Exception {
         PersistenceServiceXStream p = new PersistenceServiceXStream();
+        p.registerEntityClass(TestEntityBase1.class);
 
         EntityBase parent1 = new TestEntityBase1(PropertyHelperUtils.TEST_UUIDS[0]);
         EntityBase parent2 = new TestEntityBase1(PropertyHelperUtils.TEST_UUIDS[1]);
