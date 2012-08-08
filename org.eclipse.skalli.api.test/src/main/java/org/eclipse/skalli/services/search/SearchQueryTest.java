@@ -30,7 +30,7 @@ public class SearchQueryTest {
         testParams.put(SearchQuery.PARAM_PROPERTY, "name");
 
         SearchQuery query = new SearchQuery(testParams);
-        assertEquals("project", query.getShortName());
+        assertEquals(SearchQuery.DEFAULT_SHORTNAME, query.getShortName());
         assertEquals(".+", query.getPattern().pattern());
     }
 
@@ -88,7 +88,7 @@ public class SearchQueryTest {
         testParams.put(SearchQuery.PARAM_USER, "hugo");
         testParams.put(SearchQuery.PARAM_TAG, "foobar");
         testParams.put(SearchQuery.PARAM_EXTENSIONS, "devInf,info,xyz");
-        testParams.put(SearchQuery.PARAM_PROPERTY, "devInf.scmLocations");
+        testParams.put(SearchQuery.PARAM_PROPERTY, "!devInf.scmLocations");
         testParams.put(SearchQuery.PARAM_COUNT, "4711");
         testParams.put(SearchQuery.PARAM_START, "123");
         testParams.put(SearchQuery.PARAM_PATTERN, "abc.+");
@@ -100,12 +100,13 @@ public class SearchQueryTest {
         assertArrayEquals(new String[]{"devInf", "info", "xyz"}, query.getExtensions());
         assertEquals("devInf", query.getShortName());
         assertEquals("scmLocations", query.getPropertyName());
+        assertEquals("devInf.scmLocations", query.getProperty());
         assertEquals(123, query.getStart());
         assertEquals(123, query.getPagingInfo().getStart());
         assertEquals(4711, query.getCount());
         assertEquals(4711, query.getPagingInfo().getCount());
         assertEquals("abc.+", query.getPattern().pattern());
-        assertFalse(query.isNegate());
+        assertTrue(query.isNegate());
     }
 
     @Test
@@ -133,6 +134,30 @@ public class SearchQueryTest {
         query.setPagingInfo(null);
         assertEquals(0, query.getStart());
         assertEquals(Integer.MAX_VALUE, query.getCount());
+    }
+
+    @Test
+    public void testGetSetProperty() throws Exception {
+        SearchQuery query = new SearchQuery();
+        query.setProperty("a.b");
+        assertEquals("a.b", query.getProperty());
+        assertEquals("a", query.getShortName());
+        assertEquals("b", query.getPropertyName());
+        query.setPropertyName("c");
+        assertEquals("a.c", query.getProperty());
+        query.setShortName("d");
+        assertEquals("d.c", query.getProperty());
+        query.setPropertyName(null);
+        assertNull(query.getProperty());
+        query.setPropertyName("");
+        assertNull(query.getProperty());
+        query.setPropertyName("x");
+        query.setShortName(null);
+        assertEquals(SearchQuery.PROJECT_PREFIX + "x", query.getProperty());
+        query.setShortName("");
+        assertEquals(SearchQuery.PROJECT_PREFIX + "x", query.getProperty());
+        query.setShortName("y");
+        assertEquals("y.x", query.getProperty());
     }
 
 }

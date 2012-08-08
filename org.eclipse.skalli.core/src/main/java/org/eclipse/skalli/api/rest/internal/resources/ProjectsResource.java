@@ -10,51 +10,51 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.internal.resources;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrLookup;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.eclipse.skalli.commons.Statistics;
+import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Severity;
+import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.PropertyLookup;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
-import org.eclipse.skalli.services.group.GroupUtils;
 import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.search.QueryParseException;
+import org.eclipse.skalli.services.search.SearchQuery;
 import org.eclipse.skalli.services.search.SearchResult;
 import org.eclipse.skalli.services.search.SearchUtils;
-import org.eclipse.skalli.services.user.LoginUtils;
 import org.restlet.data.Form;
+import org.restlet.data.Reference;
 import org.restlet.data.Status;
-import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ProjectsResource extends ResourceBase {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ProjectsResource.class);
 
     /**Get might be used for 2 different cases:
      * 1) to list the details of the projects. Project set might be limited using lucene search query or tag.
@@ -69,78 +69,101 @@ public class ProjectsResource extends ResourceBase {
             return result;
         }
 
-        Form form = getRequest().getResourceRef().getQueryAsForm();
+        Reference resourceRef = getRequest().getResourceRef();
+        Form form = resourceRef.getQueryAsForm();
         try {
             RestSearchQuery queryParams = new RestSearchQuery(form);
-            Projects projects = getProjectsToUpdate(queryParams);
+            Projects projects = getProjects(queryParams);
 
             return new ResourceRepresentation<Projects>(projects,
-                    new ProjectsConverter(getRequest().getResourceRef().getHostIdentifier(),
+                    new ProjectsConverter(resourceRef.getHostIdentifier(),
                             queryParams.getExtensions(), queryParams.getStart()));
+
         } catch (QueryParseException e) {
             return createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST, "Error parsing query: " + e.getMessage());//$NON-NLS-1$
-        } catch (Exception e) {
-            return createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
         }
     }
 
-    private Projects getProjectsToUpdate(RestSearchQuery queryParams) throws QueryParseException {
-        SearchResult<Project> searchResult = SearchUtils.searchProjects(queryParams);
-        Statistics.getDefault().trackSearch(Permits.getLoggedInUser(), searchResult.getQueryString(),
-                searchResult.getResultCount(), searchResult.getDuration());
+    private Projects getProjects(SearchQuery queryParams) throws QueryParseException {
+        List<Project> projects = null;
+        if (StringUtils.isBlank(queryParams.getQuery()) || "*".equals(queryParams.getQuery())) { //$NON-NLS-1$
+            projects = Services.getRequiredService(ProjectService.class).getAll();
+        } else {
+            SearchResult<Project> searchResult = SearchUtils.searchProjects(queryParams);
+            Statistics.getDefault().trackSearch(Permits.getLoggedInUser(), searchResult.getQueryString(),
+                    searchResult.getResultCount(), searchResult.getDuration());
+            projects = searchResult.getEntities();
+        }
 
-        Projects projects = new Projects();
-        projects.setProjects(new HashSet<Project>());
-        String shortName = queryParams.getShortName();
-        for (Project project : searchResult.getEntities()) {
-            if (shortName != null) {
-                if ("project".equals(shortName)) {
-                    projects = matchByProperty(projects, project, project, queryParams);
-                } else {
-                    SortedSet<ExtensionEntityBase> allExtensions = project.getAllExtensions();
-                    for (ExtensionEntityBase extensionEntity : allExtensions) {
-                        ExtensionService<? extends ExtensionEntityBase> extensionService = ExtensionServices
-                                .getByExtensionClass(extensionEntity.getClass());
-                        if (extensionService.getShortName().equals(shortName)) {
-                            projects = matchByProperty(projects, project, extensionEntity, queryParams);
-                        }
-                    }
-                }
-                // always render extensions that are referenced in the property attribute
-                if (!queryParams.hasExtension(shortName)) {
-                    queryParams.addExtension(shortName);
-                }
-            } else {
-                projects.addProject(project);
+        Projects result = new Projects();
+        if (StringUtils.isBlank(queryParams.getPropertyName())) {
+            // if there is no property filter, add all projects to the result
+            result.addProjects(projects);
+        } else {
+            // if there is a property filter, add only those projects
+            // to the result that match this filter
+            Class<? extends ExtensionEntityBase> extClass = null;
+            if (queryParams.isExtension()) {
+                String shortName = queryParams.getShortName();
+                ExtensionService<?> extService = ExtensionServices.getByShortName(shortName);
+                extClass = extService != null? extService.getExtensionClass() : null;
+
+                // always render extensions that are referenced in the property query
+                queryParams.addExtension(shortName);
+            }
+            Set<String> propertyNames = EntityBase.getPropertyNames(extClass != null? extClass : Project.class);
+            if (!propertyNames.contains(queryParams.getPropertyName())) {
+                throw new QueryParseException(MessageFormat.format("Unknown property \"{0}\"", queryParams.getProperty()));
             }
 
+            for (Project project : projects) {
+                if (matchesPropertyQuery(project, extClass, queryParams)) {
+                    result.addProject(project);
+                }
+            }
         }
-        return projects;
+        return result;
     }
 
-    private Projects matchByProperty(Projects projects, Project project, ExtensionEntityBase extensionEntity, RestSearchQuery queryParams) {
+    boolean matchesPropertyQuery(Project project, Class<? extends ExtensionEntityBase> extClass, SearchQuery queryParams) {
         String propertyName = queryParams.getPropertyName();
-        PropertyLookup propertyLookup = new PropertyLookup(extensionEntity);
-        String lookupResult = propertyLookup.lookup(propertyName);
-        if (lookupResult != null & !queryParams.isNegate()) {
-            if (extensionEntity.getProperty(propertyName) instanceof Iterable) {
-                String[] lookupSet = lookupResult.split(",");
-                for (String string : lookupSet) {
-                    Matcher matcher = queryParams.getPattern().matcher(string);
-                    if (matcher.matches()) {
-                        projects.addProject(project);
-                    }
-                }
-            } else {
-                Matcher matcher = queryParams.getPattern().matcher(lookupResult);
+        ExtensionEntityBase ext = extClass != null ? project.getExtension(extClass) : project;
+        Object propertyValue = ext != null ? ext.getProperty(propertyName) : null;
+        if (queryParams.isNegate()) {
+            return isBlank(propertyValue);
+        }
+        return matches(propertyValue, queryParams.getPattern());
+    }
+
+    static boolean isBlank(Object o) {
+        if (o == null) {
+            return true;
+        }
+        if (o instanceof Iterable) {
+            return !((Iterable<?>)o).iterator().hasNext();
+        }
+        return StringUtils.isBlank(o.toString());
+    }
+
+    static boolean matches(Object propertyValue, Pattern pattern) {
+        if (propertyValue == null) {
+            return false;
+        }
+        if (propertyValue instanceof Iterable) {
+            Iterator<?> it = ((Iterable<?>)propertyValue).iterator();
+            while (it.hasNext()) {
+                Matcher matcher = pattern.matcher(it.next().toString());
                 if (matcher.matches()) {
-                    projects.addProject(project);
+                    return true;
                 }
             }
-        } else if (lookupResult == null && queryParams.isNegate()){
-            projects.addProject(project);
+        } else {
+            Matcher matcher = pattern.matcher(propertyValue.toString());
+            if (matcher.matches()) {
+                return true;
+            }
         }
-        return projects;
+        return false;
     }
 
     @Put
@@ -151,119 +174,131 @@ public class ProjectsResource extends ResourceBase {
             return result;
         }
 
-        Form form = getRequest().getResourceRef().getQueryAsForm();
+        Reference resourceRef = getRequest().getResourceRef();
+        Form form = resourceRef.getQueryAsForm();
         RestSearchQuery queryParams = null;
         try {
-            ResourceRepresentation<PropertyUpdate> representation = new ResourceRepresentation<PropertyUpdate>();
-            try {
-                queryParams = new RestSearchQuery(form);
-            } catch (QueryParseException e) {
-                return createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
-            }
-            representation.setConverters(new PropertyUpdateConverter(getRequest().getResourceRef()
-                    .getHostIdentifier()));
-            representation.setAnnotatedClasses(PropertyUpdate.class);
-            PropertyUpdate dataChange = representation.read(entity, PropertyUpdate.class);
-            LoginUtils loginUtils = new LoginUtils(ServletUtils.getRequest(getRequest()));
-            String loggedInUser = loginUtils.getLoggedInUserId();
-            if (!GroupUtils.isAdministrator(loggedInUser)) {
-                return createStatusMessage(Status.CLIENT_ERROR_FORBIDDEN,
-                        "Admin rights are required in order to perform this operation.");
-            } else {
-                Projects projects = getProjectsToUpdate(queryParams);
-                ProjectService projectService = Services.getRequiredService(ProjectService.class);
+            queryParams = new RestSearchQuery(form, entity);
+        } catch (QueryParseException e) {
+            return createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST, "Error parsing query: " + e.getMessage());//$NON-NLS-1$
+        } catch (IOException e) {
+            return createStatusMessage(Status.SERVER_ERROR_INTERNAL, e.getMessage());
+        }
 
-                Set<Project> updatedProjectsSet = new HashSet<Project>();
-
-                String shortName = queryParams.getShortName();
-                for (Project project : projects.getProjects()) {
-                    try {
-                        Project loadedProject = projectService.loadEntity(Project.class, project.getUuid());
-                        if (loadedProject == null) {
-                            //should never happen, just a precaution
-                            continue;
-                        }
-                        if ("project".equals(shortName)) {
-                            updateProperty(dataChange, loadedProject, loadedProject, queryParams);
-                        } else {
-                            SortedSet<ExtensionEntityBase> allExtensions = loadedProject.getAllExtensions();
-                            for (ExtensionEntityBase extensionEntity : allExtensions) {
-                                ExtensionService<? extends ExtensionEntityBase> extensionService = ExtensionServices
-                                        .getByExtensionClass(extensionEntity.getClass());
-                                if (extensionService.getShortName().equals(shortName)) {
-                                    updateProperty(dataChange, loadedProject, extensionEntity, queryParams);
-                                }
-                            }
-                        }
-                        //validate project
-                        SortedSet<Issue> errors = projectService.validate(loadedProject, Severity.FATAL);
-                        if (!errors.isEmpty()) {
-                            String message = Issue.getMessage(
-                                    MessageFormat.format(
-                                            "Operation was canceled as validation of project {0} failed",
-                                            loadedProject.getName()),
-                                    errors);
-                            return createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST, message);
-                        }
-                        updatedProjectsSet.add(loadedProject);
-                    } catch (Exception e) {
-                        LOG.debug(MessageFormat.format(
-                                "Unexpected error while trying to update the property of the project {0}: {1}",
-                                project.getName(), e.getMessage()), e);
-                        return createStatusMessage(Status.SERVER_ERROR_INTERNAL, e.getMessage());
-                    }
-                }
-                if (queryParams.doPersist()) {
-                    for (Project project : updatedProjectsSet) {
-                        projectService.persist(project, loggedInUser);
-                    }
-                }
-                Projects updatedProjects = new Projects();
-                updatedProjects.setProjects(updatedProjectsSet);
-                return new ResourceRepresentation<Projects>(updatedProjects,
-                        new ProjectsConverter(getRequest().getResourceRef().getHostIdentifier(),
-                                queryParams.getExtensions(), queryParams.getStart()));
-            }
-        } catch (Exception e) {
-            LOG.debug(MessageFormat.format("Could not update property {0}", queryParams.getPropertyName()), e);
+        Projects projects = null;
+        try {
+            projects = getProjects(queryParams);
+        } catch (QueryParseException e) {
             return createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
         }
+
+        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        Projects updatedProjects = new Projects();
+
+        result = updateProperties(projects, updatedProjects, queryParams, projectService);
+        if (result != null) {
+            return result;
+        }
+
+        if (queryParams.doPersist()) {
+            result = persistUpdatedProjects(updatedProjects, projectService);
+            if (result != null) {
+                return result;
+            }
+        }
+
+        return new ResourceRepresentation<Projects>(updatedProjects,
+                new ProjectsConverter(resourceRef.getHostIdentifier(),
+                        queryParams.getExtensions(), queryParams.getStart()));
     }
 
-    private void updateProperty(PropertyUpdate dataChange, Project loadedProject, ExtensionEntityBase extensionEntity, RestSearchQuery queryParams)
-            throws Exception {
+    private Representation persistUpdatedProjects(Projects projects, ProjectService projectService) {
+        String loggedInUser = Permits.getLoggedInUser();
+        try {
+            for (Project project : projects.getProjects()) {
+                projectService.persist(project, loggedInUser);
+            }
+        } catch (ValidationException e) {
+            // should never happen since we validated all projects beforehand, but you never know
+            return createStatusMessage(Status.SERVER_ERROR_INTERNAL, e.getMessage());
+        }
+        return null;
+    }
+
+    private Representation updateProperties(Projects projects, Projects updatedProjects,
+            RestSearchQuery queryParams, ProjectService projectService) {
+
+        Class<? extends ExtensionEntityBase> extensionClass = null;
+        if (queryParams.isExtension()) {
+            String shortName = queryParams.getShortName();
+            ExtensionService<?> extService = ExtensionServices.getByShortName(shortName);
+            extensionClass = extService != null? extService.getExtensionClass() : null;
+        }
+        try {
+            for (Project project : projects.getProjects()) {
+                Project loadedProject = projectService.loadEntity(Project.class, project.getUuid());
+                if (loadedProject == null) {
+                    //should never happen, just a precaution
+                    continue;
+                }
+                updateProperty(loadedProject, extensionClass, queryParams);
+
+                SortedSet<Issue> errors = projectService.validate(loadedProject, Severity.FATAL);
+                if (!errors.isEmpty()) {
+                    String message = Issue.getMessage(MessageFormat.format(
+                                    "Validation of project {0} failed",
+                                    loadedProject.getProjectId()), errors);
+                    return createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST, message);
+                }
+
+                updatedProjects.addProject(loadedProject);
+            }
+        } catch (UnsupportedOperationException e) {
+            return createStatusMessage(Status.SERVER_ERROR_INTERNAL, e.getMessage());
+        } catch (RuntimeException e) {
+            // NoSuchPropertyException, PropertyUpdateExeption: should not happen for correctly
+            // implemented extensions, but you never know
+            return createStatusMessage(Status.SERVER_ERROR_INTERNAL, e.getMessage());
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void updateProperty(Project project, Class<? extends ExtensionEntityBase> extensionClass,
+            RestSearchQuery queryParams) {
         String propertyName = queryParams.getPropertyName();
-        Object property = extensionEntity.getProperty(propertyName);
-        if (property instanceof Collection) {
+        ExtensionEntityBase extension = extensionClass != null ? project.getExtension(extensionClass) : project;
+        Object propertyValue = extension != null ? extension.getProperty(propertyName) : null;
+        if (propertyValue instanceof Collection) {
             try {
-                updateCollectionProperty(dataChange, loadedProject, extensionEntity, (Collection<String>) property, queryParams);
+                updateCollectionProperty(project, extension, (Collection<String>) propertyValue, queryParams);
             } catch (ClassCastException e) {
-                throw new Exception(propertyName
-                        + "is not of type Collection<String>, but only this type is currently supported.");
+                throw new UnsupportedOperationException(MessageFormat.format(
+                        "''{0}'' is not a collection of strings", propertyName));
             }
         } else {
-            updateStringProperty(dataChange, loadedProject, extensionEntity, property, queryParams);
+            updateStringProperty(project, propertyValue, extension, queryParams);
         }
     }
 
-    private void updateStringProperty(PropertyUpdate dataChange, Project project,
-            ExtensionEntityBase extensionEntity, Object property, RestSearchQuery queryParams) throws Exception {
-        String newValue = convert(property.toString(),
-                queryParams.getPattern(), dataChange.getTemplate(), project);
-        extensionEntity.setProperty(queryParams.getPropertyName(), newValue);
+    private void updateStringProperty(Project project, Object propertyValue,
+            ExtensionEntityBase extension,  RestSearchQuery queryParams) {
+        String newValue = convert(propertyValue.toString(),
+                queryParams.getPattern(), queryParams.getTemplate(), project);
+        extension.setProperty(queryParams.getPropertyName(), newValue);
     }
 
-    private void updateCollectionProperty(PropertyUpdate dataChange, Project project,
-            ExtensionEntityBase extensionEntity, Collection<String> properties, RestSearchQuery queryParams) throws Exception {
-        Collection<String> newCollection = new ArrayList<String>(properties.size());
-        for (String string : properties) {
-            Matcher matcher = queryParams.getPattern().matcher(string);
+    private void updateCollectionProperty(Project project,
+            ExtensionEntityBase extension, Collection<String> propertyValues, RestSearchQuery queryParams) {
+        Collection<String> newValues = new ArrayList<String>(propertyValues.size());
+        for (String propertyValue : propertyValues) {
+            Matcher matcher = queryParams.getPattern().matcher(propertyValue);
             if (matcher.matches()) {
-                string = convert(string, queryParams.getPattern(), dataChange.getTemplate(), project);
+                propertyValue = convert(propertyValue, queryParams.getPattern(), queryParams.getTemplate(), project);
             }
-            newCollection.add(string);
+            newValues.add(propertyValue);
         }
-        extensionEntity.setProperty(queryParams.getPropertyName(), newCollection);
+        extension.setProperty(queryParams.getPropertyName(), newValues);
     }
 
     /*copied from MapperUtil. Should we move this class to the api?*/

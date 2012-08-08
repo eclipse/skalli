@@ -23,8 +23,8 @@ class PropertyUpdateConverter extends RestConverterBase<PropertyUpdate> {
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API"; //$NON-NLS-1$
 
 
-    public PropertyUpdateConverter(String host) {
-        super(PropertyUpdate.class, "dataChangePattern", host); //$NON-NLS-1$
+    public PropertyUpdateConverter() {
+        super(PropertyUpdate.class, "dataChangePattern"); //$NON-NLS-1$
     }
 
     @Override

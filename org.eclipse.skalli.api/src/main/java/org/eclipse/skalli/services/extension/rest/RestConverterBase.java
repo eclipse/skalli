@@ -50,6 +50,10 @@ public abstract class RestConverterBase<T> implements RestConverter {
     private final String alias;
     private final Class<T> clazz;
 
+    public RestConverterBase(Class<T> clazz, String alias) {
+        this(clazz, alias, null);
+    }
+
     public RestConverterBase(Class<T> clazz, String alias, String host) {
         this.clazz = clazz;
         this.alias = alias;
