@@ -100,7 +100,8 @@ public class ProjectEditPanel extends Panel implements Issuer {
 
     private Project modifiedProject;
 
-    private TreeSet<ProjectEditPanelEntry> entries;
+    private Map<String, ProjectEditPanelEntry> panels;
+    private SortedSet<ProjectEditPanelEntry> sortedPanels;
     private Set<String> selectableExtensions;
     private Map<String, String> displayNames;
 
@@ -213,7 +214,8 @@ public class ProjectEditPanel extends Panel implements Issuer {
      */
     @SuppressWarnings("rawtypes")
     private void initializePanelEntries() {
-        entries = new TreeSet<ProjectEditPanelEntry>(new ProjectEditPanelComparator(projectTemplate));
+        panels = new HashMap<String,ProjectEditPanelEntry>();
+        sortedPanels = new TreeSet<ProjectEditPanelEntry>(new ProjectEditPanelComparator(projectTemplate));
         displayNames = new HashMap<String, String>();
         Context context = new Context(application, projectTemplate, mode);
         Iterator<ExtensionFormService> extensionFormFactories = Services.getServiceIterator(ExtensionFormService.class);
@@ -224,7 +226,8 @@ public class ProjectEditPanel extends Panel implements Issuer {
                 ProjectEditPanelEntry entry = new ProjectEditPanelEntry(
                         modifiedProject, extensionFormFactory, context, application);
                 entry.setWidth(PANEL_WIDTH);
-                entries.add(entry);
+                panels.put(extensionClassName, entry);
+                sortedPanels.add(entry);
                 displayNames.put(extensionClassName, entry.getDisplayName());
             }
         }
@@ -354,23 +357,23 @@ public class ProjectEditPanel extends Panel implements Issuer {
     }
 
     /**
-     * Renders the panels in the order defined by the comparator of {@link #entries}.
+     * Renders the panels in the order defined by the comparator of {@link #sortedPanels}.
      */
     private void renderPanels(VerticalLayout layout) {
-        for (ProjectEditPanelEntry entry : entries) {
+        for (ProjectEditPanelEntry entry : sortedPanels) {
             layout.addComponent(entry);
             layout.setComponentAlignment(entry, Alignment.MIDDLE_CENTER);
         }
     }
 
     private void collapseAllPanels() {
-        for (ProjectEditPanelEntry entry : entries) {
+        for (ProjectEditPanelEntry entry : sortedPanels) {
             entry.collapse();
         }
     }
 
     private void expandAllPanels() {
-        for (ProjectEditPanelEntry entry : entries) {
+        for (ProjectEditPanelEntry entry : sortedPanels) {
             entry.expand();
         }
     }
@@ -507,7 +510,7 @@ public class ProjectEditPanel extends Panel implements Issuer {
         sortIssuesByExtension(issues, sortedIssues);
 
         // render issues that are related to an extension
-        for (ProjectEditPanelEntry entry : entries) {
+        for (ProjectEditPanelEntry entry : sortedPanels) {
             String extensionName = entry.getExtensionClassName();
             SortedSet<Issue> extensionIssues = sortedIssues.get(extensionName);
             entry.showIssues(extensionIssues, collapseValid);
@@ -548,7 +551,7 @@ public class ProjectEditPanel extends Panel implements Issuer {
      * the modified project!
      */
     private void commitForms() {
-        for (ProjectEditPanelEntry entry : entries) {
+        for (ProjectEditPanelEntry entry : sortedPanels) {
             if (entry.isEnabled()) {
                 try {
                     entry.commit();
@@ -798,10 +801,65 @@ public class ProjectEditPanel extends Panel implements Issuer {
         }
 
         @Override
-        public void onPropertyChanged(String propertyId, Object newValue) {
-            for (ProjectEditPanelEntry entry : entries) {
-                entry.onPropertyChanged(propertyId, newValue);
+        public void onPropertyChanged(String extensionClassName, String propertyName, Object propertyValue) {
+            for (ProjectEditPanelEntry entry : sortedPanels) {
+                entry.onPropertyChanged(extensionClassName, propertyName, propertyValue);
             }
+        }
+
+        @Override
+        public Object getProperty(String extensionClassName, String propertyName) {
+            ProjectEditPanelEntry entry = panels.get(extensionClassName);
+            return entry != null? entry.getProperty(propertyName) : null;
+        }
+
+        @Override
+        public void setProperty(String extensionClassName, String propertyName, Object propertyValue) {
+            ProjectEditPanelEntry entry = panels.get(extensionClassName);
+            if (entry != null) {
+                entry.setProperty(propertyName, propertyValue);
+            }
+        }
+
+        @Override
+        public boolean hasPanel(String extensionClassName) {
+            return panels.get(extensionClassName) != null;
+        }
+
+        @Override
+        public boolean isEditable(String extensionClassName) {
+            ProjectEditPanelEntry entry = panels.get(extensionClassName);
+            if (entry == null) {
+                throw new IllegalArgumentException(MessageFormat.format("No panel for extension {0}", extensionClassName));
+            }
+            return entry.isEditable();
+        }
+
+        @Override
+        public boolean isInherited(String extensionClassName) {
+            ProjectEditPanelEntry entry = panels.get(extensionClassName);
+            if (entry == null) {
+                throw new IllegalArgumentException(MessageFormat.format("No panel for extension {0}", extensionClassName));
+            }
+            return entry.isInherited();
+        }
+
+        @Override
+        public boolean isDisabled(String extensionClassName) {
+            ProjectEditPanelEntry entry = panels.get(extensionClassName);
+            if (entry == null) {
+                throw new IllegalArgumentException(MessageFormat.format("No panel for extension {0}", extensionClassName));
+            }
+            return entry.isDisabled();
+        }
+
+        @Override
+        public boolean isExpanded(String extensionClassName) {
+            ProjectEditPanelEntry entry = panels.get(extensionClassName);
+            if (entry == null) {
+                throw new IllegalArgumentException(MessageFormat.format("No panel for extension {0}", extensionClassName));
+            }
+            return entry.isExpanded();
         }
     }
 

@@ -277,6 +277,20 @@ public abstract class EntityBase implements Comparable<Object> {
     }
 
     /**
+    * Returns <code>true</code> if this entity has a property
+     * with the given name.
+     *
+     * @param propertyName  the identifier of the property.
+     * @return <code>true</code> if this entity has the requested property,
+     * <code>false</code> otherwise.
+    *
+    * @see org.eclipse.skalli.services.projects.PropertyName
+     */
+    public boolean hasProperty(String propertyName) {
+        return getMethod(propertyName) != null;
+    }
+
+    /**
      * Returns the value of the given property, if that property exists.
      *
      * @param propertyName  the identifier of the property.

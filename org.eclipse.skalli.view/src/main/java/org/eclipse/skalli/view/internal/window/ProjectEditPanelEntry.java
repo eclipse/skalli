@@ -218,6 +218,23 @@ class ProjectEditPanelEntry extends CustomComponent {
         }
     }
 
+    public boolean isDisabled() {
+        return TrayState.DISABLED.equals(state);
+    }
+
+    public boolean isExpanded() {
+        return TrayState.EDITABLE_VISIBLE.equals(state) || TrayState.INHERITED_VISIBLE.equals(state);
+    }
+
+
+    public boolean isEditable() {
+        return TrayState.EDITABLE_VISIBLE.equals(state) || TrayState.EDITABLE_INVISIBLE.equals(state);
+    }
+
+    public boolean isInherited() {
+        return TrayState.INHERITED_VISIBLE.equals(state) || TrayState.INHERITED_INVISIBLE.equals(state);
+    }
+
     public String getDisplayName() {
         return extensionService.getCaption();
     }
@@ -234,17 +251,39 @@ class ProjectEditPanelEntry extends CustomComponent {
         return extensionClassName;
     }
 
-    public void onPropertyChanged(String propertyId, Object newValue) {
-        if (EntityBase.PROPERTY_PARENT_ENTITY.equals(propertyId)) {
+    public void onPropertyChanged(String extensionClassName, String propertyId, Object newValue) {
+        if (EntityBase.class.getName().equals(extensionClassName) && EntityBase.PROPERTY_PARENT_ENTITY.equals(propertyId)) {
             project.setParentEntity((EntityBase) newValue);
             if (TrayState.INHERITED_INVISIBLE.equals(state) || TrayState.INHERITED_VISIBLE.equals(state)) {
                 inheritExtension();
                 setState(state);
             }
         }
-        if (formService.listenOnPropertyChanged(propertyId, newValue)) {
+        if (formService.listenOnPropertyChanged(extensionClassName, propertyId, newValue)) {
             form.commit();
             layoutNewEditForm();
+        }
+    }
+
+    public Object getProperty(String propertyName) {
+        if (!isDisabled() && extension != null && extension.hasProperty(propertyName)) {
+            form.commit();
+            return extension.getProperty(propertyName);
+        }
+        return null;
+    }
+
+    public void setProperty(String propertyName, Object propertyValue) {
+        if (isInherited()) {
+            return;
+        }
+        if (isDisabled()) {
+            setState(TrayState.EDITABLE_VISIBLE);
+        }
+        if (extension != null && extension.hasProperty(propertyName)) {
+            extension.setProperty(propertyName, propertyValue);
+            layoutNewEditForm();
+            expand();
         }
     }
 

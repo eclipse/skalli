@@ -123,7 +123,8 @@ public class ProjectBasicsEditForm extends AbstractExtensionFormService<Project>
                 cb.addListener(new ValueChangeListener() {
                     @Override
                     public void valueChange(ValueChangeEvent event) {
-                        context.onPropertyChanged(EntityBase.PROPERTY_PARENT_ENTITY, (EntityBase) cb.getValue());
+                        context.onPropertyChanged(EntityBase.class.getName(),
+                                EntityBase.PROPERTY_PARENT_ENTITY, (EntityBase) cb.getValue());
                     }
                 });
             } else if (Project.PROPERTY_PHASE.equals(propertyId)) {

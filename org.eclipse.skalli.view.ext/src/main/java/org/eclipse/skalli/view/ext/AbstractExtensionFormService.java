@@ -70,7 +70,7 @@ public abstract class AbstractExtensionFormService<T extends ExtensionEntityBase
     }
 
     @Override
-    public boolean listenOnPropertyChanged(String propertyId, Object newValue) {
+    public boolean listenOnPropertyChanged(String extensionClassName, String propertyId, Object newValue) {
         return false;
     }
 

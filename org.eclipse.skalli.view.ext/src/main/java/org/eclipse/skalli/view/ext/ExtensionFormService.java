@@ -57,5 +57,5 @@ public interface ExtensionFormService<T extends ExtensionEntityBase> extends Ico
      * @param propertyId  the name of the property.
      * @param newValue  the new value of the property.
      */
-    public boolean listenOnPropertyChanged(String propertyId, Object newValue);
+    public boolean listenOnPropertyChanged(String extensionClassName, String propertyId, Object newValue);
 }
