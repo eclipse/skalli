@@ -139,10 +139,18 @@ public class EntityBaseTest {
         extBase.setStr("Homer");
         List<String> list = Arrays.asList("Marge", "Lisa", "Bart");
         extBase.setItems(list);
-
         Assert.assertEquals(Boolean.TRUE, (Boolean) extBase.getProperty(TestExtension.PROPERTY_BOOL));
         Assert.assertEquals("Homer", (String) extBase.getProperty(TestExtension.PROPERTY_STR));
         AssertUtils.assertEquals("List", list, (List<String>) extBase.getProperty(TestExtension.PROPERTY_ITEMS));
+    }
+
+    @Test
+    public void testGetPropertyWithNullValue() throws Exception {
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtension extBase = new TestExtension();
+        extBase.setExtensibleEntity(base);
+        extBase.setStr(null);
+        Assert.assertNull(extBase.getProperty(TestExtension.PROPERTY_STR));
     }
 
     @Test(expected = NoSuchPropertyException.class)
@@ -160,10 +168,20 @@ public class EntityBaseTest {
         extBase.setProperty(TestExtension.PROPERTY_STR, "Homer");
         List<String> list = Arrays.asList("Marge", "Lisa", "Bart");
         extBase.setProperty(TestExtension.PROPERTY_ITEMS, list);
-
         Assert.assertEquals(true, extBase.isBool());
         Assert.assertEquals("Homer", extBase.getStr());
         AssertUtils.assertEquals("List", list, extBase.getItems());
+    }
+
+    @Test
+    public void testNullValue() throws Exception {
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtension extBase = new TestExtension();
+        extBase.setExtensibleEntity(base);
+        extBase.setProperty(TestExtension.PROPERTY_STR, "Homer");
+        Assert.assertNotNull(extBase.getStr());
+        extBase.setProperty(TestExtension.PROPERTY_STR, null);
+        Assert.assertNull(extBase.getStr());
     }
 
     @Test(expected = NoSuchPropertyException.class)
@@ -173,11 +191,27 @@ public class EntityBaseTest {
     }
 
     @Test(expected = PropertyUpdateException.class)
-    public void testSetIncomatibleValue() throws Exception {
+    public void testSetPrimitivePropertyToNull() throws Exception {
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtension extBase = new TestExtension();
+        extBase.setExtensibleEntity(base);
+        extBase.setProperty(TestExtension.PROPERTY_BOOL, null);
+    }
+
+    @Test(expected = PropertyUpdateException.class)
+    public void testSetValueWithIncompatibleType() throws Exception {
         TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
         TestExtension extBase = new TestExtension();
         extBase.setExtensibleEntity(base);
         extBase.setProperty(TestExtension.PROPERTY_BOOL, new String[]{});
+    }
+
+    @Test(expected = PropertyUpdateException.class)
+    public void testSetterThrowsException() throws Exception {
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtension extBase = new TestExtension();
+        extBase.setExtensibleEntity(base);
+        extBase.setProperty(TestExtension.PROPERTY_ITEMS, null);
     }
 
     @Test

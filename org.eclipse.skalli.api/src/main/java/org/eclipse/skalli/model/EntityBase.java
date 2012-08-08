@@ -299,11 +299,25 @@ public abstract class EntityBase implements Comparable<Object> {
     }
 
     private Method getMethod(String propertyName) {
-        Method getter = getMethod("get", propertyName, null); //$NON-NLS-1$
+        Method getter = getMethod("get", propertyName); //$NON-NLS-1$
         if (getter == null) {
-            getter = getMethod("is", propertyName, null); //$NON-NLS-1$
+            getter = getMethod("is", propertyName); //$NON-NLS-1$
         }
         return getter;
+    }
+
+    private Method getMethod(String methodPrefix, String propertyName) {
+        String methodName = methodPrefix + StringUtils.capitalize(propertyName);
+        try {
+            return getClass().getMethod(methodName, new Class[] {});
+        } catch (NoSuchMethodException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(MessageFormat.format(
+                        "Entity of type {0} has no getter method for property \"{1}\"",
+                        getClass(), propertyName));
+            }
+        }
+        return null;
     }
 
     /**
@@ -318,14 +332,16 @@ public abstract class EntityBase implements Comparable<Object> {
      * @see org.eclipse.skalli.services.projects.PropertyName
      */
     public void setProperty(String propertyName, Object propertyValue) {
-        Method method = getMethod("set", propertyName, propertyValue.getClass()); //$NON-NLS-1$
+        Class<?> propertyType = propertyValue != null? propertyValue.getClass() : null;
+        Method method = getMethod("set", propertyName, propertyType); //$NON-NLS-1$
         if (method == null) {
             throw new NoSuchPropertyException(this, propertyName);
         }
         try {
             method.invoke(this, propertyValue);
         } catch (Exception e) {
-           throw new PropertyUpdateException(MessageFormat.format("Property \"{0}\" could not be updated", propertyName), e);
+           throw new PropertyUpdateException(MessageFormat.format(
+                   "Property \"{0}\" could not be updated", propertyName), e);
         }
     }
 
@@ -335,14 +351,12 @@ public abstract class EntityBase implements Comparable<Object> {
         if (propertyType != null && PRIMITIVES_MAP.containsKey(propertyType)) {
             propertyType = PRIMITIVES_MAP.get(propertyType);
         }
-        Class<?>[] argumentTypes = propertyType != null? new Class<?>[] { propertyType } : null;
+        Class<?>[] argumentTypes = new Class<?>[] { propertyType };
         Method method = null;
         try {
             method = entityClass.getMethod(methodName, argumentTypes);
         } catch (NoSuchMethodException e) {
-            if (propertyType != null) {
-                method = findSetterMethod(entityClass, propertyName, methodName, argumentTypes);
-            }
+            method = findSetterMethod(entityClass, propertyName, methodName, argumentTypes);
         }
         return method;
     }
@@ -355,7 +369,7 @@ public abstract class EntityBase implements Comparable<Object> {
                 if (methodName.equals(candidate.getName())) {
                     Class<?>[] parameterTypes = candidate.getParameterTypes();
                     if (parameterTypes.length == 1) {
-                        if (parameterTypes[0].isAssignableFrom(argumentTypes[0])) {
+                        if (argumentTypes[0] == null || parameterTypes[0].isAssignableFrom(argumentTypes[0])) {
                             argumentTypes[0] = parameterTypes[0];
                         } else {
                             throw new PropertyUpdateException(MessageFormat.format(
