@@ -33,6 +33,11 @@ public class LinkGroupValidator extends HostReachableValidator {
     public SortedSet<Issue> validate(UUID entityId, Object value, Severity minSeverity) {
         final SortedSet<Issue> issues = new TreeSet<Issue>();
 
+        // Do not participate in checks with Severity.FATAL & ignore null
+        if (minSeverity.equals(Severity.FATAL) || value == null) {
+            return issues;
+        }
+
         if (value instanceof Collection) {
             int item = 0;
             for (Object collectionEntry : (Collection<?>) value) {
