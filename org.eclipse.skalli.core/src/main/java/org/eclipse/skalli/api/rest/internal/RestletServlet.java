@@ -125,7 +125,7 @@ public class RestletServlet extends ServerServlet {
         String requestLine = MessageFormat.format("{0} {1}", //$NON-NLS-1$
                 request.getMethod(), request.getRequestURI());
         if (project != null) {
-            requestLine = MessageFormat.format("{0} /api/projects/{0}", //$NON-NLS-1$
+            requestLine = MessageFormat.format("{0} /api/projects/{1}", //$NON-NLS-1$
                     request.getMethod(), project.getProjectId());
         }
         statistics.trackUsage(userId, requestLine, referer);
