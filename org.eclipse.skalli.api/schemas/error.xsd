@@ -20,7 +20,7 @@
   </xsd:annotation>
   <xsd:annotation>
     <xsd:documentation xml:lang="EN">
-      This XML schema defines the Skalli REST API error resource.
+      This XML schema defines the Skalli REST API for error responses.
     </xsd:documentation>
   </xsd:annotation>
 
@@ -32,19 +32,19 @@
         <xsd:annotation>
           <xsd:documentation xml:lang="EN">
             An identifier for the error, which helps tracing the error in the log
-            and distinguishing it from other errors produced by the kind of resource.
-            The usual format is "rest:&lt;path&gt;:%lt;number%&gt;", e.g.
+            and distinguishing it from other errors produced by the same kind of resource.
+            The usual format is "rest:&lt;path&gt;:&lt;number&gt;", e.g.
             "rest:/api/projects/technology.skalli:20".
             The &lt;number&gt; distinguishes errors for a given resource type, where
-            "00" always indicates unexpected error. All other error numbers are 
-            resource-specific.
+            "00" always indicates unexpected errors. All other error numbers are
+            resource specific.
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
       <xsd:element name="timestamp" type="xsd:dateTime">
         <xsd:annotation>
           <xsd:documentation xml:lang="EN">
-            The data and time at which the error occurred.
+            The date and time at which the error occurred.
             Helpful for tracing the error in the log.
           </xsd:documentation>
         </xsd:annotation>

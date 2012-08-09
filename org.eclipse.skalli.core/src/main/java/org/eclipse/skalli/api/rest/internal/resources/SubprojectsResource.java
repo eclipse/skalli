@@ -32,8 +32,7 @@ import org.restlet.resource.Get;
 
 public class SubprojectsResource extends ResourceBase {
 
-    private static final String ID_PREFIX = "rest:api/projects/{0}/subprojects:"; //$NON-NLS-1$
-    private static final String ERROR_ID_INVALID_QUERY = ID_PREFIX + "20"; //$NON-NLS-1$
+    private static final String PARAM_DEPTH = "depth"; //$NON-NLS-1$
 
     @Get
     public Representation retrieve() {
@@ -47,7 +46,7 @@ public class SubprojectsResource extends ResourceBase {
         Form form = resourceRef.getQueryAsForm();
 
         String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
-        int depth = NumberUtils.toInt(form.getFirstValue(RestUtils.PARAM_DEPTH), Integer.MAX_VALUE);
+        int depth = NumberUtils.toInt(form.getFirstValue(PARAM_DEPTH), Integer.MAX_VALUE);
         if (depth <= 0) {
             depth = 1;
         }

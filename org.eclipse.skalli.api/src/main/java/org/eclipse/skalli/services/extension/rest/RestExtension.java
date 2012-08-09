@@ -13,16 +13,18 @@ package org.eclipse.skalli.services.extension.rest;
 import org.restlet.resource.ServerResource;
 
 /**
- * Interface describing services that can add new REST API calls.
+ * Interface representing extensions to the REST API. Implementations of
+ * this class must be registered as OSGi services for Skalli to be able to
+ * find them.
  */
 public interface RestExtension {
 
     /**
      * Returns the resource paths this REST extension serves.
      *
-     * Note, the resource path is treated as <a href="http://tools.ietf.org/html/rfc6570">URI template</a>
+     * Note, the resource paths are treated as <a href="http://tools.ietf.org/html/rfc6570">URI templates</a>
      * in the sense of RFC 6570, i.e. may contain placeholders representing request parameters.
-     *
+     * <p>
      * For example:
      * <pre>
      * /projects/{id}
@@ -35,9 +37,10 @@ public interface RestExtension {
     public String[] getResourcePaths();
 
     /**
-     * Returns the server resource that can handle the given resource path.
+     * Returns the resource that is able to handle the given resource path.
      * @param resourcePath  the requested resource path.
-     * @return
+     * @return a resource, or <code>null</code> in which case nothing is registered
+     * for the given resource path.
      */
     public Class<? extends ServerResource> getServerResource(String resourcePath);
 }

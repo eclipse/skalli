@@ -20,43 +20,62 @@ import org.eclipse.skalli.services.FilterMode;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.ExtensionServices;
 
+/**
+ * Utilities and constants for REST extensions.
+ */
 public class RestUtils {
 
     private RestUtils() {
     }
 
+    /** <tt>{@value}</tt> */
     public static final String XMLNS = "xmlns"; //$NON-NLS-1$
+
+    /** <tt>{@value}</tt> */
     public static final String XMLNS_XSI = "xmlns:xsi"; //$NON-NLS-1$
+
+    /** <tt>{@value}</tt> */
     public static final String XSI_INSTANCE_NS = "http://www.w3.org/2001/XMLSchema-instance"; //$NON-NLS-1$
+
+    /** <tt>{@value}</tt> */
     public static final String XSI_SCHEMA_LOCATION = "xsi:schemaLocation"; //$NON-NLS-1$
 
+    /**
+     * Default namespace (<tt>{@value}</tt>) reserved for the Skalli core model. Should be used as prefix
+     * for the namespaces of REST extensions, e.g. <tt>"http://www.eclipse.org/skalli/2010/API/Extension-DevInf"</tt>.
+     */
     public static final String API_NAMESPACE = "http://www.eclipse.org/skalli/2010/API"; //$NON-NLS-1$
 
     /**
-     * Path prefix used by {@link #findSchemaResource(String)} to search for
+     * Path prefix (<tt>{@value}</tt>) used by {@link #findSchemaResource(String)} to search for
      * schema definitions (<tt>*.xsd</tt> files) for REST API extensions in
      * registered bundles.
      */
     public static final String SCHEMA_RESOURCE_PATH = "/schemas"; //$NON-NLS-1$
 
-    /** URL prefix for schema access. */
+    /** URL prefix for schema access (<tt>{@value}</tt>) */
     public static final String URL_SCHEMAS = "/schemas/"; //$NON-NLS-1$
 
-    /** URL prefixes for REST API access. */
+    /** URL prefix of the REST API (<tt>{@value}</tt>) */
     public static final String URL_API = "/api/"; //$NON-NLS-1$
+
+    /** URL prefix for the collection of projects (<tt>{@value}</tt>) */
     public static final String URL_PROJECTS = URL_API + "projects/"; //$NON-NLS-1$
+
+    /** URL prefix for the collection of users (<tt>{@value}</tt>) */
     public static final String URL_USER = URL_API + "user/"; //$NON-NLS-1$
 
+    /** URL suffix for the collection of issues of a project (<tt>{@value}</tt>) */
     public final static String URL_ISSUES = "/issues"; //$NON-NLS-1$
+
+    /** URL prefix for the browseable collection of projects (<tt>{@value}</tt>) */
     public final static String URL_BROWSE = "/projects/"; //$NON-NLS-1$
 
+    /** Query parameter  <tt>{@value}</tt>) */
     public static final String PARAM_ID = "id"; //$NON-NLS-1$
-    public static final String PARAM_DEPTH = "depth"; //$NON-NLS-1$
-
-
 
     /**
-     * Search a schema file with the given name, e.g. <tt>project.xsd</tt>,
+     * Searches a schema file with the given name, e.g. <tt>project.xsd</tt>,
      * first in all extension bundles, then in all Skalli bundles and finally
      * in all registered bundles.
      * <p>

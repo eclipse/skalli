@@ -29,14 +29,16 @@ public class ConverterWrapper implements RestConverter {
     private String nodeName;
     private boolean isInherited;
     private boolean omitInheritedAttribute;
+    private String host;
 
-    public ConverterWrapper(RestConverter converter, String nodeName) {
+    public ConverterWrapper(String host, RestConverter converter, String nodeName) {
+        this.host = host;
         this.converter = converter;
         this.nodeName = nodeName;
         this.omitInheritedAttribute = true;
     }
 
-    public ConverterWrapper(RestConverter converter, String nodeName, boolean isInherited) {
+    public ConverterWrapper(String host, RestConverter converter, String nodeName, boolean isInherited) {
         this.converter = converter;
         this.nodeName = nodeName;
         this.isInherited = isInherited;
@@ -60,7 +62,7 @@ public class ConverterWrapper implements RestConverter {
         writer.addAttribute("xmlns", getNamespace());
         writer.addAttribute("xmlns:xsi", XSI_INSTANCE_NS);
         writer.addAttribute("xsi:schemaLocation", converter.getNamespace() + " " +
-                converter.getHost() + URL_SCHEMAS + converter.getXsdFileName());
+                host + URL_SCHEMAS + converter.getXsdFileName());
     }
 
     @SuppressWarnings("nls")
@@ -110,10 +112,5 @@ public class ConverterWrapper implements RestConverter {
     @Override
     public String getXsdFileName() {
         return converter.getXsdFileName();
-    }
-
-    @Override
-    public String getHost() {
-        return converter.getHost();
     }
 }

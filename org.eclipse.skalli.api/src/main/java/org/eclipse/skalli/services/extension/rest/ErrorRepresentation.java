@@ -13,10 +13,35 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+/**
+ * REST representation for error responses as defined by <tt>/schemas/error.xsd</tt>.
+ * <p>
+ * {@link RestExtension Extensions for the REST API} should return error representations
+ * at least for all kinds of HTTP 5xx server errors, and may return them for HTTP 4xx
+ * client errors as well.
+ */
 public class ErrorRepresentation extends StringRepresentation {
 
     private static final Logger LOG = LoggerFactory.getLogger(ErrorRepresentation.class);
 
+    /**
+     * Constructs an error representation with the given status, error identifier and
+     * detail message.
+     * <p>
+     * The error identifier helps tracing the error in the log and distinguishing it from
+     * other errors produced by the same REST extension.<br>
+     * The usual format is <tt>rest:&lt;path&gt;:&lt;number%&gt;</tt>, e.g.
+     * <tt>rest:/api/projects/technology.skalli:20</tt>. The <tt>&lt;number&gt;</tt> distinguishes
+     * errors for a REST extensions, where "00" is reserved for unexpected errors and
+     * "10" for i/o errors. All other error numbers are specific for the REST extension.<br>
+     * The <tt>&lt;path&gt;</tt> should be the path of the original resource that caused
+     * the error, but REST extensions may deviate from that convention.
+     *
+     * @param host  the host, from which the error is sent.
+     * @param status  the status of the response, including the status code.
+     * @param errorId  a unique identifier for the error that has happened.
+     * @param message  the error message.
+     */
     public ErrorRepresentation(String host, Status status, String errorId, String message) {
         super(getContent(host, status, errorId, message), MediaType.TEXT_XML);
     }

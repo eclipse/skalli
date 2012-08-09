@@ -32,7 +32,7 @@ class IssuesConverter extends RestConverterBase<Issues> {
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         Issues issues = (Issues) source;
         marshalNSAttributes(writer);
-        marshalCommonAttributes(issues, writer);
+        marshalCommonAttributes(writer, issues);
         writeNode(writer, "isStale", Boolean.toString(issues.isStale())); //$NON-NLS-1$
         for (Issue issue : issues.getIssues()) {
             writer.startNode("issue"); //$NON-NLS-1$

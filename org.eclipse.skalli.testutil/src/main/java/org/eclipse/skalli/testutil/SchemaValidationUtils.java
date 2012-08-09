@@ -165,7 +165,7 @@ public class SchemaValidationUtils {
             Class<T> extensionClass = (Class<T>) extension.getClass();
             if (converter != null && extensionClass.equals(converter.getConversionClass())) {
                 marshal(extension,
-                        new ConverterWrapper(converter, extensionService.getShortName(), extensible
+                        new ConverterWrapper("https://localhost", converter, extensionService.getShortName(), extensible
                                 .isInherited(extensionClass)), writer);
                 done = true;
                 break;

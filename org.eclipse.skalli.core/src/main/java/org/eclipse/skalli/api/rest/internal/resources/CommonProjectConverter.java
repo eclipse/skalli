@@ -62,7 +62,7 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
         if (!omitNSAttributes) {
             marshalNSAttributes(writer);
         }
-        marshalCommonAttributes(project, writer);
+        marshalCommonAttributes(writer, project);
         writeNode(writer, "uuid", project.getUuid().toString()); //$NON-NLS-1$
         writeNode(writer, "id", project.getProjectId()); //$NON-NLS-1$
         writeNode(writer, "template", project.getProjectTemplateId()); //$NON-NLS-1$
@@ -130,8 +130,8 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
         RestConverter converter = extensionService.getRestConverter(getHost());
         if (extension != null && converter != null) {
             writer.startNode(extensionService.getShortName());
-            marshalNSAttributes(converter, writer);
-            marshalCommonAttributes(extension, converter, writer);
+            marshalNSAttributes(writer, converter);
+            marshalCommonAttributes(writer, extension, converter);
             writer.addAttribute("inherited", Boolean.toString(extensibleEntity.isInherited(extensionClass))); //$NON-NLS-1$
             writer.addAttribute("derived", Boolean.toString(extensionClass.isAnnotationPresent(Derived.class))); //$NON-NLS-1$
             context.convertAnother(extension, converter);

@@ -73,11 +73,6 @@ class TestExtensionService extends ExtensionServiceBase<TestExtension> {
             public String getXsdFileName() {
                 return "tiffy.xsd";
             }
-
-            @Override
-            public String getHost() {
-                return "https://localhost";
-            }
         };
 
     }
