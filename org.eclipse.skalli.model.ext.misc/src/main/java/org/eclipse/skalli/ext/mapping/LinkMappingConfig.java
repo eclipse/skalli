@@ -100,8 +100,7 @@ public class LinkMappingConfig {
 
     /**
      * Sets the template for links to be calculated from a given SCM location and the
-     * {@link #getPattern() location pattern}. For details on how to convert an SCM location into a link see
-     * {@link org.eclipse.skalli.ext.mapping.MapperUtil#convert(String, String, String)}
+     * {@link #getPattern() location pattern}.
      *
      * @param template  the link template, e.g. <code>"http://git.eclipse.org/c/{1}/"</code>.
      */

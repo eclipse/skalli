@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.ext.mapping.MapperUtil;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
 import org.eclipse.skalli.model.Project;
@@ -28,6 +27,7 @@ import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenResolverService;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.extension.PropertyMapper;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;
 import org.eclipse.skalli.view.ext.InfoBoxBase;
@@ -200,7 +200,8 @@ public class ProjectMavenBox extends InfoBoxBase implements InfoBox {
         }
         String repositoryRoot = null;
         for (ScmLocationMappingConfig mapping : mappings) {
-            repositoryRoot = MapperUtil.convert(scmLocation, mapping, project.getProjectId());
+            repositoryRoot = PropertyMapper.convert(scmLocation, mapping.getPattern(),
+                    mapping.getTemplate(), project.getProjectId());
             if (StringUtils.isNotBlank(repositoryRoot)) {
                 break;
             }

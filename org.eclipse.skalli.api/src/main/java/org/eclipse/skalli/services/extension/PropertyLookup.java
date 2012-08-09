@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2010, 2011 SAP AG and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     SAP AG - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.skalli.services.extension;
 
 import java.util.Collection;
@@ -11,6 +21,7 @@ import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.PropertyName;
 
 /**
@@ -29,10 +40,25 @@ public class PropertyLookup extends StrLookup {
 
     private final HashMap<String, Object> properties = new HashMap<String, Object>();
 
+    /**
+     * Creates a property lookup instance for a given entity, e.g. a {@link Project}.
+     * Properties of the entity are scanned and provided as placeholders for the lookup.
+     *
+     * @param entity  the entity, for which to create a property lookup.
+     */
     public PropertyLookup(EntityBase entity) {
         this(entity, null);
     }
 
+    /**
+     * Creates a property lookup instance for a given entity, e.g. a {@link Project}.
+     * Properties of the entity are scanned and provided as placeholders for the lookup.
+     * The given custom properties are mapped to placeholders by their respective keys
+     * and provided for the lookup as well.
+     *
+     * @param entity  the entity, for which to create a property lookup.
+     * @param customProperties  optional custom properties, or <code>null</code>.
+     */
     public PropertyLookup(EntityBase entity, Map<String, Object> customProperties) {
         if (entity != null) {
             putAllProperties(entity, ""); //$NON-NLS-1$
@@ -69,34 +95,74 @@ public class PropertyLookup extends StrLookup {
         return sb.toString();
     }
 
+    /**
+     * Returns the number of properties available for the lookup.
+     */
     public int size() {
         return properties.size();
     }
 
+    /**
+     * Returns <tt>true</tt> if this lookup contains no properties at all.
+     */
     public boolean isEmpty() {
         return properties.isEmpty();
     }
 
+    /**
+     * Returns <tt>true</tt> if this lookup contains a property with the given key.
+     *
+     * @param key  the key of the property (without the surrounding
+     * <tt>${...}</tt> of the placeholder).
+     */
     public boolean containsKey(String key) {
         return properties.containsKey(key);
     }
 
+    /**
+     * Returns <tt>true</tt> if this lookup contains a given property value.
+     *
+     * @param value  the property value to search for.
+     */
     public boolean containsValue(Object value) {
         return properties.containsValue(value);
     }
 
+    /**
+     * Returns all known property keys
+     *
+     * @return a set of keys (equivalent to the placeholders, but without the surrounding
+     * <tt>${...}</tt>), or an empty set.
+     */
     public Set<String> keySet() {
         return properties.keySet();
     }
 
+    /**
+     * Returns the property for the given key.
+     *
+     * @param key the key of the property to return (equivalent to the placeholder,
+     * but without the surrounding <tt>${...}</tt>).
+     *
+     * @return  the value of the property, or <code>nully</code> if there is no property
+     * with the given key.
+     */
     public Object get(String key) {
         return properties.get(key);
     }
 
+    /**
+     * Returns a collection of all property values.
+     * @return the collection of property values, or an empty collection.
+     */
     public Collection<Object> values() {
         return properties.values();
     }
 
+    /**
+     * Returns an entry set of all properties.
+     * @return an entry set of properties, or an empty set.
+     */
     public Set<Map.Entry<String,Object>> entrySet() {
         return properties.entrySet();
     }

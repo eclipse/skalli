@@ -6,12 +6,12 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.ext.mapping.MapperUtil;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.maven.MavenPomResolver;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.extension.PropertyMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +68,7 @@ public abstract class MavenPomResolverBase implements MavenPomResolver {
         }
 
         for (ScmLocationMappingConfig mapping : mappings) {
-            if (MapperUtil.matches(scmLocation, mapping)) {
+            if (PropertyMapper.matches(scmLocation, mapping.getPattern())) {
                 return mapping;
             }
         }
@@ -88,7 +88,7 @@ public abstract class MavenPomResolverBase implements MavenPomResolver {
                     "no scm location mapping available for location {0}", scmLocation));
         }
 
-        String repsitoryRoot = MapperUtil.convert(scmLocation, scmMappingConfig.getPattern(),
+        String repsitoryRoot = PropertyMapper.convert(scmLocation, scmMappingConfig.getPattern(),
                 scmMappingConfig.getTemplate(), "");
         return repsitoryRoot;
     }

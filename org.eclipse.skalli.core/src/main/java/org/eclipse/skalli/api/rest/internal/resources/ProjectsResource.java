@@ -14,18 +14,14 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.text.StrLookup;
-import org.apache.commons.lang.text.StrSubstitutor;
 import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
@@ -36,7 +32,7 @@ import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServices;
-import org.eclipse.skalli.services.extension.PropertyLookup;
+import org.eclipse.skalli.services.extension.PropertyMapper;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.permit.Permit;
@@ -67,12 +63,6 @@ public class ProjectsResource extends ResourceBase {
     private static final String ERROR_ID_VALIDATION_FAILED = ID_PREFIX + "/{0}:30"; //$NON-NLS-1$
     private static final String ERROR_ID_UNSUPPORTED_PROPERTY_TYPE = ID_PREFIX + ":40"; //$NON-NLS-1$
 
-    /**Get might be used for 2 different cases:
-     * 1) to list the details of the projects. Project set might be limited using Lucene search query or tag.
-     * 2) to dry-run mass data change. The project list shows the projects, affected by the change.
-     *    Affected extension is included into the project details.
-     * If actual persist is wanted, a persist flag should be set as a REST API URL argument (persist=true)
-     */
     @Get
     public Representation retrieve() {
         String path = getReference().getPath();
@@ -299,7 +289,7 @@ public class ProjectsResource extends ResourceBase {
 
     private void updateStringProperty(Project project, Object propertyValue,
             ExtensionEntityBase extension,  RestSearchQuery queryParams) {
-        String newValue = convert(propertyValue.toString(),
+        String newValue = PropertyMapper.convert(propertyValue.toString(),
                 queryParams.getPattern(), queryParams.getTemplate(), project);
         extension.setProperty(queryParams.getPropertyName(), newValue);
     }
@@ -310,32 +300,10 @@ public class ProjectsResource extends ResourceBase {
         for (String propertyValue : propertyValues) {
             Matcher matcher = queryParams.getPattern().matcher(propertyValue);
             if (matcher.matches()) {
-                propertyValue = convert(propertyValue, queryParams.getPattern(), queryParams.getTemplate(), project);
+                propertyValue = PropertyMapper.convert(propertyValue, queryParams.getPattern(), queryParams.getTemplate(), project);
             }
             newValues.add(propertyValue);
         }
         extension.setProperty(queryParams.getPropertyName(), newValues);
     }
-
-    /*copied from MapperUtil. Should we move this class to the api?*/
-    private static String convert(String s, Pattern regex, String template, Project project) {
-        Matcher matcher = regex.matcher(s);
-        if (!matcher.matches()) {
-            return null;
-        }
-        Map<String, Object> properties = new HashMap<String, Object>();
-
-        // put the project ID as property ${0}
-        if (project != null) {
-            properties.put("0", project.getProjectId()); //$NON-NLS-1$
-        }
-        // put the groups found by the matcher as properties ${1}, ${2}, ...
-        for (int i = 1; i <= matcher.groupCount(); i++) {
-            properties.put(Integer.toString(i), matcher.group(i));
-        }
-        StrLookup propertyResolver = new PropertyLookup(project, properties);
-        StrSubstitutor subst = new StrSubstitutor(propertyResolver);
-        return subst.replace(template);
-    }
-
 }

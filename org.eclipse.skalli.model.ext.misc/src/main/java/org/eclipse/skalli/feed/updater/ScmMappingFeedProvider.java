@@ -17,12 +17,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.ext.mapping.MapperUtil;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.extension.PropertyMapper;
 import org.eclipse.skalli.services.feed.FeedProvider;
 import org.eclipse.skalli.services.feed.FeedUpdater;
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ public class ScmMappingFeedProvider implements FeedProvider {
                         ScmLocationMapper.PURPOSE_FEED);
 
                 for (ScmLocationMappingConfig mappingConfig : feedMappings) {
-                    String urlStr = MapperUtil.convert(scmLocation, mappingConfig.getPattern(),
+                    String urlStr = PropertyMapper.convert(scmLocation, mappingConfig.getPattern(),
                             mappingConfig.getTemplate(), project, "");
                     if (StringUtils.isNotBlank(urlStr)) {
                         try {

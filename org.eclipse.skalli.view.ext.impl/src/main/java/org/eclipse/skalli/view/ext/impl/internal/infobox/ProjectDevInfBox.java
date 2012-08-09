@@ -19,13 +19,13 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.commons.HtmlBuilder;
 import org.eclipse.skalli.commons.Link;
-import org.eclipse.skalli.ext.mapping.MapperUtil;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.extension.PropertyMapper;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;
 import org.eclipse.skalli.view.ext.InfoBoxBase;
@@ -150,7 +150,7 @@ public class ProjectDevInfBox extends InfoBoxBase implements InfoBox {
         List<ScmLocationMappingConfig> clipboardMappings = mapper.getMappings(configService,
                 null, ScmLocationMapper.PURPOSE_COPY_TO_CLIPBOARD);
         for (ScmLocationMappingConfig clipboardMapping : clipboardMappings) {
-            String scmUrl = MapperUtil.convert(scmLocation, clipboardMapping.getPattern(),
+            String scmUrl = PropertyMapper.convert(scmLocation, clipboardMapping.getPattern(),
                     clipboardMapping.getTemplate(), project, userId);
             if (scmUrl != null) {
                 scmUrls.add(scmUrl);

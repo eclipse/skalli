@@ -8,15 +8,14 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.model.ext.mapping;
+package org.eclipse.skalli.services.extension;
 
-import org.eclipse.skalli.ext.mapping.MapperUtil;
 import org.eclipse.skalli.model.Project;
 import org.junit.Assert;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
-public class MapperUtilTest {
+public class PropertyMapperTest {
 
     @Test
     public void testConvertGit() {
@@ -25,7 +24,7 @@ public class MapperUtilTest {
         String template = "https://${1}:8080/#project,open,${2},n,z";
         String projectId = "bla.blubb";
 
-        String res = MapperUtil.convert(scmLocation, pattern, template, projectId);
+        String res = PropertyMapper.convert(scmLocation, pattern, template, projectId);
         Assert.assertEquals("https://git.blubb.corp:8080/#project,open,eclipse/skalli,n,z", res);
     }
 
@@ -36,7 +35,7 @@ public class MapperUtilTest {
         String template = "https://server/${0}/index.html";
         String projectId = "bla.blubb";
 
-        String res = MapperUtil.convert(scmLocation, pattern, template, projectId);
+        String res = PropertyMapper.convert(scmLocation, pattern, template, projectId);
         Assert.assertEquals("https://server/bla.blubb/index.html", res);
     }
 
@@ -48,7 +47,7 @@ public class MapperUtilTest {
         String userId = "hugo";
         Project project = new Project("bla.blubb", null, null);
 
-        String res = MapperUtil.convert(scmLocation, pattern, template, project, userId);
+        String res = PropertyMapper.convert(scmLocation, pattern, template, project, userId);
         Assert.assertEquals("ssh://hugo@git.blubb.corp/bla.blubb/index.html", res);
     }
 
@@ -60,7 +59,7 @@ public class MapperUtilTest {
         String userId = "hugo";
         Project project = new Project("bla.blubb", null, "Blubber Project");
 
-        String res = MapperUtil.convert(scmLocation, pattern, template, project, userId);
+        String res = PropertyMapper.convert(scmLocation, pattern, template, project, userId);
         Assert.assertEquals("ssh://hugo@git.blubb.corp/bla.blubb/Blubber Project/index.html", res);
     }
 
@@ -71,7 +70,7 @@ public class MapperUtilTest {
         String template = "http://some/${1}";
         String projectId = "bla.blubb";
 
-        String res = MapperUtil.convert(mailingList, pattern, template, projectId);
+        String res = PropertyMapper.convert(mailingList, pattern, template, projectId);
         Assert.assertEquals("http://some/razzmatazz", res);
     }
 

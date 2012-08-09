@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.skalli.commons.ComparatorUtils;
 import org.eclipse.skalli.commons.Link;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.extension.PropertyMapper;
 
 public abstract class LinkMapperBase implements LinkMapper {
 
@@ -28,7 +29,7 @@ public abstract class LinkMapperBase implements LinkMapper {
             if (allMappings != null) {
                 for (LinkMappingConfig mapping : allMappings) {
                     if (matches(mapping, purposes)) {
-                        String url = MapperUtil.convert(source, mapping, projectId);
+                        String url = PropertyMapper.convert(source, mapping.getPattern(), mapping.getTemplate(), projectId);
                         if (url != null) {
                             Link location = new Link(url, mapping.getName());
                             ret.add(location);
