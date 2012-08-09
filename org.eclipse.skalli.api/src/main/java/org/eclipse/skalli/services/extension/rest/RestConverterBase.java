@@ -34,11 +34,6 @@ public abstract class RestConverterBase<T> implements RestConverter {
     protected static final String SUBPROJECT_RELATION = "subproject"; //$NON-NLS-1$
     protected static final String USER_RELATION = "user"; //$NON-NLS-1$
 
-    private static final String XMLNS = "xmlns"; //$NON-NLS-1$
-    private static final String XMLNS_XSI = "xmlns:xsi"; //$NON-NLS-1$
-    private static final String XSI_INSTANCE_NS = "http://www.w3.org/2001/XMLSchema-instance"; //$NON-NLS-1$
-    private static final String XSI_SCHEMA_LOCATION = "xsi:schemaLocation"; //$NON-NLS-1$
-
     private static final String MODIFIED_BY = "modifiedBy"; //$NON-NLS-1$
     private static final String LAST_MODIFIED = "lastModified"; //$NON-NLS-1$
     private static final String API_VERSION = "apiVersion"; //$NON-NLS-1$
@@ -85,9 +80,9 @@ public abstract class RestConverterBase<T> implements RestConverter {
     }
 
     protected void marshalNSAttributes(RestConverter converter, HierarchicalStreamWriter writer) {
-        writer.addAttribute(XMLNS, converter.getNamespace());
-        writer.addAttribute(XMLNS_XSI, XSI_INSTANCE_NS);
-        writer.addAttribute(XSI_SCHEMA_LOCATION, getSchemaLocationAttribute(converter));
+        writer.addAttribute(RestUtils.XMLNS, converter.getNamespace());
+        writer.addAttribute(RestUtils.XMLNS_XSI, RestUtils.XSI_INSTANCE_NS);
+        writer.addAttribute(RestUtils.XSI_SCHEMA_LOCATION, getSchemaLocationAttribute(converter));
     }
 
     private String getSchemaLocationAttribute(RestConverter converter) {

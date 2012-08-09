@@ -25,6 +25,13 @@ public class RestUtils {
     private RestUtils() {
     }
 
+    public static final String XMLNS = "xmlns"; //$NON-NLS-1$
+    public static final String XMLNS_XSI = "xmlns:xsi"; //$NON-NLS-1$
+    public static final String XSI_INSTANCE_NS = "http://www.w3.org/2001/XMLSchema-instance"; //$NON-NLS-1$
+    public static final String XSI_SCHEMA_LOCATION = "xsi:schemaLocation"; //$NON-NLS-1$
+
+    public static final String API_NAMESPACE = "http://www.eclipse.org/skalli/2010/API"; //$NON-NLS-1$
+
     /**
      * Path prefix used by {@link #findSchemaResource(String)} to search for
      * schema definitions (<tt>*.xsd</tt> files) for REST API extensions in

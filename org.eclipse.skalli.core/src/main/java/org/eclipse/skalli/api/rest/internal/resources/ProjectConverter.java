@@ -31,6 +31,10 @@ class ProjectConverter extends CommonProjectConverter {
     public static final String API_VERSION = "1.4"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API"; //$NON-NLS-1$
 
+    public ProjectConverter() {
+        super(null, true);
+    }
+
     public ProjectConverter(String host, boolean omitNSAttributes) {
         super(host, omitNSAttributes);
     }

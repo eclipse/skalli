@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    targetNamespace="http://www.eclipse.org/skalli/2010/API"
+    xmlns="http://www.eclipse.org/skalli/2010/API"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    version="1.0">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="EN">
+      Copyright (c) 2010, 2011 SAP AG and others.
+      All rights reserved. This program and the accompanying materials
+      are made available under the terms of the Eclipse Public License v1.0
+      which accompanies this distribution, and is available at
+      http://www.eclipse.org/legal/epl-v10.html
+
+      Contributors:
+         SAP AG - initial API and implementation
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:annotation>
+    <xsd:documentation xml:lang="EN">
+      This XML schema defines the Skalli REST API error resource.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="error" type="Error" />
+
+  <xsd:complexType name="Error">
+    <xsd:sequence>
+      <xsd:element name="errorId" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="EN">
+            An identifier for the error, which helps tracing the error in the log
+            and distinguishing it from other errors produced by the kind of resource.
+            The usual format is "rest:&lt;path&gt;:%lt;number%&gt;", e.g.
+            "rest:/api/projects/technology.skalli:20".
+            The &lt;number&gt; distinguishes errors for a given resource type, where
+            "00" always indicates unexpected error. All other error numbers are 
+            resource-specific.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="timestamp" type="xsd:dateTime">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="EN">
+            The data and time at which the error occurred.
+            Helpful for tracing the error in the log.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="message" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="EN">
+            The message text of the error.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

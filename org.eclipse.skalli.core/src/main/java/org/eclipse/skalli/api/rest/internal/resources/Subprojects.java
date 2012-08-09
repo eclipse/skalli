@@ -12,6 +12,7 @@ package org.eclipse.skalli.api.rest.internal.resources;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.eclipse.skalli.model.Project;
 
@@ -29,15 +30,18 @@ public class Subprojects {
         this.subprojects = new LinkedHashSet<Project>(projects);
     }
 
-    public LinkedHashSet<Project> getSubprojects() {
+    public Set<Project> getSubprojects() {
+        if (subprojects == null) {
+            subprojects = new LinkedHashSet<Project>();
+        }
         return subprojects;
     }
 
     public void setSubprojects(LinkedHashSet<Project> subprojects) {
-        this.subprojects = subprojects;
+        this.subprojects = new LinkedHashSet<Project>(subprojects);
     }
 
     public void addAll(Collection<Project> projects) {
-        subprojects.addAll(projects);
+        getSubprojects().addAll(projects);
     }
 }

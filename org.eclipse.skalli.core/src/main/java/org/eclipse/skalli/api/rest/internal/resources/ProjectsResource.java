@@ -53,12 +53,24 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProjectsResource extends ResourceBase {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ProjectsResource.class);
+
+    private static final String ID_PREFIX = "rest:api/projects:"; //$NON-NLS-1$
+    private static final String ERROR_ID_UNEXPECTED = ID_PREFIX + "00"; //$NON-NLS-1$
+    private static final String ERROR_ID_IO_ERROR = ID_PREFIX + "10"; //$NON-NLS-1$
+    private static final String ERROR_ID_INVALID_QUERY = ID_PREFIX + "20"; //$NON-NLS-1$
+    private static final String ERROR_ID_VALIDATION_FAILED = ID_PREFIX + "/{0}:30"; //$NON-NLS-1$
+    private static final String ERROR_ID_UNSUPPORTED_PROPERTY_TYPE = ID_PREFIX + ":40"; //$NON-NLS-1$
+
     /**Get might be used for 2 different cases:
-     * 1) to list the details of the projects. Project set might be limited using lucene search query or tag.
-     * 2) to dry-run mass data change. The project list shows the projects, affected by the change. Affected extension is included into the project details.
+     * 1) to list the details of the projects. Project set might be limited using Lucene search query or tag.
+     * 2) to dry-run mass data change. The project list shows the projects, affected by the change.
+     *    Affected extension is included into the project details.
      * If actual persist is wanted, a persist flag should be set as a REST API URL argument (persist=true)
      */
     @Get
@@ -80,7 +92,8 @@ public class ProjectsResource extends ResourceBase {
                             queryParams.getExtensions(), queryParams.getStart()));
 
         } catch (QueryParseException e) {
-            return createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST, "Error parsing query: " + e.getMessage());//$NON-NLS-1$
+            return createErrorRepresentation(Status.CLIENT_ERROR_BAD_REQUEST, ERROR_ID_INVALID_QUERY,
+                    "Invalid query \"?{0}\": {1}", form.getQueryString(), e.getMessage()); //$NON-NLS-1$
         }
     }
 
@@ -107,7 +120,6 @@ public class ProjectsResource extends ResourceBase {
                 String shortName = queryParams.getShortName();
                 ExtensionService<?> extService = ExtensionServices.getByShortName(shortName);
                 extClass = extService != null? extService.getExtensionClass() : null;
-
                 // always render extensions that are referenced in the property query
                 queryParams.addExtension(shortName);
             }
@@ -180,16 +192,18 @@ public class ProjectsResource extends ResourceBase {
         try {
             queryParams = new RestSearchQuery(form, entity);
         } catch (QueryParseException e) {
-            return createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST, "Error parsing query: " + e.getMessage());//$NON-NLS-1$
+            return createErrorRepresentation(Status.CLIENT_ERROR_BAD_REQUEST, ERROR_ID_INVALID_QUERY,
+                    "Invalid query \"?{0}\": {1}", form.getQueryString(), e.getMessage()); //$NON-NLS-1$
         } catch (IOException e) {
-            return createStatusMessage(Status.SERVER_ERROR_INTERNAL, e.getMessage());
+            return createIOErrorRepresentation(ERROR_ID_IO_ERROR, e);
         }
 
         Projects projects = null;
         try {
             projects = getProjects(queryParams);
         } catch (QueryParseException e) {
-            return createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage());
+            return createErrorRepresentation(Status.CLIENT_ERROR_BAD_REQUEST, ERROR_ID_INVALID_QUERY,
+                    "Invalid query \"?{0}\": {1}", form.getQueryString(), e.getMessage()); //$NON-NLS-1$
         }
 
         ProjectService projectService = Services.getRequiredService(ProjectService.class);
@@ -220,7 +234,7 @@ public class ProjectsResource extends ResourceBase {
             }
         } catch (ValidationException e) {
             // should never happen since we validated all projects beforehand, but you never know
-            return createStatusMessage(Status.SERVER_ERROR_INTERNAL, e.getMessage());
+            return createUnexpectedErrorRepresentation(ERROR_ID_UNEXPECTED, e);
         }
         return null;
     }
@@ -243,22 +257,24 @@ public class ProjectsResource extends ResourceBase {
                 }
                 updateProperty(loadedProject, extensionClass, queryParams);
 
-                SortedSet<Issue> errors = projectService.validate(loadedProject, Severity.FATAL);
-                if (!errors.isEmpty()) {
-                    String message = Issue.getMessage(MessageFormat.format(
-                                    "Validation of project {0} failed",
-                                    loadedProject.getProjectId()), errors);
-                    return createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST, message);
+                SortedSet<Issue> issues = projectService.validate(loadedProject, Severity.FATAL);
+                if (!issues.isEmpty()) {
+                    String errorId = MessageFormat.format(ERROR_ID_VALIDATION_FAILED, loadedProject.getProjectId());
+                    return createValidationFailedRepresentation(errorId, loadedProject.getProjectId(), issues);
                 }
 
                 updatedProjects.addProject(loadedProject);
             }
         } catch (UnsupportedOperationException e) {
-            return createStatusMessage(Status.SERVER_ERROR_INTERNAL, e.getMessage());
+            String message = MessageFormat.format("Failed to update property \"{0}\": unsupported type",
+                    queryParams.getProperty());
+            LOG.warn(MessageFormat.format("{0} ({1})", message, ERROR_ID_UNSUPPORTED_PROPERTY_TYPE));
+            return createErrorRepresentation(Status.CLIENT_ERROR_BAD_REQUEST,
+                    ERROR_ID_UNSUPPORTED_PROPERTY_TYPE, message);
         } catch (RuntimeException e) {
             // NoSuchPropertyException, PropertyUpdateExeption: should not happen for correctly
             // implemented extensions, but you never know
-            return createStatusMessage(Status.SERVER_ERROR_INTERNAL, e.getMessage());
+            return createUnexpectedErrorRepresentation(ERROR_ID_UNEXPECTED, e);
         }
         return null;
     }
@@ -274,7 +290,7 @@ public class ProjectsResource extends ResourceBase {
                 updateCollectionProperty(project, extension, (Collection<String>) propertyValue, queryParams);
             } catch (ClassCastException e) {
                 throw new UnsupportedOperationException(MessageFormat.format(
-                        "''{0}'' is not a collection of strings", propertyName));
+                        "\"{0}\" is not a collection of strings", propertyName));
             }
         } else {
             updateStringProperty(project, propertyValue, extension, queryParams);

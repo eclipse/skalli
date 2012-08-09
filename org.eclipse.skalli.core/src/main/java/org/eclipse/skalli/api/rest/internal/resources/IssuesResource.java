@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.internal.resources;
 
+import java.text.MessageFormat;
 import java.util.UUID;
 
 import org.eclipse.skalli.model.Project;
@@ -26,6 +27,9 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 
 public class IssuesResource extends ResourceBase {
+
+    // error codes for logging and error responses
+    private static final String ERROR_ID_NO_ISSUES_SERVICE_AVAILABLE = "rest:api/projects/{0}/issues:10"; //$NON-NLS-1$
 
     @Get
     public Representation retrieve() {
@@ -46,19 +50,20 @@ public class IssuesResource extends ResourceBase {
             project = projectService.getProjectByProjectId(id);
         }
         if (project == null) {
-            return createStatusMessage(Status.CLIENT_ERROR_NOT_FOUND, "Project \"{0}\" not found.", id);
+            setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("Project \"{0}\" not found", id));
+            return null;
         }
 
         IssuesService issuesService = Services.getService(IssuesService.class);
-
         if (issuesService == null) {
-            return createStatusMessage(Status.SERVER_ERROR_SERVICE_UNAVAILABLE,
-                    "Issues service is currently unavailable. Try again later.");
+            String errorId = MessageFormat.format(ERROR_ID_NO_ISSUES_SERVICE_AVAILABLE, project.getProjectId());
+            return createServiceUnavailableRepresentation(errorId, "Issues Service");
         }
 
         Issues issues = issuesService.getByUUID(project.getUuid());
         if (issues == null) {
-            return createStatusMessage(Status.CLIENT_ERROR_NOT_FOUND, "Project \"{0}\" has no issues", id);
+            setStatus(Status.SUCCESS_NO_CONTENT);
+            return null;
         }
 
         return new ResourceRepresentation<Issues>(issues,

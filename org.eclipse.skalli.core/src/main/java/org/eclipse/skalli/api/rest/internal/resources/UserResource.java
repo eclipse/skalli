@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.internal.resources;
 
+import java.text.MessageFormat;
+
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
@@ -34,7 +36,8 @@ public class UserResource extends ResourceBase {
 
         User user = UserUtils.getUser(id);
         if (user == null) {
-            return createStatusMessage(Status.CLIENT_ERROR_NOT_FOUND, "User \"{0}\" not found.", id); //$NON-NLS-1$
+            setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("User {0} not found", id)); //$NON-NLS-1$
+            return null;
         }
 
         return new ResourceRepresentation<User>(user,

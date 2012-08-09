@@ -57,6 +57,14 @@ public class ProjectBackupResource extends ResourceBase {
     private static final String ACTION_PARAM = "action"; //$NON-NLS-1$
     private static final String ACTION_OVERWRITE = "overwrite"; //$NON-NLS-1$
 
+    // error codes for logging and error responses
+    private static final String ID_PREFIX = "rest:api/admin/backup:"; //$NON-NLS-1$
+    private static final String ERROR_ID_IO_ERROR = ID_PREFIX + "00"; //$NON-NLS-1$
+    private static final String ERROR_ID_NO_STORAGE_SERVICE = ID_PREFIX + "10"; //$NON-NLS-1$
+    private static final String ERROR_ID_FAILED_TO_RETRIEVE_KEYS = ID_PREFIX + "20"; //$NON-NLS-1$
+    private static final String ERROR_ID_FAILED_TO_STORE = ID_PREFIX + "30"; //$NON-NLS-1$
+    private static final String ERROR_ID_OVERWRITE_EXISTING_DATA = ID_PREFIX + "40"; //$NON-NLS-1$
+
     @SuppressWarnings("nls")
     private static final Set<String> CATEGORIES = CollectionUtils.asSet("customization", "Project", "Issues",
             "Favorites", "User", "Group");
@@ -71,7 +79,7 @@ public class ProjectBackupResource extends ResourceBase {
 
         StorageService storageService = getStorageService();
         if (storageService == null) {
-            return createStatusMessage(Status.SERVER_ERROR_INTERNAL, "No storage service available");
+            return createServiceUnavailableRepresentation(ERROR_ID_NO_STORAGE_SERVICE, "Storage Service");
         }
         Set<String> included = getCategories(INCLUDE_PARAM);
         Set<String> excluded = getCategories(EXCLUDE_PARAM);
@@ -91,7 +99,7 @@ public class ProjectBackupResource extends ResourceBase {
         }
         StorageService storageService = getStorageService();
         if (storageService == null) {
-            return createStatusMessage(Status.SERVER_ERROR_INTERNAL, "No storage service available");
+            return createServiceUnavailableRepresentation(ERROR_ID_NO_STORAGE_SERVICE, "Storage Service");
         }
 
         String action = getQuery().getValues(ACTION_PARAM);
@@ -114,19 +122,25 @@ public class ProjectBackupResource extends ResourceBase {
                     rejected.add(category);
                 }
             } catch (StorageException e) {
-                LOG.error("Failed to retrieve keys for category " + category, e);
-                return createStatusMessage(Status.SERVER_ERROR_INTERNAL, "Failed to store the attachment");
+                LOG.error(MessageFormat.format("Failed to retrieve keys for category {0} ({1})",
+                        category, ERROR_ID_FAILED_TO_RETRIEVE_KEYS), e);
+                return createErrorRepresentation(Status.SERVER_ERROR_INTERNAL, ERROR_ID_FAILED_TO_RETRIEVE_KEYS ,
+                        "Failed to store the attached backup resource");
             }
         }
         if (rejected.size() > 0) {
-            return createStatusMessage(Status.CLIENT_ERROR_PRECONDITION_FAILED, MessageFormat.format(
-                    "WARNING: Restore might overwrite existing project data in the folling categories:\n{0}\n" +
-                    "Either exclude these categories from the restore with a \"exclude=<comma-separated-list>\" parameter"
-                    + " or enforce the restore with \"action=overwrite\".",
-                    CollectionUtils.toString(rejected, '\n')));
+            return createErrorRepresentation(
+                    Status.CLIENT_ERROR_PRECONDITION_FAILED,
+                    ERROR_ID_OVERWRITE_EXISTING_DATA,
+                    MessageFormat.format(
+                            "Restore might overwrite existing project data in the folling categories:\n{0}\n" +
+                            "Either exclude these categories from the restore with a \"exclude=<comma-separated-list>\" " +
+                            "parameter or enforce the restore with \"action=overwrite\".",
+                             CollectionUtils.toString(rejected, '\n')));
         }
         if (accepted.isEmpty()) {
-            return createStatusMessage(Status.SUCCESS_OK, "Nothing to do");
+            setStatus(Status.SUCCESS_NO_CONTENT);
+            return null;
         }
 
         ZipInputStream zipStream = null;
@@ -154,12 +168,14 @@ public class ProjectBackupResource extends ResourceBase {
                                 storageService.write(category, key, zipStream);
                             } catch (StorageException e) {
                                 LOG.error(MessageFormat.format(
-                                        "Failed to store entity with key {0} and category {1}",
-                                        key, category), e);
-                                return createStatusMessage(Status.SERVER_ERROR_INTERNAL, "Failed to store the attachment");
+                                        "Failed to store entity with key {0} and category {1} ({2})",
+                                        key, category, ERROR_ID_FAILED_TO_STORE), e);
+                                return createErrorRepresentation(Status.SERVER_ERROR_INTERNAL, ERROR_ID_FAILED_TO_STORE,
+                                        "Failed to store the attached backup");
                             }
                         } else {
-                            LOG.info(MessageFormat.format("Restore: Excluded {0} (category ''{1}'' not accepted)", key, category));
+                            LOG.info(MessageFormat.format("Restore: Excluded {0} (category ''{1}'' not accepted)",
+                                    key, category));
                         }
                     }
                 } finally {
@@ -168,8 +184,7 @@ public class ProjectBackupResource extends ResourceBase {
                 }
             }
         } catch (IOException e) {
-            LOG.error("I/O error when reading the attachment", e);
-            return createStatusMessage(Status.SERVER_ERROR_INTERNAL, "Failed to store the attachment");
+            return createIOErrorRepresentation(ERROR_ID_IO_ERROR, e);
         } finally {
             IOUtils.closeQuietly(zipStream);
         }
@@ -180,8 +195,8 @@ public class ProjectBackupResource extends ResourceBase {
         if (persistenceService != null) {
             persistenceService.refreshAll();
         }
-
-        return createStatusMessage(Status.SUCCESS_OK, "Attachment successfully stored");
+        setStatus(Status.SUCCESS_NO_CONTENT);
+        return null;
     }
 
     private Set<String> getCategories(String paramId) {

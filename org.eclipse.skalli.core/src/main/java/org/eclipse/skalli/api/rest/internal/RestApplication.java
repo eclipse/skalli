@@ -24,11 +24,17 @@ import org.eclipse.skalli.api.rest.internal.resources.SubprojectsResource;
 import org.eclipse.skalli.api.rest.internal.resources.UserResource;
 import org.eclipse.skalli.api.rest.monitor.Monitorable;
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.extension.rest.ErrorRepresentation;
 import org.eclipse.skalli.services.extension.rest.RestExtension;
 import org.restlet.Application;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.Restlet;
+import org.restlet.data.Status;
+import org.restlet.representation.Representation;
 import org.restlet.resource.ServerResource;
 import org.restlet.routing.Router;
+import org.restlet.service.StatusService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +104,23 @@ public class RestApplication extends Application {
         // monitors come and go together with their service, but currently
         // everything is attached to the router in createInboundRoot()
         extensions.remove(restExtension);
+    }
+
+    public RestApplication() {
+        setStatusService(new StatusService() {
+            @Override
+            public Representation getRepresentation(Status status, Request request, Response response) {
+                Throwable t = status.getThrowable();
+                if (t != null) {
+                    String errorId = MessageFormat.format("rest:{0}:00", request.getOriginalRef().getPath()); //$NON-NLS-1$
+                    String message = "An unexpected exception happend. Please report this error " +
+                            "response to the server administrators.";
+                    LOG.error(MessageFormat.format(MessageFormat.format("{0} ({1})", message, errorId), t)); //$NON-NLS-1$
+                    return new ErrorRepresentation(request.getHostRef().getHostIdentifier(), status, errorId, message);
+                }
+                return super.getRepresentation(status, request, response);
+            }
+        });
     }
 
     private void attachConfigurationResources(Router router) {

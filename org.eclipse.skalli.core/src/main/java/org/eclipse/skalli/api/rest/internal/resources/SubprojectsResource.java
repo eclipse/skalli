@@ -10,12 +10,11 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.internal.resources;
 
+import java.text.MessageFormat;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
@@ -25,11 +24,16 @@ import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.search.SearchQuery;
+import org.restlet.data.Form;
+import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 
 public class SubprojectsResource extends ResourceBase {
+
+    private static final String ID_PREFIX = "rest:api/projects/{0}/subprojects:"; //$NON-NLS-1$
+    private static final String ERROR_ID_INVALID_QUERY = ID_PREFIX + "20"; //$NON-NLS-1$
 
     @Get
     public Representation retrieve() {
@@ -39,16 +43,18 @@ public class SubprojectsResource extends ResourceBase {
             return result;
         }
 
-        Subprojects subprojects = new Subprojects();
-        subprojects.setSubprojects(new LinkedHashSet<Project>());
+        Reference resourceRef = getRequest().getResourceRef();
+        Form form = resourceRef.getQueryAsForm();
 
         String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
-        String depthArg = getQuery().getValues(RestUtils.PARAM_DEPTH);
-        int depth;
-        try {
-            depth = (StringUtils.isBlank(depthArg)) ? Integer.MAX_VALUE : new Integer(depthArg).intValue();
-        } catch (NumberFormatException e) {
-            return createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST, "Depth value \"{0}\" should be a digit", depthArg);
+        int depth = NumberUtils.toInt(form.getFirstValue(RestUtils.PARAM_DEPTH), Integer.MAX_VALUE);
+        if (depth <= 0) {
+            depth = 1;
+        }
+        String extensionParam = form.getFirstValue(SearchQuery.PARAM_EXTENSIONS);
+        String[] extensions = new String[] {};
+        if (extensionParam != null) {
+            extensions = extensionParam.split(SearchQuery.PARAM_LIST_SEPARATOR);
         }
 
         ProjectService projectService = Services.getRequiredService(ProjectService.class);
@@ -60,8 +66,10 @@ public class SubprojectsResource extends ResourceBase {
             project = projectService.getProjectByProjectId(id);
         }
         if (project == null) {
-            return createStatusMessage(Status.CLIENT_ERROR_NOT_FOUND, "Project \"{0}\" not found.", id);
+            setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("Project {0} not found", id));
+            return null;
         }
+
         Comparator<Project> comparator = new Comparator<Project>() {
             @Override
             public int compare(Project p1, Project p2) {
@@ -69,16 +77,8 @@ public class SubprojectsResource extends ResourceBase {
                 return p2.getProjectId().compareTo(p1.getProjectId());
             }
         };
-        List<Project> subprojectList = projectService.getSubProjects(project.getUuid(), comparator, depth);
-        subprojects.addAll(subprojectList);
-
-        String extensionParam = getQuery().getValues(SearchQuery.PARAM_EXTENSIONS);
-        String[] extensions = new String[] {};
-        if (extensionParam != null) {
-            extensions = extensionParam.split(SearchQuery.PARAM_LIST_SEPARATOR);
-        }
-
+        Subprojects subprojects = new Subprojects(projectService.getSubProjects(project.getUuid(), comparator, depth));
         return new ResourceRepresentation<Subprojects>(subprojects,
-               new SubprojectsConverter(getRequest().getResourceRef().getHostIdentifier(), extensions));
+               new SubprojectsConverter(resourceRef.getHostIdentifier(), extensions));
     }
 }

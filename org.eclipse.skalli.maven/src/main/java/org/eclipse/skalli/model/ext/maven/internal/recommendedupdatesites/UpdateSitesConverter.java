@@ -29,6 +29,10 @@ public class UpdateSitesConverter extends RestConverterBase<RecommendedUpdateSit
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-Maven"; //$NON-NLS-1$
 
+    public UpdateSitesConverter() {
+        this(null);
+    }
+
     public UpdateSitesConverter(String host) {
         super(RecommendedUpdateSites.class, "updateSites", host); //$NON-NLS-1$
     }

@@ -11,6 +11,7 @@
 package org.eclipse.skalli.model.ext.maven.internal.recommendedupdatesites;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpdateSites;
@@ -18,19 +19,26 @@ import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpda
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
-import org.eclipse.skalli.services.group.GroupUtils;
 import org.eclipse.skalli.services.permit.Permit;
-import org.eclipse.skalli.services.user.LoginUtils;
+import org.eclipse.skalli.services.permit.Permits;
 import org.restlet.data.Status;
-import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
+import org.restlet.resource.Post;
 import org.restlet.resource.Put;
 
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.mapper.CannotResolveClassException;
 
 public class UpdateSitesServerResource extends ResourceBase {
+
+    private static final String ID_PREFIX = "rest:api/updatesites/{0}/{1}:"; //$NON-NLS-1$
+    private static final String ERROR_ID_IO_ERROR = ID_PREFIX + "10"; //$NON-NLS-1$
+    private static final String ERROR_ID_FORBIDDEN = ID_PREFIX + "20";  //$NON-NLS-1$
+    private static final String ERROR_ID_PARSING_ENTITY_FAILED = ID_PREFIX + "30";  //$NON-NLS-1$
+    private static final String ERROR_ID_VALIDATION_FAILED = ID_PREFIX + "40";  //$NON-NLS-1$
+    private static final String ERROR_ID_SERVIVE_UNAVAILABLE = ID_PREFIX + "50";  //$NON-NLS-1$
+
 
     @Get
     public Representation retrieve() {
@@ -42,71 +50,77 @@ public class UpdateSitesServerResource extends ResourceBase {
 
         String id = (String) getRequestAttributes().get("id");//$NON-NLS-1$
         String userId = (String) getRequestAttributes().get("userId");//$NON-NLS-1$
-        RecommendedUpdateSitesService service = Services.getRequiredService(RecommendedUpdateSitesService.class);
-        RecommendedUpdateSites updateSites = service.getRecommendedUpdateSites(userId, id);
 
+        RecommendedUpdateSitesService service = Services.getService(RecommendedUpdateSitesService.class);
+        RecommendedUpdateSites updateSites = service != null? service.getRecommendedUpdateSites(userId, id) : null;
         if (updateSites == null) {
-            return createStatusMessage(Status.CLIENT_ERROR_NOT_FOUND, "Recommended update sites \"{0}\" for user \"{1}\" not found.", id, userId); //$NON-NLS-1$
+            setStatus(Status.CLIENT_ERROR_NOT_FOUND,
+                    MessageFormat.format("User {0} has no favorite update sites {1}", userId, id)); //$NON-NLS-1$
+            return null;
         }
 
-        ResourceRepresentation<RecommendedUpdateSites> representation = new ResourceRepresentation<RecommendedUpdateSites>(
-                updateSites, new UpdateSitesConverter(getRequest().getResourceRef().getHostIdentifier()));
-        return representation;
+        return new ResourceRepresentation<RecommendedUpdateSites>(updateSites,
+                new UpdateSitesConverter(getRequest().getResourceRef().getHostIdentifier()));
     }
 
     @Put
-    public Representation store(Representation entity) {
+    @Post
+    private Representation createOrUpdate(Representation entity, boolean create) {
         String path = getReference().getPath();
         Representation result = checkAuthorization(Permit.ACTION_PUT, path);
         if (result != null) {
             return result;
         }
 
+        String userId = (String) getRequestAttributes().get("userId");//$NON-NLS-1$
+        String id = (String) getRequestAttributes().get("id");//$NON-NLS-1$
+        String loggedInUser = Permits.getLoggedInUser();
+        if (!loggedInUser.equals(userId)) {
+            String errorId = MessageFormat.format(ERROR_ID_FORBIDDEN, userId, id);
+            return createErrorRepresentation(Status.CLIENT_ERROR_FORBIDDEN, ERROR_ID_FORBIDDEN, errorId,
+                    "You are not allowed to recommend update sites in the name of user {0}", userId);
+        }
+
         ResourceRepresentation<RecommendedUpdateSites> representation = new ResourceRepresentation<RecommendedUpdateSites>();
-        String host = getRequest().getResourceRef().getHostIdentifier();
-        representation.setConverters(new UpdateSitesConverter(host));
+        representation.setConverters(new UpdateSitesConverter());
         representation.setAnnotatedClasses(RecommendedUpdateSites.class);
         representation.setClassLoader(RecommendedUpdateSites.class.getClassLoader());
         RecommendedUpdateSites updateSites = null;
         try {
             updateSites = representation.read(entity, RecommendedUpdateSites.class);
-            String id = (String) getRequestAttributes().get("id");//$NON-NLS-1$
-            updateSites.setId(id);
-            String userId = (String) getRequestAttributes().get("userId");//$NON-NLS-1$
-            updateSites.setUserId(userId);
-
-            LoginUtils loginUtil = new LoginUtils(ServletUtils.getRequest(getRequest()));
-            String loggedInUser = loginUtil.getLoggedInUserId();
-
-            if (GroupUtils.isAdministrator(loggedInUser)) {
-                if (!loggedInUser.equals(userId)) {
-                    return createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST,
-                            "You are not allowed to create recommended update sites for another user");
-                }
-                RecommendedUpdateSitesService service = Services
-                        .getRequiredService(RecommendedUpdateSitesService.class);
-                RecommendedUpdateSites oldUpdateSite = service.getRecommendedUpdateSites(userId,
-                        updateSites.getId());
-                if (oldUpdateSite != null) {
-                    updateSites.setUuid(oldUpdateSite.getUuid());
-                }
-                service.persist(updateSites, loggedInUser);
-            } else {
-                return createStatusMessage(Status.CLIENT_ERROR_FORBIDDEN, "Access denied.", new Object[] {});
-            }
         } catch (IOException e) {
-            createStatusMessage(Status.SERVER_ERROR_INTERNAL,
-                    "Failed to read recommended update sites entity: " + e.getMessage());
-        } catch (ValidationException e) {
-            createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Validating resource with id \"{0}\" failed: " + e.getMessage(), updateSites.getId());
+            String errorId = MessageFormat.format(ERROR_ID_IO_ERROR, userId, id);
+            return createIOErrorRepresentation(errorId, e);
         } catch (CannotResolveClassException e) {
-            createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Failed to parse the request body: " + e.getMessage());
+            String errorId = MessageFormat.format(ERROR_ID_PARSING_ENTITY_FAILED, userId, id);
+            return createParseErrorRepresentation(errorId, e);
         } catch (ConversionException e) {
-            createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Failed to parse the request body: " + e.getMessage());
+            String errorId = MessageFormat.format(ERROR_ID_PARSING_ENTITY_FAILED, userId, id);
+            return createParseErrorRepresentation(errorId, e);
         }
+        updateSites.setId(id);
+        updateSites.setUserId(userId);
+
+        RecommendedUpdateSitesService service = Services.getService(RecommendedUpdateSitesService.class);
+        if (service == null) {
+            String errorId = MessageFormat.format(ERROR_ID_SERVIVE_UNAVAILABLE, userId, id);
+            return createServiceUnavailableRepresentation(errorId, "Recommended Update Sites Service");
+        }
+
+        Status status = Status.SUCCESS_NO_CONTENT;
+        RecommendedUpdateSites oldUpdateSite = service.getRecommendedUpdateSites(userId, id);
+        if (oldUpdateSite != null) {
+            updateSites.setUuid(oldUpdateSite.getUuid());
+            status = Status.SUCCESS_CREATED;
+        }
+        try {
+            service.persist(updateSites, loggedInUser);
+        } catch (ValidationException e) {
+            String errorId = MessageFormat.format(ERROR_ID_VALIDATION_FAILED, updateSites.getId());
+            return createValidationFailedRepresentation(errorId, updateSites.getId(), e);
+        }
+
+        setStatus(status);
         return null;
     }
 

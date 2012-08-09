@@ -11,6 +11,7 @@
 package org.eclipse.skalli.api.rest.internal.resources;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.UUID;
 
 import org.eclipse.skalli.model.Project;
@@ -19,17 +20,23 @@ import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
-import org.eclipse.skalli.services.group.GroupUtils;
 import org.eclipse.skalli.services.permit.Permit;
+import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.project.ProjectService;
-import org.eclipse.skalli.services.user.LoginUtils;
 import org.restlet.data.Status;
-import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Put;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProjectResource extends ResourceBase {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ProjectResource.class);
+
+    // error codes for logging and error responses
+    private static final String ERROR_ID_IO_ERROR = "rest:api/projects/{0}:00"; //$NON-NLS-1$
+    private static final String ERROR_VALIDATION_FAILED = "rest:api/projects/{0}:10"; //$NON-NLS-1$
 
     @Get
     public Representation retrieve() {
@@ -49,12 +56,12 @@ public class ProjectResource extends ResourceBase {
             project = projectService.getProjectByProjectId(id);
         }
         if (project == null) {
-            return createStatusMessage(Status.CLIENT_ERROR_NOT_FOUND, "Project \"{0}\" not found.", id); //$NON-NLS-1$
+            setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("Project {0} not found", id)); //$NON-NLS-1$
+            return null;
         }
 
-        ResourceRepresentation<Project> representation = new ResourceRepresentation<Project>(
-                project, new ProjectConverter(getRequest().getResourceRef().getHostIdentifier(), false));
-        return representation;
+        return new ResourceRepresentation<Project>(project,
+                new ProjectConverter(getRequest().getResourceRef().getHostIdentifier(), false));
     }
 
     @Put
@@ -65,29 +72,30 @@ public class ProjectResource extends ResourceBase {
             return result;
         }
 
+        String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
         ResourceRepresentation<Project> representation = new ResourceRepresentation<Project>();
-        representation.setConverters(new ProjectConverter(getRequest().getResourceRef().getHostIdentifier(), false));
+        representation.setConverters(new ProjectConverter());
         representation.setAnnotatedClasses(Project.class);
         Project project = null;
         try {
             project = representation.read(entity, Project.class);
         } catch (IOException e) {
-            createStatusMessage(Status.SERVER_ERROR_INTERNAL,
-                    "Failed to read project entity: " + e.getMessage());
+            String errorId = MessageFormat.format(ERROR_ID_IO_ERROR, id);
+            String message = MessageFormat.format("Failed to read project {0}", id);
+            LOG.error(MessageFormat.format("{0} ({1})", message, errorId), e);
+            return createErrorRepresentation(Status.SERVER_ERROR_INTERNAL, errorId, message);
         }
+
         try {
-            LoginUtils loginUtils = new LoginUtils(ServletUtils.getRequest(getRequest()));
-            String loggedInUser = loginUtils.getLoggedInUserId();
-            if (GroupUtils.isAdministrator(loggedInUser)) {
-                ProjectService projectService = Services.getRequiredService(ProjectService.class);
-                projectService.persist(project, loggedInUser);
-            } else {
-                return createStatusMessage(Status.CLIENT_ERROR_FORBIDDEN, "Access denied.", new Object[] {});
-            }
+            ProjectService projectService = Services.getRequiredService(ProjectService.class);
+            projectService.persist(project, Permits.getLoggedInUser());
         } catch (ValidationException e) {
-            createStatusMessage(Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Validating resource with id \"{0}\" failed: " + e.getMessage(), project.getProjectId());
+            String errorId = MessageFormat.format(ERROR_VALIDATION_FAILED, project.getProjectId());
+            String message = MessageFormat.format("Validating project {0} failed: {1}", project.getProjectId(), e.getMessage());
+            LOG.warn(MessageFormat.format("{0} ({1})", message, errorId));
+            return createErrorRepresentation(Status.CLIENT_ERROR_BAD_REQUEST,  errorId, message);
         }
+        setStatus(Status.SUCCESS_NO_CONTENT);
         return null;
     }
 
