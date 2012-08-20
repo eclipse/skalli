@@ -39,6 +39,7 @@ Import-Package: com.thoughtworks.xstream,
  org.restlet.ext.servlet,
  org.restlet.representation,
  org.restlet.resource,
+ org.restlet.util,
  org.slf4j,
  org.w3c.dom,
  org.xml.sax

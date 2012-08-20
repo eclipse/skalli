@@ -19,7 +19,6 @@ import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpda
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
-import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.permit.Permits;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -42,10 +41,8 @@ public class UpdateSitesServerResource extends ResourceBase {
 
     @Get
     public Representation retrieve() {
-        String path = getReference().getPath();
-        Representation result = checkAuthorization(Permit.ACTION_GET, path);
-        if (result != null) {
-            return result;
+        if (!Permits.isAllowed(getAction(), getPath())) {
+            return createUnauthorizedRepresentation();
         }
 
         String id = (String) getRequestAttributes().get("id");//$NON-NLS-1$
@@ -66,10 +63,8 @@ public class UpdateSitesServerResource extends ResourceBase {
     @Put
     @Post
     private Representation createOrUpdate(Representation entity, boolean create) {
-        String path = getReference().getPath();
-        Representation result = checkAuthorization(Permit.ACTION_PUT, path);
-        if (result != null) {
-            return result;
+        if (!Permits.isAllowed(getAction(), getPath())) {
+            return createUnauthorizedRepresentation();
         }
 
         String userId = (String) getRequestAttributes().get("userId");//$NON-NLS-1$

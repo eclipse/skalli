@@ -16,7 +16,7 @@ import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
-import org.eclipse.skalli.services.permit.Permit;
+import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.user.UserUtils;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -26,10 +26,8 @@ public class UserResource extends ResourceBase {
 
     @Get
     public Representation retrieve() {
-        String path = getReference().getPath();
-        Representation result = checkAuthorization(Permit.ACTION_GET, path);
-        if (result != null) {
-            return result;
+        if (!Permits.isAllowed(getAction(), getPath())) {
+            return createUnauthorizedRepresentation();
         }
 
         String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);

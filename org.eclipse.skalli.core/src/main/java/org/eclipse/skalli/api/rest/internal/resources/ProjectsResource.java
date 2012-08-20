@@ -35,7 +35,6 @@ import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.PropertyMapper;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
-import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.search.QueryParseException;
@@ -65,10 +64,8 @@ public class ProjectsResource extends ResourceBase {
 
     @Get
     public Representation retrieve() {
-        String path = getReference().getPath();
-        Representation result = checkAuthorization(Permit.ACTION_GET, path);
-        if (result != null) {
-            return result;
+        if (!Permits.isAllowed(getAction(), getPath())) {
+            return createUnauthorizedRepresentation();
         }
 
         Reference resourceRef = getRequest().getResourceRef();
@@ -170,10 +167,8 @@ public class ProjectsResource extends ResourceBase {
 
     @Put
     public Representation update(Representation entity) throws ResourceException {
-        String path = getReference().getPath();
-        Representation result = checkAuthorization(Permit.ACTION_PUT, path);
-        if (result != null) {
-            return result;
+        if (!Permits.isAllowed(getAction(), getPath())) {
+            return createUnauthorizedRepresentation();
         }
 
         Reference resourceRef = getRequest().getResourceRef();
@@ -199,15 +194,15 @@ public class ProjectsResource extends ResourceBase {
         ProjectService projectService = Services.getRequiredService(ProjectService.class);
         Projects updatedProjects = new Projects();
 
-        result = updateProperties(projects, updatedProjects, queryParams, projectService);
-        if (result != null) {
-            return result;
+        Representation representation = updateProperties(projects, updatedProjects, queryParams, projectService);
+        if (representation != null) {
+            return representation;
         }
 
         if (queryParams.doPersist()) {
-            result = persistUpdatedProjects(updatedProjects, projectService);
-            if (result != null) {
-                return result;
+            representation = persistUpdatedProjects(updatedProjects, projectService);
+            if (representation != null) {
+                return representation;
             }
         }
 

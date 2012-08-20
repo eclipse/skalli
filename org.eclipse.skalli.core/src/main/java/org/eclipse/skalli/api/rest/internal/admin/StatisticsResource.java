@@ -19,7 +19,7 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
-import org.eclipse.skalli.services.permit.Permit;
+import org.eclipse.skalli.services.permit.Permits;
 import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -28,10 +28,8 @@ public class StatisticsResource extends ResourceBase {
 
     @Get
     public Representation retrieve() {
-        String path = getReference().getPath();
-        Representation result = checkAuthorization(Permit.ACTION_GET, path);
-        if (result != null) {
-            return result;
+        if (!Permits.isAllowed(getAction(), getPath())) {
+            return createUnauthorizedRepresentation();
         }
 
         long delta = 0;

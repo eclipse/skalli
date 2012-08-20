@@ -12,7 +12,7 @@ package org.eclipse.skalli.api.rest.internal.admin;
 
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
-import org.eclipse.skalli.services.permit.Permit;
+import org.eclipse.skalli.services.permit.Permits;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 
@@ -20,10 +20,8 @@ public class StatusResource extends ResourceBase {
 
     @Get
     public Representation retrieve() {
-        String path = getReference().getPath();
-        Representation result = checkAuthorization(Permit.ACTION_GET, path);
-        if (result != null) {
-            return result;
+        if (!Permits.isAllowed(getAction(), getPath())) {
+            return createUnauthorizedRepresentation();
         }
 
         return new ResourceRepresentation<Object>(new Object(),

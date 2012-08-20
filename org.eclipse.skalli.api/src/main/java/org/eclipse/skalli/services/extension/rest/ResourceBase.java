@@ -12,6 +12,8 @@ package org.eclipse.skalli.services.extension.rest;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.Map;
 import java.util.SortedSet;
 
 import org.apache.commons.lang.StringUtils;
@@ -20,6 +22,9 @@ import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.permit.Permit.Level;
 import org.eclipse.skalli.services.permit.Permits;
+import org.restlet.Request;
+import org.restlet.data.Form;
+import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ServerResource;
@@ -29,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Base class for the implementation of {@link RestExtensions REST extensions} providing
  * convenience methods for creating certain common {@link ErrorRepresentation error representations}
- * and for permit checks.
+ * and accessing request and query attributes.
  */
 public abstract class ResourceBase extends ServerResource {
 
@@ -37,9 +42,114 @@ public abstract class ResourceBase extends ServerResource {
 
     private static final String ERROR_ID_MISSING_AUTHORIZATION = "rest:permit({0}):00"; //$NON-NLS-1$
 
+    private String action;
+    private String path;
+    private Reference resourceRef;
+    private Form form;
+    private Map<String,String> queryParams;
+
+    @Override
+    protected void doInit() {
+        super.doInit();
+        path = getReference().getPath();
+        action = getMethod().getName();
+        Request request = getRequest();
+        resourceRef = request != null ? request.getResourceRef() : null;
+        form = resourceRef != null ? resourceRef.getQueryAsForm() : null;
+        if (form != null) {
+            queryParams = form.getValuesMap();
+        } else {
+            form = new Form();
+            queryParams = Collections.emptyMap();
+        }
+    }
+
     /**
-     * Checks whether the currently logged in user has the necessary permits to
-     * perform a certain <code>action</code> on a resource given by its <code>path</code>.
+     * Returns the request path.
+     */
+    protected String getPath() {
+        return path;
+    }
+
+    /**
+     * Returns the action of this request.
+     */
+    protected String getAction() {
+        return action;
+    }
+
+    /**
+     * Returns the reference of the requested resource, or <code>null</code>
+     * if the requested resource could not be determined.
+     *
+     * @see org.restlet.Request#getResourceRef().
+     */
+    protected Reference getResourceRef() {
+        return resourceRef;
+    }
+
+    /**
+     * Returns the host part of the resource's URL including scheme,
+     * host name and port number, or <code>null</code> if the host
+     * could not be determined.
+     */
+    protected String getHost() {
+        return resourceRef != null ? resourceRef.getHostIdentifier() : null;
+    }
+
+    /**
+     * Returns the query as form, which may be an {@link Form#Form() empty form}
+     * if there is no query.
+     */
+    protected Form getQueryAsForm() {
+        return form;
+    }
+
+    /**
+     * Returns the query as string, which may be an empty string
+     * if there is no query.
+     */
+    protected String getQueryString() {
+        return form.getQueryString();
+    }
+
+    /**
+     * Returns the value of a given query attribute.
+     *
+     * @param name  the name of the attribute.
+     *
+     * @return  the value of the attribute, which may be
+     * <code>null</code> either if there is no attribute
+     * with the given name, or the attribute is a boolean
+     * attribute.
+     */
+    protected String getQueryAttribute(String name) {
+        return queryParams.get(name);
+    }
+
+    /**
+     * Returns <code>true</code> if there is a query attribute
+     * with the given name.
+     *
+     * @param name  the name of the attribute.
+     */
+    protected boolean hasQueryAttribute(String name) {
+        return queryParams.containsKey(name);
+    }
+
+    /**
+     * Returns the query attributes as map.
+     * @return a mapping of attribute names to their respective values,
+     * or an empty map if there is no query.
+     */
+    protected Map<String,String> getQueryAttributes() {
+        return queryParams;
+    }
+
+    /**
+     * Creates an {@link ErrorRepresentation error representation} for authorization errors
+     * and writes a corresponding audit log entry (severity WARN). Sets the response status to
+     * <tt>403 Forbidden</tt>.
      *
      * @param action  the action to perform.
      * @param path  path of the resource on which the action is to be performed.
@@ -47,17 +157,14 @@ public abstract class ResourceBase extends ServerResource {
      * @return <code>null</code>, if the user is authorized to perform the action,
      * otherwise an {@link ErrorRepresenation}.
      */
-    protected Representation checkAuthorization(String action, String path) {
-        if (!Permits.isAllowed(action, path)) {
-            String loggedInUser = Permits.getLoggedInUser();
-            String message = StringUtils.isBlank(loggedInUser)?
-                    MessageFormat.format("{0} {1}: Forbidden for anonymous users", action, path) :
-                    MessageFormat.format("{0} {1}: Forbidden for user ''{2}''", action, path, loggedInUser);
-            String messageId = MessageFormat.format(ERROR_ID_MISSING_AUTHORIZATION,
-                    Permit.toString(action, path, Level.ALLOW));
-            return createErrorRepresentation(Status.CLIENT_ERROR_FORBIDDEN, messageId, message);
-        }
-        return null;
+    protected Representation createUnauthorizedRepresentation() {
+        String loggedInUser = Permits.getLoggedInUser();
+        String message = StringUtils.isBlank(loggedInUser)?
+                MessageFormat.format("{0} {1}: Forbidden for anonymous users", action, path) :
+                MessageFormat.format("{0} {1}: Forbidden for user ''{2}''", action, path, loggedInUser);
+        String messageId = MessageFormat.format(ERROR_ID_MISSING_AUTHORIZATION,
+                Permit.toString(action, path, Level.ALLOW));
+        return createErrorRepresentation(Status.CLIENT_ERROR_FORBIDDEN, messageId, message);
     }
 
     /**

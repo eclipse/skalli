@@ -22,7 +22,7 @@ import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
-import org.eclipse.skalli.services.permit.Permit;
+import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.user.LoginUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -208,34 +208,32 @@ public abstract class ConfigResourceBase<T> extends ResourceBase {
 
     @Get
     public final Representation retrieve() {
-        String path = getReference().getPath();
-        Representation result = checkAuthorization(Permit.ACTION_GET, path);
-        if (result != null) {
-            return result;
+        if (!Permits.isAllowed(getAction(), getPath())) {
+            return createUnauthorizedRepresentation();
         }
 
         ConfigurationService configService = getConfigService();
         if (configService == null) {
             LOG.error(MessageFormat.format(
-                    "Failed to retrieve configuration {0}: no configuration service available", path));
+                    "Failed to retrieve configuration {0}: no configuration service available", getPath()));
             getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
             return new StringRepresentation(MessageFormat.format(
-                    "Failed to retrieve configuration {0}", path), MediaType.TEXT_PLAIN);
+                    "Failed to retrieve configuration {0}", getPath()), MediaType.TEXT_PLAIN);
 
         }
         T config = readConfig(configService, getRequestAttributes());
         if (config == null) {
             getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
             return new StringRepresentation(MessageFormat.format(
-                    "No configuration {0} found", path), MediaType.TEXT_PLAIN);
+                    "No configuration {0} found", getPath()), MediaType.TEXT_PLAIN);
         }
         try {
             ProtectionHelper.protect(config, getAdditionalConfigClasses());
         } catch (ProtectionException e) {
-            LOG.error(MessageFormat.format("Failed to apply proper protection to configuration {0}", path), e);
+            LOG.error(MessageFormat.format("Failed to apply proper protection to configuration {0}", getPath()), e);
             getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
             return new StringRepresentation(MessageFormat.format(
-                    "Failed to retrieve configuration {0}", path), MediaType.TEXT_PLAIN);
+                    "Failed to retrieve configuration {0}", getPath()), MediaType.TEXT_PLAIN);
         }
         ResourceRepresentation<T> representation = new ResourceRepresentation<T>(config);
         representation.setXStream(getXStream());
@@ -244,17 +242,16 @@ public abstract class ConfigResourceBase<T> extends ResourceBase {
 
     @Put
     public final Representation store(Representation entity) {
-        String path = getReference().getPath();
-        Representation result = checkAuthorization(Permit.ACTION_PUT, path);
-        if (result != null) {
-            return result;
+        if (!Permits.isAllowed(getAction(), getPath())) {
+            return createUnauthorizedRepresentation();
         }
 
+        Representation representation = null;
         try {
             ConfigurationService configService = getConfigService();
             if (configService == null) {
                 LOG.error(MessageFormat.format(
-                        "Failed to store configuration {0}: no configuration service available", path));
+                        "Failed to store configuration {0}: no configuration service available", getPath()));
                 getResponse().setStatus(Status.SERVER_ERROR_INTERNAL);
                 return new StringRepresentation("Failed to store configuration", MediaType.TEXT_PLAIN);
             }
@@ -264,19 +261,19 @@ public abstract class ConfigResourceBase<T> extends ResourceBase {
             ValidationException validationException = validate(configObject, getLoggedInUser());
             if (validationException.hasFatalIssues()) {
                 getResponse().setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-                result = new StringRepresentation(validationException.getMessage(), MediaType.TEXT_PLAIN);
+                representation = new StringRepresentation(validationException.getMessage(), MediaType.TEXT_PLAIN);
             } else {
                 storeConfig(configService, configObject, getRequestAttributes());
                 StringBuilder msg = new StringBuilder("Configuration successfully stored");
                 if (validationException.hasIssues()) {
                     msg.append(". But had following issues: ").append(validationException.getMessage());
                 }
-                result = new StringRepresentation(msg.toString(), MediaType.TEXT_PLAIN);
+                representation = new StringRepresentation(msg.toString(), MediaType.TEXT_PLAIN);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return result;
+        return representation;
     }
 
     private String getLoggedInUser() {
