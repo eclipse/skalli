@@ -157,7 +157,7 @@
             <td>Git Repository:</td>
             <td>
               <strong>'${param.repo}'</strong>
-              <c:if test="${invalidRepo}">is invalid<br />(must not be blank and must not contain whitespace).</c:if>
+              <c:if test="${invalidRepo}">is invalid.<br />(${invalidRepoMsg})</c:if>
               <c:if test="${!invalidRepo && repoExists}">already exists.</c:if>
               <c:if test="${!invalidRepo && !repoExists}">will be created.</c:if>
             </td>

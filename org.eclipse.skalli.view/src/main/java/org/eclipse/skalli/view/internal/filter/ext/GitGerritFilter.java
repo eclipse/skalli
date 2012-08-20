@@ -79,6 +79,7 @@ public class GitGerritFilter implements Filter {
     public static final String ATTRIBUTE_INVALID_GROUP = "invalidGroup"; //$NON-NLS-1$
     public static final String ATTRIBUTE_GROUP_EXISTS = "groupExists"; //$NON-NLS-1$
     public static final String ATTRIBUTE_INVALID_REPO = "invalidRepo"; //$NON-NLS-1$
+    public static final String ATTRIBUTE_INVALID_REPO_MSG = "invalidRepoMsg"; //$NON-NLS-1$
     public static final String ATTRIBUTE_REPO_EXISTS = "repoExists"; //$NON-NLS-1$
     public static final String ATTRIBUTE_KNOWN_ACCOUNTS = "knownAccounts"; //$NON-NLS-1$
 
@@ -180,8 +181,12 @@ public class GitGerritFilter implements Filter {
                 final boolean createGroup = !invalidGroup && !groupExists;
 
                 // general repo checks
-                final boolean invalidRepo = StringUtils.isBlank(repo) || StringUtils.contains(repo, " "); //$NON-NLS-1$
+                final String invalidRepoMsg = checkRepoName(repo);
+                final boolean invalidRepo = invalidRepoMsg != null;
                 request.setAttribute(ATTRIBUTE_INVALID_REPO, invalidRepo);
+                if (invalidRepo) {
+                    request.setAttribute(ATTRIBUTE_INVALID_REPO_MSG, invalidRepoMsg);
+                }
                 final boolean repoExists = !invalidRepo && client.projectExists(repo);
                 request.setAttribute(ATTRIBUTE_REPO_EXISTS, repoExists);
                 final boolean createRepo = !invalidGroup && !invalidRepo && !repoExists;
@@ -272,6 +277,30 @@ public class GitGerritFilter implements Filter {
         RequestDispatcher rd = request.getRequestDispatcher(Consts.URL_ERROR);
         request.setAttribute(ATTRIBUTE_EXCEPTION, e);
         rd.forward(request, response);
+    }
+
+    private String checkRepoName(String repoName) {
+        if (StringUtils.isBlank(repoName)) {
+            return "Repository name must not be blank";
+        }
+        if (StringUtils.contains(repoName, " ")) {
+            return "Repository name must not contain whitespace";
+        }
+        if (repoName.endsWith("/")) {
+            return "Repository name must not end with a trailing slash";
+        }
+        if (repoName.startsWith("/")) {
+            return "Repository name must not start with a slash";
+        }
+        if (repoName.indexOf('\\') >= 0) {
+            return "Repository name must not contain backward slashes";
+        }
+        if (repoName.startsWith("../")
+                || repoName.contains("/../")
+                || repoName.contains("/./")) {
+            return "Repository name must not contain \"../\", \"/../\" or \"/./\"";
+        }
+        return null;
     }
 
     /**
