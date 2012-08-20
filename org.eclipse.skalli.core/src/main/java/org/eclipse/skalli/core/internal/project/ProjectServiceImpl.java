@@ -146,6 +146,24 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
     }
 
     @Override
+    public Map<UUID, List<Project>> getSubProjects() {
+        Map<UUID, List<Project>> result = new HashMap<UUID, List<Project>>();
+        for (Project project : getAll()) {
+            Project parent = (Project) project.getParentEntity();
+            if (parent == null) {
+               continue;
+            }
+            List<Project> subprojects = result.get(parent.getUuid());
+            if (subprojects == null) {
+                subprojects = new ArrayList<Project>();
+                result.put(parent.getUuid(), subprojects);
+            }
+            subprojects.add(project);
+        }
+        return result;
+    }
+
+    @Override
     public List<Project> getSubProjects(UUID uuid) {
         return getSubProjects(uuid, null, 1);
     }

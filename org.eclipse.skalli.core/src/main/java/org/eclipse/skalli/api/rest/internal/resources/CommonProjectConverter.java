@@ -13,6 +13,7 @@ package org.eclipse.skalli.api.rest.internal.resources;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.UUID;
@@ -38,19 +39,25 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
     private final List<String> extensions;
     private boolean allExtensions;
     private boolean omitNSAttributes;
+    private Map<UUID, List<Project>> subprojects;
 
     public CommonProjectConverter(String host, boolean omitNSAttributes) {
-        this(host, new String[] {}, omitNSAttributes);
+        this(host, null, omitNSAttributes);
+    }
+
+    public CommonProjectConverter(String host, Map<UUID, List<Project>> subprojects, boolean omitNSAttributes) {
+        this(host, null, subprojects, omitNSAttributes);
         this.allExtensions = true;
     }
 
-    public CommonProjectConverter(String host, String[] extensions, boolean omitNSAttributes) {
+    public CommonProjectConverter(String host, String[] extensions, Map<UUID, List<Project>> subprojects, boolean omitNSAttributes) {
         super(Project.class, "project", host); //$NON-NLS-1$
         if (extensions != null) {
             this.extensions = Arrays.asList(extensions);
         } else {
             this.extensions = Collections.<String> emptyList();
         }
+        this.subprojects = subprojects;
         this.allExtensions = false;
         this.omitNSAttributes = omitNSAttributes;
     }
@@ -77,11 +84,17 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
         if (parent != null) {
             writeProjectLink(writer, PARENT_RELATION, parent);
         }
+
         ProjectService projectService = Services.getRequiredService(ProjectService.class);
-        List<Project> subprojects = projectService.getSubProjects(project.getUuid());
-        if (subprojects.size() > 0) {
+        List<Project> subprojectList = null;
+        if (subprojects != null) {
+            subprojectList = subprojects.get(project.getUuid());
+        } else {
+            subprojectList = projectService.getSubProjects(project.getUuid());
+        }
+        if (subprojectList != null && subprojectList.size() > 0) {
             writer.startNode("subprojects"); //$NON-NLS-1$
-            for (Project subproject : subprojects) {
+            for (Project subproject : subprojectList) {
                 writeProjectLink(writer, SUBPROJECT_RELATION, subproject.getUuid());
             }
             writer.endNode();

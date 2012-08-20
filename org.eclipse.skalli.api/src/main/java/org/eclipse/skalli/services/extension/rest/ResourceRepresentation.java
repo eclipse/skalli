@@ -18,6 +18,7 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.WriterRepresentation;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.CompactWriter;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
 
 /**
@@ -33,6 +34,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
     private Class<?>[] annotatedClasses;
     private RestConverter[] converters;
     private ClassLoader classLoader;
+    private boolean compact;
 
     /**
      * Creates an uninitialized representation for converting an XML representation
@@ -74,7 +76,12 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
     public void write(Writer writer) throws IOException {
         if (object != null) {
             writer.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"); //$NON-NLS-1$
-            getXStream().toXML(object, writer);
+            XStream xstream = getXStream();
+            if (compact) {
+                xstream.marshal(object, new CompactWriter(writer));
+            } else {
+                xstream.toXML(object, writer);
+            }
         }
     }
 
@@ -135,6 +142,18 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      */
     public void setXStream(XStream xstream) {
         this.xstream = xstream;
+    }
+
+    /**
+     * Switches compact output on or off (default is off). Switching on
+     * compact output will remove line breaks and indentations from the output
+     * performing slightly faster and reducing the amount of data written
+     * to the underlying socket.
+     *
+     * @param compact if <code>true</code> the output is compacted.
+     */
+    public void setCompact(boolean compact) {
+        this.compact = compact;
     }
 
     /**

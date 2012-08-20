@@ -55,6 +55,8 @@ public class ProjectsResource extends ResourceBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProjectsResource.class);
 
+    public static final String PARAM_COMPACT = "compact"; //$NON-NLS-1$
+
     private static final String ID_PREFIX = "rest:api/projects:"; //$NON-NLS-1$
     private static final String ERROR_ID_UNEXPECTED = ID_PREFIX + "00"; //$NON-NLS-1$
     private static final String ERROR_ID_IO_ERROR = ID_PREFIX + "10"; //$NON-NLS-1$
@@ -68,20 +70,23 @@ public class ProjectsResource extends ResourceBase {
             return createUnauthorizedRepresentation();
         }
 
-        Reference resourceRef = getRequest().getResourceRef();
-        Form form = resourceRef.getQueryAsForm();
         try {
-            RestSearchQuery queryParams = new RestSearchQuery(form);
+            RestSearchQuery queryParams = new RestSearchQuery(getQueryAsForm());
             Projects projects = getProjects(queryParams);
-
-            return new ResourceRepresentation<Projects>(projects,
-                    new ProjectsConverter(resourceRef.getHostIdentifier(),
-                            queryParams.getExtensions(), queryParams.getStart()));
+            setStatus(Status.SUCCESS_OK);
+            return createProjectsResourceRepresentation(projects, queryParams);
 
         } catch (QueryParseException e) {
             return createErrorRepresentation(Status.CLIENT_ERROR_BAD_REQUEST, ERROR_ID_INVALID_QUERY,
-                    "Invalid query \"?{0}\": {1}", form.getQueryString(), e.getMessage()); //$NON-NLS-1$
+                    "Invalid query \"?{0}\": {1}", getQueryString(), e.getMessage()); //$NON-NLS-1$
         }
+    }
+
+    private Representation createProjectsResourceRepresentation(Projects projects, RestSearchQuery queryParams) {
+        ResourceRepresentation<Projects> representation = new ResourceRepresentation<Projects>(projects,
+                new ProjectsConverter(getHost(), queryParams.getExtensions(), queryParams.getStart()));
+        representation.setCompact(hasQueryAttribute(PARAM_COMPACT));
+        return representation;
     }
 
     private Projects getProjects(SearchQuery queryParams) throws QueryParseException {
@@ -206,9 +211,8 @@ public class ProjectsResource extends ResourceBase {
             }
         }
 
-        return new ResourceRepresentation<Projects>(updatedProjects,
-                new ProjectsConverter(resourceRef.getHostIdentifier(),
-                        queryParams.getExtensions(), queryParams.getStart()));
+        setStatus(Status.SUCCESS_OK);
+        return createProjectsResourceRepresentation(projects, queryParams);
     }
 
     private Representation persistUpdatedProjects(Projects projects, ProjectService projectService) {

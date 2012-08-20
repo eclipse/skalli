@@ -88,6 +88,12 @@ public interface ProjectService extends EntityService<Project>, Issuer {
     public ProjectNode getProjectNode(UUID uuid, Comparator<Project> c);
 
     /**
+     * Returns all subprojects mapped to their respective parent projects.
+     * @return a map of subproject lists, or an empty map.
+     */
+    public Map<UUID, List<Project>> getSubProjects();
+
+    /**
      * Returns all subprojects of the given project.
      * The order of the subprojects is not specified.
      *

@@ -9,6 +9,7 @@ Bundle-ActivationPolicy: lazy
 Import-Package: com.thoughtworks.xstream,
  com.thoughtworks.xstream.converters,
  com.thoughtworks.xstream.io,
+ com.thoughtworks.xstream.io.xml,
  com.thoughtworks.xstream.mapper,
  javax.mail,
  javax.management.relation,

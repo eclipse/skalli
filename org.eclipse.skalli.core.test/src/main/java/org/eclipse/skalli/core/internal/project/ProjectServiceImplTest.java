@@ -281,6 +281,20 @@ public class ProjectServiceImplTest {
 
     @Test
     public void testGetSubProjects() {
+        Map<UUID, List<Project>> map = ps.getSubProjects();
+        Assert.assertEquals(4, map.size());
+        assertEquals(map.get(uuids[1]), uuids[2]);
+        assertEquals(map.get(uuids[2]), uuids[3]);
+        assertEquals(map.get(uuids[3]), uuids[6], uuids[8]);
+        assertEquals(map.get(uuids[6]), uuids[7]);
+        Assert.assertNull(map.get(uuids[4]));
+        Assert.assertNull(map.get(uuids[5]));
+        Assert.assertNull(map.get(uuids[7]));
+        Assert.assertNull(map.get(uuids[8]));
+    }
+
+    @Test
+    public void testGetSubProjectsByUUID() {
         assertEquals(ps.getSubProjects(uuids[1]), uuids[2]);
         assertEquals(ps.getSubProjects(uuids[2]), uuids[3]);
         assertEquals(ps.getSubProjects(uuids[3]), uuids[6], uuids[8]);

@@ -89,79 +89,78 @@ public class ProjectConverterTest {
             MarshallingContext context = new MarshallingContextMock(writer);
             converter.marshal(project, writer, context);
 
-            // render the expected output of the writer
-            StringBuilder expected = new StringBuilder();
-            expected.append(
-                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                            +
-                            "<project "
-                            +
-                            "xmlns=\"http://www.eclipse.org/skalli/2010/API\" "
-                            +
-                            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-                            +
-                            "xsi:schemaLocation=\"http://www.eclipse.org/skalli/2010/API https://localhost/schemas/project.xsd\" "
-                            +
-                            "apiVersion=\"" + ProjectConverter.API_VERSION + "\" " +
-                            "lastModified=\"" + project.getLastModified() + "\" " +
-                            "modifiedBy=\"" + project.getLastModifiedBy() + "\">");
-            expected.append("  <uuid>").append(project.getUuid().toString()).append("</uuid>");
-            expected.append("  <id>").append(enc(project.getProjectId())).append("</id>");
-            expected.append("  <template>").append(enc(project.getProjectTemplateId())).append("</template>");
-            expected.append("  <name>").append(enc(project.getName())).append("</name>");
-            expected.append("  <shortName>").append(enc(project.getShortName())).append("</shortName>");
-            expected.append("  <link rel=\"project\" href=\"https://localhost/api/projects/")
-                    .append(project.getUuid().toString()).append("\"/>");
-            expected.append("  <link rel=\"browse\" href=\"https://localhost/projects/").append(project.getProjectId())
-                    .append("\"/>");
-            expected.append("  <link rel=\"issues\" href=\"https://localhost/api/projects/")
-                    .append(project.getUuid().toString()).append("/issues\"/>");
-            expected.append("  <phase>").append(enc(project.getPhase())).append("</phase>");
-            if (StringUtils.isNotBlank(enc(project.getDescription()))) {
-                expected.append("  <description>").append(enc(project.getDescription())).append("</description>");
-            }
-            if (project.getParentProject() != null) {
-                expected.append("  <link rel=\"parent\" href=\"https://localhost/api/projects/")
-                        .append(enc(project.getParentProject().toString())).append("\"/>");
-            }
-            List<Project> subprojects = projectService.getSubProjects(project.getUuid());
-            if (subprojects.size() > 0) {
-                expected.append("  <subprojects>");
-                for (Project subproject : subprojects) {
-                    expected.append("    <link rel=\"subproject\" href=\"https://localhost/api/projects/")
-                            .append(enc(subproject.getUuid().toString())).append("\"/>");
-                }
-                expected.append("  </subprojects>");
-            }
+            // marshal the expected result
+            String expected = marshalExpected(writer, project);
 
-            Set<Member> allPeople = projectService.getMembers(project);
-            if (allPeople.size() > 0) {
-                expected.append("  <members>");
-                for (Member member : allPeople) {
-                    expected.append("    <member>");
-                    expected.append("      <userId>").append(enc(member.getUserID())).append("</userId>");
-                    expected.append("      <link rel=\"user\" href=\"https://localhost/api/user/")
-                            .append(enc(member.getUserID())).append("\"/>");
-                    for (Entry<String, SortedSet<Member>> entry : projectService.getMembersByRole(project)
-                            .entrySet()) {
-                        if (entry.getValue().contains(member)) {
-                            expected.append("      <role>").append(enc(entry.getKey())).append("</role>");
-                        }
-                    }
-                    expected.append("    </member>");
-                }
-                expected.append("  </members>");
-            } else {
-                expected.append("  <members/>");
-            }
-            expected.append("  <extensions/>");
-            expected.append("</project>");
-
-            // compare marshalled and expected output
+            // compare marshaled and expected output
             Document expectedDoc = XMLUtils.documentFromString(expected.toString());
             Document actualDoc = XMLUtils.documentFromString(writer.toString());
             XMLDiffUtil.assertEquals(expectedDoc, actualDoc, true);
         }
+    }
+
+    private String marshalExpected(HierarchicalStreamWriter writer, Project project) throws Exception {
+        // render the expected output of the writer
+        StringBuilder expected = new StringBuilder();
+        expected.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        expected.append("<project xmlns=\"http://www.eclipse.org/skalli/2010/API\" ");
+        expected.append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ");
+        expected.append("xsi:schemaLocation=\"http://www.eclipse.org/skalli/2010/API ");
+        expected.append("https://localhost/schemas/project.xsd\" ");
+        expected.append("apiVersion=\"").append(ProjectConverter.API_VERSION).append("\" ");
+        expected.append("lastModified=\"").append(project.getLastModified()).append("\" ");
+        expected.append("modifiedBy=\"").append(project.getLastModifiedBy()).append("\">");
+        expected.append("  <uuid>").append(project.getUuid().toString()).append("</uuid>");
+        expected.append("  <id>").append(enc(project.getProjectId())).append("</id>");
+        expected.append("  <template>").append(enc(project.getProjectTemplateId())).append("</template>");
+        expected.append("  <name>").append(enc(project.getName())).append("</name>");
+        expected.append("  <shortName>").append(enc(project.getShortName())).append("</shortName>");
+        expected.append("  <link rel=\"project\" href=\"https://localhost/api/projects/");
+        expected.append(project.getUuid().toString()).append("\"/>");
+        expected.append("  <link rel=\"browse\" href=\"https://localhost/projects/");
+        expected.append(project.getProjectId()).append("\"/>");
+        expected.append("  <link rel=\"issues\" href=\"https://localhost/api/projects/");
+        expected.append(project.getUuid().toString()).append("/issues\"/>");
+        expected.append("  <phase>").append(enc(project.getPhase())).append("</phase>");
+        if (StringUtils.isNotBlank(enc(project.getDescription()))) {
+            expected.append("  <description>").append(enc(project.getDescription())).append("</description>");
+        }
+        if (project.getParentProject() != null) {
+            expected.append("  <link rel=\"parent\" href=\"https://localhost/api/projects/");
+            expected.append(enc(project.getParentProject().toString())).append("\"/>");
+        }
+        List<Project> subprojects = projectService.getSubProjects(project.getUuid());
+        if (subprojects.size() > 0) {
+            expected.append("  <subprojects>");
+            for (Project subproject : subprojects) {
+                expected.append("    <link rel=\"subproject\" href=\"https://localhost/api/projects/");
+                expected.append(enc(subproject.getUuid().toString())).append("\"/>");
+            }
+            expected.append("  </subprojects>");
+        }
+
+        Set<Member> allPeople = projectService.getMembers(project);
+        if (allPeople.size() > 0) {
+            expected.append("  <members>");
+            for (Member member : allPeople) {
+                expected.append("    <member>");
+                expected.append("      <userId>").append(enc(member.getUserID())).append("</userId>");
+                expected.append("      <link rel=\"user\" href=\"https://localhost/api/user/");
+                expected.append(enc(member.getUserID())).append("\"/>");
+                for (Entry<String, SortedSet<Member>> entry : projectService.getMembersByRole(project).entrySet()) {
+                    if (entry.getValue().contains(member)) {
+                        expected.append("      <role>").append(enc(entry.getKey())).append("</role>");
+                    }
+                }
+                expected.append("    </member>");
+            }
+            expected.append("  </members>");
+        } else {
+            expected.append("  <members/>");
+        }
+        expected.append("  <extensions/>");
+        expected.append("</project>");
+        return expected.toString();
     }
 
     @Test
