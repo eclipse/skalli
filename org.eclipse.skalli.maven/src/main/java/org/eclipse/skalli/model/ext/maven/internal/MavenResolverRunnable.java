@@ -156,6 +156,12 @@ public class MavenResolverRunnable implements Runnable, Issuer {
                                 "MavenResolver: Failed to persist project {0}",
                                 project.getProjectId()), e, issues);
                         continue;
+                    } catch (RuntimeException e) {
+                        ++countUnexpectedException;
+                        handleIssue(Severity.FATAL, uuid, MessageFormat.format(
+                                "MavenResolver: Unexpected exception when persisting project {0}",
+                                project.getProjectId()), e, issues);
+                        continue;
                     }
                 }
             }
