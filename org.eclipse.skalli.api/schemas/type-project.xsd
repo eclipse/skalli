@@ -43,13 +43,20 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
+      <xsd:element name="nature" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="EN">
+            The project nature, either "PROJECT" or "COMPONENT".
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
       <xsd:element name="template" type="xsd:string">
         <xsd:annotation>
           <xsd:documentation xml:lang="EN">
             Identifier of the template assigned to this project.
           </xsd:documentation>
         </xsd:annotation>
-      </xsd:element>      
+      </xsd:element>
       <xsd:element name="name" type="ProjectName">
         <xsd:annotation>
           <xsd:documentation xml:lang="EN">

@@ -70,8 +70,11 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
             marshalNSAttributes(writer);
         }
         marshalCommonAttributes(writer, project);
+
+        ProjectService projectService = Services.getRequiredService(ProjectService.class);
         writeNode(writer, "uuid", project.getUuid().toString()); //$NON-NLS-1$
         writeNode(writer, "id", project.getProjectId()); //$NON-NLS-1$
+        writeNode(writer, "nature", projectService.getProjectNature(project.getUuid())); //$NON-NLS-1$
         writeNode(writer, "template", project.getProjectTemplateId()); //$NON-NLS-1$
         writeNode(writer, "name", project.getName()); //$NON-NLS-1$
         writeNode(writer, "shortName", project.getShortName()); //$NON-NLS-1$
@@ -85,7 +88,6 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
             writeProjectLink(writer, PARENT_RELATION, parent);
         }
 
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
         List<Project> subprojectList = null;
         if (subprojects != null) {
             subprojectList = subprojects.get(project.getUuid());

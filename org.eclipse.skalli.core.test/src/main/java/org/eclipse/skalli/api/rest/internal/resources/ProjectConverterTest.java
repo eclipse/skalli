@@ -112,6 +112,7 @@ public class ProjectConverterTest {
         expected.append("modifiedBy=\"").append(project.getLastModifiedBy()).append("\">");
         expected.append("  <uuid>").append(project.getUuid().toString()).append("</uuid>");
         expected.append("  <id>").append(enc(project.getProjectId())).append("</id>");
+        expected.append("  <nature>PROJECT</nature>");
         expected.append("  <template>").append(enc(project.getProjectTemplateId())).append("</template>");
         expected.append("  <name>").append(enc(project.getName())).append("</name>");
         expected.append("  <shortName>").append(enc(project.getShortName())).append("</shortName>");

@@ -286,6 +286,19 @@ public abstract class RestConverterBase<T> implements RestConverter {
     }
 
     /**
+     * Marshals a node with string content and a given name.
+     * The given value is converted with <code>value.toString()</code>.
+     *
+     * @param writer  the writer to use for marshaling.
+     * @param nodeName the name of the node.
+     * @param value the value of the node.
+     */
+    protected void writeNode(HierarchicalStreamWriter writer, String nodeName, Object value) {
+        String s = value != null? value.toString() : null;
+        writeNode(writer, nodeName, s);
+    }
+
+    /**
      * Marshals a list of nodes with given item name under a common root node.
      *
      * @param writer  the writer to use for marshaling.

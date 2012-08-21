@@ -91,9 +91,11 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
 
     protected void bindProjectTemplateService(ProjectTemplateService projectTemplateService) {
         this.projectTemplateService = projectTemplateService;
+        LOG.info(MessageFormat.format("bindProjectTemplateService({0})", projectTemplateService)); //$NON-NLS-1$
     }
 
     protected void unbindProjectTemplateService(ProjectTemplateService projectTemplateService) {
+        LOG.info(MessageFormat.format("unbindProjectTemplateService({0})", projectTemplateService)); //$NON-NLS-1$
         this.projectTemplateService = null;
     }
 
@@ -113,6 +115,20 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
     @Override
     public int getModelVersion() {
         return CURRENT_MODEL_VERISON;
+    }
+
+    @Override
+    public ProjectNature getProjectNature(UUID uuid) {
+        ProjectTemplate projectTemplate = getProjectTemplate(uuid);
+        return projectTemplate != null ? projectTemplate.getProjectNature() : null;
+    }
+
+    private ProjectTemplate getProjectTemplate(UUID uuid) {
+        Project project = getByUUID(uuid);
+        if (project == null || projectTemplateService == null) {
+            return null;
+        }
+        return projectTemplateService.getProjectTemplateById(project.getProjectTemplateId());
     }
 
     @Override

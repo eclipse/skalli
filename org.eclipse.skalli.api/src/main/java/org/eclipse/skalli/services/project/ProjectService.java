@@ -41,6 +41,17 @@ public interface ProjectService extends EntityService<Project>, Issuer {
     public Project createProject(String templateId, String userId);
 
     /**
+     * Returns the nature of the given project, i.e whether it is
+     * a component or a project.
+     *
+     * @param uuid  project UUID (see
+     *          {@link org.eclipse.skalli.services.projects.Project#getUuid()})
+     * @return the nature of the given project, or <code>null</code> if the
+     *         project does not exist.
+     */
+    public ProjectNature getProjectNature(UUID uuid);
+
+    /**
      * Returns a sorted list of all currently existing projects.
      *
      * @param c
