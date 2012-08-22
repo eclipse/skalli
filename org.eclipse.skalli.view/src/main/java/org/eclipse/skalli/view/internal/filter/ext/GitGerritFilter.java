@@ -97,6 +97,8 @@ public class GitGerritFilter implements Filter {
     public static final String GIT_PREFIX = "scm:git:"; //$NON-NLS-1$
     public static final String GIT_EXT = ".git"; //$NON-NLS-1$
 
+    private static final char[] REPO_NAME_INVALID_CHARS = { '\\', ':', '~', '?', '*', '<', '>', '|', '%', '"' };
+
     private static final Logger LOG = LoggerFactory.getLogger(GitGerritFilter.class);
 
     @Override
@@ -281,26 +283,36 @@ public class GitGerritFilter implements Filter {
 
     private String checkRepoName(String repoName) {
         if (StringUtils.isBlank(repoName)) {
-            return "Repository name must not be blank";
+            return "Repository names must not be blank";
         }
-        if (StringUtils.contains(repoName, " ")) {
-            return "Repository name must not contain whitespace";
-        }
-        if (repoName.endsWith("/")) {
-            return "Repository name must not end with a trailing slash";
+        if (containsWhitespace(repoName)) {
+            return "Repository names must not contain whitespace";
         }
         if (repoName.startsWith("/")) {
-            return "Repository name must not start with a slash";
+            return "Repository names must not start with a slash";
         }
-        if (repoName.indexOf('\\') >= 0) {
-            return "Repository name must not contain backward slashes";
+        if (repoName.endsWith("/")) {
+            return "Repository names must not end with a trailing slash";
         }
-        if (repoName.startsWith("../")
-                || repoName.contains("/../")
-                || repoName.contains("/./")) {
-            return "Repository name must not contain \"../\", \"/../\" or \"/./\"";
+        if (StringUtils.containsAny(repoName, REPO_NAME_INVALID_CHARS )) {
+            return "Repository names must not contain any of the following characters: " +
+                    "'\\', ':', '~', '?', '*', '<', '>', '|', '%', '\"'";
+        }
+        if (repoName.startsWith("../") //$NON-NLS-1$
+                || repoName.contains("/../") //$NON-NLS-1$
+                || repoName.contains("/./")) { //$NON-NLS-1$
+            return "Repository names must not contain \"../\", \"/../\" or \"/./\"";
         }
         return null;
+    }
+
+    private boolean containsWhitespace(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            if (Character.isWhitespace(s.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
