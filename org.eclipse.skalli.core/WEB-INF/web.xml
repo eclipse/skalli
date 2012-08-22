@@ -36,7 +36,9 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Authenticated Write Access</web-resource-name>
-            <url-pattern>/*</url-pattern>
+            <url-pattern>/projects</url-pattern>
+            <url-pattern>/projects/*</url-pattern>
+            <url-pattern>/user/*</url-pattern>
             <http-method>POST</http-method>
             <http-method>PUT</http-method>
             <http-method>DELETE</http-method>
