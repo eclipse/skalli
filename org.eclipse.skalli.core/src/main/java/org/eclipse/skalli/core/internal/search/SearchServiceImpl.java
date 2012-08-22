@@ -48,24 +48,27 @@ public class SearchServiceImpl implements SearchService {
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
-    protected void bindProjectService(ProjectService srvc) {
-        LOG.info("Project service injected into search service"); //$NON-NLS-1$
+    protected void bindProjectService(ProjectService projectService) {
+        LOG.info(MessageFormat.format("bindProjectService({0})", projectService)); //$NON-NLS-1$
         try {
-            luceneIndex = new LuceneIndex<Project>(srvc);
+            luceneIndex = new LuceneIndex<Project>(projectService);
             luceneIndex.reindexAll();
         } catch (RuntimeException e) {
             LOG.warn("Failed to initialize Lucene index", e);
         }
     }
 
-    protected void unbindProjectService(ProjectService srvc) {
-        LOG.info("Project service removed from search service"); //$NON-NLS-1$
+    protected void unbindProjectService(ProjectService projectService) {
+        LOG.info(MessageFormat.format("unbindProjectService({0})", projectService)); //$NON-NLS-1$
         luceneIndex = null;
     }
 
     @Override
     public void reindex(Collection<Project> projects) {
+        long time = System.currentTimeMillis();
+        LOG.info("Reindexing all projects...");
         luceneIndex.reindex(projects);
+        LOG.info(MessageFormat.format("Reindexing all projects finished in {0} milliseconds", Long.toString(System.currentTimeMillis() - time)));
     }
 
     @Override
