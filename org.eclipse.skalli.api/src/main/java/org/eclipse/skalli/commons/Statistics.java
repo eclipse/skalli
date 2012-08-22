@@ -205,12 +205,13 @@ public class Statistics {
         responseTimes.add(new ResponseTimeInfo(userId, path, responseTime));
     }
 
-    public synchronized void retain(long startDate, long endDate) {
-        retain(usages, startDate, endDate);
-        retain(users, startDate, endDate);
-        retain(browsers, startDate, endDate);
-        retain(searches, startDate, endDate);
-        retain(referers, startDate, endDate);
+    public synchronized void remove(long startDate, long endDate) {
+        remove(usages, startDate, endDate);
+        remove(users, startDate, endDate);
+        remove(browsers, startDate, endDate);
+        remove(searches, startDate, endDate);
+        remove(referers, startDate, endDate);
+        remove(responseTimes, startDate, endDate);
     }
 
     public Map<String, Long> getUserCount(long startDate, long endDate) {
@@ -373,11 +374,11 @@ public class Statistics {
 
     }
 
-    private void retain(SortedSet<? extends StatisticsInfo> entries, long startDate, long endDate) {
+    private void remove(SortedSet<? extends StatisticsInfo> entries, long startDate, long endDate) {
         Iterator<? extends StatisticsInfo> it = entries.iterator();
         while (it.hasNext()) {
             StatisticsInfo next = it.next();
-            if (!next.inRange(startDate, endDate)) {
+            if (next.inRange(startDate, endDate)) {
                 it.remove();
             }
         }

@@ -10,21 +10,19 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.internal.admin;
 
-import java.util.concurrent.TimeUnit;
-
-import javax.xml.bind.DatatypeConverter;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.permit.Permits;
-import org.restlet.data.Form;
+import org.restlet.data.Status;
 import org.restlet.representation.Representation;
+import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 
 public class StatisticsResource extends ResourceBase {
+
+    private static final String ID_PREFIX = "rest:api/admin/statistics:"; //$NON-NLS-1$
+    private static final String ERROR_ID_INVALID_QUERY = ID_PREFIX + "20"; //$NON-NLS-1$
 
     @Get
     public Representation retrieve() {
@@ -32,49 +30,26 @@ public class StatisticsResource extends ResourceBase {
             return createUnauthorizedRepresentation();
         }
 
-        long delta = 0;
-        Form form = getRequest().getResourceRef().getQueryAsForm();
-        String periodAttribute = form.getFirstValue("period"); //$NON-NLS-1$
-        if (StringUtils.isNotBlank(periodAttribute)) {
-            int period = 1;
-            TimeUnit unit = TimeUnit.DAYS;
-            period = NumberUtils.toInt(periodAttribute.substring(0, periodAttribute.length() - 1), 1);
-            if (period <= 0) {
-                period = 1;
-            }
-            if (periodAttribute.endsWith("h")) { //$NON-NLS-1$
-                unit = TimeUnit.HOURS;
-            } else if (periodAttribute.endsWith("m")) { //$NON-NLS-1$
-                unit = TimeUnit.MINUTES;
-            }
-            delta = TimeUnit.MILLISECONDS.convert(period, unit);
-        }
-
-        long from = parseDateTime(form.getFirstValue("from"), 0); //$NON-NLS-1$
-        long to = parseDateTime(form.getFirstValue("to"), 0); //$NON-NLS-1$
-        if (from <= 0 && to <= 0) {
-            to = System.currentTimeMillis();
-            from = delta > 0 ? to - delta : to - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS);
-        } else if (from > 0 && to <= 0) {
-            to = delta > 0 ? from + delta : System.currentTimeMillis();
-        } else if (from <= 0 && to > 0) {
-            from = delta > 0 ? to - delta : 0;
-        } else {
-            // both from/to given: ignore period
-        }
-
-        return new ResourceRepresentation<Statistics>(Statistics.getDefault(),
-                new StatisticsConverter(getRequest().getResourceRef().getHostIdentifier(), from, to));
+        StatisticsQuery query = new StatisticsQuery(getQueryAttributes());
+        Statistics statistics = Statistics.getDefault();
+        return new ResourceRepresentation<Statistics>(statistics,
+                new StatisticsConverter(getRequest().getResourceRef().getHostIdentifier(), query.getFrom(), query.getTo()));
     }
 
-    private long parseDateTime(String s, long defaultValue) {
-        if (StringUtils.isBlank(s)) {
-            return defaultValue;
+    @Delete
+    public Representation remove() {
+        if (!Permits.isAllowed(getAction(), getPath())) {
+            return createUnauthorizedRepresentation();
         }
-        try {
-            return DatatypeConverter.parseDateTime(s).getTimeInMillis();
-        } catch (IllegalArgumentException e) {
-            return defaultValue;
+        if (!hasQueryAttribute(StatisticsQuery.PARAM_TO)) {
+            return createErrorRepresentation(Status.CLIENT_ERROR_BAD_REQUEST, ERROR_ID_INVALID_QUERY,
+                    "Query attribute \"to\" is mandatory");
         }
+        StatisticsQuery query = new StatisticsQuery(getQueryAttributes());
+        Statistics statistics = Statistics.getDefault();
+        statistics.remove(query.getFrom(), query.getTo());
+        setStatus(Status.SUCCESS_NO_CONTENT);
+        return null;
     }
+
 }
