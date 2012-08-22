@@ -225,7 +225,7 @@ public class ProjectsResource extends ResourceBase {
         }
 
         setStatus(Status.SUCCESS_OK);
-        return createProjectsResourceRepresentation(projects, queryParams);
+        return createProjectsResourceRepresentation(updatedProjects, queryParams);
     }
 
     private Representation persistUpdatedProjects(Projects projects, ProjectService projectService) {
