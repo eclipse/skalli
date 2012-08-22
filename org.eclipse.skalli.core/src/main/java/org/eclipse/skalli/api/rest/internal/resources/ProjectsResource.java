@@ -100,13 +100,18 @@ public class ProjectsResource extends ResourceBase {
             projects = searchResult.getEntities();
         }
 
+        int size = projects.size();
+        int fromIndex = Math.min(queryParams.getStart(), size) ;
+        int toIndex = Math.min(fromIndex + queryParams.getCount(), size);
         Projects result = new Projects();
+
         if (StringUtils.isBlank(queryParams.getPropertyName())) {
-            // if there is no property filter, add all projects to the result
-            result.addProjects(projects);
+            // if there is no property filter, just add the requested subset
+            // of projects to the result and quit
+            result.addProjects(projects.subList(fromIndex, toIndex));
         } else {
             // if there is a property filter, add only those projects
-            // to the result that match this filter
+            // to the result that match the filter
             Class<? extends ExtensionEntityBase> extClass = null;
             if (queryParams.isExtension()) {
                 String shortName = queryParams.getShortName();
@@ -120,12 +125,20 @@ public class ProjectsResource extends ResourceBase {
                 throw new QueryParseException(MessageFormat.format("Unknown property \"{0}\"", queryParams.getProperty()));
             }
 
+            int index = 0;
             for (Project project : projects) {
+                if (index >= toIndex) {
+                    break;
+                }
                 if (matchesPropertyQuery(project, extClass, queryParams)) {
-                    result.addProject(project);
+                    if (index >= fromIndex) {
+                        result.addProject(project);
+                    }
+                    ++index;
                 }
             }
         }
+
         return result;
     }
 
