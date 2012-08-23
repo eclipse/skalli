@@ -279,12 +279,31 @@ welcome page
 }
 
 .welcomepage .tagcloud {
-    width: 400px;
+    width: 500px;
     margin-top: 50px;
-    border-width: 1px;
-    border-style: solid;
-    border-color: silver;
     background-color: white;
+}
+
+.welcomepage .tagcloudheader {
+    text-align: center;
+    color: #aaaaaa;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.welcomepage .tagcloudfooter {
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.welcomepage .tagcloudcontent {
+    border-top: thin dotted #aaaaaa;
+    border-bottom: thin dotted #aaaaaa;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .welcomepage .tagcloud .tag1 {

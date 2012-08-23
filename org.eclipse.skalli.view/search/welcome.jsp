@@ -66,8 +66,11 @@ function focusSearch()
 <center>
 <% if (tagCloud != null) { %>
     <div class="tagcloud">
-        <div align="left"><%= viewMax %> most popular tags <a href='<%= Consts.URL_TAGCLOUD %>'>(show all tags)</a></div>
+        <div class="tagcloudheader">Most Popular Tags</div>
+        <div class="tagcloudcontent">
         <%= tagCloud.doLayout() %>
+        </div>
+        <div class="tagcloudfooter"><a href='<%= Consts.URL_TAGCLOUD %>'>Show All Tags</a></div>
     </div>
 <% } %>
 <c:if test="${newsConfig != null && newsConfig.messageDefined}">
