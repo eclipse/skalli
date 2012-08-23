@@ -352,6 +352,7 @@
        <url-pattern>/myprojects</url-pattern>
        <url-pattern>/create/*</url-pattern>
        <url-pattern>/reindex</url-pattern>
+       <url-pattern>/search-plugin.xml</url-pattern>
        <dispatcher>REQUEST</dispatcher>
        <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
