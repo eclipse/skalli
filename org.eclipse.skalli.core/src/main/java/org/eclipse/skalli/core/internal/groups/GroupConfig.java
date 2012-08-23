@@ -57,7 +57,7 @@ public class GroupConfig {
     }
 
     public synchronized void setGroupMembers(Collection<String> groupMembers) {
-        groupMembers = new TreeSet<String>(groupMembers);
+        this.groupMembers = new TreeSet<String>(groupMembers);
     }
 
     public boolean hasGroupMember(String userId) {
