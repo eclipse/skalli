@@ -50,6 +50,7 @@
       <plugin id="org.eclipse.persistence.asm" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.persistence.core" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.persistence.jpa" autoStart="true" startLevel="1" />
+      <plugin id="org.eclipse.persistence.jpa.jpql" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.gemini.dbaccess.derby" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.gemini.jpa" autoStart="true" startLevel="1" />
       <plugin id="osgi.enterprise" autoStart="true" startLevel="1" />
