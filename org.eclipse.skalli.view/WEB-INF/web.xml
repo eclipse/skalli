@@ -462,6 +462,7 @@
 
     <login-config>
         <auth-method>FORM</auth-method>
+        <realm-name>Skalli</realm-name>
         <form-login-config>
             <form-login-page>/search/login.jsp</form-login-page>
             <form-error-page>/search/login_fail.jsp</form-error-page>

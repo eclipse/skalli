@@ -6,7 +6,7 @@
 <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.rcp.feature.group" version="0.0.0"/>
 <unit id="org.eclipse.persistence.jpa.feature.group" version="0.0.0"/>
-<repository location="http://download.eclipse.org/releases/indigo/"/>
+<repository location="http://download.eclipse.org/releases/juno/"/>
 </location>
 <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.gemini.jpa.feature.feature.group" version="0.0.0"/>
@@ -64,7 +64,7 @@
 </location>
 <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.jetty.sdk.feature.group" version="0.0.0"/>
-<repository location="http://download.eclipse.org/jetty/updates/jetty-rt-3.7milestones/S-3.7.1-201109140245/"/>
+<repository location="http://download.eclipse.org/jetty/updates/jetty-rt-3.8milestones/S-3.8.RC3-201206060641/"/>
 </location>
 </locations>
 <environment>
