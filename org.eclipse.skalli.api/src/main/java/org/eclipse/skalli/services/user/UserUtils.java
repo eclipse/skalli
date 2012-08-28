@@ -19,11 +19,12 @@ public class UserUtils {
     }
 
     /**
-     * Returns the {@link User} matching the given <code>userId<code>-
+     * Returns the {@link User} matching a given unique identifier.
      *
      * @param userId  the unique identifier of the user.
-     * @return a user, or <code>null</code> if no known user matched
-     * the given unique identifier.
+     *
+     * @return a user, which may be the {@link User#isUnknown() unknown} user,
+     * if the given unique identifier does not much any user.
      *
      * @throws IllegalStateException if no user service is available.
      */

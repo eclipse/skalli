@@ -82,7 +82,7 @@ public class LDAPClient {
                 ldap = getConnection();
             } catch (AuthException e1) {
                 LOG.debug("Could not authenticate to LDAP");
-                return User.createUserWithoutDetails(userId);
+                return new User(userId);
             }
             try {
                 return searchUserById(ldap, userId);
@@ -170,7 +170,7 @@ public class LDAPClient {
                 return user;
             }
         }
-        return User.createUserWithoutDetails(userId);
+        return new User(userId);
     }
 
     private List<User> searchUserByName(LdapContext ldap, String name) throws NamingException {

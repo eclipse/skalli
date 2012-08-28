@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.model;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.ComparatorUtils;
 
 /**
@@ -17,8 +18,16 @@ import org.eclipse.skalli.commons.ComparatorUtils;
  */
 public class User extends EntityBase {
 
+    /** The version of this model entity ({@value}) */
     public static final String MODEL_VERSION = "1.0"; //$NON-NLS-1$
+
+    /** The namespace of this model entity ({@value}) */
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/Model"; //$NON-NLS-1$
+
+    /**
+     * Constant representing first name, last name and email address of
+     * an {@link #isUnknown() unknown} user.
+     */
     public static final String UNKNOWN = "?"; //$NON-NLS-1$
 
     @PropertyName(position = 0)
@@ -32,6 +41,27 @@ public class User extends EntityBase {
 
     @PropertyName(position = 3)
     public static final String PROPERTY_EMAIL = "email"; //$NON-NLS-1$
+
+    @PropertyName
+    public static final String PROPERTY_TELEPHONE = "telephone"; //$NON-NLS-1$
+
+    @PropertyName
+    public static final String PROPERTY_MOBILE = "mobile"; //$NON-NLS-1$
+
+    @PropertyName
+    public static final String PROPERTY_ROOM = "room"; //$NON-NLS-1$
+
+    @PropertyName
+    public static final String PROPERTY_LOCATION = "location"; //$NON-NLS-1$
+
+    @PropertyName
+    public static final String PROPERTY_DEPARTMENT = "department"; //$NON-NLS-1$
+
+    @PropertyName
+    public static final String PROPERTY_COMPANY = "company"; //$NON-NLS-1$
+
+    @PropertyName
+    public static final String PROPERTY_SIP = "sip"; //$NON-NLS-1$
 
     @Derived
     @PropertyName
@@ -48,22 +78,44 @@ public class User extends EntityBase {
     private String department;
     private String company;
     private String sip;
-    private boolean detailsMissing;
 
+    /**
+     * Default constructor for unmarshaling users.
+     * This constructor should not be called in application code.
+     * <p>
+     * Note, there is a difference between an {@link #isUnknown() unknown} user
+     * and a user created with this constructor: the former has a
+     * {@link #getUserId() user identifier}, the latter may have
+     * a {@link #getUuid() UUID} (or nothing at all).
+     */
     public User() {
     }
 
-    private User(String userId) {
+    /**
+     * Creates an "unknown" user with only a unique identifier but no further
+     * details like first name, last name or email. Calling {@link #isUnknown()}
+     * on such a user will always return <code>true</code>.
+     *
+     * @param userId  the unique identifier of the user.
+     */
+    public User(String userId) {
         this(userId, UNKNOWN, UNKNOWN, UNKNOWN);
-        this.detailsMissing = true;
     }
 
+    /**
+     * Creates a user with given unique identifier, first name, last name
+     * and email address.
+     *
+     * @param userId  the unique identifier of the user.
+     * @param firstname  the first name of the user.
+     * @param lastname  the last name of the user.
+     * @param email  the email address of the user.
+     */
     public User(String userId, String firstname, String lastname, String email) {
         this.userId = userId;
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
-        this.detailsMissing = false;
     }
 
     public String getUserId() {
@@ -98,11 +150,35 @@ public class User extends EntityBase {
         this.email = email;
     }
 
+    /**
+     * Returns the display name of the user.
+     *
+     * @return either the concatenation of first name and last name, or the email address
+     * if neither first nor last name are specified, or the user's unique identifier if the
+     * user is {@link #isUnknown() unknown}, or <code>super.toString()</code> if the instance
+     * is uninitialized, but never <code>null</code>.
+     */
     public String getDisplayName() {
-        if (detailsMissing) {
+        if (isUnknown()) {
             return getUserId();
         } else {
-            return getFirstname() + " " + getLastname(); //$NON-NLS-1$
+            StringBuilder sb = new StringBuilder();
+            if (StringUtils.isNotBlank(firstname) && !UNKNOWN.equals(firstname)) {
+                sb.append(firstname);
+            }
+            if (StringUtils.isNotBlank(lastname) && !UNKNOWN.equals(lastname)) {
+                if (sb.length() > 0) {
+                    sb.append(' ');
+                }
+                sb.append(lastname);
+            }
+            if (sb.length() == 0 && StringUtils.isNotBlank(email) && !UNKNOWN.equals(email)) {
+                sb.append(email);
+            }
+            if (sb.length() == 0) {
+                sb.append(super.toString());
+            }
+            return sb.toString();
         }
     }
 
@@ -162,13 +238,23 @@ public class User extends EntityBase {
         this.sip = sip;
     }
 
+    /**
+     * Checks if this user is an "unknown" user.
+     *
+     * @return <code>true</code> if <em>all</em> first name, last name and email of
+     * this user equal {@link #UNKNOWN}. If any of these parameters is specified,
+     * this method will return <code>false</code>.
+     */
+    public boolean isUnknown() {
+        return UNKNOWN.equals(firstname) && UNKNOWN.equals(lastname) && UNKNOWN.equals(email);
+    }
+
+    /**
+     * Returns the {@link #getDisplayName() display name} of this user.
+     */
     @Override
     public String toString() {
         return getDisplayName();
-    }
-
-    public static User createUserWithoutDetails(String userId) {
-        return new User(userId);
     }
 
     @Override
@@ -179,6 +265,10 @@ public class User extends EntityBase {
         return result;
     }
 
+    /**
+     * Checks if this user equals a given user. Two users are treated
+     * equal, if their {@link #getUserId() unique identifiers} are equal.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -201,6 +291,10 @@ public class User extends EntityBase {
         return true;
     }
 
+    /**
+     * Compares this user to a given user by last name, first name and
+     * unique identifier (in this order).
+     */
     @Override
     public int compareTo(Object o) {
         int ret = 0;

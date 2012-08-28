@@ -46,7 +46,7 @@ public class LocalUserServiceImplTest {
         for (User user : users) {
             Assert.assertEquals(user, userService.getUserById(user.getUserId()));
         }
-        Assert.assertEquals(User.createUserWithoutDetails("anonymous"), userService.getUserById("anonymous"));
+        Assert.assertEquals(new User("anonymous"), userService.getUserById("anonymous"));
     }
 
     @Test
@@ -58,7 +58,7 @@ public class LocalUserServiceImplTest {
 
         userSet = userService.getUsersById(CollectionUtils.asSet("gh", "unknown"));
         Assert.assertTrue(userSet.contains(userService.getUserById("gh")));
-        Assert.assertTrue(userSet.contains(User.createUserWithoutDetails("unknown")));
+        Assert.assertTrue(userSet.contains(new User("unknown")));
 
         userSet = userService.getUsersById(null);
         Assert.assertEquals(0, userSet.size());

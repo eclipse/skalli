@@ -28,10 +28,84 @@ public class UserTest {
         values.put(User.PROPERTY_LASTNAME, "Simpson");
         values.put(User.PROPERTY_EMAIL, "homer@springfield.net");
         values.put(User.PROPERTY_DISPLAY_NAME, "Homer Simpson");
+        values.put(User.PROPERTY_TELEPHONE, "5551234");
+        values.put(User.PROPERTY_MOBILE, "5555678");
+        values.put(User.PROPERTY_ROOM, "reactor control");
+        values.put(User.PROPERTY_LOCATION, "Springfield");
+        values.put(User.PROPERTY_DEPARTMENT, "reactor stuff");
+        values.put(User.PROPERTY_COMPANY, "Springfield Nuclear Power Plant");
+        values.put(User.PROPERTY_SIP, "homer@springfield.net");
 
         Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
 
         PropertyHelper.checkPropertyDefinitions(User.class, requiredProperties, values);
+    }
+
+    @Test
+    public void testUnknown() throws Exception {
+        User unknown = new User("homer");
+        Assert.assertTrue(unknown.isUnknown());
+        Assert.assertEquals(User.UNKNOWN, unknown.getFirstname());
+        Assert.assertEquals(User.UNKNOWN, unknown.getLastname());
+        Assert.assertEquals(User.UNKNOWN, unknown.getEmail());
+
+        User user = new User("homer", "Homer", "Simpson", "homer@springfield.net");
+        Assert.assertFalse(user.isUnknown());
+
+        user = new User("homer", "Homer", "Simpson", null);
+        Assert.assertFalse(user.isUnknown());
+
+        user = new User("homer", "Homer", "Simpson", User.UNKNOWN);
+        Assert.assertFalse(user.isUnknown());
+
+        user = new User("homer", null, "Simpson", null);
+        Assert.assertFalse(user.isUnknown());
+
+        user = new User("homer", "Homer", null, null);
+        Assert.assertFalse(user.isUnknown());
+
+        user = new User("homer", "Homer", null, User.UNKNOWN);
+        Assert.assertFalse(user.isUnknown());
+
+        user = new User("homer", "Homer", User.UNKNOWN, null);
+        Assert.assertFalse(user.isUnknown());
+
+        user = new User("homer", null, null, "homer@springfield.net");
+        Assert.assertFalse(user.isUnknown());
+
+        user = new User("homer", User.UNKNOWN, User.UNKNOWN, "homer@springfield.net");
+        Assert.assertFalse(user.isUnknown());
+
+        user = new User();
+        Assert.assertFalse(user.isUnknown());
+    }
+
+    @Test
+    public void testGetDisplayName() throws Exception {
+        User user = new User("homer");
+        Assert.assertEquals("homer", user.getDisplayName());
+
+        user = new User("homer", "Homer", "Simpson", "homer@springfield.net");
+        Assert.assertEquals("Homer Simpson", user.getDisplayName());
+
+        user = new User("homer", "Homer", "Simpson", null);
+        Assert.assertEquals("Homer Simpson", user.getDisplayName());
+
+        user = new User("homer", "Homer", null, "homer@springfield.net");
+        Assert.assertEquals("Homer", user.getDisplayName());
+
+        user = new User("homer", null, "Simpson", "homer@springfield.net");
+        Assert.assertEquals("Simpson", user.getDisplayName());
+
+        user = new User("homer", null, null, "homer@springfield.net");
+        Assert.assertEquals("homer@springfield.net", user.getDisplayName());
+
+        user = new User("homer", User.UNKNOWN, User.UNKNOWN, "homer@springfield.net");
+        Assert.assertEquals("homer@springfield.net", user.getDisplayName());
+
+        user = new User();
+        user.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
+        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[0].toString(), user.getDisplayName());
     }
 
     @Test

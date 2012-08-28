@@ -107,7 +107,7 @@ public class LocalUserServiceImpl extends EntityServiceBase<User> implements Use
     @Override
     public User getUserById(String userId) {
         User user = getCache().get(userId);
-        return user != null ? user : User.createUserWithoutDetails(userId);
+        return user != null ? user : new User(userId);
     }
 
     @Override
@@ -206,7 +206,7 @@ public class LocalUserServiceImpl extends EntityServiceBase<User> implements Use
                 if (user != null) {
                     result.add(user);
                 } else {
-                    result.add(User.createUserWithoutDetails(userId));
+                    result.add(new User(userId));
                 }
             }
         }

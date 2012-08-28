@@ -33,12 +33,11 @@ public class UserResource extends ResourceBase {
         String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
 
         User user = UserUtils.getUser(id);
-        if (user == null) {
-            setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("User {0} not found", id)); //$NON-NLS-1$
+        if (user.isUnknown()) {
+            setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("User \"{0}\" not found", id)); //$NON-NLS-1$
             return null;
         }
 
-        return new ResourceRepresentation<User>(user,
-                new UserConverter(getRequest().getResourceRef().getHostIdentifier()));
+        return new ResourceRepresentation<User>(user, new UserConverter(getHost()));
     }
 }
