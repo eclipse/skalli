@@ -138,4 +138,14 @@ public interface PermitService {
      * given permit.
      */
     public boolean hasPermit(int level, String action, Project project, String... segments);
+
+    /**
+     * Returns the effective permit set of a given user, optionally in the
+     * context of a given project.
+     *
+     * @param userId the unique identifier of the user.
+     * @param project  the project in which context to retrieve permits, or <code>null</code>.
+     * @return  the set of permits the given user currently has.
+     */
+    public PermitSet getPermits(String userId, Project project);
 }

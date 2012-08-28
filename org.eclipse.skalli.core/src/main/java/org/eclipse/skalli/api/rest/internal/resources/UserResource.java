@@ -15,7 +15,6 @@ import java.text.MessageFormat;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
-import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.user.UserUtils;
 import org.restlet.data.Status;
@@ -24,13 +23,15 @@ import org.restlet.resource.Get;
 
 public class UserResource extends ResourceBase {
 
+    private static final String PARAM_USERID = "userId"; //$NON-NLS-1$
+
     @Get
     public Representation retrieve() {
         if (!Permits.isAllowed(getAction(), getPath())) {
             return createUnauthorizedRepresentation();
         }
 
-        String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
+        String id = (String) getRequestAttributes().get(PARAM_USERID);
 
         User user = UserUtils.getUser(id);
         if (user.isUnknown()) {

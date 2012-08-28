@@ -52,7 +52,7 @@ public class PermitServiceImpl implements PermitService, EventListener<EventCust
     private static final String PERMITS_TIMESTAMP_ATTRIBUTE = "PERMITS_TIMESTAMP"; //$NON-NLS-1$
     private static final String PERMITS_PROJECT_ATTRIBUTE = "PERMITS_PROJECT"; //$NON-NLS-1$
 
-    private static final String PROJECT_WILDCARD =
+    private static final String PROPERTY_PROJECTID =
             StringUtils.substringBetween(Permit.PROJECT_WILDCARD, "{", "}"); //$NON-NLS-1$ //$NON-NLS-2$
     private static final String USER_WILDCARD =
             StringUtils.substringBetween(Permit.USER_WILDCARD, "{", "}"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -267,7 +267,8 @@ public class PermitServiceImpl implements PermitService, EventListener<EventCust
         }
     }
 
-    private PermitSet getPermits(String userId, Project project) {
+    @Override
+    public PermitSet getPermits(String userId, Project project) {
         PermitSet permits = new PermitSet();
         if (configService != null) {
             userId = StringUtils.isNotBlank(userId)? userId : User.UNKNOWN;
@@ -283,14 +284,14 @@ public class PermitServiceImpl implements PermitService, EventListener<EventCust
             if (permitsConfig != null) {
                 Map<String,String> properties = new HashMap<String,String>();
                 properties.put(USER_WILDCARD, userId);
-                String projectWildcard = "???"; //$NON-NLS-1$
+                String projectId = "?"; //$NON-NLS-1$
                 if (project != null) {
-                    projectWildcard = project.getProjectId();
-                    if (StringUtils.isBlank(projectWildcard)) {
-                        projectWildcard = project.getUuid().toString();
+                    projectId = project.getProjectId();
+                    if (StringUtils.isBlank(projectId)) {
+                        projectId = project.getUuid().toString();
                     }
                 }
-                properties.put(PROJECT_WILDCARD, projectWildcard);
+                properties.put(PROPERTY_PROJECTID, projectId);
 
                 collectGlobalCommits(properties, permitsConfig, permits);
                 if (templateId != null) {

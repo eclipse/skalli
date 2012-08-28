@@ -21,6 +21,7 @@ import org.eclipse.skalli.api.rest.internal.resources.IssuesResource;
 import org.eclipse.skalli.api.rest.internal.resources.ProjectResource;
 import org.eclipse.skalli.api.rest.internal.resources.ProjectsResource;
 import org.eclipse.skalli.api.rest.internal.resources.SubprojectsResource;
+import org.eclipse.skalli.api.rest.internal.resources.UserPermitsResource;
 import org.eclipse.skalli.api.rest.internal.resources.UserResource;
 import org.eclipse.skalli.api.rest.monitor.Monitorable;
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
@@ -62,7 +63,11 @@ public class RestApplication extends Application {
         router.attach("/projects/{id}/issues", IssuesResource.class); //$NON-NLS-1$
         router.attach("/projects/{id}/subprojects", SubprojectsResource.class); //$NON-NLS-1$
 
-        router.attach("/user/{id}", UserResource.class); //$NON-NLS-1$
+        router.attach("/user/{userId}", UserResource.class); //$NON-NLS-1$
+        router.attach("/users/{userId}", UserResource.class); //$NON-NLS-1$
+        router.attach("/users/{userId}/permits", UserPermitsResource.class); //$NON-NLS-1$
+        router.attach("/users/{userId}/permits/{projectId}", UserPermitsResource.class); //$NON-NLS-1$
+
         attachCustomResources(router);
 
         return router;
