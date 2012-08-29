@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
@@ -38,16 +39,12 @@ public class ProjectDescriptionValidator implements Issuer, ExtensionValidator<P
 
     public static final int DESCRIPTION_RECOMMENDED_LENGHT = 25;
 
-    static final String[] allowedTags = { "i", "b", "u", "a", "p", "br", "hr", "tt", "code", "pre", "em",
-        "strong", "u", "s", "strike", "big", "small", "sup", "sub", "span", "blockquote", "dl", "dt", "dd", "h1",
-        "h2", "h3", "h4", "h5", "h6", "cite", "q", "ul", "ol", "li" };
-
     private static final String TXT_DESCRIPTION_EMPTY = "The project description is empty. Let others know what this is about.";
     private static final String TXT_DESCRIPTION_SHORT = "The project description is quite short. Give some more context.";
     private static final String TXT_NO_TAGS_ALLOWED = "The project description must not contain any HTML tags for description " +
             "format 'text'. Remove all tags or select another description format.";
     private static final String TXT_ALLOWED_TAGS = "The project description contains unsupported HTML tags. " +
-            "Supported tags are: &lt;" + StringUtils.join(allowedTags, "&gt;, &lt;") + "&gt;.";
+            "Supported tags are: &lt;" + StringUtils.join(HtmlUtils.ALLOWED_TAGS, "&gt;, &lt;") + "&gt;.";
 
     @Override
     public Class<Project> getExtensionClass() {
@@ -69,13 +66,7 @@ public class ProjectDescriptionValidator implements Issuer, ExtensionValidator<P
         String fatalMessage = null;
         String format = project.getDescriptionFormat();
         if ("html".equals(format)) {
-            whitelist = new Whitelist();
-            whitelist.addTags(allowedTags).addAttributes(":all", "style")
-                .addAttributes("a", "href", "target", "name", "title").addAttributes("ul", "type")
-                .addAttributes("ol", "start", "type").addAttributes("li", "value").addAttributes("blockquote", "cite")
-                .addAttributes("q", "cite").addProtocols("a", "href", "http", "https", "mailto")
-                .addProtocols("blockquote", "cite", "http", "https").addProtocols("cite", "cite", "http", "https")
-                .addProtocols("q", "cite", "http", "https");
+            whitelist = HtmlUtils.getWhiteList();
             fatalMessage = TXT_ALLOWED_TAGS;
         } else {
             whitelist = Whitelist.none();

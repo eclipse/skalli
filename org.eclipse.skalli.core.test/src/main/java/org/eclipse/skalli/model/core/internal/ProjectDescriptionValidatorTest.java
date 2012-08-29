@@ -11,6 +11,7 @@
 package org.eclipse.skalli.model.core.internal;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
@@ -20,7 +21,7 @@ import org.junit.Test;
 @SuppressWarnings("nls")
 public class ProjectDescriptionValidatorTest {
 
-    private static final String ALL_TAGS = "<" + StringUtils.join(ProjectDescriptionValidator.allowedTags, ">, <") + ">";
+    private static final String ALL_TAGS = "<" + StringUtils.join(HtmlUtils.ALLOWED_TAGS, ">, <") + ">";
 
     @Test
     public void testIssuesFATAL() throws Exception {
