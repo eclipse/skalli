@@ -187,7 +187,7 @@ public class LoginFilter implements Filter {
         String requestLine = MessageFormat.format("{0} {1}", //$NON-NLS-1$
                 httpRequest.getMethod(), httpRequest.getRequestURI());
         if (project != null) {
-            requestLine = MessageFormat.format("{0} /api/projects/{1}", //$NON-NLS-1$
+            requestLine = MessageFormat.format("{0} /projects/{1}", //$NON-NLS-1$
                     httpRequest.getMethod(), project.getProjectId());
         }
         statistics.trackUsage(userId, requestLine, referer);
