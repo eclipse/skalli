@@ -317,15 +317,10 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
 
         issues.addAll(validateProjectId(project));
         issues.addAll(validateProjectName(project));
-
-        UUID projectUUID = project.getUuid();
-        // soft description validation
-        issues.addAll(new ProjectDescriptionValidator(Project.class, Project.PROPERTY_DESCRIPTION).validate(
-                projectUUID, project.getDescription(), minSeverity));
-
         issues.addAll(validatePeopleExtension(project));
 
         // ensure that the entity service exists
+        UUID projectUUID = project.getUuid();
         ExtensionService<?> extensionService = validateExtensionService(projectUUID, project, issues);
 
         // ensure that the project template exists

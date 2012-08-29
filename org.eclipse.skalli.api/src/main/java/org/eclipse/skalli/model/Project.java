@@ -56,8 +56,10 @@ public class Project extends ExtensibleEntityBase {
 
     private static final String DEFAULT_TEMPLATE_ID = "default"; //$NON-NLS-1$
 
-    private static final String DEFAULT_FORMAT = "text"; //$NON-NLS-1$
-    public static final List<String> TEXT_FORMATS = Arrays.asList(DEFAULT_FORMAT, "html"); //$NON-NLS-1$
+    public static final String DEFAULT_FORMAT = "text"; //$NON-NLS-1$
+    public static final String FORMAT_HTML = "html"; //$NON-NLS-1$
+    public static final List<String> TEXT_FORMATS = Arrays.asList(DEFAULT_FORMAT, FORMAT_HTML);
+
     private static final String INITIAL_PHASE = "initial"; //$NON-NLS-1$
 
     private String projectId = ""; //$NON-NLS-1$
