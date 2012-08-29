@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ValidationException;
@@ -42,6 +43,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
+import com.vaadin.ui.Window.Notification;
 
 public class ProjectViewPanel extends CssLayout {
 
@@ -184,7 +186,9 @@ public class ProjectViewPanel extends CssLayout {
             try {
                 projectService.persist(project, getLoggedInUser().getUserId());
             } catch (ValidationException e) {
-                throw new RuntimeException(e);
+                getWindow().showNotification("Project could not be saved",
+                        Issue.asHTMLList(null, e.getIssues()),
+                        Notification.TYPE_ERROR_MESSAGE);
             }
         }
 
