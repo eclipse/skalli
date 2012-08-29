@@ -107,7 +107,7 @@
                 <div style="margin-left:10px">
                     <c:forEach var="child" items="${subprojects[uuid]}">
                         <span style="white-space:nowrap">
-                            <img class="linkicon" src="VAADIN/themes/simple/icons/search/projects.png" 
+                            <img class="linkicon" src="VAADIN/themes/simple/icons/search/projects.png"
                                 alt="Subproject" width="14px" height="14px" />
                             <a href="/projects/${child.singleValues['projectId']}" target="_top">
                                 ${html:escapeHtml(child.singleValuesHighlighted['name'])}

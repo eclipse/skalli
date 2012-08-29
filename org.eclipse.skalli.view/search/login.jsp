@@ -17,7 +17,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Login to ${html:escapeHtml(pagetitle)}</title>
+<title>Login</title>
 <style type="text/css">
 @import "<%=Consts.JSP_STYLE%>";
 </style>

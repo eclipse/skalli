@@ -34,7 +34,7 @@
         <a href="<%=request.getRequestURI() + "?" + Consts.PARAM_ACTION + "=" + Consts.PARAM_VALUE_EDIT%>" target="_top">Edit</a><br />
           <c:forEach var="link" items="${projectContextLinks}" >
             <%-- render the project context links --%>
-            <c:set var="linkCaption" value="${html:clean(link.caption)}" />
+            <c:set var="linkCaption" value="${link.caption}" />
             <c:set var="linkUri" value="${link.uri}" />
             <c:set var="linkId" value="${link.id}" />
             <a id="${linkId}" href="${linkUri}" target="_top">${html:clean(linkCaption)}</a><br />

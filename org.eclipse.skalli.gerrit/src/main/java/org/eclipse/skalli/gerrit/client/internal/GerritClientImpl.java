@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritFeature;
 import org.eclipse.skalli.gerrit.client.GerritVersion;
@@ -49,9 +50,11 @@ import com.jcraft.jsch.Session;
 @SuppressWarnings("nls")
 public class GerritClientImpl implements GerritClient {
 
-    private static final int SLEEP_INTERVAL = 500;
     private final static Logger LOG = LoggerFactory.getLogger(GerritClientImpl.class);
+
     private final static int TIMEOUT = 2500;
+    private static final int SLEEP_INTERVAL = 500;
+    private static final char[] REPO_NAME_INVALID_CHARS = { '\\', ':', '~', '?', '*', '<', '>', '|', '%', '"' };
 
     enum Cache {
         ALL, PROJECTS, GROUPS
@@ -191,8 +194,9 @@ public class GerritClientImpl implements GerritClient {
         if (name == null) {
             throw andDisconnect(new IllegalArgumentException("'name' is required"));
         }
-        if (StringUtils.contains(name, " ")) {
-            throw andDisconnect(new IllegalArgumentException("'name' must not contain whitespaces"));
+        String checkFailedMsg = checkProjectName(name);
+        if (checkFailedMsg != null) {
+            throw andDisconnect(new IllegalArgumentException(checkFailedMsg));
         }
 
         appendArgument(sb, "name", name);
@@ -233,7 +237,10 @@ public class GerritClientImpl implements GerritClient {
         if (name == null) {
             throw andDisconnect(new IllegalArgumentException("'name' is required"));
         }
-
+        String checkFailedMsg = checkGroupName(name);
+        if (checkFailedMsg != null) {
+            throw andDisconnect(new IllegalArgumentException(checkFailedMsg));
+        }
 
         final StringBuffer sb = new StringBuffer("gerrit create-group");
         appendArgument(sb, "owner", owner);
@@ -346,6 +353,58 @@ public class GerritClientImpl implements GerritClient {
             }
         }
         return result;
+    }
+
+    @Override
+    public String checkGroupName(String name) {
+        if (StringUtils.isBlank(name)) {
+            return "Group names must not be blank";
+        }
+        if (containsWhitespace(name)) {
+            return "Group names must not contain whitespace";
+        }
+        if (HtmlUtils.containsTags(name)) {
+            return "Group names must not contain HTML tags";
+        }
+        return null;
+    }
+
+    @Override
+    public String checkProjectName(String name) {
+        if (StringUtils.isBlank(name)) {
+            return "Repository names must not be blank";
+        }
+        if (containsWhitespace(name)) {
+            return "Repository names must not contain whitespace";
+        }
+        if (name.startsWith("/")) {
+            return "Repository names must not start with a slash";
+        }
+        if (name.endsWith("/")) {
+            return "Repository names must not end with a trailing slash";
+        }
+        if (HtmlUtils.containsTags(name)) {
+            return "Repository names must not contain HTML tags";
+        }
+        if (StringUtils.containsAny(name, REPO_NAME_INVALID_CHARS )) {
+            return "Repository names must not contain any of the following characters: " +
+                    "'\', ':', '~', '?', '*', '<', '>', '|', '%', '\"'";
+        }
+        if (name.startsWith("../") //$NON-NLS-1$
+                || name.contains("/../") //$NON-NLS-1$
+                || name.contains("/./")) { //$NON-NLS-1$
+            return "Repository names must not contain \"../\", \"/../\" or \"/./\"";
+        }
+        return null;
+    }
+
+    private boolean containsWhitespace(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            if (Character.isWhitespace(s.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

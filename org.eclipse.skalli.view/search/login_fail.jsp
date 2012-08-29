@@ -16,7 +16,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Login Failed - ${html:escapeHtml(pagetitle)}</title>
+<title>Login Failed</title>
 </head>
 <body>
 Login Failed!

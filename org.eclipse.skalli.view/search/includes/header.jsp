@@ -30,7 +30,7 @@
             <a href="<%=Consts.URL_MYPROJECTS%>">${html:escapeHtml(userDisplayName)}</a>
             <c:if test="${feedbackConfig != null }">
               <span class="vertical_separator"><img src="/VAADIN/themes/simple/images/separator.png" alt="separator"></span>
-              <a title="${feedbackConfig.displayName}" href="${feedbackConfig.url}">${html:escapeHtml(feedbackConfig.displayName)}</a>
+              <a href="${feedbackConfig.url}">${html:escapeHtml(feedbackConfig.displayName)}</a>
             </c:if>
           </c:when>
           <c:otherwise>

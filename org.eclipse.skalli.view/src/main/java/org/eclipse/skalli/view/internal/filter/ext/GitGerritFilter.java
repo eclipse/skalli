@@ -77,6 +77,7 @@ public class GitGerritFilter implements Filter {
     public static final String ATTRIBUTE_PROPOSED_REPO = "proposedRepo"; //$NON-NLS-1$
     public static final String ATTRIBUTE_PROPOSED_EXISTING_GROUPS = "proposedExistingGroups"; //$NON-NLS-1$
     public static final String ATTRIBUTE_INVALID_GROUP = "invalidGroup"; //$NON-NLS-1$
+    public static final String ATTRIBUTE_INVALID_GROUP_MSG = "invalidGroupMsg"; //$NON-NLS-1$
     public static final String ATTRIBUTE_GROUP_EXISTS = "groupExists"; //$NON-NLS-1$
     public static final String ATTRIBUTE_INVALID_REPO = "invalidRepo"; //$NON-NLS-1$
     public static final String ATTRIBUTE_INVALID_REPO_MSG = "invalidRepoMsg"; //$NON-NLS-1$
@@ -96,8 +97,6 @@ public class GitGerritFilter implements Filter {
 
     public static final String GIT_PREFIX = "scm:git:"; //$NON-NLS-1$
     public static final String GIT_EXT = ".git"; //$NON-NLS-1$
-
-    private static final char[] REPO_NAME_INVALID_CHARS = { '\\', ':', '~', '?', '*', '<', '>', '|', '%', '"' };
 
     private static final Logger LOG = LoggerFactory.getLogger(GitGerritFilter.class);
 
@@ -176,14 +175,18 @@ public class GitGerritFilter implements Filter {
                 client.connect();
 
                 // general group checks
-                final boolean invalidGroup = StringUtils.isBlank(group);
+                final String invalidGroupMsg = client.checkGroupName(group);
+                final boolean invalidGroup = invalidGroupMsg != null;
                 request.setAttribute(ATTRIBUTE_INVALID_GROUP, invalidGroup);
+                if (invalidGroup) {
+                    request.setAttribute(ATTRIBUTE_INVALID_GROUP_MSG, invalidGroupMsg);
+                }
                 final boolean groupExists = !invalidGroup && client.groupExists(group);
                 request.setAttribute(ATTRIBUTE_GROUP_EXISTS, groupExists);
                 final boolean createGroup = !invalidGroup && !groupExists;
 
                 // general repo checks
-                final String invalidRepoMsg = checkRepoName(repo);
+                final String invalidRepoMsg = client.checkProjectName(repo);
                 final boolean invalidRepo = invalidRepoMsg != null;
                 request.setAttribute(ATTRIBUTE_INVALID_REPO, invalidRepo);
                 if (invalidRepo) {
@@ -279,40 +282,6 @@ public class GitGerritFilter implements Filter {
         RequestDispatcher rd = request.getRequestDispatcher(Consts.URL_ERROR);
         request.setAttribute(ATTRIBUTE_EXCEPTION, e);
         rd.forward(request, response);
-    }
-
-    private String checkRepoName(String repoName) {
-        if (StringUtils.isBlank(repoName)) {
-            return "Repository names must not be blank";
-        }
-        if (containsWhitespace(repoName)) {
-            return "Repository names must not contain whitespace";
-        }
-        if (repoName.startsWith("/")) {
-            return "Repository names must not start with a slash";
-        }
-        if (repoName.endsWith("/")) {
-            return "Repository names must not end with a trailing slash";
-        }
-        if (StringUtils.containsAny(repoName, REPO_NAME_INVALID_CHARS )) {
-            return "Repository names must not contain any of the following characters: " +
-                    "'\\', ':', '~', '?', '*', '<', '>', '|', '%', '\"'";
-        }
-        if (repoName.startsWith("../") //$NON-NLS-1$
-                || repoName.contains("/../") //$NON-NLS-1$
-                || repoName.contains("/./")) { //$NON-NLS-1$
-            return "Repository names must not contain \"../\", \"/../\" or \"/./\"";
-        }
-        return null;
-    }
-
-    private boolean containsWhitespace(String s) {
-        for (int i = 0; i < s.length(); i++) {
-            if (Character.isWhitespace(s.charAt(i))) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

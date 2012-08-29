@@ -204,4 +204,23 @@ public interface GerritClient {
      */
     public Set<String> getKnownAccounts(Set<String> variousAccounts) throws ConnectionException, CommandException;
 
+    /**
+     * Checks that the given name is a valid Gerrit group name.
+     *
+     * @param name  the name to check.
+     *
+     * @return <code>null</code>, if the name is valid, otherwise an error message indicating
+     * the cause of the invalidity.
+     */
+    public String checkGroupName(String name);
+
+    /**
+     * Checks that the given name is a valid Gerrit project name.
+     *
+     * @param name  the name to check.
+     *
+     * @return <code>null</code>, if the name is valid, otherwise an error message indicating
+     * the cause of the invalidity.
+     */
+    public String checkProjectName(String name);
 }

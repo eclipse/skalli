@@ -137,9 +137,10 @@
           <tr valign="top" align="left">
             <td>Gerrit Group:</td>
             <td>
-              <c:if test="${invalidGroup}">Group name must not be blank.</c:if>
-              <c:if test="${!invalidGroup && groupExists}"><strong>'${html:escapeHtml(param.group)}'</strong> already exists.</c:if>
-              <c:if test="${!invalidGroup && !groupExists}"><strong>'${html:escapeHtml(param.group)}'</strong> will be created.</c:if>
+              <strong>'${html:escapeHtml(param.group)}'</strong>
+              <c:if test="${invalidGroup}">is not a valid group name<br />(${invalidGroupMsg})</c:if>
+              <c:if test="${!invalidGroup && groupExists}">already exists.</c:if>
+              <c:if test="${!invalidGroup && !groupExists}">will be created.</c:if>
             </td>
           </tr>
           <c:if test="${!invalidGroup && !groupExists && not empty knownAccounts}">
@@ -159,7 +160,7 @@
             <td>Git Repository:</td>
             <td>
               <strong>'${html:escapeHtml(param.repo)}'</strong>
-              <c:if test="${invalidRepo}">is invalid.<br />(${invalidRepoMsg})</c:if>
+              <c:if test="${invalidRepo}">is not a valid repository name<br />(${invalidRepoMsg})</c:if>
               <c:if test="${!invalidRepo && repoExists}">already exists.</c:if>
               <c:if test="${!invalidRepo && !repoExists}">will be created.</c:if>
             </td>
@@ -244,9 +245,9 @@
       </c:choose>
     </c:when>
   </c:choose>
-<c:if test="${not empty gerritContact}">
-  <div><a href="${gerritContact}" target="_blank">Gerrit Contacts</a></div>
-</c:if>
+  <c:if test="${not empty gerritContact}">
+    <div><a href="${gerritContact}" target="_blank">Gerrit Contacts</a></div>
+  </c:if>
 </div>
 </body>
 </html>
