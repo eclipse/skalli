@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.User;
@@ -49,11 +50,11 @@ public class PeopleComponent extends CustomComponent {
             sb.append("<a href=\""); //$NON-NLS-1$
             sb.append(userDetailsLink);
             sb.append("\" target=\"_blank\">"); //$NON-NLS-1$
-            sb.append(user.getDisplayName());
+            sb.append(StringEscapeUtils.escapeHtml(user.getDisplayName()));
             sb.append("</a> "); //$NON-NLS-1$
         } else {
             // not configured, just display the user name
-            sb.append(user.getDisplayName());
+            sb.append(StringEscapeUtils.escapeHtml(user.getDisplayName()));
             sb.append(" "); //$NON-NLS-1$
         }
 
@@ -70,7 +71,7 @@ public class PeopleComponent extends CustomComponent {
 
         sb.append("<a class=\"link\" href=\""); //$NON-NLS-1$
         sb.append(Consts.URL_PROJECTS_USER);
-        sb.append(user.getUserId());
+        sb.append(StringEscapeUtils.escapeHtml(user.getUserId()));
         sb.append("\">"); //$NON-NLS-1$
         sb.append("projects");
         sb.append("</a> "); //$NON-NLS-1$

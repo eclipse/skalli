@@ -10,6 +10,7 @@
  --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="html" uri="http://www.eclipse.org/skalli/taglib" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page import="org.eclipse.skalli.services.Services" %>
 <%@ page import="org.osgi.framework.Version" %>
@@ -18,7 +19,7 @@
 <div class="mainheader">
     <div class="mainheader-left">
        <c:forEach var="toplinkConfig" items="${toplinksConfig.topLinks}" >
-         <a href ="${toplinkConfig.url}">${toplinkConfig.displayName}</a>
+         <a href ="${toplinkConfig.url}">${html:escapeHtml(toplinkConfig.displayName)}</a>
        </c:forEach>
     </div>
     <div class="mainheader-right">
@@ -26,10 +27,10 @@
         <c:choose>
           <c:when test="${user!=null}">
             Welcome
-            <a href="<%=Consts.URL_MYPROJECTS%>">${userDisplayName}</a>
+            <a href="<%=Consts.URL_MYPROJECTS%>">${html:escapeHtml(userDisplayName)}</a>
             <c:if test="${feedbackConfig != null }">
               <span class="vertical_separator"><img src="/VAADIN/themes/simple/images/separator.png" alt="separator"></span>
-              <a title="${feedbackConfig.displayName}" href="${feedbackConfig.url}">${feedbackConfig.displayName}</a>
+              <a title="${feedbackConfig.displayName}" href="${feedbackConfig.url}">${html:escapeHtml(feedbackConfig.displayName)}</a>
             </c:if>
           </c:when>
           <c:otherwise>

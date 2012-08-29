@@ -9,6 +9,7 @@
         SAP AG - initial API and implementation
  --%>
 
+<%@ taglib prefix="html" uri="http://www.eclipse.org/skalli/taglib" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page import="org.eclipse.skalli.view.Consts" %>
 
@@ -16,7 +17,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>${pagetitle} - Embedded Search</title>
+<title>${html:escapeHtml(pagetitle)} - Embedded Search</title>
 <style type="text/css">
 body {
     color: #b8bbbe;

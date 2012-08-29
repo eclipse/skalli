@@ -10,6 +10,7 @@
  --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="html" uri="http://www.eclipse.org/skalli/taglib" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page import="org.eclipse.skalli.view.Consts" %>
 
@@ -33,10 +34,10 @@
         <a href="<%=request.getRequestURI() + "?" + Consts.PARAM_ACTION + "=" + Consts.PARAM_VALUE_EDIT%>" target="_top">Edit</a><br />
           <c:forEach var="link" items="${projectContextLinks}" >
             <%-- render the project context links --%>
-            <c:set var="linkCaption" value="${link.caption}" />
+            <c:set var="linkCaption" value="${html:clean(link.caption)}" />
             <c:set var="linkUri" value="${link.uri}" />
             <c:set var="linkId" value="${link.id}" />
-            <a id="${linkId}" href="${linkUri}" target="_top">${linkCaption}</a><br />
+            <a id="${linkId}" href="${linkUri}" target="_top">${html:clean(linkCaption)}</a><br />
         </c:forEach>
     </c:if>
 </div>

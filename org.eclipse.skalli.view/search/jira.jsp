@@ -10,6 +10,7 @@
  --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="html" uri="http://www.eclipse.org/skalli/taglib" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page import="org.eclipse.skalli.view.internal.filter.ext.JiraFilter" %>
 <%@ page import="org.eclipse.skalli.view.Consts" %>
@@ -19,7 +20,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<title>Create JIRA Project - ${pagetitle}</title>
+<title>Create JIRA Project - ${html:escapeHtml(pagetitle)}</title>
 <style type="text/css">
 @import "<%=Consts.JSP_STYLE%>";
 .inputhelp {
@@ -62,11 +63,11 @@ Click on the link below to open a JIRA dialog on the JIRA server in another brow
 
 <tr align="left">
 <td>Name:</td>
-<td><em>${project.name }</em></td>
+<td><em>${html:escapeHtml(project.name)}</em></td>
 </tr>
 <tr align="left">
 <td>Key:</td>
-<td><em>${project.projectId }</em></td>
+<td><em>${project.projectId}</em></td>
 </tr>
 <tr align="left">
 <td>Url: </td>
@@ -74,7 +75,7 @@ Click on the link below to open a JIRA dialog on the JIRA server in another brow
 </tr>
 <tr align="left">
 <td>Description: </td>
-<td><em>${project.description }</em></td>
+<td><em>${html:clean(project.description)}</em></td>
 </tr>
 </table>
 <br/>
@@ -103,11 +104,11 @@ Paste the copied project key from clipboard to the following input field. Choose
             <input type="checkbox" disabled="disabled"/>
             <span class="disabled">to track bugs (not available as Development Information is inherited)</span>
           </c:when>
-          <c:when test="${addBugTracker }">
+          <c:when test="${addBugTracker}">
             <input type="checkbox" onclick="toggleBooleanValue('addBugTracker');document.jiraform.submit();" checked="checked" />
             to track bugs
           </c:when>
-          <c:when test="${!addBugTracker }">
+          <c:when test="${!addBugTracker}">
             <input type="checkbox" onclick="toggleBooleanValue('addBugTracker');document.jiraform.submit();"/>
             to track bugs
           </c:when>
@@ -116,15 +117,15 @@ Paste the copied project key from clipboard to the following input field. Choose
         <br/>
 
         <c:choose>
-          <c:when test="${ scrumExtInherited }">
+          <c:when test="${scrumExtInherited}">
             <input type="checkbox" disabled="disabled" />
             <span class="disabled">as a Scrum backlog (not available as Scrum Information is inherited)</span>
           </c:when>
-          <c:when test="${ addScrumBacklog }">
+          <c:when test="${addScrumBacklog}">
             <input type="checkbox" onclick="toggleBooleanValue('addScrumBacklog');document.jiraform.submit();" checked="checked" />
             as a Scrum backlog
           </c:when>
-          <c:when test="${ !addScrumBacklog }">
+          <c:when test="${!addScrumBacklog}">
             <input type="checkbox" onclick="toggleBooleanValue('addScrumBacklog');document.jiraform.submit();" />
             as a Scrum backlog
           </c:when>
@@ -164,12 +165,12 @@ Paste the copied project key from clipboard to the following input field. Choose
   <c:otherwise>
     <c:if test="${bugTracker != null && addBugTracker}">
       <div class="warningMessage">
-      Bug Tracker is already defined for this project ('${bugTracker }'), click on 'Save' to overwrite the current setting.
+      Bug Tracker is already defined for this project ('${bugTracker}'), click on 'Save' to overwrite the current setting.
       </div>
     </c:if>
     <c:if test="${scrumBacklog != null && addScrumBacklog}">
       <div class="warningMessage">
-      Scrum Backlog is already defined for this project ('${scrumBacklog }'), click on 'Save' to overwrite the current setting.
+      Scrum Backlog is already defined for this project ('${scrumBacklog}'), click on 'Save' to overwrite the current setting.
       </div>
     </c:if>
   </c:otherwise>

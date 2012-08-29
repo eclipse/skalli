@@ -10,6 +10,7 @@
  --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="html" uri="http://www.eclipse.org/skalli/taglib" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page import="org.eclipse.skalli.model.Severity" %>
 <%@ page import="org.eclipse.skalli.model.Issue" %>
@@ -27,12 +28,13 @@
 <%@ page import="org.eclipse.skalli.services.issues.IssuesService" %>
 <%@ page import="org.eclipse.skalli.services.Services" %>
 <%@ page import="org.eclipse.skalli.view.Consts" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<title>All Projects - ${pagetitle}</title>
+<title>All Projects - ${html:escapeHtml(pagetitle)}</title>
 <style type="text/css">
 @import "<%=Consts.JSP_STYLE%>";
 </style>
@@ -123,7 +125,7 @@ function collapseAll() {
     for (int i=0; i<tab; i++)
           out.append("     ");
     out.append("<a class='projectlink"+tab+"' href='/projects/"+project.getProjectId()+"' target='_top'>");
-    out.append(project.getName());
+    out.append(StringEscapeUtils.escapeHtml(project.getName()));
     int sizeChildren = countSubProjects(projectNode, true);
     if (sizeChildren>0)
       out.append(" ("+sizeChildren+")");

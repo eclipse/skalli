@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.component;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.eclipse.skalli.commons.HtmlUtils;
+
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -75,7 +78,7 @@ public class Tray extends CustomComponent {
         header.setComponentAlignment(trayIcon, Alignment.MIDDLE_LEFT);
         header.setExpandRatio(trayIcon, 0);
 
-        Label captionLabel = new Label(caption, Label.CONTENT_XHTML);
+        Label captionLabel = new Label(StringEscapeUtils.escapeHtml(caption), Label.CONTENT_XHTML);
         captionLabel.setStyleName(STYLE_TRAY_HEADER_LABEL);
         header.addComponent(captionLabel);
         header.setExpandRatio(captionLabel, 1);
@@ -97,7 +100,7 @@ public class Tray extends CustomComponent {
         layout.addComponent(header);
 
         CssLayout content = new CssLayout();
-        Label descriptionLabel = new Label(description, Label.CONTENT_XHTML);
+        Label descriptionLabel = new Label(HtmlUtils.clean(description), Label.CONTENT_XHTML);
         descriptionLabel.setStyleName(STYLE_TRAY_DESCRIPTION);
         content.addComponent(descriptionLabel);
 

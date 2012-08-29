@@ -9,6 +9,7 @@
         SAP AG - initial API and implementation
  --%>
 
+<%@ taglib prefix="html" uri="http://www.eclipse.org/skalli/taglib" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Comparator" %>
@@ -24,7 +25,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Deleted Projects - ${pagetitle}</title>
+<title>Deleted Projects - ${html:escapeHtml(pagetitle)}</title>
 <style type="text/css">
 @import "<%=Consts.JSP_STYLE%>";
 </style>

@@ -10,6 +10,7 @@
  --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="html" uri="http://www.eclipse.org/skalli/taglib" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="pp" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page import="org.eclipse.skalli.view.Consts" %>
@@ -18,7 +19,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<title>${title} - ${pagetitle}</title>
+<title>${html:escapeHtml(title)} - ${html:escapeHtml(pagetitle)}</title>
 <style type="text/css">
 @import "<%=Consts.JSP_STYLE%>";
 </style>

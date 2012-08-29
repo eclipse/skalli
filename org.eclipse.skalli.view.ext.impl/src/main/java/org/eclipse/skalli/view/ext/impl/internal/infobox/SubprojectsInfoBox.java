@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ProjectNature;
 import org.eclipse.skalli.services.project.ProjectService;
@@ -127,11 +128,11 @@ public class SubprojectsInfoBox extends InfoBoxBase implements InfoBox {
             sb.append("<a class=\"link\" href=\"/projects/"); //$NON-NLS-1$
             sb.append(project.getProjectId());
             sb.append("\" target=\"_top\">"); //$NON-NLS-1$
-            sb.append(project.getName());
+            sb.append(StringEscapeUtils.escapeHtml(project.getName()));
             sb.append("</a>"); //$NON-NLS-1$
         }
         else {
-            sb.append("<em>").append(project.getName()).append("</em>"); //$NON-NLS-1$ //$NON-NLS-2$
+            sb.append("<em>").append(StringEscapeUtils.escapeHtml(project.getName())).append("</em>"); //$NON-NLS-1$ //$NON-NLS-2$
         }
         sb.append("</div>"); //$NON-NLS-1$
     }

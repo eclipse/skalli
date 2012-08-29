@@ -14,6 +14,7 @@ import java.text.MessageFormat;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.commons.InfoExtension;
 import org.eclipse.skalli.services.Services;
@@ -60,10 +61,12 @@ public class ProjectAboutBox extends InfoBoxBase implements InfoBox {
         String description = "No description available";
         if (StringUtils.isNotBlank(project.getDescription())) {
             description = project.getDescription();
-            if (project.getDescriptionFormat().equals("text")) {//$NON-NLS-1$
+            if (Project.FORMAT_HTML.equals(project.getDescriptionFormat())) {
+                description = HtmlUtils.clean(description);
+            } else {
                 description = StringEscapeUtils.escapeHtml(description);
-                description = StringUtils.replace(description, "\n", "<br />"); //$NON-NLS-1$//$NON-NLS-2$
             }
+            description = StringUtils.replace(description, "\n", "<br />"); //$NON-NLS-1$//$NON-NLS-2$
         }
         createLabel(layout, description, STYLE_ABOUT);
 
@@ -81,8 +84,8 @@ public class ProjectAboutBox extends InfoBoxBase implements InfoBox {
         if (!util.getProjectTemplate().isHidden(Project.class.getName(), Project.PROPERTY_PHASE,
                 util.isUserProjectAdmin(project))) {
             createLabel(layout,
-                    MessageFormat.format("This project is in the <b>{0}</b> phase.", project.getPhase()),
-                    STYLE_PHASE);
+                    MessageFormat.format("This project is in the <b>{0}</b> phase.",
+                    StringEscapeUtils.escapeHtml(project.getPhase())), STYLE_PHASE);
         }
 
         // for ui testing

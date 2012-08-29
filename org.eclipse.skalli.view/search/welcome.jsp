@@ -10,6 +10,7 @@
  --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="html" uri="http://www.eclipse.org/skalli/taglib" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page import="org.eclipse.skalli.view.component.TagCloud" %>
 <%@ page import="org.eclipse.skalli.view.Consts" %>
@@ -18,7 +19,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Welcome to ${pagetitle}</title>
+<title>Welcome to ${html:escapeHtml(pagetitle)}</title>
 <style type="text/css">
 @import "<%=Consts.JSP_STYLE%>";
 </style>
@@ -28,7 +29,7 @@ function focusSearch()
     document.getElementById("query").focus();
 }
 </script>
-<link rel="search" type="application/opensearchdescription+xml" title="${searchPluginTitle}" href="/search-plugin.xml">
+<link rel="search" type="application/opensearchdescription+xml" title="${html:escapeHtml(searchPluginTitle)}" href="/search-plugin.xml">
 </head>
 <body class="welcomepage" onload="focusSearch()">
 
@@ -77,21 +78,16 @@ function focusSearch()
     <div class="messages-section">
       <c:if test="${newsConfig.alert != null}">
           <div class="alert-section">
-              <span class="alert-msg">${newsConfig.alert}</span>
+              <span class="alert-msg">${html:clean(newsConfig.alert)}</span>
           </div>
       </c:if>
       <c:if test="${newsConfig.info != null}">
           <div class="info-section">
-              <span class="info-msg">${newsConfig.info}</span>
+              <span class="info-msg">${html:clean(newsConfig.info)}</span>
           </div>
       </c:if>
     </div>
 </c:if>
 </center>
-<%--
-    <iframe src="/content/tipoftheday" name="Tip of the Day" frameborder="0"
-            class="tipofthedayframe" width="500px" height="400px" scrolling="no">
-    </iframe>
---%>
 </body>
 </html>

@@ -43,7 +43,7 @@ public class ProjectDescriptionValidator implements Issuer, ExtensionValidator<P
     private static final String TXT_DESCRIPTION_SHORT = "The project description is quite short. Give some more context.";
     private static final String TXT_NO_TAGS_ALLOWED = "The project description must not contain any HTML tags for description " +
             "format 'text'. Remove all tags or select another description format.";
-    private static final String TXT_ALLOWED_TAGS = "The project description contains unsupported HTML tags. " +
+    private static final String TXT_ALLOWED_TAGS = "The project description contains unsupported HTML tags or attributes. " +
             "Supported tags are: &lt;" + StringUtils.join(HtmlUtils.ALLOWED_TAGS, "&gt;, &lt;") + "&gt;.";
 
     @Override

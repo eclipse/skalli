@@ -10,6 +10,7 @@
  --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="html" uri="http://www.eclipse.org/skalli/taglib" %>
 
 <%@ attribute name="project" type="org.eclipse.skalli.services.search.SearchHit" required="true" rtexprvalue="true" %>
 <%@ attribute name="parentChain" type="java.util.List" required="false" rtexprvalue="true" %>
@@ -34,7 +35,9 @@
         </c:when>
         <c:otherwise/>
     </c:choose>
-    <a class="projectlink" href='/projects/${p.singleValues["projectId"]}' target='_top'>${p.singleValuesHighlighted["name"]}</a>
+    <a class="projectlink" href='/projects/${p.singleValues["projectId"]}' target='_top'>
+        ${html:escapeHtml(p.singleValuesHighlighted["name"])}
+    </a>
 
     <c:if test="${user != null}">
       <c:choose>
@@ -53,7 +56,7 @@
 
     <div class="projectdetails">
         <c:if test="${p.singleValuesHighlighted['description'] != null}">
-            ${p.singleValuesHighlighted['description']}
+            ${html:clean(p.singleValuesHighlighted['description'])}
         </c:if>
         <div class="projectlinks">
             <c:if test="${p.singleValues['pageUrl'] != null}">
@@ -83,7 +86,9 @@
 
             <c:if test="${parents[uuid] != null}">
                 <img class="linkicon" src="/VAADIN/themes/simple/icons/search/projects.png" alt="Parent Project" />
-                <a href="/projects/${parents[uuid].projectId}" target="_top">Parent Project (${parents[uuid].name})</a>
+                <a href="/projects/${parents[uuid].projectId}" target="_top">
+                    Parent Project (${html:escapeHtml(parents[uuid].name)})
+                </a>
             </c:if>
         </div>
         <div>
@@ -102,8 +107,11 @@
                 <div style="margin-left:10px">
                     <c:forEach var="child" items="${subprojects[uuid]}">
                         <span style="white-space:nowrap">
-                            <img class="linkicon" src="VAADIN/themes/simple/icons/search/projects.png" alt="Subproject" width="14px" height="14px" />
-                            <a href="/projects/${child.singleValues['projectId']}" target="_top">${child.singleValuesHighlighted['name']}</a>
+                            <img class="linkicon" src="VAADIN/themes/simple/icons/search/projects.png" 
+                                alt="Subproject" width="14px" height="14px" />
+                            <a href="/projects/${child.singleValues['projectId']}" target="_top">
+                                ${html:escapeHtml(child.singleValuesHighlighted['name'])}
+                            </a>
                         </span>
                     </c:forEach>
                 </div>

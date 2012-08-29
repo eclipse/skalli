@@ -13,7 +13,9 @@ package org.eclipse.skalli.view.ext.impl.internal.infobox;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ext.misc.ProjectRating;
@@ -181,10 +183,10 @@ public class ReviewComponent extends CustomComponent {
 
             StringBuilder sb = new StringBuilder();
             sb.append("<span style=\"white-space:normal\">"); //$NON-NLS-1$
-            sb.append(review.getComment());
+            sb.append(HtmlUtils.clean(review.getComment()));
             sb.append("<br>"); //$NON-NLS-1$
             sb.append("<span style=\"font-size:x-small\">").append(" posted by "); //$NON-NLS-1$
-            sb.append(review.getVoter());
+            sb.append(StringEscapeUtils.escapeHtml(review.getVoter()));
             sb.append(" "); //$NON-NLS-1$
 
             long deltaMillis = System.currentTimeMillis() - review.getTimestamp();

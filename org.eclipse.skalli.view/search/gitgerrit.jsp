@@ -10,6 +10,7 @@
  --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="html" uri="http://www.eclipse.org/skalli/taglib" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page import="org.eclipse.skalli.view.internal.filter.ext.GitGerritFilter" %>
 <%@ page import="org.eclipse.skalli.view.Consts" %>
@@ -19,7 +20,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-<title>Create Git/Gerrit Repository - ${pagetitle}</title>
+<title>Create Git/Gerrit Repository - ${html:escapeHtml(pagetitle)}</title>
 <style type="text/css">
   @import "<%=Consts.JSP_STYLE%>";
 
@@ -79,7 +80,8 @@
         Furthermore, specify a suitable repository name or accept the proposal based on the project hierarchy.
       </p>
       <p>Once created the repository will be added as SCM location to your project.</p>
-      <form id="gitgerritform" name="gitgerritform" action="gitgerrit?id=${project.projectId}" method="post" accept-charset="UTF-8" class="marginTop">
+      <form id="gitgerritform" name="gitgerritform" action="gitgerrit?id=${project.projectId}"
+          method="post" accept-charset="UTF-8" class="marginTop">
         <input type="hidden" id="action" name="action" value="<%= GitGerritFilter.ACTION_CHECK %>"/>
         <script type="text/javascript">
           function submitGitGerritForm(action) {
@@ -108,7 +110,7 @@
                   </select>
                 </c:when>
                 <c:otherwise>
-                  <input type="text" name="<%= GitGerritFilter.PARAMETER_GROUP %>" value="${proposedGroup}" class="searchfield"/>
+                  <input type="text" name="<%= GitGerritFilter.PARAMETER_GROUP %>" value="${html:escapeHtml(proposedGroup)}" class="searchfield"/>
                 </c:otherwise>
               </c:choose>
             </td>
@@ -116,7 +118,7 @@
           <tr>
             <td>Git Repository:</td>
             <td>
-              <input type="text" name="<%= GitGerritFilter.PARAMETER_REPO %>" value="${proposedRepo}" class="searchfield"/>
+              <input type="text" name="<%= GitGerritFilter.PARAMETER_REPO %>" value="${html:escapeHtml(proposedRepo)}" class="searchfield"/>
             </td>
           </tr>
         </table>
@@ -136,8 +138,8 @@
             <td>Gerrit Group:</td>
             <td>
               <c:if test="${invalidGroup}">Group name must not be blank.</c:if>
-              <c:if test="${!invalidGroup && groupExists}"><strong>'${param.group}'</strong> already exists.</c:if>
-              <c:if test="${!invalidGroup && !groupExists}"><strong>'${param.group}'</strong> will be created.</c:if>
+              <c:if test="${!invalidGroup && groupExists}"><strong>'${html:escapeHtml(param.group)}'</strong> already exists.</c:if>
+              <c:if test="${!invalidGroup && !groupExists}"><strong>'${html:escapeHtml(param.group)}'</strong> will be created.</c:if>
             </td>
           </tr>
           <c:if test="${!invalidGroup && !groupExists && not empty knownAccounts}">
@@ -156,7 +158,7 @@
             <tr valign="top" align="left">
             <td>Git Repository:</td>
             <td>
-              <strong>'${param.repo}'</strong>
+              <strong>'${html:escapeHtml(param.repo)}'</strong>
               <c:if test="${invalidRepo}">is invalid.<br />(${invalidRepoMsg})</c:if>
               <c:if test="${!invalidRepo && repoExists}">already exists.</c:if>
               <c:if test="${!invalidRepo && !repoExists}">will be created.</c:if>

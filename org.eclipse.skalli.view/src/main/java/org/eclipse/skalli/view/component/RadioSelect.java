@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.eclipse.skalli.commons.HtmlUtils;
+
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -84,10 +87,10 @@ public class RadioSelect extends CustomField implements Button.ClickListener {
 
             StringBuilder sb = new StringBuilder();
             sb.append("<span style=\"font-weight:bold\">"); //$NON-NLS-1$
-            sb.append(entry.getCaption());
+            sb.append(StringEscapeUtils.escapeHtml(entry.getCaption()));
             sb.append("</span><br>"); //$NON-NLS-1$
             sb.append("<span style=\"white-space:normal\">"); //$NON-NLS-1$
-            sb.append(entry.getDescription());
+            sb.append(HtmlUtils.clean(entry.getDescription()));
             sb.append("</span>"); //$NON-NLS-1$
 
             CssLayout css = new CssLayout() {

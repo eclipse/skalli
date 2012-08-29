@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
@@ -396,7 +397,7 @@ class ProjectEditPanelEntry extends CustomComponent {
         sb.append("\" name=\"");
         sb.append(extensionClassName);
         sb.append("\"><!-- --></a>");
-        sb.append(extensionService.getCaption());
+        sb.append(StringEscapeUtils.escapeHtml(extensionService.getCaption()));
         return sb.toString();
     }
 
@@ -527,7 +528,7 @@ class ProjectEditPanelEntry extends CustomComponent {
         try {
             newForm = formService.createForm(project, context);
         } catch (RuntimeException e) {
-            LOG.error("Failed to render '" + getDisplayName() + "' form", e);
+            LOG.error("Failed to render '" + StringEscapeUtils.escapeHtml(getDisplayName()) + "' form", e);
             newForm = new Form();
             tray.addComponent(new Label("<span style=\"font-weight:bold;color:red\">Sorry, can't display this form. " +
                     "An internal error occurred. Please notify the administrator.</span>", Label.CONTENT_XHTML));

@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.commons;
 
+import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
@@ -36,7 +37,7 @@ public class HtmlUtils {
     @SuppressWarnings("nls")
     public static Whitelist getWhiteList() {
         Whitelist whitelist = new Whitelist();
-        whitelist.addTags(ALLOWED_TAGS).addAttributes(":all", "style")
+        whitelist.addTags(ALLOWED_TAGS)
                 .addAttributes("a", "href", "target", "name", "title", "rel")
                 .addAttributes("ul", "type")
                 .addAttributes("ol", "start", "type")
@@ -62,6 +63,18 @@ public class HtmlUtils {
     }
 
     /**
+     * Returns <code>true</code> if the  given string contains any HTML tags.
+     *
+     * @param s  the string to check.
+     */
+    public static boolean containsTags(String s) {
+        if (StringUtils.isBlank(s)) {
+            return false;
+        }
+        return !Jsoup.isValid(s, Whitelist.none());
+    }
+
+    /**
      * Filters untrusted tags and attributes from the given HTML fragment by using
      * the {@link #getWhiteList() whitelist} of allowed tags and attributes.
      *
@@ -69,6 +82,9 @@ public class HtmlUtils {
      * @return the cleaned input string.
      */
     public static String clean(String html) {
+        if (StringUtils.isBlank(html)) {
+            return html;
+        }
         return Jsoup.clean(html, getWhiteList());
     }
 
@@ -81,6 +97,9 @@ public class HtmlUtils {
      * @return the cleaned input string.
      */
     public static String clean(String html, String baseUri) {
+        if (StringUtils.isBlank(html)) {
+            return html;
+        }
         return Jsoup.clean(html, baseUri, getWhiteList());
     }
 }
