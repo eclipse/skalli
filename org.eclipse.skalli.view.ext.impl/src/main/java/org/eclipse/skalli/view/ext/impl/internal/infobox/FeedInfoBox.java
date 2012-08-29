@@ -23,9 +23,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.HtmlBuilder;
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.commons.Link;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.model.Project;
@@ -283,23 +283,23 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
 
         link = mapLink(project, link);
 
-        html.appendLink(StringEscapeUtils.escapeHtml(title), link);
+        html.appendLink(HtmlUtils.clean(title), link);
 
         html.append("<br />");
 
         String source = entry.getSource();
-        if (StringUtils.isNotBlank(StringEscapeUtils.escapeHtml(source))) {
+        if (StringUtils.isNotBlank(HtmlUtils.clean(source))) {
             html.append(source);
         }
 
         String date = getDate(entry);
         if (StringUtils.isNotBlank(date)) {
-            html.append(" - ").append(StringEscapeUtils.escapeHtml(date));
+            html.append(" - ").append(HtmlUtils.clean(date));
         }
 
         String author = getAuthor(entry);
         if (StringUtils.isNotBlank(author)) {
-            html.append(" - ").append(StringEscapeUtils.escapeHtml(author));
+            html.append(" - ").append(HtmlUtils.clean(author));
         }
         html.append("</p>");
     }
