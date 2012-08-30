@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 public class XStreamPersistenceService extends PersistenceServiceBase implements PersistenceService {
 
     private static final Logger LOG = LoggerFactory.getLogger(XStreamPersistenceService.class);
+    private static final Logger AUDIT_LOG = LoggerFactory.getLogger("audit"); //$NON-NLS-1$
 
     private final EntityCache cache = new EntityCache();
     private final EntityCache deleted = new EntityCache();
@@ -185,17 +186,22 @@ public class XStreamPersistenceService extends PersistenceServiceBase implements
         } catch (MigrationException e) {
             throw new RuntimeException(e);
         }
-        reloadAndUpdateCache(entity);
-    }
 
-    private void reloadAndUpdateCache(EntityBase entity) {
+        // reload the entity to proof that is has been persisted successfully;
+        // if so, update the caches
         EntityBase savedEntity = loadEntity(entity.getClass(), entity.getUuid());
         if (savedEntity != null) {
             updateCache(savedEntity);
-            LOG.debug(MessageFormat.format("entity {0} successfully saved", savedEntity));
+            if (entity.isDeleted()) {
+                AUDIT_LOG.info(MessageFormat.format("Entity {0} of type ''{1}'' has been deleted by user ''{2}''",
+                        entity.getUuid(), entityClass.getSimpleName(), userId));
+            } else {
+                AUDIT_LOG.info(MessageFormat.format("Entity {0} of type ''{1}'' has been changed by user ''{2}''",
+                        entity.getUuid(), entityClass.getSimpleName(), userId));
+            }
         } else {
             throw new RuntimeException(MessageFormat.format("Failed to save entity {0} of type {1}",
-                    entity, entity.getClass().getName()));
+                    entity, entityClass.getName()));
         }
     }
 

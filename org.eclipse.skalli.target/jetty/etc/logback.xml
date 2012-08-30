@@ -6,16 +6,6 @@
         </encoder>
     </appender>
 
-    <!--Basic file appender
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <File>logs/skalli-log.log</File>
-        <encoder>
-            <pattern>%date{yyyy-mm-dd'T'HH:mm:ss.SSSZ} %4relative [%thread] %-5level %class{40}#%method@%line - %msg%n</pattern>
-        </encoder>
-    </appender>
-    -->
-
-    <!-- File appender with rolling policy -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>logs/skalli-log.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -25,6 +15,21 @@
             <pattern>%date{yyyy-mm-dd'T'HH:mm:ss.SSSZ} %4relative [%thread] %-5level %class{40}#%method@%line - %msg%n</pattern>
         </encoder>
     </appender>
+
+    <appender name="AUDIT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>logs/audit-log.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>audit-log.%d{yyyy-MM-dd}.log</FileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{yyyy-mm-dd'T'HH:mm:ss.SSSZ} %4relative [%thread] %-5level %class{40}#%method@%line - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="audit">
+        <level value="all" />
+        <appender-ref ref="AUDIT" />
+    </logger>
 
     <root>
         <level value="info" />
