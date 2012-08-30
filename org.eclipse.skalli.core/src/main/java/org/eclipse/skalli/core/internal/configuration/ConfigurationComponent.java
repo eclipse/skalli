@@ -34,6 +34,7 @@ import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.event.EventConfigUpdate;
 import org.eclipse.skalli.services.event.EventCustomizingUpdate;
 import org.eclipse.skalli.services.event.EventService;
+import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.osgi.service.component.ComponentConstants;
@@ -47,6 +48,7 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
 
 public class ConfigurationComponent implements ConfigurationService {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationComponent.class);
+    private static final Logger AUDIT_LOG = LoggerFactory.getLogger("audit"); //$NON-NLS-1$
 
     private static final String CATEGORY_CUSTOMIZATION = "customization"; //$NON-NLS-1$
     private static final String KEY_PROPERTYSTORE = "PROPERTYSTORE"; //$NON-NLS-1$
@@ -116,8 +118,7 @@ public class ConfigurationComponent implements ConfigurationService {
                     try {
                         customizationKeys = storageService.keys(CATEGORY_CUSTOMIZATION);
                     } catch (StorageException e) {
-                        LOG.error(MessageFormat.format("Failed to retrieve customization keys: storage service {0} not ready",
-                                storageService), e);
+                        LOG.error("Failed to retrieve configuration keys", e);
                         return;
                     }
                     for (String customizationKey: customizationKeys) {
@@ -242,7 +243,10 @@ public class ConfigurationComponent implements ConfigurationService {
     @Override
     public <T> void writeCustomization(String customizationKey, T customization) {
         if (storageService == null) {
-            throw new IllegalStateException("StorageService not available");
+            LOG.error(MessageFormat.format(
+                    "Cannot store configuration for key {0}: StorageService not available",
+                    customizationKey));
+            return;
         }
         String xml = getXStream(customization.getClass()).toXML(customization);
         InputStream is = null;
@@ -252,10 +256,14 @@ public class ConfigurationComponent implements ConfigurationService {
             if (eventService != null) {
                 eventService.fireEvent(new EventCustomizingUpdate(customizationKey));
             }
+            AUDIT_LOG.info(MessageFormat.format("Configuration ''{0}'' changed by user ''{1}''",
+                    customizationKey, Permits.getLoggedInUser()));
         } catch (UnsupportedEncodingException e) {
+            // should never happen for UTF-8
             throw new IllegalStateException(e);
         } catch (StorageException e) {
-            throw new RuntimeException(e);
+            LOG.error(MessageFormat.format("Failed to store configuration for key ''{0}''",
+                    customizationKey, storageService), e);
         } finally {
             IOUtils.closeQuietly(is);
         }
@@ -265,7 +273,7 @@ public class ConfigurationComponent implements ConfigurationService {
     public <T> T readCustomization(String customizationKey, Class<T> customizationClass) {
         if (storageService == null) {
             LOG.warn(MessageFormat.format(
-                    "Cannot load customization for key {0}: StorageService not available",
+                    "Cannot load configuration for key {0}: StorageService not available",
                     customizationKey));
             return null;
         }
@@ -278,12 +286,12 @@ public class ConfigurationComponent implements ConfigurationService {
             return customizationClass.cast(getXStream(customizationClass).fromXML(is));
         } catch (XStreamException e) {
             LOG.error(MessageFormat.format(
-                    "Failed to unmarshal customization of type ''{0}'' for key ''{1}'' ",
-                    customizationClass.getName(), customizationKey), e);
+                    "Failed to unmarshal configuration for key ''{0}'' ",
+                    customizationKey), e);
             return null;
         } catch (StorageException e) {
             LOG.error(MessageFormat.format(
-                    "Failed to retrieve customization for key ''{0}'' from storage service",
+                    "Failed to retrieve configuration for key ''{0}''",
                     customizationKey), e);
             return null;
         } finally {
