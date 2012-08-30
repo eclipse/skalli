@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.extension.validators;
 
-import java.text.MessageFormat;
 import java.util.UUID;
 
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.PropertyName;
 import org.eclipse.skalli.model.Severity;
@@ -88,13 +88,13 @@ public class StringLengthValidator extends PropertyValidatorBase {
     protected String getInvalidMessageFromCaption(Object value) {
         String message = null;
         if (minLength == maxLength) {
-            message = MessageFormat.format("{0} must be exactly {1} characters long", caption, minLength);
+            message = HtmlUtils.formatEscaped("{0} must be exactly {1} characters long", caption, minLength);
         } else if (minLength == 0 && maxLength > 0) {
-            message = MessageFormat.format("{0} must be at max {1} characters long", caption, maxLength);
+            message = HtmlUtils.formatEscaped("{0} must be at max {1} characters long", caption, maxLength);
         } else if (minLength > 0 && maxLength == Integer.MAX_VALUE) {
-            message = MessageFormat.format("{0} must be at least {1} characters long", caption, minLength);
+            message = HtmlUtils.formatEscaped("{0} must be at least {1} characters long", caption, minLength);
         } else if (minLength > 0 && maxLength > 0) {
-            message = MessageFormat.format("{0} must be at least {1} and at max {2} characters long", caption,
+            message = HtmlUtils.formatEscaped("{0} must be at least {1} and at max {2} characters long", caption,
                     minLength, maxLength);
         }
         return message;
@@ -104,16 +104,16 @@ public class StringLengthValidator extends PropertyValidatorBase {
     protected String getDefaultInvalidMessage(Object value) {
         String message = null;
         if (minLength == maxLength) {
-            message = MessageFormat.format("Value of property ''{0}'' must be exactly {1} characters long",
+            message = HtmlUtils.formatEscaped("Value of property ''{0}'' must be exactly {1} characters long",
                     propertyName, minLength);
         } else if (minLength == 0 && maxLength > 0) {
-            message = MessageFormat.format("Value of property ''{0}'' must be at max {1} characters long",
+            message = HtmlUtils.formatEscaped("Value of property ''{0}'' must be at max {1} characters long",
                     propertyName, maxLength);
         } else if (minLength > 0 && maxLength == Integer.MAX_VALUE) {
-            message = MessageFormat.format("Value of property ''{0}'' must be at least {1} characters long",
+            message = HtmlUtils.formatEscaped("Value of property ''{0}'' must be at least {1} characters long",
                     propertyName, minLength);
         } else if (minLength > 0 && maxLength > 0) {
-            message = MessageFormat.format(
+            message = HtmlUtils.formatEscaped(
                     "Value of property ''{0}'' must be at least {1} and at max {2} characters long", propertyName,
                     minLength, maxLength);
         }

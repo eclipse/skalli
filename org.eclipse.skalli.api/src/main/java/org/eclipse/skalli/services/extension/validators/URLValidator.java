@@ -12,9 +12,9 @@ package org.eclipse.skalli.services.extension.validators;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.UUID;
 
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.PropertyName;
 import org.eclipse.skalli.model.Severity;
@@ -62,12 +62,12 @@ public class URLValidator extends PropertyValidatorBase {
 
     @Override
     protected String getInvalidMessageFromCaption(Object value) {
-        return MessageFormat.format("{0} link must be a valid URL", caption);
+        return HtmlUtils.formatEscaped("{0} link must be a valid URL", caption);
     }
 
     @Override
     protected String getDefaultInvalidMessage(Object value) {
-        return MessageFormat.format("''{0}'' is not a valid URL", value);
+        return HtmlUtils.formatEscaped("''{0}'' is not a valid URL", value);
     }
 
     @Override

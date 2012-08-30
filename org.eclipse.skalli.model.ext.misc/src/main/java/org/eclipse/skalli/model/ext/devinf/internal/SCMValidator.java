@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.devinf.internal;
 
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -18,6 +17,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Severity;
@@ -69,18 +69,17 @@ public class SCMValidator implements PropertyValidator, Issuer {
                             DevInfProjectExt.class,
                             DevInfProjectExt.PROPERTY_SCM_LOCATIONS,
                             item,
-                            MessageFormat
-                                    .format("''{0}'' is not a valid value for {1}. For Perforce repositories the value "
-                                            +
-                                            "must match the regular expression {2}. Ensure that a port is specified and that the URL ends with a slash.",
-                                            scmLocation, caption, PATTERN_PERFORCE.pattern())
+                            HtmlUtils.formatEscaped(
+                                    "''{0}'' is not a valid value for {1}. For Perforce repositories the value "  +
+                                    "must match the regular expression {2}. Ensure that a port is specified and that the URL ends with a slash.",
+                                    scmLocation, caption, PATTERN_PERFORCE.pattern())
                             ));
                 }
             } else if (scmLocation.startsWith("scm:git:")) {//$NON-NLS-1$
                 if (!PATTERN_GIT.matcher(scmLocation).matches()) {
                     issues.add(new Issue(Severity.ERROR, SCMValidator.class, entity,
                             DevInfProjectExt.class, DevInfProjectExt.PROPERTY_SCM_LOCATIONS, item,
-                            MessageFormat.format(
+                            HtmlUtils.formatEscaped(
                                     "''{0}'' is not a valid value for {1}. For Git repositories the value " +
                                             "must match the regular expression {2}.",
                                     scmLocation, caption, PATTERN_GIT.pattern())
@@ -91,7 +90,7 @@ public class SCMValidator implements PropertyValidator, Issuer {
                 if (!PATTERN_SVN.matcher(scmLocation).matches()) {
                     issues.add(new Issue(Severity.ERROR, SCMValidator.class, entity,
                             DevInfProjectExt.class, DevInfProjectExt.PROPERTY_SCM_LOCATIONS, item,
-                            MessageFormat.format(
+                            HtmlUtils.formatEscaped(
                                     "''{0}'' is not a valid value for {1}. For Subversion repositories the value " +
                                             "must match the regular expression {2}.",
                                     scmLocation, caption, PATTERN_SVN.pattern())
@@ -101,7 +100,7 @@ public class SCMValidator implements PropertyValidator, Issuer {
             else {
                 issues.add(new Issue(Severity.FATAL, SCMValidator.class, entity,
                         DevInfProjectExt.class, DevInfProjectExt.PROPERTY_SCM_LOCATIONS, item,
-                        MessageFormat.format(
+                        HtmlUtils.formatEscaped(
                                 "''{0}'' is not a valid value for {1}. It must start with 'scm:&lt;repotype&gt;:' "
                                         + "where &lt;repotype&gt; is one of git, perforce, or svn", scmLocation,
                                 caption)

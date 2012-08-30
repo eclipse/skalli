@@ -31,6 +31,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.params.HttpParams;
 import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.commons.Link;
 import org.eclipse.skalli.commons.URLUtils;
 import org.eclipse.skalli.model.ExtensionEntityBase;
@@ -68,10 +69,10 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
     private static final String TXT_TEMP_SERVER_PROBLEM = "''{0}'' not found due to temporary problem on target server ({1} {2}).";
     private static final String TXT_PERMANENT_SERVER_PROBLEM = "''{0}'' not found due to a permanent problem on target server ({1} {2}).";
     private static final String TXT_PERMANENT_REQUEST_PROBLEM = "''{0}'' not found due to a permanent problem with the request ({1} {2}).";
-    private static final String TXT_HOST_NOT_REACHABLE = "''{0}'' is not reachable.";
-    private static final String TXT_HOST_UNKNOWN = "''{0}'' is unknown.";
+    private static final String TXT_HOST_NOT_REACHABLE = "Host ''{0}'' is not reachable.";
+    private static final String TXT_HOST_UNKNOWN = "Host ''{0}'' is unknown or cannot be resolved.";
     private static final String TXT_CONNECT_FAILED = "Could not connect to host ''{0}''.";
-    private static final String TXT_MALFORMED_URL = "''{0}'' is malformed.";
+    private static final String TXT_MALFORMED_URL = "URL ''{0}'' is malformed.";
 
     // general timeout for connection requests
     private static final int TIMEOUT = 10000;
@@ -270,7 +271,7 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
      * centralized issue generation (w/ message arguments)
      */
     protected Issue newIssue(Severity severity, UUID entityId, int item, String message, Object... messageArguments) {
-        return newIssue(severity, entityId, item, MessageFormat.format(message, messageArguments));
+        return newIssue(severity, entityId, item, HtmlUtils.formatEscaped(message, messageArguments));
     }
 
     /**

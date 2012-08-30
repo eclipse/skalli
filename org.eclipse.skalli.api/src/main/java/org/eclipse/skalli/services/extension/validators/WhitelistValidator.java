@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.extension.validators;
 
-import java.text.MessageFormat;
 import java.util.UUID;
 
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.services.extension.PropertyValidatorBase;
@@ -43,12 +43,12 @@ public class WhitelistValidator extends PropertyValidatorBase {
 
     @Override
     protected String getInvalidMessageFromCaption(Object value) {
-        return MessageFormat.format("{0} contains forbidden or unsafe HTML tags", caption);
+        return HtmlUtils.formatEscaped("{0} contains forbidden or unsafe HTML tags", caption);
     }
 
     @Override
     protected String getDefaultInvalidMessage(Object value) {
-        return MessageFormat.format("''{0}'' contains forbidden or unsafe HTML tags", value);
+        return HtmlUtils.formatEscaped("''{0}'' contains forbidden or unsafe HTML tags", value);
     }
 
     @Override

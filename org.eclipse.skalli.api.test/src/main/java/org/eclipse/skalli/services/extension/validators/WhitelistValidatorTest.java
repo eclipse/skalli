@@ -12,6 +12,7 @@ package org.eclipse.skalli.services.extension.validators;
 
 import java.util.SortedSet;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
@@ -30,7 +31,7 @@ public class WhitelistValidatorTest {
 
         Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "foobar"));
         Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "<b>foobar</b>"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "<script>altert('Gotcha!')</script>"));
+        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "<script>alert('Gotcha!')</script>"));
     }
 
     @Test
@@ -40,7 +41,7 @@ public class WhitelistValidatorTest {
         assertNoIssues("");
         assertNoIssues(null);
 
-        assertHasIssue("<script>altert('Gotcha!')</script>", "");
+        assertHasIssue("<script>alert('Gotcha!')</script>");
     }
 
     private void assertNoIssues(String s) {
@@ -51,7 +52,7 @@ public class WhitelistValidatorTest {
         Assert.assertEquals(0, issues.size());
     }
 
-    private void assertHasIssue(String s, String message) {
+    private void assertHasIssue(String s) {
         WhitelistValidator validator = new WhitelistValidator(Severity.FATAL, TestExtension.class,
                 TestExtension.PROPERTY_STR, Whitelist.basic());
         SortedSet<Issue> issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], s, Severity.FATAL);
@@ -61,7 +62,7 @@ public class WhitelistValidatorTest {
         Assert.assertEquals(TestExtension.class, issues.first().getExtension());
         Assert.assertEquals(TestExtension.PROPERTY_STR, issues.first().getPropertyId());
         Assert.assertEquals(Severity.FATAL, issues.first().getSeverity());
-        Assert.assertEquals(validator.getDefaultInvalidMessage(s), issues.first().getMessage());
+        Assert.assertTrue(issues.first().getMessage().contains(StringEscapeUtils.escapeHtml(s)));
     }
 
 }

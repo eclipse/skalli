@@ -10,11 +10,11 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.extension.validators;
 
-import java.text.MessageFormat;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.PropertyName;
 import org.eclipse.skalli.model.Severity;
@@ -76,12 +76,12 @@ public class RegularExpressionValidator extends PropertyValidatorBase {
 
     @Override
     protected String getInvalidMessageFromCaption(Object value) {
-        return MessageFormat.format("''{0}'' does not match the pattern {1}", caption, pattern);
+        return HtmlUtils.formatEscaped("''{0}'' does not match the pattern {1}", caption, pattern);
     }
 
     @Override
     protected String getDefaultInvalidMessage(Object value) {
-        return MessageFormat.format("Value of property ''{0}'' does not match the pattern {1}", propertyName, pattern);
+        return HtmlUtils.formatEscaped("Value of property ''{0}'' does not match the pattern {1}", propertyName, pattern);
     }
 
     @Override

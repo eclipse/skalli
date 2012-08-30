@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.commons;
 
+import java.text.MessageFormat;
+
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
@@ -101,5 +104,27 @@ public class HtmlUtils {
             return html;
         }
         return Jsoup.clean(html, baseUri, getWhiteList());
+    }
+
+   /**
+     * Wrapper for {@link MessageFormat#format(String, Object...)}, which
+     * HTML-escapes the given arguments before inserting them into the pattern.
+     *
+     * @param pattern  the pattern with placeholders for the arguments.
+     * @param arguments  the arguments to insert.
+     * @return the formatted result.
+     *
+     * @see StringEscapeUtils#escapeHtml(String)
+     */
+    public static String formatEscaped(String pattern, Object... arguments) {
+        if (arguments == null || arguments.length == 0) {
+            return pattern;
+        }
+        Object[] escapedArguments = new String[arguments.length];
+        for (int i = 0; i < arguments.length; ++i) {
+            escapedArguments[i] = arguments[i] != null?
+                    StringEscapeUtils.escapeHtml(arguments[i].toString()) : null;
+        }
+        return MessageFormat.format(pattern, escapedArguments);
     }
 }

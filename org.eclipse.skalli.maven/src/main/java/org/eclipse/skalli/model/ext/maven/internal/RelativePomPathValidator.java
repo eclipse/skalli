@@ -12,10 +12,10 @@ package org.eclipse.skalli.model.ext.maven.internal;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.services.extension.PropertyValidatorBase;
@@ -28,7 +28,7 @@ public class RelativePomPathValidator extends PropertyValidatorBase {
 
     @Override
     protected String getInvalidMessageFromCaption(Object value) {
-        return MessageFormat.format("''{0}'' is not a valid value for {1} - it must be a valid path, " +
+        return HtmlUtils.formatEscaped("''{0}'' is not a valid value for {1} - it must be a valid path, " +
                 "must not contain backslashes and /../ segments, and must not end with /pom.xml or a trailing slash",
                 value, caption);
     }

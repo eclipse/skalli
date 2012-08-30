@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.extension;
 
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
@@ -29,6 +29,7 @@ import org.eclipse.skalli.model.Severity;
  * It simplifies the implementation of property validators that perform simple yes/no validations,
  * for example check whether a given value matches a regular expression or has a certain minimum
  * length.
+ * <p>
  * Validators derived from this class must implement {@link PropertyValidatorBase#isValid(Object, Severity)}.
  */
 public abstract class PropertyValidatorBase implements PropertyValidator, Issuer {
@@ -128,6 +129,10 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
      * to construct a message. Otherwise {@link #getCustomInvalidMessage(Object)} is called to retrieve
      * a custom "validation failed" message.<br>
      * Replaces <tt>"{0}"</tt> placeholders in custom messages with <code>value</code>.
+     * <p>
+     * <em>Important note</em>: if you overwrite this method ensure that <code>value</code>
+     * is properly escaped (see {@link HtmlUtils#formatEscaped(String, Object...)})
+     * if it appears in the result.
      *
      * @param value  the value of the property.
      * @return  a validation message, if either a caption or custom messages have been
@@ -142,7 +147,7 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
             if (StringUtils.isNotBlank(message)) {
                 int n = message.indexOf("{0}"); //$NON-NLS-1$
                 if (n >= 0) {
-                    message = MessageFormat.format(message, value);
+                    message = HtmlUtils.formatEscaped(message, value);
                 }
             }
         }
@@ -170,21 +175,31 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
 
     /**
      * Constructs a "invalid value" message from the caption of the property.
+     * <p>
+     * <em>Important note</em>: if you overwrite this method ensure that <code>value</code>
+     * is properly escaped (see {@link HtmlUtils#formatEscaped(String, Object...)})
+     * if it appears in the result.
+     *
      * @param value  the value of the property.
      */
     protected String getInvalidMessageFromCaption(Object value) {
-        return MessageFormat.format("''{0}'' is not a valid {1}", value, caption);
+        return HtmlUtils.formatEscaped("''{0}'' is not a valid {1}", value, caption);
     }
 
     /**
      * Constructs a "value undefined" message from the caption of the property.
      */
     protected String getUndefinedMessageFromCaption() {
-        return MessageFormat.format("{0} must have a value", caption);
+        return HtmlUtils.formatEscaped("{0} must have a value", caption);
     }
 
     /**
      * Returns a custom "invalid value" message.
+     * <p>
+     * <em>Important note</em>: if you overwrite this method ensure that <code>value</code>
+     * is properly escaped (see {@link HtmlUtils#formatEscaped(String, Object...)})
+     * if it appears in the result.
+     *
      * @param value  the value of the property.
      */
     protected String getCustomInvalidMessage(Object value) {
@@ -201,13 +216,18 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
     /**
      * Returns a default "invalid value" message constructed from the
      * property name and the actual property value.
+     * <p>
+     * <em>Important note</em>: if you overwrite this method ensure that <code>value</code>
+     * is properly escaped (see {@link HtmlUtils#formatEscaped(String, Object...)})
+     * if it appears in the result.
+     *
      * @param value  the value of the property.
      */
     protected String getDefaultInvalidMessage(Object value) {
         return extension != null ?
-                MessageFormat.format("''{0}'' is not a valid value for property ''{1}'' of extension ''{2}''",
+                HtmlUtils.formatEscaped("''{0}'' is not a valid value for property ''{1}'' of extension ''{2}''",
                         value, propertyName, extension.getName()) :
-                MessageFormat.format("''{0}'' is not a valid value for property ''{1}''",
+                HtmlUtils.formatEscaped("''{0}'' is not a valid value for property ''{1}''",
                         value, propertyName);
     }
 
@@ -217,9 +237,9 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
      */
     protected String getDefaultUndefinedMessage() {
         return extension != null ?
-                MessageFormat.format("Property ''{0}'' of extension ''{1}'' must have a value",
+                HtmlUtils.formatEscaped("Property ''{0}'' of extension ''{1}'' must have a value",
                         propertyName, extension.getName()) :
-                MessageFormat.format("Property ''{0}'' must have a value",
+                HtmlUtils.formatEscaped("Property ''{0}'' must have a value",
                         propertyName);
     }
 
@@ -259,9 +279,13 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
      * If no suitable custom message is available, the method tries to construct a default message
      * by calling {@link #getDefaultInvalidMessage(Object)} or {@link #getDefaultUndefinedMessage()},
      * respectively.
-     *
+     * <p>
      * The result set of this method contains exactly one {@link Issue} entry,
      * if the validation failed, but is empty otherwise.
+     * <p>
+     * <em>Important note</em>: if you overwrite this method ensure that <code>value</code>
+     * is properly escaped (see {@link HtmlUtils#formatEscaped(String, Object...)})
+     * if it appears in any of the messages of the result issue set.
      */
     @Override
     public SortedSet<Issue> validate(UUID entity, Object value, Severity minSeverity) {
@@ -273,7 +297,8 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
                     if (StringUtils.isBlank(message)) {
                         message = getDefaultUndefinedMessage();
                     }
-                    issues.add(new Issue(severity, getClass(), entity, extension, propertyName, 0, message));
+                    issues.add(new Issue(severity, getClass(), entity, extension, propertyName,
+                            0, message));
                 }
             }
             else if (value instanceof Collection) {
@@ -299,7 +324,8 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
             }
         }
         if (StringUtils.isNotBlank(message)) {
-            issues.add(new Issue(severity, getClass(), entity, extension, propertyName, item, message));
+            issues.add(new Issue(severity, getClass(), entity, extension, propertyName,
+                    item, message));
         }
     }
 }

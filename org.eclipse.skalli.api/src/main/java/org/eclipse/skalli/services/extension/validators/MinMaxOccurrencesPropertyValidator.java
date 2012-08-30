@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.extension.validators;
 
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
@@ -102,18 +102,16 @@ public class MinMaxOccurrencesPropertyValidator implements PropertyValidator, Is
         }
 
         if (occurrences > maxAllowedOccurrences) {
-            String msg = MessageFormat
-                    .format(
-                            "Property ''{0}'' of extension ''{1}'' should not have more than {2} values, but it currently has {3} values.",
-                            propertyCaption, extensionCaption, maxAllowedOccurrences, occurrences);
+            String msg = HtmlUtils.formatEscaped(
+                "Property ''{0}'' of extension ''{1}'' should not have more than {2} values, but it currently has {3} values.",
+                propertyCaption, extensionCaption, maxAllowedOccurrences, occurrences);
             issues.add(new Issue(severity, getClass(), entity, extension, propertyCaption, msg));
         }
 
         if (occurrences < minExpectedOccurrences) {
-            String msg = MessageFormat
-                    .format(
-                            "Property ''{0}'' of extension ''{1}'' should have at least {2} values, but it currently has only {3} values.",
-                            propertyCaption, extensionCaption, minExpectedOccurrences, occurrences);
+            String msg = HtmlUtils.formatEscaped(
+                "Property ''{0}'' of extension ''{1}'' should have at least {2} values, but it currently has only {3} values.",
+                propertyCaption, extensionCaption, minExpectedOccurrences, occurrences);
             issues.add(new Issue(severity, getClass(), entity, extension, propertyCaption, msg));
         }
         return issues;

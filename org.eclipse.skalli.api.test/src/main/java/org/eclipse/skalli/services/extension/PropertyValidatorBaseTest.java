@@ -56,7 +56,7 @@ public class PropertyValidatorBaseTest {
         Assert.assertNull(validator.undefinedValueMessage);
 
         assertValidIssue(validator);
-        Issue issue = assertInvalidIssue(validator);
+        Issue issue = assertInvalidIssue(validator, "value");
         Assert.assertEquals(validator.getDefaultInvalidMessage("value"), issue.getMessage());
 
         issue = assertUndefinedIssue(validator, false);
@@ -76,7 +76,7 @@ public class PropertyValidatorBaseTest {
         Assert.assertNull(validator.undefinedValueMessage);
 
         assertValidIssue(validator);
-        Issue issue = assertInvalidIssue(validator);
+        Issue issue = assertInvalidIssue(validator, "value");
         Assert.assertEquals(validator.getInvalidMessageFromCaption("value"), issue.getMessage());
 
         issue = assertUndefinedIssue(validator, false);
@@ -96,7 +96,7 @@ public class PropertyValidatorBaseTest {
         Assert.assertEquals("undefined {0}", validator.undefinedValueMessage);
 
         assertValidIssue(validator);
-        Issue issue = assertInvalidIssue(validator);
+        Issue issue = assertInvalidIssue(validator, "value");
         Assert.assertEquals("invalid value", issue.getMessage());
 
         issue = assertUndefinedIssue(validator, false);
@@ -105,15 +105,34 @@ public class PropertyValidatorBaseTest {
         Assert.assertEquals("undefined {0}", issue.getMessage());
     }
 
+    @Test
+    public void testHtmlEnocdingOfMessage() {
+        final String VALUE = "<script>alert('Gotcha!')</script>";
+        final String ENCODED_VALUE = "&lt;script&gt;alert('Gotcha!')&lt;/script&gt;";
+
+        TestPropertyValidator validator = new TestPropertyValidator(TestExtension.class, TestExtension.PROPERTY_STR);
+        Issue issue = assertInvalidIssue(validator, VALUE);
+        Assert.assertTrue(issue.getMessage().contains(ENCODED_VALUE));
+
+        validator = new TestPropertyValidator(TestExtension.class, TestExtension.PROPERTY_STR, "CAPTION");
+        issue = assertInvalidIssue(validator, VALUE);
+        Assert.assertTrue(issue.getMessage().contains(ENCODED_VALUE));
+
+        validator = new TestPropertyValidator(TestExtension.class, TestExtension.PROPERTY_STR,
+                "invalid {0}", "undefined {0}"); //$NON-NLS-1$ //$NON-NLS-2$
+        issue = assertInvalidIssue(validator, VALUE);
+        Assert.assertEquals("invalid " + ENCODED_VALUE, issue.getMessage());
+    }
+
     private void assertValidIssue(TestPropertyValidator validator) {
         SortedSet<Issue> issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], "valid", Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(0, issues.size());
     }
 
-    private Issue assertInvalidIssue(TestPropertyValidator validator) {
+    private Issue assertInvalidIssue(TestPropertyValidator validator, String testValue) {
         // validation failes => assert issue set with one entry, assert issue correctly initialized
-        SortedSet<Issue> issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], "value", Severity.ERROR);
+        SortedSet<Issue> issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], testValue, Severity.ERROR);
         Assert.assertNotNull(issues);
         Assert.assertEquals(1, issues.size());
         Issue issue = issues.first();
