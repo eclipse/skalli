@@ -103,21 +103,29 @@ public class FeedManagerImpl implements FeedManager {
         LOG.info("Updating all project feeds...");
         Set<UUID> projectIds = projectService.keySet();
         for (UUID projectId : projectIds) {
-            Project project = projectService.getByUUID(projectId);
-            if (project == null) {
-                LOG.warn(MessageFormat.format(
-                        "Failed to update feeds: A project with unique identifier ''{0}'' does not exist",
-                        projectId));
-                return;
-            }
-            updateFeeds(project);
-            if (doSleep) {
-                try {
-                    // delay the execution for 10 seconds, otherwise we may overload the remote systems
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    break;
+            try {
+                Project project = projectService.getByUUID(projectId);
+                if (project == null) {
+                    LOG.warn(MessageFormat.format(
+                            "Failed to update feeds: A project with unique identifier ''{0}'' does not exist",
+                            projectId));
+                    return;
                 }
+                updateFeeds(project);
+                if (doSleep) {
+                    try {
+                        // delay the execution for 10 seconds, otherwise we may overload the remote systems
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        LOG.error("Feed updater job has been interrupted", e);
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                // ensure that the loop never breaks!
+                LOG.error(MessageFormat.format(
+                        "Unexpected Exception: Failed to update the feed for project {0}",
+                        projectId), e);
             }
         }
         LOG.info("Updated all project feeds");
@@ -170,9 +178,9 @@ public class FeedManagerImpl implements FeedManager {
                                     project.getProjectId()), e);
                         }
                     }
-                } catch (RuntimeException e) {
+                } catch (Exception e) {
                     LOG.error(MessageFormat.format(
-                            "Failed to update the feed for project {0}",
+                            "Unexpected Exception: Failed to update the feed for project {0}",
                             project.getProjectId()), e);
                 }
             }
