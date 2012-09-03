@@ -14,6 +14,7 @@ import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
@@ -434,5 +435,31 @@ public class Issue implements Comparable<Issue> {
             sb.append("</ul>");
         }
         return sb.toString();
+    }
+
+    /**
+     * Returns issues that are equal of more serious than the given <code>minSeverity</code>.
+     *
+     * @param minSeverity  the minimal severity of issues to include in the result.
+     * @return a set of issues sorted by {@link Issue#compareTo(Issue)}, or an empty set.
+     */
+    public static SortedSet<Issue> filterBySeverity(SortedSet<Issue> issues, Severity minSeverity) {
+        TreeSet<Issue> result = new TreeSet<Issue>();
+        if (issues != null) {
+            for (Issue issue : issues) {
+                if (issue.getSeverity().compareTo(minSeverity) <= 0) {
+                    result.add(issue);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns <code>true</code>, if {@link Severity#FATAL} issues are present
+     * in the given set of issues.
+     */
+    public static boolean hasFatalIssues(SortedSet<Issue> issues) {
+        return filterBySeverity(issues, Severity.FATAL).size() > 0;
     }
 }

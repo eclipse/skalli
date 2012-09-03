@@ -27,6 +27,11 @@ import org.eclipse.skalli.services.configuration.ConfigurationService;
 public abstract class ConfigResource<K extends ConfigKey, O> extends ConfigResourceBase<O> {
 
     /**
+     * The path prefix with which configuration resources are registered ({@value}).
+     */
+    public static final String CONFIG_PATH_PREFIX = "/config"; //$NON-NLS-1$
+
+    /**
      * Converts all configuration parameters into a map.
      * @param configObject configuration object that should be converted into single values by their corresponding keys.
      * @return

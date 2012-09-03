@@ -98,6 +98,25 @@ public class PermitTest {
         assertPermit(0, "PUT", "/projects", Permit.valueOf("FORBID  \t  PUT    \n  /projects \t   "));
     }
 
+    @Test
+    public void testParseLevel() throws Exception {
+        assertEquals(0, Permit.parseLevel("0"));
+        assertEquals(0, Permit.parseLevel("FORBID"));
+        assertEquals(0, Permit.parseLevel("forbid"));
+        assertEquals(1, Permit.parseLevel("1"));
+        assertEquals(1, Permit.parseLevel("ALLOW"));
+        assertEquals(1, Permit.parseLevel("allow"));
+        assertEquals(1, Permit.parseLevel("+1"));
+        assertEquals(0, Permit.parseLevel(null));
+        assertEquals(0, Permit.parseLevel(""));
+    }
+
+    @Test(expected=NumberFormatException.class)
+    public void testInvalidParseLevel() throws Exception {
+        Permit.parseLevel("foobar");
+    }
+
+
     @Test(expected=IllegalArgumentException.class)
     public void testValueOfIllegalArgument() throws Exception {
         Permit.valueOf("PUT");

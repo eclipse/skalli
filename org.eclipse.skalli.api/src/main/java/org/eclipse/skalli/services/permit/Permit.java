@@ -124,6 +124,12 @@ public class Permit implements Comparable<Permit> {
      */
     public static final Permit ALLOW_ALL = Permit.valueOf("ALLOW ** /"); //$NON-NLS-1$
 
+    /** Shortcut for {@link Level#ALLOW} */
+    public static final Level ALLOW = Level.ALLOW;
+
+    /** Shortcut for {@link Level#FORBID} */
+    public static final Level FORBID = Level.FORBID;
+
 
     private String action = ALL_ACTIONS;
     private String path = ROOT;
@@ -194,8 +200,24 @@ public class Permit implements Comparable<Permit> {
         return new Permit(level, parts[1], parts[2]);
     }
 
-    private static int parseLevel(String s) {
+    /**
+     * Parses the given string and returns the corresponding level.
+     *
+     * @param s  the string to parse, which must be either <code>"ALLOW"</code>,
+     * or <code>"FORBID"</code> (case-insensitive), or an integer number.
+     * If the given string is blank or <code>null</code>, <code>"FORBID"</code>
+     * is assumed.
+     *
+     * @return  the level corresponding to the given string.
+     *
+     * @throws NumberFormatException  if the given string is neither <code>"ALLOW"</code>,
+     * nor <code>"FORBID"</code>, nor an integer number.
+     */
+    public static int parseLevel(String s) {
         int level;
+        if (StringUtils.isBlank(s)) {
+            return Level.FORBID.intValue();
+        }
         if (Level.ALLOW.name().equalsIgnoreCase(s)) {
             level = Level.ALLOW.intValue();
         } else if (Level.FORBID.name().equalsIgnoreCase(s)) {

@@ -10,9 +10,12 @@
  *******************************************************************************/
 package org.eclipse.skalli.model;
 
+import static org.junit.Assert.assertTrue;
+
 import java.text.MessageFormat;
 import java.util.TreeSet;
 
+import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.PropertyHelperUtils;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.eclipse.skalli.testutil.TestExtension1;
@@ -115,7 +118,6 @@ public class IssueTest implements Issuer {
     public void testBasics_noIssuer() {
         new Issue(Severity.WARNING, null, PropertyHelperUtils.TEST_UUIDS[0]);
     }
-
 
     @Test
     public void testCompareToEquals() {
@@ -272,6 +274,26 @@ public class IssueTest implements Issuer {
         Assert.assertEquals("Message", Issue.getMessage("Message", null));
         Assert.assertEquals("", Issue.getMessage("", new TreeSet<Issue>()));
         Assert.assertEquals("", Issue.getMessage("", null));
+    }
+
+    @Test
+    public void testFilterBySeverity() throws Exception {
+        TreeSet<Issue> issues = new TreeSet<Issue>();
+        Issue issue0 = new Issue(Severity.WARNING, ISSUER, PropertyHelperUtils.TEST_UUIDS[0], "");
+        Issue issue1 = new Issue(Severity.ERROR, ISSUER, PropertyHelperUtils.TEST_UUIDS[1], null);
+        Issue issue2 = new Issue(Severity.INFO, ISSUER, PropertyHelperUtils.TEST_UUIDS[2], "IssueInfo");
+        Issue issue3 = new Issue(Severity.FATAL, ISSUER, PropertyHelperUtils.TEST_UUIDS[3], "");
+        issues.add(issue0);
+        issues.add(issue1);
+        issues.add(issue2);
+        issues.add(issue3);
+        assertTrue(Issue.hasFatalIssues(issues));
+        AssertUtils.assertEquals("filter FATAL", Issue.filterBySeverity(issues, Severity.FATAL), issue3);
+        AssertUtils.assertEquals("filter ERROR", Issue.filterBySeverity(issues, Severity.ERROR), issue3, issue1);
+        AssertUtils.assertEquals("filter WARNING", Issue.filterBySeverity(issues,
+                Severity.WARNING), issue3, issue1, issue0);
+        AssertUtils.assertEquals("filter INFO", Issue.filterBySeverity(issues,
+                Severity.INFO), issue3, issue1, issue0, issue2);
     }
 
 }

@@ -12,7 +12,6 @@ package org.eclipse.skalli.model;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -196,16 +195,8 @@ public class ValidationException extends Exception {
      * @param minSeverity  the minimal severity of issues to include in the result.
      * @return a set of issues sorted by {@link Issue#compareTo(Issue)}, or an empty set.
      */
-    public Set<Issue> getIssues(Severity minSeverity) {
-        Set<Issue> result = new TreeSet<Issue>();
-        if (issues != null) {
-            for (Issue issue : issues) {
-                if (issue.getSeverity().compareTo(minSeverity) <= 0) {
-                    result.add(issue);
-                }
-            }
-        }
-        return result;
+    public SortedSet<Issue> getIssues(Severity minSeverity) {
+        return Issue.filterBySeverity(issues, minSeverity);
     }
 
     /**

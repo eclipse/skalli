@@ -30,7 +30,13 @@ public class PropertyHelperUtils {
             UUID.fromString("84b2dbab-1038-44a3-a925-06aa58039a16"),
             UUID.fromString("24144e5a-6cb5-4925-9ea9-c6e13fb660e0"),
             UUID.fromString("2bf62f55-780b-4df8-b0b1-c97e773cce11"),
-            UUID.fromString("7488bfa2-d795-460e-997f-11ba39fd2a07")
+            UUID.fromString("7488bfa2-d795-460e-997f-11ba39fd2a07"),
+            UUID.fromString("00c5cdb4-fb0f-4f11-913c-44a7f24531bd"),
+            UUID.fromString("0c2b3d8c-b27b-4fb2-9afc-c3517d37745a"),
+            UUID.fromString("8906b4b1-591c-42aa-9f74-9396f3d8f645"),
+            UUID.fromString("57129f9c-1d12-4376-9c01-58f77f6996dd"),
+            UUID.fromString("92129b24-df47-422d-9d20-2706daa9d47b"),
+            UUID.fromString("1349368c-9864-4aff-ae0b-92da92cee677")
     };
 
     public static Map<String, Object> getValues() {
@@ -51,3 +57,4 @@ public class PropertyHelperUtils {
         return new HashMap<Class<?>, String[]>();
     }
 }
+

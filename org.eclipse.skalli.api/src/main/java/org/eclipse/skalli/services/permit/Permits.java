@@ -12,6 +12,7 @@ package org.eclipse.skalli.services.permit;
 
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.permit.Permit.Level;
 
 public class Permits {
 
@@ -131,6 +132,23 @@ public class Permits {
 
     /**
      * Checks whether the currently logged in user, i.e. the user that is
+     * attached to the current thread, has the given permit.
+     *
+     * @param level  the requested permit level, e.g. {@link Permit#ALLOW}.
+     * @param action  the requested action.
+     * @param segments  the requested resource path. Either a  complete resource
+     * path (with forward slashes (/) as separators), or a list of path
+     * segments (without slashes).
+     *
+     * @return <code>true</code>, if the currently logged in user has the
+     * given permit.
+     */
+    public static boolean hasPermit(Level level, String action, String... segments) {
+        return hasPermit(level.intValue(), action, segments);
+    }
+
+    /**
+     * Checks whether the currently logged in user, i.e. the user that is
      * attached to the current thread, has the given permit on a certain project.
      *
      * @param level  the requested permit level, e.g. 1 for <tt>"ALLOW"</tt>.
@@ -143,6 +161,21 @@ public class Permits {
     public static boolean hasProjectPermit(int level, String action, Project project) {
         PermitService permitService = getPermitService();
         return permitService != null? permitService.hasPermit(level, action, project) : false;
+    }
+
+    /**
+     * Checks whether the currently logged in user, i.e. the user that is
+     * attached to the current thread, has the given permit on a certain project.
+     *
+     * @param level  the requested permit level, e.g. {@link Permit#ALLOW}.
+     * @param action  the requested action
+     * @param project  the project on which to perform the action.
+     *
+     * @return <code>true</code>, if the currently logged in user has the
+     * given permit.
+     */
+    public static boolean hasProjectPermit(Level level, String action, Project project) {
+        return hasProjectPermit(level.intValue(), action, project);
     }
 
     /**
@@ -161,6 +194,23 @@ public class Permits {
     public static boolean hasProjectPermit(int level, String action, Project project, String... segments) {
         PermitService permitService = getPermitService();
         return permitService != null? permitService.hasPermit(level, action, project, segments) : false;
+    }
+
+    /**
+     * Checks whether the currently logged in user, i.e. the user that is
+     * attached to the current thread, has the given permit
+     * on a resource within a project, e.g. a certain property.
+     *
+     * @param level  the requested permit level, e.g. {@link Permit#ALLOW}.
+     * @param action  the requested action
+     * @param project  the project on which to perform the action.
+     * @param segments  the resource path relative to <tt>/project/&lt;projectId&gt;</tt>.
+     *
+     * @return <code>true</code>, if the currently logged in user has the
+     * given permit.
+     */
+    public static boolean hasProjectPermit(Level level, String action, Project project, String... segments) {
+        return hasProjectPermit(level.intValue(), action, project, segments);
     }
 
     /**

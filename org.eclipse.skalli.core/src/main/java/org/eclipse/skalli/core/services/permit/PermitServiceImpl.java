@@ -293,23 +293,24 @@ public class PermitServiceImpl implements PermitService, EventListener<EventCust
                 }
                 properties.put(PROPERTY_PROJECTID, projectId);
 
-                collectGlobalCommits(properties, permitsConfig, permits);
+                Map<String, List<PermitConfig>> permitsByType = permitsConfig.getByType();
+                collectGlobalCommits(properties, permitsByType, permits);
                 if (templateId != null) {
-                    collectTemplatePermits(templateId, properties, permitsConfig, permits);
+                    collectTemplatePermits(templateId, properties, permitsByType, permits);
                 }
                 if (groupRoles.size() > 0) {
-                    collectRolePermits(groupRoles, properties, permitsConfig, permits);
+                    collectRolePermits(groupRoles, properties, permitsByType, permits);
                 }
                 if (roles.size() > 0) {
-                    collectRolePermits(roles, properties, permitsConfig, permits);
+                    collectRolePermits(roles, properties, permitsByType, permits);
                 }
                 if (projectRoles.size() > 0) {
-                    collectRolePermits(projectRoles, properties, permitsConfig, permits);
+                    collectRolePermits(projectRoles, properties, permitsByType, permits);
                 }
                 if (groups.size() > 0) {
-                    collectGroupPermits(groups, properties, permitsConfig, permits);
+                    collectGroupPermits(groups, properties, permitsByType, permits);
                 }
-                collectUserPermits(userId, properties, permitsConfig, permits);
+                collectUserPermits(userId, properties, permitsByType, permits);
             } else {
                 // special handling for bootstrapping of a new instance or for
                 // instances where authorization is not relevant
@@ -322,49 +323,60 @@ public class PermitServiceImpl implements PermitService, EventListener<EventCust
         return permits;
     }
 
-    private void collectGlobalCommits(Map<String,String> properties, PermitsConfig permitsConfig, PermitSet permits) {
-        List<PermitConfig> globalPermits = permitsConfig.getGlobalPermits();
-        for (PermitConfig globalPermit: globalPermits) {
-            permits.add(globalPermit.asPermit(properties));
+    private void collectGlobalCommits(Map<String,String> properties,
+            Map<String, List<PermitConfig>> permitsConfig, PermitSet permits) {
+        List<PermitConfig> globalPermits = permitsConfig.get(PermitsConfig.GLOBAL_PERMIT);
+        if (globalPermits != null) {
+            for (PermitConfig globalPermit: globalPermits) {
+                permits.add(globalPermit.asPermit(properties));
+            }
         }
     }
 
     private void collectUserPermits(String userId,  Map<String,String> properties,
-            PermitsConfig permitsConfig, PermitSet permits) {
-        List<PermitConfig> userPermits = permitsConfig.getUserPermits();
-        for (PermitConfig userPermit: userPermits) {
-            if (userId.equals(userPermit.getOwner())) {
-                permits.add(userPermit.asPermit(properties));
+            Map<String, List<PermitConfig>> permitsConfig, PermitSet permits) {
+        List<PermitConfig> userPermits = permitsConfig.get(PermitsConfig.USER_PERMIT);
+        if (userPermits != null) {
+            for (PermitConfig userPermit: userPermits) {
+                if (userId.equals(userPermit.getOwner())) {
+                    permits.add(userPermit.asPermit(properties));
+                }
             }
         }
     }
 
     private void collectGroupPermits(List<String> groups,  Map<String,String> properties,
-            PermitsConfig permitsConfig, PermitSet permits) {
-        List<PermitConfig> groupPermits = permitsConfig.getGroupPermits();
-        for (PermitConfig groupPermit: groupPermits) {
-            if (groups.contains(groupPermit.getOwner())) {
-                permits.add(groupPermit.asPermit(properties));
+            Map<String, List<PermitConfig>> permitsConfig, PermitSet permits) {
+        List<PermitConfig> groupPermits = permitsConfig.get(PermitsConfig.GROUP_PERMIT);
+        if (groupPermits != null) {
+            for (PermitConfig groupPermit: groupPermits) {
+                if (groups.contains(groupPermit.getOwner())) {
+                    permits.add(groupPermit.asPermit(properties));
+                }
             }
         }
     }
 
     private void collectRolePermits(List<String> roles, Map<String,String> properties,
-            PermitsConfig permitsConfig, PermitSet permits) {
-        List<PermitConfig> rolePermits = permitsConfig.getRolePermits();
-        for (PermitConfig rolePermit: rolePermits) {
-            if (roles.contains(rolePermit.getOwner())) {
-                permits.add(rolePermit.asPermit(properties));
+            Map<String, List<PermitConfig>> permitsConfig, PermitSet permits) {
+        List<PermitConfig> rolePermits = permitsConfig.get(PermitsConfig.ROLE_PERMIT);
+        if (rolePermits != null) {
+            for (PermitConfig rolePermit: rolePermits) {
+                if (roles.contains(rolePermit.getOwner())) {
+                    permits.add(rolePermit.asPermit(properties));
+                }
             }
         }
     }
 
     private void collectTemplatePermits(String templateId, Map<String,String> properties,
-            PermitsConfig permitsConfig, PermitSet permits) {
-        List<PermitConfig> templatePermits = permitsConfig.getTemplatePermits();
-        for (PermitConfig templatePermit: templatePermits) {
-            if (templateId.equals(templatePermit.getOwner())) {
-                permits.add(templatePermit.asPermit(properties));
+            Map<String, List<PermitConfig>> permitsConfig, PermitSet permits) {
+        List<PermitConfig> templatePermits = permitsConfig.get(PermitsConfig.TEMPLATE_PERMIT);
+        if (templatePermits != null) {
+            for (PermitConfig templatePermit: templatePermits) {
+                if (templateId.equals(templatePermit.getOwner())) {
+                    permits.add(templatePermit.asPermit(properties));
+                }
             }
         }
     }

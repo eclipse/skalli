@@ -24,6 +24,7 @@ import org.eclipse.skalli.api.rest.internal.resources.SubprojectsResource;
 import org.eclipse.skalli.api.rest.internal.resources.UserPermitsResource;
 import org.eclipse.skalli.api.rest.internal.resources.UserResource;
 import org.eclipse.skalli.api.rest.monitor.Monitorable;
+import org.eclipse.skalli.services.configuration.rest.ConfigResource;
 import org.eclipse.skalli.services.configuration.rest.ConfigSection;
 import org.eclipse.skalli.services.extension.rest.ErrorRepresentation;
 import org.eclipse.skalli.services.extension.rest.RestExtension;
@@ -140,7 +141,7 @@ public class RestApplication extends Application {
                 }
                 Class<? extends ServerResource> resource = configSection.getServerResource(resourcePath);
                 if (resource != null) {
-                    router.attach("/config" + resourcePath, resource); //$NON-NLS-1$
+                    router.attach(ConfigResource.CONFIG_PATH_PREFIX + resourcePath, resource); //$NON-NLS-1$
                     LOG.info(MessageFormat.format(
                             "Attached REST resource {0} to path {1} for configuration section ''{2}''",
                             resource.getName(), resourcePath, configSection.getName()));

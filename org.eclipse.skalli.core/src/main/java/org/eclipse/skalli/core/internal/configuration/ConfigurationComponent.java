@@ -26,7 +26,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.ThreadPool;
 import org.eclipse.skalli.core.internal.persistence.CompositeEntityClassLoader;
 import org.eclipse.skalli.core.internal.persistence.xstream.FileStorageService;
-import org.eclipse.skalli.core.internal.persistence.xstream.IgnoreUnknownFieldsMapperWrapper;
 import org.eclipse.skalli.services.configuration.ConfigKey;
 import org.eclipse.skalli.services.configuration.ConfigTransaction;
 import org.eclipse.skalli.services.configuration.ConfigurationProperties;
@@ -44,7 +43,6 @@ import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
-import com.thoughtworks.xstream.mapper.MapperWrapper;
 
 public class ConfigurationComponent implements ConfigurationService {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationComponent.class);
@@ -227,12 +225,7 @@ public class ConfigurationComponent implements ConfigurationService {
     }
 
     private XStream getXStream(Class<?> customizationClass) {
-        XStream xstream = new XStream() {
-            @Override
-            protected MapperWrapper wrapMapper(MapperWrapper next) {
-                return new IgnoreUnknownFieldsMapperWrapper(next);
-            }
-        };
+        XStream xstream = new XStream();
         ClassLoader classLoader = customizationClass.getClassLoader();
         if (classLoader != null) {
             xstream.setClassLoader(new CompositeEntityClassLoader(Collections.singleton(classLoader)));

@@ -18,13 +18,30 @@ public class PermitsConfigSection extends ConfigSectionBase implements ConfigSec
 
     private static final String NAME = "permissions"; //$NON-NLS-1$
 
+    private static final String PERMISSIONS_PATH = "/permissions"; //$NON-NLS-1$
+    private static final String PERMITS_PATH = "/permits"; //$NON-NLS-1$
+    private static final String PERMIT_PATH = "/permits/{id}"; //$NON-NLS-1$
+
     @Override
     public String getName() {
         return NAME;
     }
 
     @Override
+    public String[] getResourcePaths() {
+        return new String[] {
+                PERMISSIONS_PATH, PERMITS_PATH, PERMIT_PATH
+        };
+    }
+
+    @Override
     public Class<? extends ServerResource> getServerResource(String resourePath) {
-        return PermitsResource.class;
+        if (PERMISSIONS_PATH.equals(resourePath) || PERMITS_PATH.equals(resourePath)) {
+            return PermitsResource.class;
+        }
+        if (PERMIT_PATH.equals(resourePath)) {
+            return PermitResource.class;
+        }
+        return null;
     }
 }

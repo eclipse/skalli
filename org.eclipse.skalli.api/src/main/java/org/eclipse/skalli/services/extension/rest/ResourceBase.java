@@ -65,7 +65,8 @@ public abstract class ResourceBase extends ServerResource {
     }
 
     /**
-     * Returns the request path.
+     * Returns the request path including the context path
+     * prefix <code>/api</code>.
      */
     protected String getPath() {
         return path;

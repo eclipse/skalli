@@ -12,12 +12,13 @@ package org.eclipse.skalli.core.services.role;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Severity;
-import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
 
 public class RolesResource extends CustomizingResource<RolesConfig> implements Issuer {
@@ -42,11 +43,13 @@ public class RolesResource extends CustomizingResource<RolesConfig> implements I
     }
 
     @Override
-    public ValidationException validate(RolesConfig configObject, String loggedInUser) {
+    public SortedSet<Issue> validate(RolesConfig configObject, String loggedInUser) {
+        TreeSet<Issue> issues = new TreeSet<Issue>();
         for (RoleConfig roleConfig: configObject.getRoles()) {
             if (StringUtils.isBlank(roleConfig.getRoleId())) {
-                return new ValidationException(new Issue(Severity.FATAL, this.getClass(),
-                        "Roles must have a non-empty role identifier"));
+                issues.add(new Issue(Severity.FATAL, this.getClass(),
+                        "Roles must have non-empty role identifiers"));
+                return issues;
             }
         }
         //check that roles identifiers are unique
@@ -58,13 +61,14 @@ public class RolesResource extends CustomizingResource<RolesConfig> implements I
                 if (StringUtils.isNotBlank(roleId)) {
                     for (int j = i + 1; j < roleConfigs.size(); j++) {
                         if (roleId.equals(roleConfigs.get(j).getRoleId())) {
-                            return new ValidationException(new Issue(Severity.FATAL, this.getClass(),
+                            issues.add(new Issue(Severity.FATAL, this.getClass(),
                                     "Role names must be unique"));
+                            return issues;
                         }
                     }
                 }
             }
         }
-        return new ValidationException();
+        return issues;
     }
 }

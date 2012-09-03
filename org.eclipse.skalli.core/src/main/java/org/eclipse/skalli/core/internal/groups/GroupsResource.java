@@ -13,12 +13,13 @@ package org.eclipse.skalli.core.internal.groups;
 import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Severity;
-import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
 import org.eclipse.skalli.services.group.GroupService;
 
@@ -44,10 +45,8 @@ public class GroupsResource extends CustomizingResource<GroupsConfig> implements
     }
 
     @Override
-    public ValidationException validate(
-            GroupsConfig configObject, String loggedInUser) {
-
-        ValidationException validationException = new ValidationException();
+    public SortedSet<Issue> validate(GroupsConfig configObject, String loggedInUser) {
+        TreeSet<Issue> issues = new TreeSet<Issue>();
 
         boolean adminGroupExists = false;
         boolean memberEmptyErrorFound = false;
@@ -56,7 +55,7 @@ public class GroupsResource extends CustomizingResource<GroupsConfig> implements
 
             //goupId is mandatory
             if (StringUtils.isBlank(group.getGroupId())) {
-                validationException.addIssue(new Issue(Severity.FATAL, this.getClass(),
+                issues.add(new Issue(Severity.FATAL, this.getClass(),
                         "Groups must have a name"));
             }
 
@@ -64,13 +63,13 @@ public class GroupsResource extends CustomizingResource<GroupsConfig> implements
                 //admin group: warn if empty group
                 adminGroupExists = true;
                 if (group.getGroupMembers().size() == 0) {
-                    validationException.addIssue(new Issue(Severity.WARNING, this.getClass(),
+                    issues.add(new Issue(Severity.WARNING, this.getClass(),
                             "Administrators group has no members. All users will be administrators!"));
                 }
             } else {
                 //warn: each group should have at least one members
                 if (group.getGroupMembers().size() == 0) {
-                    validationException.addIssue(new Issue(Severity.WARNING, this.getClass(),
+                    issues.add(new Issue(Severity.WARNING, this.getClass(),
                             MessageFormat.format("Group {0} has no members.", group.getGroupId())));
                 }
             }
@@ -79,14 +78,14 @@ public class GroupsResource extends CustomizingResource<GroupsConfig> implements
             for (String member : group.getGroupMembers()) {
                 if (StringUtils.isBlank(member) && !memberEmptyErrorFound) {
                     memberEmptyErrorFound = true;
-                    validationException.addIssue(new Issue(Severity.FATAL, this.getClass(),
+                    issues.add(new Issue(Severity.FATAL, this.getClass(),
                             "All members must have a non empty value"));
                 }
             }
         }
 
         if (!adminGroupExists) {
-            validationException.addIssue(new Issue(Severity.WARNING, this.getClass(),
+            issues.add(new Issue(Severity.WARNING, this.getClass(),
                     "No administrators group configured. All users will be administrators!"));
         }
 
@@ -108,10 +107,10 @@ public class GroupsResource extends CustomizingResource<GroupsConfig> implements
 
             }
             if (!unique) {
-                validationException.addIssue(new Issue(Severity.FATAL, this.getClass(), "Group names must be unique"));
+                issues.add(new Issue(Severity.FATAL, this.getClass(), "Group names must be unique"));
             }
         }
 
-        return validationException;
+        return issues;
     }
 }
