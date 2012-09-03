@@ -18,53 +18,52 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Failed Creating Git/Gerrit Repository - ${html:escapeHtml(pagetitle)}</title>
+<title>Creating Git Repository Failed - ${html:escapeHtml(pagetitle)}</title>
 <style type="text/css">
-  @import "<%=Consts.JSP_STYLE%>";
-  .errormessage {
+@import "<%=Consts.JSP_STYLE%>";
+
+.errormessage {
     font-style: italic;
     color: #9E0000;
-  }
+}
 </style>
 </head>
 <body>
 
-<%-- header area --%>
-<jsp:include page="<%= Consts.JSP_HEADER %>" flush="true" />
-<jsp:include page="<%= Consts.JSP_HEADER_SEARCH %>" flush="true" />
+    <%-- header area --%>
+    <jsp:include page="<%=Consts.JSP_HEADER%>" flush="true" />
+    <jsp:include page="<%=Consts.JSP_HEADER_SEARCH%>" flush="true" />
 
-<%-- navigation menu on left side --%>
-<jsp:include page="<%= Consts.JSP_NAVIGATIONBAR %>" flush="true" />
+    <%-- navigation menu on left side --%>
+    <jsp:include page="<%=Consts.JSP_NAVIGATIONBAR%>" flush="true" />
 
-<%-- git/gerrit error --%>
-<div class="rightarea" >
-<h2>
-Creation of Git/Gerrit repository not possible!
-</h2>
-Creation of a Git/Gerrit repository is not possible because of the following reason:
-<br/><br/>
-<c:choose>
-  <c:when test="${errormessage == 'noConfiguration'}" >
-  <div class='errormessage'>
-  The Gerrit client is not configured. Please contact the system administrator.
-  </div>
-  <br/>
-  <c:if test="${feedbackConfig != null}">
-    <a title="${feedbackConfig.displayName}" href="${feedbackConfig.url}">Send Bug Report</a>
-  </c:if>
-  </c:when>
-  <c:when test="${errormessage == 'noParent'}" >
-  <div id="errorMessageNoParent" class='errormessage'>
-  Root projects are not allowed to create a Git/Gerrit repository. Please set a parent project first.
-  </div>
-  <br/>
-  <a id="errorEditProjectLink" href="<%= Consts.URL_PROJECTS + "/" + request.getAttribute(Consts.ATTRIBUTE_PROJECTID) + "?" + Consts.PARAM_ACTION + "=" + Consts.PARAM_VALUE_EDIT%>" target="_top">
-  Edit this project</a>
-  </c:when>
-  <c:otherwise>
-    Unknown.
-  </c:otherwise>
-</c:choose>
-</div>
+    <%-- git/gerrit error --%>
+    <div class="rightarea">
+        <h2>Creation of Git/Gerrit repository not possible!</h2>
+        <c:choose>
+            <c:when test="${errormessage == 'noConfiguration'}">
+                <div class='errormessage'>Gerrit access is not configured.</div>
+                <br />
+                <c:if test="${feedbackConfig != null}">
+                    <a title="${feedbackConfig.displayName}" href="${feedbackConfig.url}">Send Bug Report</a>
+                </c:if>
+            </c:when>
+            <c:when test="${errormessage == 'noParent'}">
+                <div id="errorMessageNoParent" class='errormessage'>Root projects are not allowed to create a Git
+                    repository. Please set a parent project first.</div>
+                <br />
+                <a id="errorEditProjectLink"
+                    href="<%=Consts.URL_PROJECTS + "/" + request.getAttribute(Consts.ATTRIBUTE_PROJECTID) + "?"
+                            + Consts.PARAM_ACTION + "=" + Consts.PARAM_VALUE_EDIT%>"
+                    target="_top"> Edit this project</a>
+            </c:when>
+            <c:otherwise>
+                An unexpected error occurred.
+                <c:if test="${feedbackConfig != null}">
+                    <a title="${feedbackConfig.displayName}" href="${feedbackConfig.url}">Send Bug Report</a>
+                </c:if>
+            </c:otherwise>
+        </c:choose>
+    </div>
 </body>
 </html>

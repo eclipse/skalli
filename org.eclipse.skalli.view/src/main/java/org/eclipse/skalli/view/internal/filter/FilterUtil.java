@@ -31,7 +31,7 @@ public class FilterUtil {
     public static void handleException(ServletRequest request, ServletResponse response, Exception e)
             throws ServletException, IOException {
         if (!response.isCommitted()) {
-            // dispatch this request to error page
+            // dispatch this request to /error
             RequestDispatcher rd = request.getRequestDispatcher(Consts.URL_ERROR);
             request.setAttribute(Consts.ATTRIBUTE_EXCEPTION, e);
             rd.forward(request, response);
@@ -40,8 +40,12 @@ public class FilterUtil {
 
     public static void handleACException(ServletRequest request, ServletResponse response, AccessControlException e)
             throws ServletException, IOException {
-        // should be improved later
-        FilterUtil.handleException(request, response, e);
+        if (!response.isCommitted()) {
+            // dispatch this request to /unauthorized
+            RequestDispatcher rd = request.getRequestDispatcher(Consts.URL_UNAUTHORIZED);
+            request.setAttribute(Consts.ATTRIBUTE_EXCEPTION, e);
+            rd.forward(request, response);
+        }
     }
 
     public static void forward(ServletRequest request, ServletResponse response, String url) throws ServletException,

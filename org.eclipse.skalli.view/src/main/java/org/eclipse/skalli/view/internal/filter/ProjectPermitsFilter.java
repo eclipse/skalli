@@ -25,10 +25,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.permit.Permit;
+import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.view.Consts;
 
 /**
- * Checks project related permits, e.g. that only project members or users with explicit PUT permit
+ * Filter that checks project related permits, e.g. that only project members or users with explicit PUT permit
  * are allowed to edit a project.
  * <p>
  * This filter reads the following attributes:
@@ -44,7 +46,7 @@ import org.eclipse.skalli.view.Consts;
  * <code>false</code> otherwise.</li>
  * </ul>
  */
-public class ACFilter implements Filter {
+public class ProjectPermitsFilter implements Filter {
 
     @Override
     public void destroy() {
@@ -66,15 +68,24 @@ public class ACFilter implements Filter {
         String pathInfo = httpRequest.getPathInfo();
 
         if (servletPath.startsWith(Consts.URL_PROJECTS)) {
+            // handle access to project detail page
+            if (project != null && !Permits.hasProjectPermit(Permit.ALLOW, Permit.ACTION_GET, project)) {
+                AccessControlException e = new AccessControlException(MessageFormat.format(
+                        "User ''{0}'' is not authorized to view project ''{1}''", userId,
+                        project.getProjectId()));
+                FilterUtil.handleACException(httpRequest, response, e);
+                return;
+            }
             // handle URL starting with /projects
             String actionValue = request.getParameter(Consts.PARAM_ACTION);
             if (project != null && Consts.PARAM_VALUE_EDIT.equals(actionValue)) {
                 // handle /projects/{projectId}?action=edit
                 if (!isProjectAdmin) {
                     AccessControlException e = new AccessControlException(MessageFormat.format(
-                            "User {0} is not authorized to edit project {1}", userId,
+                            "User ''{0}'' is not authorized to edit project ''{1}''", userId,
                             project.getProjectId()));
                     FilterUtil.handleACException(httpRequest, response, e);
+                    return;
                 }
             } else if (project == null && StringUtils.isNotBlank(pathInfo)) {
                 // handle /projects/{projectId} with unknown projectId => project creation dialog
@@ -82,14 +93,16 @@ public class ACFilter implements Filter {
                     AccessControlException e = new AccessControlException(
                             "Anonymous users are not authorized to create new projects");
                     FilterUtil.handleACException(httpRequest, response, e);
+                    return;
                 }
             }
         } else {
             // handle all other URLs not starting with /projects
             if (isAnonymousUser) {
                 AccessControlException e = new AccessControlException(
-                        "Anonymous users are not authorized to request this page");
+                        "Anonymous users are not authorized to view this page");
                 FilterUtil.handleACException(request, response, e);
+                return;
             }
             if (StringUtils.isNotBlank(pathInfo)) {
                 if (project == null) {
@@ -97,9 +110,12 @@ public class ACFilter implements Filter {
                             "No project instance available although servlet path is {0}.",
                             servletPath));
                     FilterUtil.handleException(request, response, e);
+                    return;
                 } else if (!isProjectAdmin) {
-                    AccessControlException e = new AccessControlException("User is not authorized to request this page");
+                    AccessControlException e = new AccessControlException(
+                            "User is not authorized to view this page");
                     FilterUtil.handleACException(request, response, e);
+                    return;
                 }
             }
         }

@@ -125,9 +125,15 @@
     </servlet>
     <servlet>
         <description>Error Page</description>
-        <display-name>SkalliError</display-name>
+        <display-name>Error</display-name>
         <servlet-name>ErrorPage</servlet-name>
         <jsp-file>/search/error.jsp</jsp-file>
+    </servlet>
+        <servlet>
+        <description>Unauthorized Page</description>
+        <display-name>Unauthorized</display-name>
+        <servlet-name>UnauthorizedPage</servlet-name>
+        <jsp-file>/search/unauthorized.jsp</jsp-file>
     </servlet>
 
     <!--  move functionality of the following servlets to separate bundles -->
@@ -171,8 +177,8 @@
        <filter-class>org.eclipse.skalli.view.internal.filter.RestFilter</filter-class>
     </filter>
     <filter>
-       <filter-name>ProjectACFilter</filter-name>
-       <filter-class>org.eclipse.skalli.view.internal.filter.ACFilter</filter-class>
+       <filter-name>ProjectPermitsFilter</filter-name>
+       <filter-class>org.eclipse.skalli.view.internal.filter.ProjectPermitsFilter</filter-class>
     </filter>
     <filter>
        <filter-name>ProjectDetailsFilter</filter-name>
@@ -300,6 +306,10 @@
         <servlet-name>ErrorPage</servlet-name>
         <url-pattern>/error</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UnauthorizedPage</servlet-name>
+        <url-pattern>/unauthorized</url-pattern>
+    </servlet-mapping>
 
     <!-- move functionality of the following servlets to separate bundles -->
     <servlet-mapping>
@@ -363,7 +373,7 @@
         <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>ProjectACFilter</filter-name>
+        <filter-name>ProjectPermitsFilter</filter-name>
         <url-pattern>/projects/*</url-pattern>
         <url-pattern>/create/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
@@ -427,6 +437,7 @@
             <url-pattern>/search/style.css</url-pattern>
             <url-pattern>/js/*</url-pattern>
             <url-pattern>/error</url-pattern>
+            <url-pattern>/unauthorized</url-pattern>
             <url-pattern>/VAADIN/*</url-pattern>
             <url-pattern>/schemas/*</url-pattern>
             <url-pattern>/favicon.ico</url-pattern>
