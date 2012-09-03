@@ -80,7 +80,7 @@ public class LuceneIndex<T extends EntityBase> {
         this.entityService = entityService;
     }
 
-    public void reindexAll() {
+    public synchronized void reindexAll() {
         reindex(entityService.getAll());
     }
 
@@ -161,7 +161,7 @@ public class LuceneIndex<T extends EntityBase> {
         }
     }
 
-    public void reindex(final Collection<T> entities) {
+    public synchronized void reindex(final Collection<T> entities) {
         directory = new RAMDirectory();
         addEntitiesToIndex(entities);
     }
@@ -203,7 +203,7 @@ public class LuceneIndex<T extends EntityBase> {
         }
     }
 
-    public void remove(final Collection<T> entities) {
+    public synchronized void remove(final Collection<T> entities) {
         try {
             IndexSearcher searcher = new IndexSearcher(directory, false);
             for (EntityBase entity : entities) {
@@ -221,7 +221,7 @@ public class LuceneIndex<T extends EntityBase> {
         }
     }
 
-    public void update(final Collection<T> entities) {
+    public synchronized void update(final Collection<T> entities) {
         // first delete entities from index
         remove(entities);
 
@@ -261,7 +261,7 @@ public class LuceneIndex<T extends EntityBase> {
         return ret;
     }
 
-    public SearchResult<T> moreLikeThis(T entity, String[] fields, int count) {
+    public synchronized SearchResult<T> moreLikeThis(T entity, String[] fields, int count) {
         List<SearchHit<T>> searchHits = new LinkedList<SearchHit<T>>();
         try {
             IndexSearcher searcher = new IndexSearcher(directory, true);
@@ -306,14 +306,14 @@ public class LuceneIndex<T extends EntityBase> {
         }
     }
 
-    public SearchResult<T> search(final String[] fields, final String queryString, PagingInfo pagingInfo)
+    public synchronized SearchResult<T> search(final String[] fields, final String queryString, PagingInfo pagingInfo)
             throws QueryParseException {
         SearchResult<T> ret = new SearchResult<T>();
         search(fields, null, queryString, pagingInfo, ret);
         return ret;
     }
 
-    public FacetedSearchResult<T> facetedSearch(final String[] fields, String[] facetFields, final String queryString,
+    public synchronized FacetedSearchResult<T> facetedSearch(final String[] fields, String[] facetFields, final String queryString,
             PagingInfo pagingInfo) throws QueryParseException {
         FacetedSearchResult<T> ret = new FacetedSearchResult<T>();
         search(fields, facetFields, queryString, pagingInfo, ret);
