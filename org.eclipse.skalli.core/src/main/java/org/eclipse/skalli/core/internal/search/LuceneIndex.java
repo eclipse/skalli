@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.search;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -145,19 +146,21 @@ public class LuceneIndex<T extends EntityBase> {
     }
 
     private void addEntitiesToIndex(Collection<T> entities) {
+        IndexWriter writer = null;
         try {
-            IndexWriter writer = new IndexWriter(directory, analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
+            writer = new IndexWriter(directory, analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
             for (T entity : entities) {
                 if (!entity.isDeleted()) {
                     addEntityToIndex(writer, entity);
                 }
             }
-            writer.close();
         } catch (LockObtainFailedException e) {
             LOG.error("Failed to add index entries due to Lucene lock: re-indexing all entities", e);
-            reindexAll();
+            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            closeQuietly(writer);
         }
     }
 
@@ -204,20 +207,22 @@ public class LuceneIndex<T extends EntityBase> {
     }
 
     public synchronized void remove(final Collection<T> entities) {
+        IndexSearcher searcher = null;
         try {
-            IndexSearcher searcher = new IndexSearcher(directory, false);
+            searcher = new IndexSearcher(directory, false);
             for (EntityBase entity : entities) {
                 ScoreDoc hit = getDocByUUID(searcher, entity.getUuid());
                 if (hit != null) {
                     searcher.getIndexReader().deleteDocument(hit.doc);
                 }
             }
-            searcher.close();
         } catch (LockObtainFailedException e) {
             LOG.error("Failed to remove index entries due to Lucene lock: re-indexing all entities", e);
-            reindexAll();
+            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            closeQuietly(searcher);
         }
     }
 
@@ -263,8 +268,9 @@ public class LuceneIndex<T extends EntityBase> {
 
     public synchronized SearchResult<T> moreLikeThis(T entity, String[] fields, int count) {
         List<SearchHit<T>> searchHits = new LinkedList<SearchHit<T>>();
+        IndexSearcher searcher = null;
         try {
-            IndexSearcher searcher = new IndexSearcher(directory, true);
+            searcher = new IndexSearcher(directory, true);
             ScoreDoc baseDoc = getDocByUUID(searcher, entity.getUuid());
             if (baseDoc == null) {
                 // entity!=null && baseDoc == null, can happen if deleted flag is set
@@ -295,7 +301,6 @@ public class LuceneIndex<T extends EntityBase> {
                     searchHits.add(searchHit);
                 }
             }
-            searcher.close();
             SearchResult<T> ret = new SearchResult<T>();
             ret.setPagingInfo(new PagingInfo(0, count));
             ret.setResultCount(collector.getTotalHits() - 1);
@@ -303,6 +308,8 @@ public class LuceneIndex<T extends EntityBase> {
             return ret;
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            closeQuietly(searcher);
         }
     }
 
@@ -336,8 +343,9 @@ public class LuceneIndex<T extends EntityBase> {
             totalHitCount = allEntities.size();
         } else {
             List<String> fieldList = Arrays.asList(fields);
+            IndexSearcher searcher = null;
             try {
-                IndexSearcher searcher = new IndexSearcher(directory);
+                searcher = new IndexSearcher(directory);
                 QueryParser parser = new MultiFieldQueryParser(Version.LUCENE_30, fields, analyzer);
                 Query query = getQuery(parser, queryString);
 
@@ -368,9 +376,10 @@ public class LuceneIndex<T extends EntityBase> {
                 if (collector instanceof FacetedCollector && ret instanceof FacetedSearchResult) {
                     ((FacetedSearchResult<T>) ret).setFacetInfo(((FacetedCollector) collector).getFacetsMap());
                 }
-                searcher.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            } finally {
+                closeQuietly(searcher);
             }
         }
 
@@ -402,5 +411,15 @@ public class LuceneIndex<T extends EntityBase> {
             }
         }
         return query;
+    }
+
+    private void closeQuietly(Closeable closable) {
+        try {
+            if (closable != null) {
+                closable.close();
+            }
+        } catch (IOException e) {
+            LOG.error("Failed to close " + closable.getClass().getName(), e);
+        }
     }
 }
