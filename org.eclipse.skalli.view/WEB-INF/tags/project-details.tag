@@ -36,7 +36,7 @@
         <c:otherwise/>
     </c:choose>
     <a class="projectlink" href='/projects/${p.singleValues["projectId"]}' target='_top'>
-        ${html:escapeHtml(p.singleValuesHighlighted["name"])}
+        ${html:clean(p.singleValuesHighlighted["name"])}
     </a>
 
     <c:if test="${user != null}">
@@ -87,7 +87,7 @@
             <c:if test="${parents[uuid] != null}">
                 <img class="linkicon" src="/VAADIN/themes/simple/icons/search/projects.png" alt="Parent Project" />
                 <a href="/projects/${parents[uuid].projectId}" target="_top">
-                    Parent Project (${html:escapeHtml(parents[uuid].name)})
+                    Parent Project (${html:clean(parents[uuid].name)})
                 </a>
             </c:if>
         </div>
@@ -110,7 +110,7 @@
                             <img class="linkicon" src="VAADIN/themes/simple/icons/search/projects.png"
                                 alt="Subproject" width="14px" height="14px" />
                             <a href="/projects/${child.singleValues['projectId']}" target="_top">
-                                ${html:escapeHtml(child.singleValuesHighlighted['name'])}
+                                ${html:clean(child.singleValuesHighlighted['name'])}
                             </a>
                         </span>
                     </c:forEach>
