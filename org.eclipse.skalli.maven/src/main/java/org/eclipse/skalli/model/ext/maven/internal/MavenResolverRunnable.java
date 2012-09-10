@@ -235,9 +235,28 @@ public class MavenResolverRunnable implements Runnable, Issuer {
                 issues.addAll(((ValidationException) e).getIssues());
             }
         } else {
-            LOG.error(message);
+            logIssue(message, severity);
         }
         issues.add(new Issue(severity, MavenResolverRunnable.class, uuid, MavenReactorProjectExt.class, null, message));
+    }
+
+    private void logIssue(String message, Severity severity) {
+        switch (severity) {
+        case ERROR:
+            LOG.error(message);
+            break;
+        case FATAL:
+            LOG.error(message);
+            break;
+        case INFO:
+            LOG.info(message);
+            break;
+        case WARNING:
+            LOG.warn(message);
+            break;
+        default:
+            break;
+        }
     }
 
     private boolean updateMavenReactorExtension(Project project, MavenReactor mavenReactor) {
