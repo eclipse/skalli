@@ -69,7 +69,7 @@
          id="org.apache.derby"
          download-size="0"
          install-size="0"
-         version="10.5.1.1"
+         version="10.5.1.1_v201108232300"
          unpack="false"/>
 
    <plugin
@@ -83,21 +83,21 @@
          id="org.apache.lucene.core"
          download-size="0"
          install-size="0"
-         version="3.0.3.v201111231628"
+         version="3.5.0.v20120319-2345"
          unpack="false"/>
 
    <plugin
          id="org.apache.lucene.highlighter"
          download-size="0"
          install-size="0"
-         version="3.0.3.v201111141847"
+         version="3.5.0.v20120319-2345"
          unpack="false"/>
 
    <plugin
          id="org.apache.lucene.queries"
          download-size="0"
          install-size="0"
-         version="3.0.3.v201111141847"
+         version="3.5.0.v20120319-2345"
          unpack="false"/>
 
    <plugin
@@ -146,7 +146,7 @@
          id="osgi.enterprise"
          download-size="0"
          install-size="0"
-         version="4.2.0.201003190513"
+         version="4.2.0.v201108120515"
          unpack="false"/>
 
    <plugin
@@ -223,7 +223,7 @@
          id="org.apache.lucene.memory"
          download-size="0"
          install-size="0"
-         version="3.0.3.v201111151751"
+         version="3.5.0.v20120319-2345"
          unpack="false"/>
 
    <plugin
@@ -269,42 +269,6 @@
          unpack="false"/>
 
    <plugin
-         id="ch.qos.logback.classic"
-         download-size="0"
-         install-size="0"
-         version="1.0.0.v20111214-2030"
-         unpack="false"/>
-
-   <plugin
-         id="ch.qos.logback.core"
-         download-size="0"
-         install-size="0"
-         version="1.0.0.v20111214-2030"
-         unpack="false"/>
-
-   <plugin
-         id="ch.qos.logback.slf4j"
-         download-size="0"
-         install-size="0"
-         version="1.0.0.v20120123-1500"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="com.sun.el"
-         download-size="0"
-         install-size="0"
-         version="2.2.0.v201108011116"
-         unpack="false"/>
-
-   <plugin
-         id="javax.servlet.jsp.jstl"
-         download-size="0"
-         install-size="0"
-         version="1.2.0.v201105211821"
-         unpack="false"/>
-
-   <plugin
          id="org.slf4j.api"
          download-size="0"
          install-size="0"
@@ -330,41 +294,6 @@
          download-size="0"
          install-size="0"
          version="2.0.4.v201112161009"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.equinox.console"
-         download-size="0"
-         install-size="0"
-         version="1.0.0.v20120522-1841"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.felix.gogo.command"
-         download-size="0"
-         install-size="0"
-         version="0.8.0.v201108120515"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.felix.gogo.runtime"
-         download-size="0"
-         install-size="0"
-         version="0.8.0.v201108120515"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.felix.gogo.shell"
-         download-size="0"
-         install-size="0"
-         version="0.8.0.v201110170705"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.persistence.jpa.jpql"
-         download-size="0"
-         install-size="0"
-         version="2.0.0.v20120608-r11652"
          unpack="false"/>
 
 </feature>

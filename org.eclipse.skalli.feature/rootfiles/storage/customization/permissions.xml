@@ -1,31 +1,39 @@
 <org.eclipse.skalli.core.services.permit.PermitsConfig>
-  <globalPermits>
+  <permits>
     <org.eclipse.skalli.core.services.permit.PermitConfig>
+      <uuid>f4e989fe-4dc9-4a87-a3b5-476aae3e1d6d</uuid>
+      <type>global</type>
       <action>GET</action>
       <path>/</path>
       <level>1</level>
+      <override>false</override>
     </org.eclipse.skalli.core.services.permit.PermitConfig>
-  </globalPermits>
-  <rolePermits>
     <org.eclipse.skalli.core.services.permit.PermitConfig>
+      <uuid>9c6e2f0a-b9c7-40e7-99ba-9ee0bd4c31db</uuid>
+      <type>role</type>
       <action>PUT</action>
       <path>/projects/${project}</path>
       <level>1</level>
+      <override>false</override>
       <owner>projectmember</owner>
     </org.eclipse.skalli.core.services.permit.PermitConfig>
     <org.eclipse.skalli.core.services.permit.PermitConfig>
+      <uuid>0bab1bda-19dd-4535-83d9-71f6f9f53da5</uuid>
+      <type>role</type>
       <action>PUT</action>
       <path>/projects/${project}</path>
       <level>1</level>
+      <override>false</override>
       <owner>projectlead</owner>
     </org.eclipse.skalli.core.services.permit.PermitConfig>
-  </rolePermits>
-  <groupPermits>
     <org.eclipse.skalli.core.services.permit.PermitConfig>
+      <uuid>fa16c7f8-8039-4ae4-a662-df56ef328489</uuid>
+      <type>group</type>
       <action>**</action>
       <path>/</path>
       <level>1</level>
+      <override>true</override>
       <owner>administrators</owner>
     </org.eclipse.skalli.core.services.permit.PermitConfig>
-  </groupPermits>
+  </permits>
 </org.eclipse.skalli.core.services.permit.PermitsConfig>
