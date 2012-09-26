@@ -355,26 +355,27 @@ public class LuceneIndex<T extends EntityBase> {
                 if (numHits < 0 || numHits > maxHits) {
                     numHits = maxHits;
                 }
+                if (numHits > 0) {
+                    TopDocsCollector<ScoreDoc> collector;
+                    if (facetFields == null) {
+                        collector = TopScoreDocCollector.create(numHits, false);
+                    } else {
+                        collector = new FacetedCollector(facetFields, searcher.getIndexReader(), numHits);
+                    }
 
-                TopDocsCollector<ScoreDoc> collector;
-                if (facetFields == null) {
-                    collector = TopScoreDocCollector.create(numHits, false);
-                } else {
-                    collector = new FacetedCollector(facetFields, searcher.getIndexReader(), numHits);
-                }
+                    searcher.search(query, collector);
+                    Highlighter highlighter = new Highlighter(formatter, new QueryScorer(query));
+                    TopDocs topDocs = collector.topDocs(pagingInfo.getStart(), pagingInfo.getCount());
+                    for (ScoreDoc hit : topDocs.scoreDocs) {
+                        Document doc = searcher.doc(hit.doc);
+                        SearchHit<T> searchHit = getSearchHit(doc, fieldList, hit.score, highlighter);
+                        resultList.add(searchHit);
+                    }
 
-                searcher.search(query, collector);
-                Highlighter highlighter = new Highlighter(formatter, new QueryScorer(query));
-                TopDocs topDocs = collector.topDocs(pagingInfo.getStart(), pagingInfo.getCount());
-                for (ScoreDoc hit : topDocs.scoreDocs) {
-                    Document doc = searcher.doc(hit.doc);
-                    SearchHit<T> searchHit = getSearchHit(doc, fieldList, hit.score, highlighter);
-                    resultList.add(searchHit);
-                }
-
-                totalHitCount = collector.getTotalHits();
-                if (collector instanceof FacetedCollector && ret instanceof FacetedSearchResult) {
-                    ((FacetedSearchResult<T>) ret).setFacetInfo(((FacetedCollector) collector).getFacetsMap());
+                    totalHitCount = collector.getTotalHits();
+                    if (collector instanceof FacetedCollector && ret instanceof FacetedSearchResult) {
+                        ((FacetedSearchResult<T>) ret).setFacetInfo(((FacetedCollector) collector).getFacetsMap());
+                    }
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
