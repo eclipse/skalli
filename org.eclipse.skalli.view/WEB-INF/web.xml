@@ -21,6 +21,11 @@
         <mime-type>image/x-icon</mime-type>
     </mime-mapping>
 
+    <context-param>
+      <param-name>useNaming</param-name>
+      <param-value>osgi</param-value>
+    </context-param>
+
     <!--
     *******************
     servlet definitions

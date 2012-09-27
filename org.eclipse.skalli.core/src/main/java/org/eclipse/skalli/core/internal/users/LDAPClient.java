@@ -31,6 +31,8 @@ import javax.naming.ldap.LdapContext;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.User;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.service.jndi.JNDIConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,13 +61,14 @@ public class LDAPClient {
                     || StringUtils.isBlank(hostname) || StringUtils.isBlank(factory)) {
                 throw new AuthException("LDAP not configured");
             }
-            Hashtable<String, String> env = new Hashtable<String, String>();
+            Hashtable<String, Object> env = new Hashtable<String, Object>();
             env.put(Context.INITIAL_CONTEXT_FACTORY, factory);
-            env.put(Context.PROVIDER_URL, hostname); // SET YOUR SERVER AND STARTING
-            // CONTEXT HERE
-            env.put(Context.SECURITY_PRINCIPAL, username); // SET USER
-            env.put(Context.SECURITY_CREDENTIALS, password); // SET PASSWORD HERE
-            env.put(Context.SECURITY_AUTHENTICATION, "simple");
+            env.put(Context.PROVIDER_URL, hostname);
+            env.put(Context.SECURITY_PRINCIPAL, username);
+            env.put(Context.SECURITY_CREDENTIALS, password);
+            env.put(Context.SECURITY_AUTHENTICATION, "simple"); //$NON-NLS-1$
+            env.put(JNDIConstants.BUNDLE_CONTEXT,
+                    FrameworkUtil.getBundle(LDAPClient.class).getBundleContext());
             InitialLdapContext ctx = new InitialLdapContext(env, null);
             return ctx;
         } catch (AuthenticationException e) {
