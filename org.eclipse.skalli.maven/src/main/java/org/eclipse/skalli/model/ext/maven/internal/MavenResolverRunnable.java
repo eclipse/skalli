@@ -12,7 +12,9 @@ package org.eclipse.skalli.model.ext.maven.internal;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -72,7 +74,9 @@ public class MavenResolverRunnable implements Runnable, Issuer {
     @Override
     public void run() {
         ProjectService projectService = getProjectService();
-        Set<UUID> uuids = uuid != null? Collections.singleton(uuid) : projectService.keySet();
+        List<UUID> uuids = uuid != null ?
+                Collections.singletonList(uuid) :
+                new ArrayList<UUID>(projectService.keySet());
         LOG.info(MessageFormat.format("MavenResolver: Started ({0} projects to scan)", uuids.size()));
 
         NexusVersionsResolver versionsResolver = new NexusVersionsResolver(nexusClient);

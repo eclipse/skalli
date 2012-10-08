@@ -11,6 +11,7 @@
 package org.eclipse.skalli.core.internal.feed;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -101,7 +102,7 @@ public class FeedManagerImpl implements FeedManager {
             return;
         }
         LOG.info("Updating all project feeds...");
-        Set<UUID> projectIds = projectService.keySet();
+        List<UUID> projectIds = new ArrayList<UUID>(projectService.keySet());
         for (UUID projectId : projectIds) {
             try {
                 Project project = projectService.getByUUID(projectId);
