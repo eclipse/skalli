@@ -14,6 +14,7 @@
 
 <%@ attribute name="project" type="org.eclipse.skalli.services.search.SearchHit" required="true" rtexprvalue="true" %>
 <%@ attribute name="parentChain" type="java.util.List" required="false" rtexprvalue="true" %>
+<%@ attribute name="srcLinks" type="java.util.List" required="false" rtexprvalue="true" %>
 <%@ attribute name="style" required="true" rtexprvalue="true" %>
 
 <c:set var="p" value="${pageScope.project}" />
@@ -64,9 +65,11 @@
                 <a href='${p.singleValues["pageUrl"]}' target='_top'>Homepage</a>
             </c:if>
 
-            <c:if test="${p.singleValues['scmUrl'] != null}">
-                <img class="linkicon" src="/VAADIN/themes/simple/icons/devinf/code.png" alt="Source" />
-                <a href='${p.singleValues["scmUrl"]}' target='_top'>Source</a>
+            <c:if test="${srcLinks != null}">
+                <c:forEach var="srcLink" items="${srcLinks}" >
+                    <img class="linkicon" src="/VAADIN/themes/simple/icons/devinf/code.png" alt="Source" />
+                    <a href='${srcLink}' target='_top'>Source</a>
+                </c:forEach>
             </c:if>
 
             <c:if test="${p.singleValues['ciUrl'] != null}">

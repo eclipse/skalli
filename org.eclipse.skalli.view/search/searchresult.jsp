@@ -81,7 +81,8 @@ viewsize = ${viewSize} @ start = ${start} @ currentPage = ${currentPage} @ pages
     <c:forEach var="project" items="${projects}" >
         <%-- render the project details, see /search/tags/project-details.tag --%>
         <c:set var="uuid" value="${project.singleValues['uuid']}" />
-        <pp:project-details project="${project}" parentChain="${parentChains[uuid]}" style="project" />
+        <pp:project-details project="${project}" parentChain="${parentChains[uuid]}"
+            srcLinks="${sourceLinks[uuid]}" style="project" />
     </c:forEach>
 
     <%-- page navigator --%>

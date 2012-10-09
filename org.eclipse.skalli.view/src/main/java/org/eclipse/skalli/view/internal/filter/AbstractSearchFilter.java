@@ -12,6 +12,7 @@ package org.eclipse.skalli.view.internal.filter;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,9 +28,14 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.commons.Link;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.favorites.Favorites;
 import org.eclipse.skalli.services.favorites.FavoritesService;
 import org.eclipse.skalli.services.project.ProjectService;
@@ -56,6 +62,7 @@ public abstract class AbstractSearchFilter implements Filter {
     public static final String ATTRIBUTE_PARENTS = "parents"; //$NON-NLS-1$
     public static final String ATTRIBUTE_PARENTCHAINS = "parentChains"; //$NON-NLS-1$
     public static final String ATTRIBUTE_SUBPROJETS = "subprojects"; //$NON-NLS-1$
+    public static final String ATTRIBUTE_SOURCELINKS = "sourceLinks"; //$NON-NLS-1$
     public static final String ATTRIBUTE_START = "start"; //$NON-NLS-1$
     public static final String ATTRIBUTE_CURRENTPAGE = "currentPage"; //$NON-NLS-1$
     public static final String ATTRIBUTE_PAGES = "pages"; //$NON-NLS-1$
@@ -79,6 +86,7 @@ public abstract class AbstractSearchFilter implements Filter {
         Map<String, Project> parents = getParents(searchHits);
         Map<String, List<Project>> parentChains = getParentChains(searchHits);
         Map<String, List<SearchHit<Project>>> subprojects = getSubprojects(searchHits);
+        Map<String, List<String>> sourceLinks = getSourceLinks(searchHits);
 
         // retrieve the favorites of the user
         Favorites favorites = getFavorites(user);
@@ -96,6 +104,7 @@ public abstract class AbstractSearchFilter implements Filter {
         request.setAttribute(ATTRIBUTE_PARENTS, parents);
         request.setAttribute(ATTRIBUTE_PARENTCHAINS, parentChains);
         request.setAttribute(ATTRIBUTE_SUBPROJETS, subprojects);
+        request.setAttribute(ATTRIBUTE_SOURCELINKS, sourceLinks);
         request.setAttribute(Consts.ATTRIBUTE_FAVORITES, favorites.asMap());
         request.setAttribute(ATTRIBUTE_DURATION, duration);
         request.setAttribute(ATTRIBUTE_START, start);
@@ -172,6 +181,10 @@ public abstract class AbstractSearchFilter implements Filter {
         return Services.getService(FavoritesService.class);
     }
 
+    protected ConfigurationService getConfigurationService() {
+        return Services.getService(ConfigurationService.class);
+    }
+
     protected User getUser(HttpServletRequest request) {
         LoginUtils util = new LoginUtils(request);
         return util.getLoggedInUser();
@@ -213,6 +226,37 @@ public abstract class AbstractSearchFilter implements Filter {
             }
         }
         return natures;
+    }
+
+    protected Map<String, List<String>> getSourceLinks(List<SearchHit<Project>> searchHits) {
+        ConfigurationService configService = getConfigurationService();
+        Map<String, List<String>> links = new HashMap<String, List<String>>();
+        for (SearchHit<Project> searchHit : searchHits) {
+            Project project = searchHit.getEntity();
+            if (project != null) {
+                String uuid = project.getUuid().toString();
+                DevInfProjectExt devInf = project.getExtension(DevInfProjectExt.class);
+                if (devInf != null && CollectionUtils.isNotBlank(devInf.getScmLocations())) {
+                    ScmLocationMapper mapper = new ScmLocationMapper();
+                    for (String scmLocation : devInf.getScmLocations()) {
+                        List<String> scmUrls = new ArrayList<String>();
+                        List<Link> mappedLinks = mapper.getMappedLinks(configService, project.getProjectId(), scmLocation,
+                                ScmLocationMapper.PURPOSE_BROWSE);
+                        for (Link link: mappedLinks) {
+                            scmUrls.add(link.getUrl());
+                        }
+                        if (scmUrls.isEmpty()) {
+                            String scmUrl = searchHit.getSingleValues().get("scmUrl");
+                            if (scmUrl != null) {
+                                scmUrls.add(scmUrl);
+                            }
+                        }
+                        links.put(uuid, scmUrls);
+                    }
+                }
+            }
+        }
+        return links;
     }
 
     /**
