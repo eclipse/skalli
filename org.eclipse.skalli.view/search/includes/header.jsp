@@ -28,13 +28,14 @@
           <c:when test="${user!=null}">
             Welcome
             <a href="<%=Consts.URL_MYPROJECTS%>">${html:escapeHtml(userDisplayName)}</a>
+            <a href="/logout" onclick="javascript:document.getElementById('logoutinput').value=document.location.href;document.forms['logout'].submit()">(Logout)</a>
             <c:if test="${feedbackConfig != null }">
               <span class="vertical_separator"><img src="/VAADIN/themes/simple/images/separator.png" alt="separator"></span>
               <a href="${feedbackConfig.url}">${html:escapeHtml(feedbackConfig.displayName)}</a>
             </c:if>
           </c:when>
           <c:otherwise>
-            Anonymous User <a href="#" onclick="javascript:document.getElementById('logininput').value=document.location.href;document.forms['login'].submit()">(Login)</a>
+            Anonymous User <a href="/" onclick="javascript:document.getElementById('logininput').value=document.location.href;document.forms['login'].submit()">(Login)</a>
           </c:otherwise>
         </c:choose>
         <c:choose>

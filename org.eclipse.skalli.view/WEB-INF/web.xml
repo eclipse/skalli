@@ -41,8 +41,8 @@
     <servlet>
         <description>Logout</description>
         <display-name>Logout</display-name>
-        <servlet-name>LogoutServlet</servlet-name>
-        <servlet-class>org.eclipse.skalli.view.internal.servlet.LogoutServlet</servlet-class>
+        <servlet-name>Logout</servlet-name>
+        <jsp-file>/search/logout.jsp</jsp-file>
     </servlet>
     <servlet>
         <description>Welcome</description>
@@ -239,7 +239,7 @@
     <url-pattern>/authenticate</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-name>Logout</servlet-name>
         <url-pattern>/logout</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -447,6 +447,7 @@
             <url-pattern>/schemas/*</url-pattern>
             <url-pattern>/favicon.ico</url-pattern>
             <url-pattern>/search-plugin.xml</url-pattern>
+            <url-pattern>/logout</url-pattern>
             <url-pattern>/</url-pattern>
             <url-pattern>/tags</url-pattern>
             <url-pattern>/hierarchy</url-pattern>
@@ -454,7 +455,6 @@
             <url-pattern>/projects</url-pattern>
             <url-pattern>/projects/*</url-pattern>
             <url-pattern>/vprojects/*</url-pattern>
-            <url-pattern>/logout</url-pattern>
             <http-method>GET</http-method>
             <http-method>POST</http-method>
         </web-resource-collection>
