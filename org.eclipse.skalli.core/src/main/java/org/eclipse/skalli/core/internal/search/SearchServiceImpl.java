@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.skalli.commons.ThreadPool;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Taggable;
 import org.eclipse.skalli.services.extension.ExtensionService;
@@ -50,12 +51,15 @@ public class SearchServiceImpl implements SearchService {
 
     protected void bindProjectService(ProjectService projectService) {
         LOG.info(MessageFormat.format("bindProjectService({0})", projectService)); //$NON-NLS-1$
-        try {
-            luceneIndex = new LuceneIndex<Project>(projectService);
-            luceneIndex.reindexAll();
-        } catch (RuntimeException e) {
-            LOG.warn("Failed to initialize Lucene index", e);
-        }
+        luceneIndex = new LuceneIndex<Project>(projectService);
+
+        // perform re-indexing asynchronously: do not block service binding!
+        ThreadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                reindexAll();
+            }
+        });
     }
 
     protected void unbindProjectService(ProjectService projectService) {
@@ -65,15 +69,31 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public void reindex(Collection<Project> projects) {
-        long time = System.currentTimeMillis();
-        LOG.info("Reindexing all projects...");
-        luceneIndex.reindex(projects);
-        LOG.info(MessageFormat.format("Reindexing all projects finished in {0} milliseconds", Long.toString(System.currentTimeMillis() - time)));
+        if (projects == null || projects.isEmpty()) {
+            return;
+        }
+        try {
+            long time = System.currentTimeMillis();
+            LOG.info(MessageFormat.format("Re-indexing {0} projects...", projects.size()));
+            luceneIndex.reindex(projects);
+            LOG.info(MessageFormat.format("Re-indexing {0} projects finished in {1} milliseconds",
+                    projects.size(), Long.toString(System.currentTimeMillis() - time)));
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to re-index projects", e);
+        }
     }
 
     @Override
     public void reindexAll() {
-        luceneIndex.reindexAll();
+        try {
+            long time = System.currentTimeMillis();
+            LOG.info("Re-indexing all projects...");
+            luceneIndex.reindexAll();
+            LOG.info(MessageFormat.format("Re-indexing all projects finished in {0} milliseconds",
+                    Long.toString(System.currentTimeMillis() - time)));
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to re-index all projects", e);
+        }
     }
 
     @Override
