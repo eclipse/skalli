@@ -13,6 +13,7 @@ package org.eclipse.skalli.view.internal.filter.ext;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -64,6 +65,9 @@ public class GitGerritFilter implements Filter {
     public static final String PARAMETER_ACTION = "action"; //$NON-NLS-1$
     public static final String PARAMETER_GROUP = "group"; //$NON-NLS-1$
     public static final String PARAMETER_REPO = "repo"; //$NON-NLS-1$
+    public static final String PARAMETER_PARENT = "parent"; //$NON-NLS-1$
+    public static final String PARAMETER_PERMITS_ONLY = "permitsOnly"; //$NON-NLS-1$
+    public static final String PARAMETER_PROPOSE_EXISTING_PROJECTS = "proposeExistingProjects"; //$NON-NLS-1$
     public static final String PARAMETER_PROPOSE_EXISTING_GROUPS = "proposeExistingGroups"; //$NON-NLS-1$
 
     public static final String ACTION_CHECK = "check"; //$NON-NLS-1$
@@ -75,6 +79,9 @@ public class GitGerritFilter implements Filter {
     public static final String ATTRIBUTE_GERRITCONTACT = "gerritContact"; //$NON-NLS-1$
     public static final String ATTRIBUTE_PROPOSED_GROUP = "proposedGroup"; //$NON-NLS-1$
     public static final String ATTRIBUTE_PROPOSED_REPO = "proposedRepo"; //$NON-NLS-1$
+    public static final String ATTRIBUTE_PROPOSED_PARENT = "proposedParent"; //$NON-NLS-1$
+    public static final String ATTRIBUTE_PERMITS_ONLY = "permitsOnly"; //$NON-NLS-1$
+    public static final String ATTRIBUTE_PROPOSED_EXISTING_PROJECTS = "proposedExistingProjects"; //$NON-NLS-1$
     public static final String ATTRIBUTE_PROPOSED_EXISTING_GROUPS = "proposedExistingGroups"; //$NON-NLS-1$
     public static final String ATTRIBUTE_INVALID_GROUP = "invalidGroup"; //$NON-NLS-1$
     public static final String ATTRIBUTE_INVALID_GROUP_MSG = "invalidGroupMsg"; //$NON-NLS-1$
@@ -82,6 +89,7 @@ public class GitGerritFilter implements Filter {
     public static final String ATTRIBUTE_INVALID_REPO = "invalidRepo"; //$NON-NLS-1$
     public static final String ATTRIBUTE_INVALID_REPO_MSG = "invalidRepoMsg"; //$NON-NLS-1$
     public static final String ATTRIBUTE_REPO_EXISTS = "repoExists"; //$NON-NLS-1$
+    public static final String ATTRIBUTE_INVALID_PARENT = "invalidParent"; //$NON-NLS-1$
     public static final String ATTRIBUTE_KNOWN_ACCOUNTS = "knownAccounts"; //$NON-NLS-1$
 
     public static final String ATTRIBUTE_DATA_SAVED = "dataSaved"; //$NON-NLS-1$
@@ -109,8 +117,8 @@ public class GitGerritFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-            ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
 
         // get some attributes from request provided by other filters
         final String projectId = (String) request.getAttribute(Consts.ATTRIBUTE_PROJECTID);
@@ -135,6 +143,8 @@ public class GitGerritFilter implements Filter {
         final String action = request.getParameter(PARAMETER_ACTION);
         final String group = request.getParameter(PARAMETER_GROUP);
         final String repo = request.getParameter(PARAMETER_REPO);
+        final String parent = request.getParameter(PARAMETER_PARENT);
+        final boolean permitsOnly = "permitsOnly".equals(request.getParameter(PARAMETER_PERMITS_ONLY)); //$NON-NLS-1$
 
         GerritClient client = null;
         try {
@@ -163,11 +173,20 @@ public class GitGerritFilter implements Filter {
                         StringUtils.isNotBlank(group) ? group : generateName(project, "_", "_committers")); //$NON-NLS-1$ //$NON-NLS-2$
                 request.setAttribute(ATTRIBUTE_PROPOSED_REPO,
                         StringUtils.isNotBlank(repo) ? repo : generateName(project, "/", StringUtils.EMPTY)); //$NON-NLS-1$
+                request.setAttribute(ATTRIBUTE_PROPOSED_PARENT,
+                        StringUtils.isNotBlank(parent) ? parent : fromConfig(ConfigKeyGerrit.PARENT));
+                request.setAttribute(ATTRIBUTE_PERMITS_ONLY, permitsOnly);
                 String groupMode = request.getParameter(PARAMETER_PROPOSE_EXISTING_GROUPS);
-                if ("related".equals(groupMode)) {
+                if ("related".equals(groupMode)) { //$NON-NLS-1$
                     request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_GROUPS, getGroupsFromHierarchy(client, project));
-                } else if ("all".equals(groupMode)) {
+                } else if ("all".equals(groupMode)) { //$NON-NLS-1$
                     request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_GROUPS, getAllGroups(client, project));
+                }
+                String parentMode = request.getParameter(PARAMETER_PROPOSE_EXISTING_PROJECTS);
+                if ("permissions".equals(parentMode)) { //$NON-NLS-1$
+                    request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_PROJECTS, getProjects(client, "permissions")); //$NON-NLS-1$
+                } else if ("all".equals(parentMode)) { //$NON-NLS-1$
+                    request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_PROJECTS, getProjects(client, "all")); //$NON-NLS-1$
                 }
             }
             // (2) CHECK (validate input against Gerrit)
@@ -196,6 +215,10 @@ public class GitGerritFilter implements Filter {
                 request.setAttribute(ATTRIBUTE_REPO_EXISTS, repoExists);
                 final boolean createRepo = !invalidGroup && !invalidRepo && !repoExists;
 
+                // general parent checks
+                final boolean invalidParent = !client.projectExists(parent);
+                request.setAttribute(ATTRIBUTE_INVALID_PARENT, invalidParent);
+
                 // checks only relevant for group creation
                 Set<String> knownAccounts = Collections.emptySet();
                 boolean actingUserHasAccount = false;
@@ -221,15 +244,19 @@ public class GitGerritFilter implements Filter {
                         // perform operations on Gerrit
                         if (createGroup || createRepo) {
                             HttpServletRequest httpRequest = (HttpServletRequest) request;
-                            final String description = "Created by " + user.getDisplayName() + ".\nMore details: " + httpRequest.getRequestURL().toString().replaceFirst(httpRequest.getServletPath(), "") + Consts.URL_PROJECTS + "/" + projectId; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+                            String description = MessageFormat.format(
+                                "Created by {0}.\nMore details: {1}{2}/{3}",
+                                user.getDisplayName(),
+                                httpRequest.getRequestURL().toString().replaceFirst(httpRequest.getServletPath(), ""),
+                                Consts.URL_PROJECTS, projectId);
 
                             if (createGroup) {
                                 client.createGroup(group, StringUtils.EMPTY, description, knownAccounts);
                             }
                             if (createRepo) {
                                 client.createProject(repo, null, CollectionUtils.asSet(group),
-                                        fromConfig(ConfigKeyGerrit.PARENT), false,
-                                        description, null, false, false);
+                                        StringUtils.isNotBlank(parent)? parent : fromConfig(ConfigKeyGerrit.PARENT),
+                                        permitsOnly, description, null, false, false);
                             }
                         }
 
@@ -241,7 +268,7 @@ public class GitGerritFilter implements Filter {
                         }
                         Map<String, String> parameters = new HashMap<String, String>();
                         parameters.put(ConfigKeyGerrit.HOST.getKey(), fromConfig(ConfigKeyGerrit.HOST));
-                        parameters.put("repository", repo);
+                        parameters.put("repository", repo); //$NON-NLS-1$
                         parameters.put(ConfigKeyGerrit.PORT.getKey(), fromConfig(ConfigKeyGerrit.PORT));
                         StrSubstitutor substitutor = new StrSubstitutor(parameters);
                         String template = fromConfig(ConfigKeyGerrit.SCM_TEMPLATE);
@@ -346,6 +373,20 @@ public class GitGerritFilter implements Filter {
         Set<String> result = new TreeSet<String>();
         try {
             result.addAll(client.getGroups());
+            return result;
+        } catch (ConnectionException e) {
+            LOG.warn("Can't connect to gerrit:", e);
+            return Collections.emptySet();
+        } catch (CommandException e) {
+            LOG.warn("Can't connect to gerrit:", e);
+            return Collections.emptySet();
+        }
+    }
+
+    private Set<String> getProjects(final GerritClient client, String type) {
+        Set<String> result = new TreeSet<String>();
+        try {
+            result.addAll(client.getProjects(type));
             return result;
         } catch (ConnectionException e) {
             LOG.warn("Can't connect to gerrit:", e);

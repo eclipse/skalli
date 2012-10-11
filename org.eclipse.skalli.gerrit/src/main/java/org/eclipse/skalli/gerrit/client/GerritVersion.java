@@ -6,7 +6,7 @@ import org.apache.commons.lang.StringUtils;
 public enum GerritVersion {
     GERRIT_UNKNOWN_VERSION,
     GERRIT_2_0_X, GERRIT_2_1_X, GERRIT_2_1_7, GERRIT_2_1_8, GERRIT_2_2_X,
-    GERRIT_2_2_2, GERRIT_2_3_X, GERRIT_2_4_X, GERRIT_2_5_X;
+    GERRIT_2_2_2, GERRIT_2_3_X, GERRIT_2_4_X, GERRIT_2_5_X, GERRIT_2_6_X;
 
     @SuppressWarnings("nls")
     public static GerritVersion asGerritVersion(String s) {
@@ -39,6 +39,9 @@ public enum GerritVersion {
         }
         if (s.equals("2.5") || s.startsWith("2.5.") || s.startsWith("2.5-")) {
             return GERRIT_2_5_X;
+        }
+        if (s.equals("2.6") || s.startsWith("2.6.") || s.startsWith("2.6-")) {
+            return GERRIT_2_6_X;
         }
         return GERRIT_UNKNOWN_VERSION;
     }

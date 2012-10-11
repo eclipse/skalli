@@ -105,6 +105,18 @@ public interface GerritClient {
     public List<String> getProjects() throws ConnectionException, CommandException;
 
     /**
+     * Returns the list of projects of a given type.
+     * Currently supported types are <tt>"all"</tt>, <tt>"permissions"</tt> and <tt>"code"</tt>.
+     *
+     * @param type  the type of projects to return.
+     * @return a list of project names, or an empty list.
+     *
+     * @throws ConnectionException in case of connection / communication problems
+     * @throws CommandException    in case of unsuccessful commands
+     */
+    public List<String> getProjects(String type) throws ConnectionException, CommandException;
+
+    /**
      * Checks if a given project exists.
      *
      * @param name

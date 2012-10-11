@@ -218,7 +218,17 @@ public class GerritClientImpl implements GerritClient {
 
     @Override
     public List<String> getProjects() throws ConnectionException, CommandException {
-        return sshCommand("gerrit ls-projects");
+        return getProjects("all");
+    }
+
+    @Override
+    public List<String> getProjects(String type) throws ConnectionException, CommandException {
+        GerritVersion version = getVersion();
+        final StringBuffer sb = new StringBuffer("gerrit ls-projects");
+        if (version.supports(GerritFeature.LS_PROJECTS_TYPE_ATTR)) {
+            appendArgument(sb, "type", type);
+        }
+        return sshCommand(sb.toString());
     }
 
     @Override
