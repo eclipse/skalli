@@ -132,6 +132,7 @@ Service-Component: OSGI-INF/PermitComponent.xml,
 Web-ContextPath: /api
 Webapp-Context: /api
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.apache.lucene.highlighter;bundle-version="3.0.3",
+Require-Bundle: org.apache.lucene.core;bundle-version="3.0.3",
+ org.apache.lucene.highlighter;bundle-version="3.0.3",
  org.apache.lucene.queries;bundle-version="3.0.3",
- org.apache.lucene.core;bundle-version="3.0.3"
+ org.apache.lucene.memory;bundle-version="3.0.3"
