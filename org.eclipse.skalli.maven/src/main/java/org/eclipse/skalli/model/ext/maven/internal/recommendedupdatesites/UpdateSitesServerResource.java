@@ -22,6 +22,7 @@ import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.permit.Permits;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
+import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.Put;
@@ -33,7 +34,6 @@ public class UpdateSitesServerResource extends ResourceBase {
 
     private static final String ID_PREFIX = "rest:api/updatesites/{0}/{1}:"; //$NON-NLS-1$
     private static final String ERROR_ID_IO_ERROR = ID_PREFIX + "10"; //$NON-NLS-1$
-    private static final String ERROR_ID_FORBIDDEN = ID_PREFIX + "20";  //$NON-NLS-1$
     private static final String ERROR_ID_PARSING_ENTITY_FAILED = ID_PREFIX + "30";  //$NON-NLS-1$
     private static final String ERROR_ID_VALIDATION_FAILED = ID_PREFIX + "40";  //$NON-NLS-1$
     private static final String ERROR_ID_SERVIVE_UNAVAILABLE = ID_PREFIX + "50";  //$NON-NLS-1$
@@ -51,8 +51,8 @@ public class UpdateSitesServerResource extends ResourceBase {
         RecommendedUpdateSitesService service = Services.getService(RecommendedUpdateSitesService.class);
         RecommendedUpdateSites updateSites = service != null? service.getRecommendedUpdateSites(userId, id) : null;
         if (updateSites == null) {
-            setStatus(Status.CLIENT_ERROR_NOT_FOUND,
-                    MessageFormat.format("User {0} has no favorite update sites {1}", userId, id)); //$NON-NLS-1$
+            setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format(
+                    "User {0} has no recommended update sites with id ''{1}''", userId, id));
             return null;
         }
 
@@ -71,9 +71,9 @@ public class UpdateSitesServerResource extends ResourceBase {
         String id = (String) getRequestAttributes().get("id");//$NON-NLS-1$
         String loggedInUser = Permits.getLoggedInUser();
         if (!loggedInUser.equals(userId)) {
-            String errorId = MessageFormat.format(ERROR_ID_FORBIDDEN, userId, id);
-            return createErrorRepresentation(Status.CLIENT_ERROR_FORBIDDEN, ERROR_ID_FORBIDDEN, errorId,
-                    "You are not allowed to recommend update sites in the name of user {0}", userId);
+            setStatus(Status.CLIENT_ERROR_FORBIDDEN, MessageFormat.format(
+                    "You are not authorized to recommend update sites in the name of user {0}", userId));
+            return null;
         }
 
         ResourceRepresentation<RecommendedUpdateSites> representation = new ResourceRepresentation<RecommendedUpdateSites>();
@@ -119,4 +119,43 @@ public class UpdateSitesServerResource extends ResourceBase {
         return null;
     }
 
+    @Delete
+    public Representation remove() {
+        if (!Permits.isAllowed(getAction(), getPath())) {
+            return createUnauthorizedRepresentation();
+        }
+
+        String userId = (String) getRequestAttributes().get("userId");//$NON-NLS-1$
+        String id = (String) getRequestAttributes().get("id");//$NON-NLS-1$
+        String loggedInUser = Permits.getLoggedInUser();
+        if (!loggedInUser.equals(userId)) {
+            setStatus(Status.CLIENT_ERROR_FORBIDDEN, MessageFormat.format(
+                    "You are not authorized to delete recommended update sites of user {0}", userId)); //$NON-NLS-1$
+            return null;
+        }
+
+        RecommendedUpdateSitesService service = Services.getService(RecommendedUpdateSitesService.class);
+        if (service == null) {
+            String errorId = MessageFormat.format(ERROR_ID_SERVIVE_UNAVAILABLE, userId, id);
+            return createServiceUnavailableRepresentation(errorId, "Recommended Update Sites Service");
+        }
+
+        RecommendedUpdateSites updateSites = service.getRecommendedUpdateSites(userId, id);
+        if (updateSites == null) {
+            setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format(
+                    "User {0} has no recommended update sites with id ''{1}''", userId, id));
+            return null;
+        }
+        updateSites.setDeleted(true);
+
+        try {
+            service.persist(updateSites, loggedInUser);
+        } catch (ValidationException e) {
+            String errorId = MessageFormat.format(ERROR_ID_VALIDATION_FAILED, updateSites.getId());
+            return createValidationFailedRepresentation(errorId, updateSites.getId(), e);
+        }
+
+        setStatus(Status.SUCCESS_NO_CONTENT);
+        return null;
+    }
 }
