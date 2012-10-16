@@ -216,8 +216,10 @@ public class GitGerritFilter implements Filter {
                 final boolean createRepo = !invalidGroup && !invalidRepo && !repoExists;
 
                 // general parent checks
-                final boolean invalidParent = !client.projectExists(parent);
-                request.setAttribute(ATTRIBUTE_INVALID_PARENT, invalidParent);
+                if (StringUtils.isNotBlank(parent)) {
+                    final boolean invalidParent = !client.projectExists(parent);
+                    request.setAttribute(ATTRIBUTE_INVALID_PARENT, invalidParent);
+                }
 
                 // checks only relevant for group creation
                 Set<String> knownAccounts = Collections.emptySet();
