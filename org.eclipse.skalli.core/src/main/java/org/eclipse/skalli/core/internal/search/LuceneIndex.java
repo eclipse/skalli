@@ -12,6 +12,7 @@ package org.eclipse.skalli.core.internal.search;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -41,7 +42,6 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.highlight.Highlighter;
-import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.similar.MoreLikeThis;
@@ -155,10 +155,9 @@ public class LuceneIndex<T extends EntityBase> {
                 }
             }
         } catch (LockObtainFailedException e) {
-            LOG.error("Failed to add index entries due to Lucene lock: re-indexing all entities", e);
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOG.error("Failed to add index entries due to Lucene lock", e);
+        } catch (Exception e) {
+            LOG.error("Failed to add index entries", e);
         } finally {
             closeQuietly(writer);
         }
@@ -171,39 +170,41 @@ public class LuceneIndex<T extends EntityBase> {
 
     private String doHighlight(final Highlighter highlighter, final List<String> fields, final String fieldName,
             String fieldContents) throws IOException {
-        String ret = fieldContents;
+        String highlighted = fieldContents;
         if (fieldContents != null && fields.contains(fieldName)) {
             try {
                 String[] fragments = highlighter.getBestFragments(analyzer, fieldName, fieldContents,
                         NUMBER_BEST_FRAGMENTS);
                 if (fragments != null && fragments.length > 0) {
-                    ret = LuceneUtil.withEllipsis(fragments, fieldContents);
+                    highlighted = LuceneUtil.withEllipsis(fragments, fieldContents);
                 }
-            } catch (InvalidTokenOffsetsException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                LOG.error(MessageFormat.format("Failed to highlight search result ''{0}''", fieldContents), e);
             }
         }
-        return ret;
+        return highlighted;
     }
 
     private ScoreDoc getDocByUUID(Searcher searcher, UUID uuid) throws IOException {
+        Query query = null;
         try {
             QueryParser parser = new QueryParser(Version.LUCENE_30, FIELD_UUID, analyzer);
-            Query query = parser.parse(StringUtils.lowerCase(uuid.toString()));
-
-            TopScoreDocCollector collector = TopScoreDocCollector.create(2, false);
-            searcher.search(query, collector);
-            if (collector.getTotalHits() < 1) {
-                return null;
-            }
-            if (collector.getTotalHits() > 1) {
-                throw new RuntimeException("Too many documents found with UUID " + uuid); //$NON-NLS-1$
-            }
-            ScoreDoc hit = collector.topDocs().scoreDocs[0];
-            return hit;
+            query = parser.parse(StringUtils.lowerCase(uuid.toString()));
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            LOG.error(MessageFormat.format("Failed to create query from UUID {0}", uuid.toString()), e);
+            return null;
         }
+        TopScoreDocCollector collector = TopScoreDocCollector.create(2, false);
+        searcher.search(query, collector);
+        if (collector.getTotalHits() < 1) {
+            return null;
+        }
+        if (collector.getTotalHits() > 1) {
+            LOG.error(MessageFormat.format("Too many documents found with UUID {0}", uuid.toString()));
+            return null;
+        }
+        ScoreDoc hit = collector.topDocs().scoreDocs[0];
+        return hit;
     }
 
     public synchronized void remove(final Collection<T> entities) {
@@ -217,10 +218,9 @@ public class LuceneIndex<T extends EntityBase> {
                 }
             }
         } catch (LockObtainFailedException e) {
-            LOG.error("Failed to remove index entries due to Lucene lock: re-indexing all entities", e);
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOG.error("Failed to remove index entries due to Lucene lock", e);
+        } catch (Exception e) {
+            LOG.error("Failed to remove index entries", e);
         } finally {
             closeQuietly(searcher);
         }
@@ -239,8 +239,8 @@ public class LuceneIndex<T extends EntityBase> {
         return ret;
     }
 
-    private SearchHit<T> getSearchHit(final Document doc, final List<String> fields, float score, final Highlighter highlighter)
-            throws IOException {
+    private SearchHit<T> getSearchHit(final Document doc, final List<String> fields, float score,
+            final Highlighter highlighter) throws IOException {
         T entity = getEntity(doc);
         Map<String, List<String>> storedValues = new HashMap<String, List<String>>();
         Map<String, List<String>> highlightedValues = new HashMap<String, List<String>>();
@@ -267,6 +267,7 @@ public class LuceneIndex<T extends EntityBase> {
     }
 
     public synchronized SearchResult<T> moreLikeThis(T entity, String[] fields, int count) {
+        SearchResult<T> moreLikeThis = new SearchResult<T>();
         List<SearchHit<T>> searchHits = new LinkedList<SearchHit<T>>();
         IndexSearcher searcher = null;
         try {
@@ -274,43 +275,43 @@ public class LuceneIndex<T extends EntityBase> {
             ScoreDoc baseDoc = getDocByUUID(searcher, entity.getUuid());
             if (baseDoc == null) {
                 // entity!=null && baseDoc == null, can happen if deleted flag is set
-                SearchResult<T> ret = new SearchResult<T>();
-                ret.setPagingInfo(new PagingInfo(0, 0));
-                ret.setResultCount(0);
-                ret.setResult(searchHits);
-                return ret;
-            }
-            MoreLikeThis mlt = new MoreLikeThis(searcher.getIndexReader());
-            mlt.setFieldNames(fields);
-            mlt.setMinWordLen(2);
-            mlt.setBoost(true);
-            mlt.setMinDocFreq(0);
-            mlt.setMinTermFreq(0);
-            mlt.setAnalyzer(analyzer);
-            Query query = mlt.like(baseDoc.doc);
-            int numHits = Math.min(count + 1, entityService.size()); // count + 1 because baseDoc will be one of the hits
-            TopScoreDocCollector collector = TopScoreDocCollector.create(numHits, false);
-            searcher.search(query, collector);
+                moreLikeThis.setPagingInfo(new PagingInfo(0, 0));
+                moreLikeThis.setResultCount(0);
+            } else {
+                MoreLikeThis mlt = new MoreLikeThis(searcher.getIndexReader());
+                mlt.setFieldNames(fields);
+                mlt.setMinWordLen(2);
+                mlt.setBoost(true);
+                mlt.setMinDocFreq(0);
+                mlt.setMinTermFreq(0);
+                mlt.setAnalyzer(analyzer);
+                Query query = mlt.like(baseDoc.doc);
+                int numHits = Math.min(count + 1, entityService.size()); // count + 1: baseDoc will be one of the hits
+                TopScoreDocCollector collector = TopScoreDocCollector.create(numHits, false);
+                searcher.search(query, collector);
 
-            List<String> fieldList = Arrays.asList(fields);
-            Highlighter highlighter = new Highlighter(formatter, new QueryScorer(query));
-            for (ScoreDoc hit : collector.topDocs().scoreDocs) {
-                if (hit.doc != baseDoc.doc) {
-                    Document doc = searcher.doc(hit.doc);
-                    SearchHit<T> searchHit = getSearchHit(doc, fieldList, hit.score, highlighter);
-                    searchHits.add(searchHit);
+                List<String> fieldList = Arrays.asList(fields);
+                Highlighter highlighter = new Highlighter(formatter, new QueryScorer(query));
+                for (ScoreDoc hit : collector.topDocs().scoreDocs) {
+                    if (hit.doc != baseDoc.doc) {
+                        Document doc = searcher.doc(hit.doc);
+                        SearchHit<T> searchHit = getSearchHit(doc, fieldList, hit.score, highlighter);
+                        searchHits.add(searchHit);
+                    }
                 }
+                moreLikeThis.setPagingInfo(new PagingInfo(0, count));
+                moreLikeThis.setResultCount(collector.getTotalHits() - 1);
             }
-            SearchResult<T> ret = new SearchResult<T>();
-            ret.setPagingInfo(new PagingInfo(0, count));
-            ret.setResultCount(collector.getTotalHits() - 1);
-            ret.setResult(searchHits);
-            return ret;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            LOG.error(MessageFormat.format("Searching for entities similiar to ''{0}'' failed", entity.getUuid()), e);
+            moreLikeThis.setPagingInfo(new PagingInfo(0, 0));
+            moreLikeThis.setResultCount(0);
         } finally {
             closeQuietly(searcher);
         }
+
+        moreLikeThis.setResult(searchHits);
+        return moreLikeThis;
     }
 
     public synchronized SearchResult<T> search(final String[] fields, final String queryString, PagingInfo pagingInfo)
@@ -320,8 +321,8 @@ public class LuceneIndex<T extends EntityBase> {
         return ret;
     }
 
-    public synchronized FacetedSearchResult<T> facetedSearch(final String[] fields, String[] facetFields, final String queryString,
-            PagingInfo pagingInfo) throws QueryParseException {
+    public synchronized FacetedSearchResult<T> facetedSearch(final String[] fields, String[] facetFields,
+            final String queryString, PagingInfo pagingInfo) throws QueryParseException {
         FacetedSearchResult<T> ret = new FacetedSearchResult<T>();
         search(fields, facetFields, queryString, pagingInfo, ret);
         return ret;
@@ -377,8 +378,8 @@ public class LuceneIndex<T extends EntityBase> {
                         ((FacetedSearchResult<T>) ret).setFacetInfo(((FacetedCollector) collector).getFacetsMap());
                     }
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                LOG.error(MessageFormat.format("Searching with query ''{0}'' failed", queryString), e);
             } finally {
                 closeQuietly(searcher);
             }
@@ -420,7 +421,7 @@ public class LuceneIndex<T extends EntityBase> {
                 closable.close();
             }
         } catch (IOException e) {
-            LOG.error("Failed to close " + closable.getClass().getName(), e);
+            LOG.error(MessageFormat.format("Failed to close {0}", closable.getClass().getName()), e);
         }
     }
 }
