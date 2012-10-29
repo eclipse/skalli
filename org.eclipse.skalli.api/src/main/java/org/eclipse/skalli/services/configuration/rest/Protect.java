@@ -15,8 +15,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation for fields of entities that contain secret or confidential
+ * information and must be protected. Such fields for example should not
+ * appear in the response of a REST API call and should be encrypted
+ * when persisted.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Protect {
-
 }
