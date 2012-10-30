@@ -41,6 +41,16 @@ public class PropertyLookup extends StrLookup {
     private final HashMap<String, Object> properties = new HashMap<String, Object>();
 
     /**
+     * Creates a property lookup instance from a given property map.
+     * The given properties are mapped to placeholders by their respective keys.
+     *
+     * @param @param customProperties  optional custom properties, or <code>null</code>.
+     */
+    public PropertyLookup(Map<String, ?> customProperties) {
+        this(null, customProperties);
+    }
+
+    /**
      * Creates a property lookup instance for a given entity, e.g. a {@link Project}.
      * Properties of the entity are scanned and provided as placeholders for the lookup.
      *
@@ -53,13 +63,15 @@ public class PropertyLookup extends StrLookup {
     /**
      * Creates a property lookup instance for a given entity, e.g. a {@link Project}.
      * Properties of the entity are scanned and provided as placeholders for the lookup.
+     * If the entity is {@link ExtensibleEntityBase extensible}, extensions are scanned,
+     * too, and added as placeholders of the form <tt>${extensionName.propertyName}</tt>.
      * The given custom properties are mapped to placeholders by their respective keys
      * and provided for the lookup as well.
      *
      * @param entity  the entity, for which to create a property lookup.
      * @param customProperties  optional custom properties, or <code>null</code>.
      */
-    public PropertyLookup(EntityBase entity, Map<String, Object> customProperties) {
+    public PropertyLookup(EntityBase entity, Map<String, ?> customProperties) {
         if (entity != null) {
             putAllProperties(entity, ""); //$NON-NLS-1$
         }
@@ -68,7 +80,20 @@ public class PropertyLookup extends StrLookup {
         }
     }
 
-    private void putAllProperties(EntityBase entity, String prefix) {
+    /**
+     * Adds all properties of the given entity to this property lookup.
+     * Property names of the entity are scanned and provided as placeholders of the form
+     * <tt>${prefix.propertyName}</tt> for the lookup. If the prefix is blank, placeholders
+     * of the form <tt>${propertyName}</tt> are used.
+     * Extensions of the entity are scanned, too, and added as placeholders of the form
+     * <tt>${prefix.extensionName.propertyName}</tt>. If the prefix is blank, placeholders are
+     * named <tt>${extensionName.propertyName}</tt>, respectively.
+     *
+     * @param entity  the entity to add to this property lookup.
+     * @param prefix  the prefix for building placeholders.
+     */
+    public void putAllProperties(EntityBase entity, String prefix) {
+        prefix = StringUtils.removeEnd(prefix, "."); //$NON-NLS-1$
         if (entity instanceof ExtensibleEntityBase) {
             putAllProperties((ExtensibleEntityBase) entity, prefix);
         }
@@ -93,6 +118,13 @@ public class PropertyLookup extends StrLookup {
         }
         sb.append(s);
         return sb.toString();
+    }
+
+    /**
+     * Returns the properties available for lookup as map.
+     */
+    public Map<String, Object> asMap() {
+        return properties;
     }
 
     /**
@@ -163,7 +195,7 @@ public class PropertyLookup extends StrLookup {
      * Returns an entry set of all properties.
      * @return an entry set of properties, or an empty set.
      */
-    public Set<Map.Entry<String,Object>> entrySet() {
+    public Set<Map.Entry<String, Object>> entrySet() {
         return properties.entrySet();
     }
 

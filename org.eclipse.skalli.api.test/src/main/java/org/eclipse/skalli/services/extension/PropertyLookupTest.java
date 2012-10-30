@@ -19,6 +19,7 @@ import java.util.Set;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.TestExtension;
@@ -52,8 +53,8 @@ public class PropertyLookupTest {
 
     private static final String PREFIX = "testext.";
     private static final String PREFIX1 = "testext1.";
+    private static final String USER_PREFIX = "user.";
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testMapMethods() throws Exception {
         Project project = createProject();
@@ -83,6 +84,30 @@ public class PropertyLookupTest {
         Assert.assertEquals(expectedKeys.size(), lookup.size());
         AssertUtils.assertEqualsAnyOrder("keySet", expectedKeys, lookup.keySet());
 
+        Assert.assertEquals("hugo", lookup.get("userId"));
+        assertProjectLookup(lookup);
+    }
+
+    @Test
+    public void testPutAll() {
+        Project project = createProject();
+        User user = createUser();
+        Map<String,Object> props = new HashMap<String,Object>();
+        props.put(User.PROPERTY_USERID, user.getUserId());
+        PropertyLookup lookup = new PropertyLookup(props);
+        lookup.putAllProperties(project, "");
+        lookup.putAllProperties(user, USER_PREFIX);
+
+        assertProjectLookup(lookup);
+        Assert.assertEquals(user.getUserId(), lookup.get(User.PROPERTY_USERID));
+        Assert.assertEquals(user.getUserId(), lookup.get(USER_PREFIX + User.PROPERTY_USERID));
+        Assert.assertEquals(user.getFirstname(), lookup.get(USER_PREFIX + User.PROPERTY_FIRSTNAME));
+        Assert.assertEquals(user.getLastname(), lookup.get(USER_PREFIX + User.PROPERTY_LASTNAME));
+        Assert.assertEquals(user.getEmail(), lookup.get(USER_PREFIX + User.PROPERTY_EMAIL));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void assertProjectLookup(PropertyLookup lookup) {
         Assert.assertEquals("bla.blubb", lookup.get(Project.PROPERTY_PROJECTID));
         Assert.assertEquals("Blubber", lookup.get(Project.PROPERTY_NAME));
         Assert.assertEquals("text", lookup.get(Project.PROPERTY_DESCRIPTION_FORMAT));
@@ -91,7 +116,6 @@ public class PropertyLookupTest {
         AssertUtils.assertEquals("get", (List<String>)lookup.get(PREFIX + TestExtension.PROPERTY_ITEMS), "a", "b", "c");
         AssertUtils.assertEquals("get", (List<String>)lookup.get(PREFIX + TestExtension.PROPERTY_ITEMS), "a", "b", "c");
         Assert.assertTrue(((List<String>)lookup.get(PREFIX1 + TestExtension1.PROPERTY_ITEMS)).isEmpty());
-        Assert.assertEquals("hugo", lookup.get("userId"));
         Assert.assertNull(lookup.get(Project.PROPERTY_DESCRIPTION));
         Assert.assertNull(lookup.get("testext.abc"));
         Assert.assertNull(lookup.get(null));
@@ -150,5 +174,9 @@ public class PropertyLookupTest {
         ext1.setStr("hubab");
         project.addExtension(ext1);
         return project;
+    }
+
+    private User createUser() {
+        return new User("homer", "Homer", "Simpson", "homer@springfield.org");
     }
 }
