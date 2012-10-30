@@ -20,6 +20,8 @@ public class Consts {
     private Consts() {
     };
 
+    public static final String PARAM_LIST_SEPARATOR = ",";
+
     public static final String PARAM_QUERY = "query";
     public static final String PARAM_START = "start";
     public static final String PARAM_COUNT = "count";
@@ -34,35 +36,44 @@ public class Consts {
     public static final String PARAM_VALUE_VIEW_HIERARCHY = "hierarchy";
     public static final String PARAM_VALUE_VALIDATE = "validate";
     public static final String PARAM_EXTENSIONS = "extensions";
-    public static final String PARAM_LIST_SEPARATOR = ",";
+
+    public static final String ATTRIBUTE_WEBLOCATOR = "webLocator";
+    public static final String ATTRIBUTE_BASE_URL = "baseUrl";
+    public static final String ATTRIBUTE_WINDOWNAME = "windowName";
 
     public static final String ATTRIBUTE_USERID = "userId";
     public static final String ATTRIBUTE_USER = "user";
     public static final String ATTRIBUTE_USER_DISPLAY_NAME = "userDisplayName";
-    public static final String ATTRIBUTE_PROJECT = "project";
-    public static final String ATTRIBUTE_PROJECTID = "projectId";
-    public static final String ATTRIBUTE_PROJECTUUID = "projectUUID";
     public static final String ATTRIBUTE_ANONYMOUS_USER = "isAnonymousUser";
     public static final String ATTRIBUTE_PROJECTADMIN = "isProjectAdmin";
     public static final String ATTRIBUTE_PARENTPROJECTADMIN = "isProjectAdminInParentChain";
-    public static final String ATTRIBUTE_SHOW_ISSUES = "showIssues";
-    public static final String ATTRIBUTE_EDITMODE = "editmode";
-    public static final String ATTRIBUTE_WINDOWNAME = "windowName";
+
+    public static final String ATTRIBUTE_PROJECT = "project";
+    public static final String ATTRIBUTE_PROJECTID = "projectId";
+    public static final String ATTRIBUTE_PROJECTUUID = "projectUUID";
     public static final String ATTRIBUTE_PROJECTTEMPLATE = "projectTemplate";
-    public static final String ATTRIBUTE_FAVORITES = "favorites";
     public static final String ATTRIBUTE_PROJECTCONTEXTLINKS = "projectContextLinks";
+
+    public static final String ATTRIBUTE_EDITMODE = "editmode";
+
+    public static final String ATTRIBUTE_SHOW_ISSUES = "showIssues";
     public static final String ATTRIBUTE_ISSUES = "issues";
     public static final String ATTRIBUTE_MAX_SEVERITY = "maxSeverity";
+
+    public static final String ATTRIBUTE_FAVORITES = "favorites";
+
     public static final String ATTRIBUTE_FEEDBACKCONFIG = "feedbackConfig";
     public static final String ATTRIBUTE_TOPLINKSCONFIG = "toplinksConfig";
     public static final String ATTRIBUTE_NEWSCONFIG = "newsConfig";
     public static final String ATTRIBUTE_BRANDINGCONFIG = "brandingConfig";
     public static final String ATTRIBUTE_USERDETAILSCONFIG = "userDetailsConfig";
+
     public static final String ATTRIBUTE_PAGETITLE = "pagetitle";
     public static final String ATTRIBUTE_SEARCH_PLUGIN_TITLE = "searchPluginTitle";
     public static final String ATTRIBUTE_SEARCH_PLUGIN_DESCRIPTION = "searchPluginDescription";
-    public static final String ATTRIBUTE_WEBLOCATOR = "webLocator";
+
     public static final String ATTRIBUTE_EXCEPTION = "exception";
+
     public static final String ATTRIBUTE_QUERY = "query";
     public static final String ATTRIBUTE_TAGQUERY = "tagquery";
     public static final String ATTRIBUTE_USERQUERY = "userquery";
@@ -95,8 +106,8 @@ public class Consts {
     public static final String ACTION_REFRESH= "refresh";
 
     public static final String JSP_WELCOME = "/search/welcome.jsp";
-    protected static final String JSP_TAGCLOUD = "/search/tagcloud.jsp";
-    protected static final String JSP_MYPROJECTS = "/search/myprojects.jsp";
+    public static final String JSP_TAGCLOUD = "/search/tagcloud.jsp";
+    public static final String JSP_MYPROJECTS = "/search/myprojects.jsp";
     public static final String JSP_HEADER = "/search/includes/header.jsp";
     public static final String JSP_SEARCHRESULT = "/search/searchresult.jsp";
     public static final String JSP_HEADER_SEARCH = "/search/includes/searchheader.jsp";

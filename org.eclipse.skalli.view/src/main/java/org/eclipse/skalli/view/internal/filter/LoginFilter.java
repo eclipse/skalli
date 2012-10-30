@@ -46,30 +46,36 @@ import org.slf4j.LoggerFactory;
  *
  * This  filter sets the following boolean attributes:
  * <ul>
- * <li>"{@value Consts#ATTRIBUTE_ANONYMOUS_USER} - <code>true</code>, if the user is not the anonymous
+ * <li>{@link Consts#ATTRIBUTE_ANONYMOUS_USER} - <code>true</code>, if the user is not the anonymous
  * user, <code>false</code> otherwise.</li>
- * <li>"{@value Consts#ATTRIBUTE_PROJECTADMIN} - <code>true</code>, if the user is not anonymous, the
+ * <li>{@link Consts#ATTRIBUTE_PROJECTADMIN} - <code>true</code>, if the user is not anonymous, the
  * request specified a project and the user is an administrator of this project, i.e. has the permit
  * <tt>PUT /projects/&lt;projectId&gt; ALLOW</tt>, <code>false</code> otherwise.</li>
- * <li>"{@value Consts#ATTRIBUTE_PARENTPROJECTADMIN} - <code>true</code>, if the user is administrator
+ * <li>{@link Consts#ATTRIBUTE_PARENTPROJECTADMIN} - <code>true</code>, if the user is administrator
  * of one of the projects in the parent chain of the requested project, <code>false</code> otherwise.</li>
  * </ul>
  * <p>
  * This filter sets the following attributes if user is not anonymous:
  * <ul>
- * <li>"{@value Consts#ATTRIBUTE_USERID}" - the unique identifier of the logged in user.</li>
- * <li>"{@value Consts#ATTRIBUTE_USER} "- the {@link User} instance of the logged in user; undefined if the user
+ * <li>{@link Consts#ATTRIBUTE_USERID} - the unique identifier of the logged in user.</li>
+ * <li>{@link Consts#ATTRIBUTE_USER} - the {@link User} instance of the logged in user; undefined if the user
  * service in charge does not know the logged in user.</li>
  * </ul>
  * <p>
  * This filter sets the following attributes if the request specifies a project:
  * <ul>
- * <li>"{@value Consts#ATTRIBUTE_PROJECT}" - the {@link Project} instance.</li>
- * <li>"{@value Consts#ATTRIBUTE_PROJECTID}" - the {@link Project#getName() symbolic identifier} of the project.</li>
- * <li>"{@value Consts#ATTRIBUTE_PROJECTUUID}" - the {@link Project#getUuid() unique identifier} of the project.</li>
+ * <li>{@link Consts#ATTRIBUTE_PROJECT} - the {@link Project} instance.</li>
+ * <li>{@link Consts#ATTRIBUTE_PROJECTID} - the {@link Project#getName() symbolic identifier} of the project.</li>
+ * <li>{@link Consts#ATTRIBUTE_PROJECTUUID} - the {@link Project#getUuid() unique identifier} of the project.</li>
  * </ul>
  * Otherwise the filter retrieves the {@link HttpServletRequest#getPathInfo() path info} from the request and
- * set the attribute "{@value Consts#ATTRIBUTE_WINDOWNAME}".
+ * sets the attribute {@link Consts#ATTRIBUTE_WINDOWNAME}.
+ * <p>
+ * For convenience the filter sets the following attributes that are derived from the request URL:
+ * <ul>
+ * <li>{@link Consts#ATTRIBUTE_WEBLOCATOR} - <tt>schema://host:port</tt></li>
+ * <li>{@link Consts#ATTRIBUTE_BASE_URL} - <tt>schema://host:port/contextPath/servletPath</tt></li>
+ * </ul>
  */
 public class LoginFilter implements Filter {
 
@@ -90,7 +96,18 @@ public class LoginFilter implements Filter {
         long timeBeginnProcessing = System.currentTimeMillis();
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+
         String pathInfo = httpRequest.getPathInfo();
+        String requestURL = httpRequest.getRequestURL().toString();
+
+        // baseURL = schema://host:port/contextPath/servletPath
+        String baseURL = StringUtils.removeEnd(requestURL, pathInfo);
+        request.setAttribute(Consts.ATTRIBUTE_BASE_URL, baseURL);
+
+        // webLocator = schema://host:port
+        String webLocator = StringUtils.removeEnd(requestURL, httpRequest.getRequestURI());
+        request.setAttribute(Consts.ATTRIBUTE_WEBLOCATOR, webLocator);
+
         String paramProjectId = request.getParameter(Consts.PARAM_ID);
 
         // determine the project from the URL
