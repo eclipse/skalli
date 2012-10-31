@@ -292,6 +292,11 @@ public class GerritClientImpl implements GerritClient {
             return result;
         }
 
+        // Gerrit throws exceptions for --project options that correspond to
+        // no Gerrit project; thus, we have to filter out thise project names before
+        // sending the ls-groups command
+        Set<String> allProjects = new HashSet<String>(getProjects());
+
         GerritVersion version = getVersion();
         if (version.supports(GerritFeature.LS_GROUPS_PROJECT_ATTR)) {
             StringBuffer sb = new StringBuffer("gerrit ls-groups");
@@ -299,7 +304,9 @@ public class GerritClientImpl implements GerritClient {
                 appendArgument(sb, "visible-to-all", true);
             }
             for (String projectName : projectNames) {
-                appendArgument(sb, "project", projectName);
+                if (allProjects.contains(projectName)) {
+                    appendArgument(sb, "project", projectName);
+                }
             }
             result = sshCommand(sb.toString());
         } else if (version.supports(GerritFeature.REF_RIGHTS_TABLE)) {
@@ -308,7 +315,9 @@ public class GerritClientImpl implements GerritClient {
             sb.append("SELECT name FROM ").append(GSQL.Tables.ACCOUNT_GROUP_NAMES)
                     .append(" WHERE group_id IN (SELECT group_id FROM ").append(GSQL.Tables.REF_RIGHTS).append(" WHERE");
             for (String projectName : projectNames) {
-                sb.append(" project_name='").append(projectName).append("' OR");
+                if (allProjects.contains(projectName)) {
+                    sb.append(" project_name='").append(projectName).append("' OR");
+                }
             }
             sb.replace(sb.length() - 3, sb.length(), "");
             sb.append(");");
