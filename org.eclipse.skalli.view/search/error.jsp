@@ -43,6 +43,7 @@
     <p style=" color: red;"> OOPS, an unexpected error occurred.</p>
     Please send us a bug report and include the following information in your feedback:<br>
     <ul>
+    <li>The project that causes the problem.</li>
     <li>Step-by-step description how to reproduce the problem.</li>
     <li>The following error identifier:
     <%
