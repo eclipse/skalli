@@ -23,6 +23,7 @@ import java.util.Queue;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrBuilder;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -314,15 +315,20 @@ public class LuceneIndex<T extends EntityBase> {
         return moreLikeThis;
     }
 
-    public synchronized SearchResult<T> search(final String[] fields, final String queryString, PagingInfo pagingInfo)
+    public synchronized SearchResult<T> search(String[] fields, String queryString, PagingInfo pagingInfo)
             throws QueryParseException {
         SearchResult<T> ret = new SearchResult<T>();
         search(fields, null, queryString, pagingInfo, ret);
         return ret;
     }
 
-    public synchronized FacetedSearchResult<T> facetedSearch(final String[] fields, String[] facetFields,
-            final String queryString, PagingInfo pagingInfo) throws QueryParseException {
+    public synchronized SearchResult<T> searchPhrase(String[] fields, String queryString, PagingInfo pagingInfo)
+            throws QueryParseException {
+        return search(fields, "\"" + queryString + "\"", pagingInfo); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
+    public synchronized FacetedSearchResult<T> facetedSearch(String[] fields, String[] facetFields,
+            String queryString, PagingInfo pagingInfo) throws QueryParseException {
         FacetedSearchResult<T> ret = new FacetedSearchResult<T>();
         search(fields, facetFields, queryString, pagingInfo, ret);
         return ret;
@@ -397,13 +403,11 @@ public class LuceneIndex<T extends EntityBase> {
 
     private Query getQuery(QueryParser parser, String queryString) throws QueryParseException {
         Query query = null;
+        String extendedQuery = getExtendedQuery(queryString);
         try {
-            // first, allow full Lucene query syntax
-            // http://lucene.apache.org/java/2_4_0/queryparsersyntax.html
-            query = parser.parse(queryString);
-        } catch (ParseException e) {
-            // if the parsing failed because of invalid query syntax,
-            // escape the query string and try again
+            query = parser.parse(extendedQuery);
+        } catch (ParseException e1) {
+            // if the parsing fails escape the query string and try again
             String escapedQueryString = QueryParser.escape(queryString);
             try {
                 query = parser.parse(escapedQueryString);
@@ -413,6 +417,85 @@ public class LuceneIndex<T extends EntityBase> {
             }
         }
         return query;
+    }
+
+    static String getExtendedQuery(String queryString) {
+        StrBuilder extendedQuery = new StrBuilder();
+        if (StringUtils.isNotBlank(queryString)) {
+            StrBuilder term = new StrBuilder();
+            boolean isSimpleTerm = true;
+            boolean insideQuotes = false;
+            boolean insideBrackets = false;
+            char openedBracket = '\0';
+            int pos = 0;
+            int len = queryString.length();
+            while (pos < len) {
+                char c = queryString.charAt(pos++);
+                if (c == '"') {
+                    isSimpleTerm = false;
+                    insideQuotes = !insideQuotes;
+                    term.append(c);
+                } else if (c == '(' || c == '[' || c == '{') {
+                    isSimpleTerm = false;
+                    insideBrackets = true;
+                    openedBracket = c;
+                    term.append(c);
+                } else if (c == ')' || c == ']' || c == '}') {
+                    isSimpleTerm = false;
+                    if (c == ')' && openedBracket == '('
+                            || c == ']' && openedBracket == '['
+                            || c == '}' && openedBracket == '{') {
+                        insideBrackets = false;
+                        openedBracket = '\0';
+                    }
+                    term.append(c);
+                } else if (insideQuotes || insideBrackets) {
+                    term.append(c);
+                } else if (c == '*' || c == '?' || c == '~'|| c == '+' || c == '-' || c == '!'
+                        || c == ':' || c == '^' || c == '|' || c == '&' || c == '\\') {
+                    isSimpleTerm = false;
+                    term.append(c);
+                } else if (Character.isWhitespace(c)) {
+                    addTerm(extendedQuery, term, isSimpleTerm);
+                    isSimpleTerm = true;
+                    insideQuotes = false;
+                    insideBrackets = false;
+                    openedBracket = '\0';
+                    term.setLength(0);
+                } else {
+                    term.append(c);
+                }
+            }
+            addTerm(extendedQuery, term, isSimpleTerm);
+        }
+        return extendedQuery.toString();
+    }
+
+    private static final StrBuilder AND = new StrBuilder("AND"); //$NON-NLS-1$
+    private static final StrBuilder OR = new StrBuilder("OR"); //$NON-NLS-1$
+    private static final StrBuilder NOT = new StrBuilder("NOT"); //$NON-NLS-1$
+    private static final StrBuilder TO = new StrBuilder("TO"); //$NON-NLS-1$
+
+    static private void addTerm(StrBuilder query, StrBuilder term, boolean isSimpleTerm) {
+        term.trim();
+        if (term.length() > 0) {
+            if (query.length() > 0) {
+                query.append(' ');
+            }
+            if (term.equals(AND) || term.equals(OR)
+                    || term.equals(NOT) || term.equals(TO)) {
+               isSimpleTerm = false;
+            }
+            if (isSimpleTerm) {
+                query.append('(');
+                query.append('"').append(term).append('"');
+                query.append(' ').append(term).append('*');
+                query.append(' ').append(term).append('~');
+                query.append(')');
+            } else {
+                query.append(term);
+            }
+        }
     }
 
     private void closeQuietly(Closeable closable) {

@@ -126,14 +126,14 @@ public class SearchServiceImpl implements SearchService {
     public SearchResult<Project> findProjectsByUser(String userId, PagingInfo pagingInfo)
             throws QueryParseException {
         String[] fields = new String[] { "allMembers" }; //$NON-NLS-1$
-        return luceneIndex.search(fields, userId, pagingInfo);
+        return luceneIndex.searchPhrase(fields, userId, pagingInfo);
     }
 
     @Override
     public SearchResult<Project> findProjectsByTag(String tag, PagingInfo pagingInfo)
             throws QueryParseException {
         String[] fields = new String[] { Taggable.PROPERTY_TAGS };
-        return luceneIndex.search(fields, tag, pagingInfo);
+        return luceneIndex.searchPhrase(fields, tag, pagingInfo);
     }
 
     @Override
