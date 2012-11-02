@@ -37,11 +37,12 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.eclipse.skalli.core.internal.configuration.proxy.ProxyConfig;
+import org.eclipse.skalli.core.internal.configuration.proxy.ProxyResource;
 import org.eclipse.skalli.destination.internal.config.DestinationConfig;
 import org.eclipse.skalli.destination.internal.config.DestinationsConfig;
 import org.eclipse.skalli.destination.internal.config.DestinationsResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.destination.ConfigKeyProxy;
 import org.eclipse.skalli.services.destination.DestinationService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
@@ -190,19 +191,17 @@ public class DestinationServiceImpl implements DestinationService {
 
         // allow to overwrite the system properties with configuration /api/config/proxy
         if (configService != null) {
-            String defaultConfigProxyHost = configService.readString(ConfigKeyProxy.HOST);
-            String defaultConfigProxyPort = configService.readString(ConfigKeyProxy.PORT);
-            String configProxyHost = HTTPS.equals(protocol) ?
-                    configService.readString(ConfigKeyProxy.HOST_SSL)
-                    : defaultConfigProxyHost;
+            ProxyConfig proxyConfig = configService.readCustomization(ProxyResource.KEY, ProxyConfig.class);
+            String defaultConfigProxyHost = proxyConfig.getHost();
+            String defaultConfigProxyPort = proxyConfig.getPort();
+            String configProxyHost = HTTPS.equals(protocol) ? proxyConfig.getHostSSL() : defaultConfigProxyHost;
             int configProxyPort = NumberUtils.toInt(HTTPS.equals(protocol) ?
-                    configService.readString(ConfigKeyProxy.PORT_SSL)
-                    : defaultConfigProxyPort);
+                    proxyConfig.getPortSSL() : defaultConfigProxyPort);
             if (StringUtils.isNotBlank(configProxyHost) && configProxyPort > 0) {
                 proxyHost = configProxyHost;
                 proxyPort = configProxyPort;
             }
-            String configNonProxyHosts = configService.readString(ConfigKeyProxy.NONPROXYHOSTS);
+            String configNonProxyHosts = proxyConfig.getNonProxyHosts();
             if (StringUtils.isNotBlank(configNonProxyHosts)) {
                 nonProxyHosts = configNonProxyHosts;
             }
