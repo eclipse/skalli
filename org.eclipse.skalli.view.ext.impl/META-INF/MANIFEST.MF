@@ -6,7 +6,10 @@ Bundle-Version: 0.2.0.qualifier
 Bundle-Activator: org.eclipse.skalli.view.ext.impl.internal.Activator
 Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: com.vaadin.data,
+Import-Package: com.thoughtworks.xstream.annotations,
+ com.thoughtworks.xstream.converters,
+ com.thoughtworks.xstream.io,
+ com.vaadin.data,
  com.vaadin.data.util,
  com.vaadin.data.validator,
  com.vaadin.terminal,
@@ -31,9 +34,11 @@ Import-Package: com.vaadin.data,
  org.eclipse.skalli.services.configuration,
  org.eclipse.skalli.services.entity,
  org.eclipse.skalli.services.extension,
+ org.eclipse.skalli.services.extension.rest,
  org.eclipse.skalli.services.feed,
  org.eclipse.skalli.services.group,
  org.eclipse.skalli.services.issues,
+ org.eclipse.skalli.services.permit,
  org.eclipse.skalli.services.project,
  org.eclipse.skalli.services.search,
  org.eclipse.skalli.services.tagging,
@@ -42,6 +47,9 @@ Import-Package: com.vaadin.data,
  org.eclipse.skalli.view.component,
  org.eclipse.skalli.view.ext,
  org.osgi.framework,
+ org.restlet.data,
+ org.restlet.representation,
+ org.restlet.resource,
  org.slf4j
 Service-Component: OSGI-INF/BasicForm.xml,
  OSGI-INF/DevInfForm.xml,
@@ -68,6 +76,7 @@ Service-Component: OSGI-INF/BasicForm.xml,
  OSGI-INF/ExtensionServiceCreateGitGerritRepo.xml,
  OSGI-INF/ExtensionServiceRequestP4Project.xml,
  OSGI-INF/ExtensionServiceRefreshInfoBoxes.xml,
- OSGI-INF/FeedInfoBox.xml 
+ OSGI-INF/FeedInfoBox.xml,
+ OSGI-INF/InfoBoxesRestExtension.xml
 Bundle-ActivationPolicy: lazy
 

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    targetNamespace="http://www.eclipse.org/skalli/2010/API"
+    xmlns="http://www.eclipse.org/skalli/2010/API"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified"
+    version="1.0">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="EN">
+      Copyright (c) 2010, 2011 SAP AG and others.
+      All rights reserved. This program and the accompanying materials
+      are made available under the terms of the Eclipse Public License v1.0
+      which accompanies this distribution, and is available at
+      http://www.eclipse.org/legal/epl-v10.html
+
+      Contributors:
+         SAP AG - initial API and implementation
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:annotation>
+    <xsd:documentation xml:lang="EN">
+      This XML schema defines the Skalli REST API resource for
+      infoboxes, i.e. /api/infoboxes
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <!-- BEGIN of common declarations -->
+  <xsd:include schemaLocation="common.xsd" />
+  <!-- END of common declarations -->
+
+  <xsd:element name="infoboxes">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="infobox" type="Infobox" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="apiVersion" type="ModelVersion" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:complexType name="Infobox">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="EN">
+        Defines the properties of an infobox.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="shortName" type="xsd:string" minOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="EN">
+            The short name of the infobox.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="actions" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="EN">
+            List of actions that can be performed on the infobox, e.g. triggering a refresh
+           with /infoboxes/maven?action=refresh
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="action" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+     </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

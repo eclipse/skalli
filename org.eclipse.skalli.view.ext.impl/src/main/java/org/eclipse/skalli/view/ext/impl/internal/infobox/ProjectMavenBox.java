@@ -11,6 +11,7 @@
 package org.eclipse.skalli.view.ext.impl.internal.infobox;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -286,5 +287,10 @@ public class ProjectMavenBox extends InfoBoxBase implements InfoBox {
                         action, project.getUuid(), userId));
             }
         }
+    }
+
+    @Override
+    public List<String> getSupportedActions() {
+        return Arrays.asList(REFRESH_ACTION);
     }
 }

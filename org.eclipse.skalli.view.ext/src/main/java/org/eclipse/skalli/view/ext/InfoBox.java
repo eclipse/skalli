@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext;
 
+import java.util.List;
+
 import org.eclipse.skalli.model.Project;
 
 import com.vaadin.ui.Component;
@@ -115,5 +117,11 @@ public interface InfoBox extends IconProvider {
      * @param userId the unique identifier of the user that triggered the action
      */
     public void perform(String action, Project project, String userId);
+
+    /**
+     * Returns the actions supported by this infobox.
+     * @return  a list of actions, or an empty list.
+     */
+    public List<String> getSupportedActions();
 
 }

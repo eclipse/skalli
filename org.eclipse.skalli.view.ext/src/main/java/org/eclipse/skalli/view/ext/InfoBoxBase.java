@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.HtmlBuilder;
 import org.eclipse.skalli.model.EntityBase;
@@ -185,6 +188,11 @@ public abstract class InfoBoxBase implements InfoBox {
     @Override
     public String getShortName() {
         return null;
+    }
+
+    @Override
+    public List<String> getSupportedActions() {
+        return Collections.emptyList();
     }
 
     @Override
