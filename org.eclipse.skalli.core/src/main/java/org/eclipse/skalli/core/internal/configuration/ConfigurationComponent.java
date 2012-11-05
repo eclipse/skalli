@@ -55,6 +55,8 @@ public class ConfigurationComponent implements ConfigurationService {
     private StorageService storageService;
     private String storageServiceClassName;
 
+    private Map<String, Object> configCache = new HashMap<String, Object>();
+
     private final Map<ConfigTransaction, Map<ConfigKey, String>> transactions =
             new HashMap<ConfigTransaction, Map<ConfigKey, String>>(0);
 
@@ -94,6 +96,7 @@ public class ConfigurationComponent implements ConfigurationService {
     protected void bindStorageService(StorageService storageService) {
         if (storageServiceClassName.equals(storageService.getClass().getName())) {
             this.storageService = storageService;
+            configCache.clear();
             notifyCustomizationChanged(storageService);
             LOG.info(MessageFormat.format("bindStorageService({0})", storageService)); //$NON-NLS-1$
         }
@@ -103,6 +106,7 @@ public class ConfigurationComponent implements ConfigurationService {
         if (storageServiceClassName.equals(storageService.getClass().getName())) {
             LOG.info(MessageFormat.format("unbindStorageService({0})", storageService)); //$NON-NLS-1$
             this.storageService = null;
+            configCache.clear();
             notifyCustomizationChanged(storageService);
         }
     }
@@ -234,13 +238,14 @@ public class ConfigurationComponent implements ConfigurationService {
     }
 
     @Override
-    public <T> void writeCustomization(String customizationKey, T customization) {
+    public synchronized <T> void writeCustomization(String customizationKey, T customization) {
         if (storageService == null) {
             LOG.error(MessageFormat.format(
                     "Cannot store configuration for key {0}: StorageService not available",
                     customizationKey));
             return;
         }
+        configCache.put(customizationKey, customization);
         String xml = getXStream(customization.getClass()).toXML(customization);
         InputStream is = null;
         try {
@@ -263,32 +268,36 @@ public class ConfigurationComponent implements ConfigurationService {
     };
 
     @Override
-    public <T> T readCustomization(String customizationKey, Class<T> customizationClass) {
+    public synchronized <T> T readCustomization(String customizationKey, Class<T> customizationClass) {
         if (storageService == null) {
             LOG.warn(MessageFormat.format(
                     "Cannot load configuration for key {0}: StorageService not available",
                     customizationKey));
             return null;
         }
-        InputStream is = null;
-        try {
-            is = storageService.read(CATEGORY_CUSTOMIZATION, customizationKey);
-            if (is == null) {
+        Object config = configCache.get(customizationKey);
+        if (config == null) {
+            InputStream is = null;
+            try {
+                is = storageService.read(CATEGORY_CUSTOMIZATION, customizationKey);
+                if (is == null) {
+                    return null;
+                }
+                config = getXStream(customizationClass).fromXML(is);
+            } catch (XStreamException e) {
+                LOG.error(MessageFormat.format(
+                        "Failed to unmarshal configuration for key ''{0}'' ",
+                        customizationKey), e);
                 return null;
+            } catch (StorageException e) {
+                LOG.error(MessageFormat.format(
+                        "Failed to retrieve configuration for key ''{0}''",
+                        customizationKey), e);
+                return null;
+            } finally {
+                IOUtils.closeQuietly(is);
             }
-            return customizationClass.cast(getXStream(customizationClass).fromXML(is));
-        } catch (XStreamException e) {
-            LOG.error(MessageFormat.format(
-                    "Failed to unmarshal configuration for key ''{0}'' ",
-                    customizationKey), e);
-            return null;
-        } catch (StorageException e) {
-            LOG.error(MessageFormat.format(
-                    "Failed to retrieve configuration for key ''{0}''",
-                    customizationKey), e);
-            return null;
-        } finally {
-            IOUtils.closeQuietly(is);
         }
+        return customizationClass.cast(config);
     }
 }
