@@ -8,7 +8,7 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.gerrit.client;
+package org.eclipse.skalli.gerrit.client.internal;
 
 import org.json.JSONException;
 import org.json.JSONObject;

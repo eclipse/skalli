@@ -13,7 +13,8 @@ package org.eclipse.skalli.gerrit.client.internal;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritService;
-import org.eclipse.skalli.gerrit.client.config.ConfigKeyGerrit;
+import org.eclipse.skalli.gerrit.client.config.GerritConfig;
+import org.eclipse.skalli.gerrit.client.config.GerritResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,71 +26,48 @@ public class GerritServiceImpl implements GerritService {
 
     private ConfigurationService configService;
 
-    public GerritServiceImpl() {
-
-    }
-
-    GerritServiceImpl(ConfigurationService configService) {
+    protected void bindConfigurationService(ConfigurationService configService) {
         this.configService = configService;
     }
 
-    public void bindConfigurationService(ConfigurationService configService) {
-        this.configService = configService;
-    }
-
-    public void unbindConfigurationService(ConfigurationService configService) {
+    protected void unbindConfigurationService(ConfigurationService configService) {
         this.configService = null;
     }
 
     @Override
-    public GerritClient getClient(String userId) {
-        if (StringUtils.isBlank(userId)) {
-            LOG.warn("No user ID passed. Cannot return GerritClient, but null.");
+    public GerritClient getClient(String onBehalfOf) {
+        if (StringUtils.isBlank(onBehalfOf)) {
+            LOG.warn("Failed to create a Gerrit client: No acting user available");
             return null;
         }
         if (configService == null) {
-            LOG.warn("No ConfigurationService found. Cannot return GerritClient, but null.");
+            LOG.warn("Failed to create a Gerrit client:  No configuration service available");
             return null;
         }
 
-        String cfgHost = configService.readString(ConfigKeyGerrit.HOST);
-        String cfgPort = configService.readString(ConfigKeyGerrit.PORT);
-        String cfgUser = configService.readString(ConfigKeyGerrit.USER);
-        String cfgPrivateKey = configService.readString(ConfigKeyGerrit.PRIVATEKEY);
-        String cfgPassphrase = configService.readString(ConfigKeyGerrit.PASSPHRASE);
-
-        // check all so that the log gives as much information as possible for reconfiguration
-        boolean validHost = isValidString(cfgHost, "host");
-        boolean validPort = isValidNumber(cfgPort, "port");
-        boolean validUser = isValidString(cfgUser, "user");
-        boolean validPrivateKey = isValidString(cfgPrivateKey, "privateKey");
-        boolean validPassphrase = isValidString(cfgPassphrase, "passphrase");
-
-        if (!validHost || !validPort || !validUser || !validPrivateKey || !validPassphrase) {
-            LOG.warn("Invalid configuration. Cannot return GerritClient, but null.");
+        GerritConfig gerritConfig = configService.readCustomization(GerritResource.KEY, GerritConfig.class);
+        if (gerritConfig == null) {
+            LOG.warn("Failed to create a Gerrit client:  No Gerrit configuration available");
             return null;
         }
 
-        LOG.info("Configuration loaded successfully. Trying to initialize GerritClient.");
-        return new GerritClientImpl(cfgHost, Integer.valueOf(cfgPort), cfgUser, cfgPrivateKey, cfgPassphrase, userId);
-    }
-
-    private boolean isValidString(String value, String property) {
-        boolean isValid = !StringUtils.isBlank(value);
-
-        if (!isValid && !StringUtils.isBlank(property)) {
-            LOG.warn(String.format("Property '%s' is not set.", property));
+        if (StringUtils.isBlank(gerritConfig.getHost())) {
+            LOG.warn("Failed to create a Gerrit client:  No host configuration available");
+            return null;
         }
-        return isValid;
-    }
+        if (StringUtils.isBlank(gerritConfig.getPort())) {
+            LOG.warn("No port configuration available: Using default port " + GerritClient.DEFAULT_PORT);
+        } else if (!StringUtils.isNumeric(gerritConfig.getPort())) {
+            LOG.warn("Failed to create a Gerrit client:  No host configuration available");
+            return null;
 
-    private boolean isValidNumber(String value, String property) {
-        boolean isValid = !StringUtils.isBlank(value) && StringUtils.isNumeric(value);
-
-        if (!isValid && !StringUtils.isBlank(property)) {
-            LOG.warn(String.format("Property '%s' is not set or not numeric.", property));
         }
-        return isValid;
+        if (StringUtils.isBlank(gerritConfig.getUser())
+                || StringUtils.isBlank(gerritConfig.getPrivateKey())
+                || StringUtils.isBlank(gerritConfig.getPassphrase())) {
+            LOG.warn("Failed to create a Gerrit client:  No credentials configuration available");
+            return null;
+        }
+        return new GerritClientImpl(gerritConfig, onBehalfOf);
     }
-
 }

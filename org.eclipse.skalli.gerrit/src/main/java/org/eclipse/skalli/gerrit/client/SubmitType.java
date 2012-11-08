@@ -8,21 +8,8 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.gerrit.client.config;
+package org.eclipse.skalli.gerrit.client;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
-
-public class GerritResource extends CustomizingResource<GerritConfig> {
-
-    public static final String KEY = "gerrit"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return KEY;
-    }
-
-    @Override
-    protected Class<GerritConfig> getConfigClass() {
-        return GerritConfig.class;
-    }
+public enum SubmitType {
+    FAST_FORWARD_ONLY, MERGE_IF_NECESSARY, MERGE_ALWAYS, CHERRY_PICK
 }

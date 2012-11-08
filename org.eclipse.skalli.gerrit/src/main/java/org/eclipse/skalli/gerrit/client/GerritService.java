@@ -13,12 +13,14 @@ package org.eclipse.skalli.gerrit.client;
 public interface GerritService {
 
     /**
-     * Returns a client to perform operations on the configured remote Gerrit.
+     * Returns a Gerrit client for communication with a configured Gerrit server.
      *
-     * @param user the user to act on behalf on (used in logging, not for authentication)
+     * @param onBehalfOf  the unique identifier of the user to act on behalf of.
+     * Note, this user is usually the currently logged in user and not the user
+     * with which the returned client communicates with Gerrit.
      *
-     * @return the client
+     * @return a preconfigured Gerrit client.
      */
-    GerritClient getClient(String userId);
+    public GerritClient getClient(String onBehalfOf);
 
 }

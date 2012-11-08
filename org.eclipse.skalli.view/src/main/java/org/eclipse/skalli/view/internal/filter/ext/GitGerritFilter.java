@@ -11,19 +11,17 @@
 package org.eclipse.skalli.view.internal.filter.ext;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -32,7 +30,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
@@ -40,7 +37,8 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritService;
-import org.eclipse.skalli.gerrit.client.config.ConfigKeyGerrit;
+import org.eclipse.skalli.gerrit.client.config.GerritConfig;
+import org.eclipse.skalli.gerrit.client.config.GerritResource;
 import org.eclipse.skalli.gerrit.client.exception.CommandException;
 import org.eclipse.skalli.gerrit.client.exception.ConnectionException;
 import org.eclipse.skalli.gerrit.client.exception.GerritClientException;
@@ -51,6 +49,7 @@ import org.eclipse.skalli.model.ext.commons.PeopleExtension;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.extension.PropertyLookup;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.internal.filter.FilterException;
@@ -103,8 +102,13 @@ public class GitGerritFilter implements Filter {
     public static final String ERROR_NO_PARENT = "noParent"; //$NON-NLS-1$
     public static final String ERROR_NO_CONFIGURATION = "noConfiguration"; //$NON-NLS-1$
 
-    public static final String GIT_PREFIX = "scm:git:"; //$NON-NLS-1$
-    public static final String GIT_EXT = ".git"; //$NON-NLS-1$
+    private static final String GIT_PREFIX = "scm:git:"; //$NON-NLS-1$
+    private static final String GIT_EXT = ".git"; //$NON-NLS-1$
+
+    static final String DEFAULT_SCM_TEMPLATE =
+            GIT_PREFIX +"${protocol}://${host}:${port}/${repository}" + GIT_EXT; //$NON-NLS-1$
+    static final String DEFAULT_DESCRIPTION =
+            "Created by ${user.displayName}. More details: ${link}"; //$NON-NLS-1$
 
     private static final Logger LOG = LoggerFactory.getLogger(GitGerritFilter.class);
 
@@ -120,80 +124,121 @@ public class GitGerritFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        // get some attributes from request provided by other filters
+        // get some attributes provided by previous filters in the chain
         final String projectId = (String) request.getAttribute(Consts.ATTRIBUTE_PROJECTID);
         final Project project = (Project) request.getAttribute(Consts.ATTRIBUTE_PROJECT);
         final User user = (User) request.getAttribute(Consts.ATTRIBUTE_USER);
 
         FilterException fe = null;
         if (StringUtils.isBlank(projectId)) {
-            fe = new FilterException("projectId is blank.");
+            fe = new FilterException("Missing required request parameter 'projectId'");
         } else if (project == null) {
-            fe = new FilterException("project is null.");
+            fe = new FilterException("Missing required request parameter 'project'");
         } else if (user == null) {
-            fe = new FilterException("user is null.");
+            fe = new FilterException("Missing required request parameter 'user'");
         }
         if (fe != null) {
             FilterUtil.handleException(request, response, fe);
-            // abort this filter, forward to error page is triggered
+            return;
+        }
+
+        // no configuration service: cancel further processing since we will not
+        // be able to create a Gerrit client
+        ConfigurationService configService = Services.getService(ConfigurationService.class);
+        if (configService == null) {
+            request.setAttribute(ATTRIBUTE_ERROR_MESSAGE, ERROR_NO_CONFIGURATION);
+            FilterUtil.forward(request, response, URL_GITGERRITERROR);
+            return;
+        }
+
+        // no Gerrit configuration: cancel further processing since we will not
+        // be able to create a Gerrit client
+        GerritConfig gerritConfig = configService.readCustomization(GerritResource.KEY, GerritConfig.class);
+        if (gerritConfig == null) {
+            request.setAttribute(ATTRIBUTE_ERROR_MESSAGE, ERROR_NO_CONFIGURATION);
+            FilterUtil.forward(request, response, URL_GITGERRITERROR);
+            return;
+        }
+
+        // no Gerrit service available: cancel further processing since we will not
+        // be able to create a Gerrit client
+        GerritService gerritService = Services.getService(GerritService.class);
+        if (gerritService == null) {
+            request.setAttribute(ATTRIBUTE_ERROR_MESSAGE, ERROR_NO_CONFIGURATION);
+            FilterUtil.forward(request, response, URL_GITGERRITERROR);
             return;
         }
 
         // Retrieve request parameters
         final String action = request.getParameter(PARAMETER_ACTION);
         final String group = request.getParameter(PARAMETER_GROUP);
-        final String repo = request.getParameter(PARAMETER_REPO);
+        final String repository = request.getParameter(PARAMETER_REPO);
         final String parent = request.getParameter(PARAMETER_PARENT);
-        final boolean permitsOnly = "permitsOnly".equals(request.getParameter(PARAMETER_PERMITS_ONLY)); //$NON-NLS-1$
+        final boolean permitsOnly = PARAMETER_PERMITS_ONLY.equals(request.getParameter(PARAMETER_PERMITS_ONLY));
 
         GerritClient client = null;
         try {
-            client = getClient(user.getUserId());
-
-            // special case. no client configured. cancel further processing.
+            // no Gerrit client available: cancel further processing since we will not
+            // be able to communicate with Gerrit
+            client = gerritService.getClient(user.getUserId());
             if (client == null) {
                 request.setAttribute(ATTRIBUTE_ERROR_MESSAGE, ERROR_NO_CONFIGURATION);
                 FilterUtil.forward(request, response, URL_GITGERRITERROR);
                 return;
             }
 
-            // (0) Check if project has at least one parent.
-            if (project.getParentEntityId() == null) {
+            // if "subprojectsOnly" flag is set in configuration,
+            // ensure that project has at least one parent
+            if (gerritConfig.isSubprojectsOnly() && project.getParentEntityId() == null) {
                 request.setAttribute(ATTRIBUTE_ERROR_MESSAGE, ERROR_NO_PARENT);
                 FilterUtil.forward(request, response, URL_GITGERRITERROR);
                 return;
             }
 
-            request.setAttribute(ATTRIBUTE_GERRITCONTACT, fromConfig(ConfigKeyGerrit.CONTACT));
+            // render a contact address, if available
+            if (StringUtils.isNotBlank(gerritConfig.getContact())) {
+                request.setAttribute(ATTRIBUTE_GERRITCONTACT, gerritConfig.getContact());
+            }
 
-            // (1) INITIAL (input proposals for group and repo)
+
+            // ***** HERE starts the action evaluation/handling ****
+
+            // (1) INITIAL (action: input proposals for group and repo)
             if (StringUtils.isBlank(action) || ACTION_TOGGLE.equals(action)) {
-                request.setAttribute(ATTRIBUTE_GERRITHOST, fromConfig(ConfigKeyGerrit.HOST));
+                request.setAttribute(ATTRIBUTE_GERRITHOST, gerritConfig.getHost());
                 request.setAttribute(ATTRIBUTE_PROPOSED_GROUP,
-                        StringUtils.isNotBlank(group) ? group : generateName(project, "_", "_committers")); //$NON-NLS-1$ //$NON-NLS-2$
+                        StringUtils.isNotBlank(group) ?
+                                group : generateName(project, "_", "_committers")); //$NON-NLS-1$ //$NON-NLS-2$
                 request.setAttribute(ATTRIBUTE_PROPOSED_REPO,
-                        StringUtils.isNotBlank(repo) ? repo : generateName(project, "/", StringUtils.EMPTY)); //$NON-NLS-1$
+                        StringUtils.isNotBlank(repository) ?
+                                repository : generateName(project, "/", StringUtils.EMPTY)); //$NON-NLS-1$
                 request.setAttribute(ATTRIBUTE_PROPOSED_PARENT,
-                        StringUtils.isNotBlank(parent) ? parent : fromConfig(ConfigKeyGerrit.PARENT));
+                        StringUtils.isNotBlank(parent) ? parent : gerritConfig.getParent());
                 request.setAttribute(ATTRIBUTE_PERMITS_ONLY, permitsOnly);
                 String groupMode = request.getParameter(PARAMETER_PROPOSE_EXISTING_GROUPS);
                 if ("related".equals(groupMode)) { //$NON-NLS-1$
-                    request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_GROUPS, getGroupsFromHierarchy(client, project));
+                    request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_GROUPS,
+                            getRelatedGroups(gerritConfig, client, project, user));
                 } else if ("all".equals(groupMode)) { //$NON-NLS-1$
                     request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_GROUPS, getAllGroups(client, project));
                 }
                 String parentMode = request.getParameter(PARAMETER_PROPOSE_EXISTING_PROJECTS);
-                if ("permissions".equals(parentMode)) { //$NON-NLS-1$
-                    request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_PROJECTS, getProjects(client, "permissions")); //$NON-NLS-1$
+                if ("related".equals(parentMode)) { //$NON-NLS-1$
+                    request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_PROJECTS,
+                            getRelatedProjects(gerritConfig, client, project, user));
+                } else if ("permissions".equals(parentMode)) { //$NON-NLS-1$
+                    request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_PROJECTS,
+                            getProjects(client, "permissions")); //$NON-NLS-1$
                 } else if ("all".equals(parentMode)) { //$NON-NLS-1$
-                    request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_PROJECTS, getProjects(client, "all")); //$NON-NLS-1$
+                    request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_PROJECTS,
+                            getProjects(client, "all")); //$NON-NLS-1$
                 }
             }
-            // (2) CHECK (validate input against Gerrit)
+            // (2) CHECK (action: validate input against Gerrit)
             else if (ACTION_CHECK.equals(action) || ACTION_SAVE.equals(action)) {
                 client.connect();
 
-                // general group checks
+                // group checks: valid group name? does the group already exist? will a group be created?
                 final String invalidGroupMsg = client.checkGroupName(group);
                 final boolean invalidGroup = invalidGroupMsg != null;
                 request.setAttribute(ATTRIBUTE_INVALID_GROUP, invalidGroup);
@@ -204,24 +249,24 @@ public class GitGerritFilter implements Filter {
                 request.setAttribute(ATTRIBUTE_GROUP_EXISTS, groupExists);
                 final boolean createGroup = !invalidGroup && !groupExists;
 
-                // general repo checks
-                final String invalidRepoMsg = client.checkProjectName(repo);
+                // repo checks: valid repo name? does the repo already exist? will a repo be created?
+                final String invalidRepoMsg = client.checkProjectName(repository);
                 final boolean invalidRepo = invalidRepoMsg != null;
                 request.setAttribute(ATTRIBUTE_INVALID_REPO, invalidRepo);
                 if (invalidRepo) {
                     request.setAttribute(ATTRIBUTE_INVALID_REPO_MSG, invalidRepoMsg);
                 }
-                final boolean repoExists = !invalidRepo && client.projectExists(repo);
+                final boolean repoExists = !invalidRepo && client.projectExists(repository);
                 request.setAttribute(ATTRIBUTE_REPO_EXISTS, repoExists);
                 final boolean createRepo = !invalidGroup && !invalidRepo && !repoExists;
 
-                // general parent checks
+                // does the selected Gerrit parent project exist?
                 if (StringUtils.isNotBlank(parent)) {
                     final boolean invalidParent = !client.projectExists(parent);
                     request.setAttribute(ATTRIBUTE_INVALID_PARENT, invalidParent);
                 }
 
-                // checks only relevant for group creation
+                // proposed committers: do they have accounts? will the acting user be a committer?
                 Set<String> knownAccounts = Collections.emptySet();
                 boolean actingUserHasAccount = false;
                 boolean actingUserIsProjectMember = false;
@@ -235,30 +280,33 @@ public class GitGerritFilter implements Filter {
                 request.setAttribute(ATTRIBUTE_NO_PROJECT_MEMBER, !actingUserIsProjectMember);
                 request.setAttribute(ATTRIBUTE_NO_GERRIT_USER, actingUserIsProjectMember && !actingUserHasAccount);
 
-                // (3) SAVE (if validation is OK)
+                // (3) SAVE (action: create group/repo, set SCM location)
                 if (ACTION_SAVE.equals(action)) {
                     // Only proceed if ...
-                    boolean persist = groupExists && repoExists; // ... both entities exist
-                    persist = persist || groupExists && createRepo; // ... or repo will be created
-                    persist = persist || createGroup && createRepo; // ... or repo and group will be created
-
-                    if (persist) {
+                    boolean proceed = groupExists && repoExists; // ... both entities exist
+                    proceed = proceed || groupExists && createRepo; // ... or repo will be created
+                    proceed = proceed || createGroup && createRepo; // ... or repo and group will be created
+                    if (proceed) {
                         // perform operations on Gerrit
                         if (createGroup || createRepo) {
-                            HttpServletRequest httpRequest = (HttpServletRequest) request;
-                            String description = MessageFormat.format(
-                                "Created by {0}.\nMore details: {1}{2}/{3}",
-                                user.getDisplayName(),
-                                httpRequest.getRequestURL().toString().replaceFirst(httpRequest.getServletPath(), ""),
-                                Consts.URL_PROJECTS, projectId);
-
+                            String baseUrl = (String)request.getAttribute(Consts.ATTRIBUTE_BASE_URL);
                             if (createGroup) {
-                                client.createGroup(group, StringUtils.EMPTY, description, knownAccounts);
+                                String groupDescription = getDescription(gerritConfig.getGroupDescription(),
+                                        baseUrl, project, user, Collections.singletonMap("group", group)); //$NON-NLS-1$
+                                client.createGroup(group, StringUtils.EMPTY, groupDescription, knownAccounts);
                             }
                             if (createRepo) {
-                                client.createProject(repo, null, CollectionUtils.asSet(group),
-                                        StringUtils.isNotBlank(parent)? parent : fromConfig(ConfigKeyGerrit.PARENT),
-                                        permitsOnly, description, null, false, false);
+                                String projectDescription = getDescription(gerritConfig.getProjectDescription(),
+                                        baseUrl, project, user, Collections.singletonMap("repository", repository)); //$NON-NLS-1$
+                                client.createProject(repository,
+                                        gerritConfig.getBranch(),
+                                        CollectionUtils.asSet(group),
+                                        StringUtils.isNotBlank(parent)? parent : gerritConfig.getParent(),
+                                        permitsOnly,
+                                        projectDescription,
+                                        gerritConfig.getSubmitType(),
+                                        gerritConfig.isUseContributorAgreement(),
+                                        gerritConfig.isUseSignedOffBy());
                             }
                         }
 
@@ -268,30 +316,22 @@ public class GitGerritFilter implements Filter {
                             devInf = new DevInfProjectExt();
                             project.addExtension(devInf);
                         }
-                        Map<String, String> parameters = new HashMap<String, String>();
-                        parameters.put(ConfigKeyGerrit.HOST.getKey(), fromConfig(ConfigKeyGerrit.HOST));
-                        parameters.put("repository", repo); //$NON-NLS-1$
-                        parameters.put(ConfigKeyGerrit.PORT.getKey(), fromConfig(ConfigKeyGerrit.PORT));
-                        StrSubstitutor substitutor = new StrSubstitutor(parameters);
-                        String template = fromConfig(ConfigKeyGerrit.SCM_TEMPLATE);
-                        String newScmLocation = substitutor.replace(template);
-
-                        if (!devInf.hasScmLocation(newScmLocation)) {
-                            devInf.addScmLocation(newScmLocation);
+                        String scmLocation = getScmLocation(gerritConfig, repository, project, user);
+                        if (!devInf.hasScmLocation(scmLocation)) {
+                            devInf.addScmLocation(scmLocation);
                             Services.getRequiredService(ProjectService.class).persist(project, user.getUserId());
                         }
                     }
-                    request.setAttribute(ATTRIBUTE_DATA_SAVED, persist);
+                    request.setAttribute(ATTRIBUTE_DATA_SAVED, proceed);
                 }
             }
             // (!) CANCEL (redirect to project details)
             else if (ACTION_CANCEL.equals(action)) {
                 ((HttpServletResponse) response).sendRedirect(Consts.URL_PROJECTS + "/" + projectId); //$NON-NLS-1$
             }
-
-        } catch (final GerritClientException e) {
+        } catch (GerritClientException e) {
             handleException(request, response, e);
-        } catch (final Exception e) {
+        } catch (Exception e) {
             handleException(request, response, e);
         } finally {
             if (client != null) {
@@ -316,7 +356,7 @@ public class GitGerritFilter implements Filter {
     /**
      * Generates a name based on the project hierarchy (short names) and the project ID using a delimiter and a possible suffix.
      */
-    private String generateName(Project project, String delimiter, String suffix) {
+    String generateName(Project project, String delimiter, String suffix) {
         StringBuffer sb = new StringBuffer();
         for (Project parent : Services.getRequiredService(ProjectService.class).getParentChain(project.getUuid())) {
             if (parent.getProjectId() == project.getProjectId()) {
@@ -331,7 +371,7 @@ public class GitGerritFilter implements Filter {
         return sb.toString();
     }
 
-    private Set<String> getProposedProjectMembers(final Project project) {
+    Set<String> getProposedProjectMembers(Project project) {
         PeopleExtension peopleExt = project.getExtension(PeopleExtension.class);
         if (peopleExt == null) {
             return Collections.emptySet();
@@ -347,136 +387,140 @@ public class GitGerritFilter implements Filter {
         return userIds;
     }
 
-    /**
-     * Retrieves a list of all groups known to Gerrit based on the project hierarchy.
-     */
-    private Set<String> getGroupsFromHierarchy(final GerritClient client, final Project project)
-            throws GerritClientException {
+    Set<String> getRelatedProjects(GerritConfig gerritConfig, GerritClient client,
+            Project project, User user) throws GerritClientException {
 
-        URI newScmUri = null;
-        try {
-            newScmUri = new URI(StringUtils.removeStart(getScmLocationStaticPart(), GIT_PREFIX));
-        } catch (URISyntaxException e) {
-            return Collections.emptySet();
-        }
+        // pattern to match with SCM location strings of related projects:
+        // we replace ${repository} with the regular expression "(.*)", which allows us to extract
+        // the repository name from a matching SCM location with Matcher.group(int).
+        Pattern scmPattern = Pattern.compile(getScmLocation(gerritConfig, "(.*)", project, user)); //$NON-NLS-1$
 
         ProjectService projectService = Services.getRequiredService(ProjectService.class);
-        List<Project> relevantSkalliProjects = projectService.getParentChain(project.getUuid());
-        relevantSkalliProjects.addAll(getSiblingsAndAllDescendants(projectService, project));
 
-        Set<String> proposedGroups = new TreeSet<String>();
-        proposedGroups.addAll(client.getGroups(getRelevantGerritProjects(relevantSkalliProjects, newScmUri).toArray(
-                new String[0])));
+        // first, add all my parents: inheriting a group from a parent is
+        // likely the most common use case
+        List<Project> relatedProjects = projectService.getParentChain(project.getUuid());
 
-        return proposedGroups;
+        // second, add my siblings unless I'm a top-level project
+        UUID parent = project.getParentProject();
+        if (parent != null) {
+            relatedProjects.addAll(projectService.getSubProjects(parent));
+        }
+
+        // finally, add my own subprojects
+        relatedProjects.addAll(projectService.getSubProjects(project.getUuid()));
+
+        return getRepositoryNames(relatedProjects, scmPattern);
     }
 
-    private Set<String> getAllGroups(final GerritClient client, final Project project) {
+
+    /**
+     * Returns groups that are related to the given project based on its position in
+     * the project hierarchy: Groups used by parents, groups used by siblings,
+     * groups used by subprojects.
+     */
+    List<String> getRelatedGroups(GerritConfig gerritConfig, GerritClient client,
+            Project project, User user) throws GerritClientException {
+        Set<String> repositoryNames = getRelatedProjects(gerritConfig, client, project, user);
+        return client.getGroups(repositoryNames.toArray(new String[repositoryNames.size()]));
+    }
+
+    Set<String> getAllGroups(final GerritClient client, final Project project) {
         Set<String> result = new TreeSet<String>();
         try {
             result.addAll(client.getGroups());
             return result;
         } catch (ConnectionException e) {
-            LOG.warn("Can't connect to gerrit:", e);
+            LOG.warn("Can't connect to Gerrit:", e);
             return Collections.emptySet();
         } catch (CommandException e) {
-            LOG.warn("Can't connect to gerrit:", e);
+            LOG.warn("Can't connect to Gerrit:", e);
             return Collections.emptySet();
         }
     }
 
-    private Set<String> getProjects(final GerritClient client, String type) {
+    Set<String> getProjects(final GerritClient client, String type) {
         Set<String> result = new TreeSet<String>();
         try {
             result.addAll(client.getProjects(type));
             return result;
         } catch (ConnectionException e) {
-            LOG.warn("Can't connect to gerrit:", e);
+            LOG.warn("Can't connect to Gerrit:", e);
             return Collections.emptySet();
         } catch (CommandException e) {
-            LOG.warn("Can't connect to gerrit:", e);
+            LOG.warn("Can't connect to Gerrit:", e);
             return Collections.emptySet();
         }
     }
 
-    private List<Project> getSiblingsAndAllDescendants(ProjectService projectService, final Project project) {
-        List<Project> result = new ArrayList<Project>();
-
-        UUID parent = project.getParentProject();
-        List<Project> siblings = projectService.getSubProjects(parent);
-        result.addAll(siblings);
-
-        //now add all Descendants of all the siblings
-        for (Project sibling : siblings) {
-            Comparator<Project> comparator = new Comparator<Project>() {
-                @Override
-                public int compare(Project p1, Project p2) {
-                    return p1.getProjectId().compareTo(p2.getProjectId());
-                }
-            };
-
-            result.addAll(projectService.getSubProjects(sibling.getUuid(), comparator, Integer.MAX_VALUE));
-        }
-        return result;
-    }
-
-    private Set<String> getRelevantGerritProjects(List<Project> skalliProjects, final URI newScmUri) {
-        Set<String> relevantParentProjects = new HashSet<String>();
-        for (Project parent : skalliProjects) {
-            DevInfProjectExt devInf = parent.getExtension(DevInfProjectExt.class);
-            if (devInf == null || parent.isInherited(DevInfProjectExt.class)) {
+    Set<String> getRepositoryNames(List<Project> projects, Pattern scmPattern) {
+        LinkedHashSet<String> repositoryNames = new LinkedHashSet<String>();
+        for (Project project : projects) {
+            DevInfProjectExt devInf = project.getExtension(DevInfProjectExt.class);
+            if (devInf == null || project.isInherited(DevInfProjectExt.class)) {
                 continue;
             }
-
             for (String scmLocation : devInf.getScmLocations()) {
-                URI existingScmUri = null;
-                try {
-                    existingScmUri = new URI(StringUtils.removeStart(scmLocation, GIT_PREFIX));
-                } catch (URISyntaxException e) {
-                    continue;
+                Matcher matcher = scmPattern.matcher(scmLocation);
+                if (matcher.matches() && matcher.groupCount() > 0) {
+                    repositoryNames.add(matcher.group(1));
                 }
-
-                if (!StringUtils.equals(newScmUri.getScheme(), existingScmUri.getScheme())
-                        || !StringUtils.equals(newScmUri.getHost(), existingScmUri.getHost())) {
-                    continue;
-                }
-
-                String relevantProjectName = StringUtils.removeStart(existingScmUri.getPath(), "/"); //$NON-NLS-1$
-                if (relevantProjectName.endsWith(GIT_EXT)) {
-                    relevantProjectName = StringUtils.substring(relevantProjectName, 0, -GIT_EXT.length());
-                }
-                relevantParentProjects.add(relevantProjectName);
             }
         }
-        return relevantParentProjects;
+        return repositoryNames;
     }
 
-    /**
-     * Retrieves the client from the service, might be null
-     */
     @SuppressWarnings("nls")
-    private GerritClient getClient(final String userId) throws Exception {
-        GerritService service = Services.getService(GerritService.class);
-        if (service == null) {
-            throw new Exception("Gerrit Service not available.");
+    String getScmLocation(GerritConfig gerritConfig, String repository, Project project, User user) {
+        Map<String, String> parameters = new HashMap<String, String>();
+        String protocol = gerritConfig.getProtocol();
+        if (StringUtils.isBlank(protocol)) {
+            protocol = "git";
         }
-        return service.getClient(userId);
+        parameters.put("protocol", protocol);
+        parameters.put("host", gerritConfig.getHost());
+        String port = gerritConfig.getPort();
+        if (StringUtils.isBlank(port)) {
+            port = Integer.toString(GerritClient.DEFAULT_PORT);
+        }
+        parameters.put("port", port);
+        parameters.put("repository", repository);
+        if (StringUtils.isNotBlank(gerritConfig.getParent())) {
+            parameters.put("parent", gerritConfig.getParent());
+        }
+        if (StringUtils.isNotBlank(gerritConfig.getBranch())) {
+            parameters.put("branch", gerritConfig.getBranch());
+        }
+        parameters.put("user", user.getDisplayName());
+        parameters.put("userId", user.getUserId());
+
+        String scmTemplate = gerritConfig.getScmTemplate();
+        if (StringUtils.isBlank(scmTemplate)) {
+            scmTemplate = DEFAULT_SCM_TEMPLATE;
+        }
+
+        PropertyLookup propertyLookup = new PropertyLookup(parameters);
+        propertyLookup.putAllProperties(project, "");
+        propertyLookup.putAllProperties(user, "user");
+        StrSubstitutor substitutor = new StrSubstitutor(propertyLookup);
+        return substitutor.replace(scmTemplate);
     }
 
-    /**
-     * Constructs the static part of a SCM location for the configured Gerrit
-     */
-    private String getScmLocationStaticPart() {
-        return String.format("%s%s://%s/", GIT_PREFIX, fromConfig(ConfigKeyGerrit.PROTOCOL),
-                fromConfig(ConfigKeyGerrit.HOST));
+    @SuppressWarnings("nls")
+    String getDescription(String descriptionTemplate, String baseUrl, Project project,
+            User user, Map<String, String> properties) {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.putAll(properties);
+        parameters.put("user", user.getDisplayName());
+        parameters.put("userId", user.getUserId());
+        parameters.put("link", baseUrl + Consts.URL_PROJECTS + "/" + project.getProjectId());
+        if (StringUtils.isBlank(descriptionTemplate)) {
+            descriptionTemplate = DEFAULT_DESCRIPTION;
+        }
+        PropertyLookup propertyLookup = new PropertyLookup(parameters);
+        propertyLookup.putAllProperties(project, "");
+        propertyLookup.putAllProperties(user, "user");
+        StrSubstitutor substitutor = new StrSubstitutor(propertyLookup);
+        return substitutor.replace(descriptionTemplate);
     }
-
-    /**
-     * Utility to get GerritConfig entries
-     */
-    private String fromConfig(final ConfigKeyGerrit key) {
-        ConfigurationService configService = Services.getService(ConfigurationService.class);
-        return configService.readString(key);
-    }
-
 }

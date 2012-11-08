@@ -74,7 +74,8 @@ import org.slf4j.LoggerFactory;
  * For convenience the filter sets the following attributes that are derived from the request URL:
  * <ul>
  * <li>{@link Consts#ATTRIBUTE_WEBLOCATOR} - <tt>schema://host:port</tt></li>
- * <li>{@link Consts#ATTRIBUTE_BASE_URL} - <tt>schema://host:port/contextPath/servletPath</tt></li>
+ * <li>{@link Consts#ATTRIBUTE_BASE_URL} - <tt>schema://host:port/contextPath</tt></li>
+ * <li>{@link Consts#ATTRIBUTE_SERVLET_URL} - <tt>schema://host:port/contextPath/servletPath</tt></li>
  * </ul>
  */
 public class LoginFilter implements Filter {
@@ -100,8 +101,12 @@ public class LoginFilter implements Filter {
         String pathInfo = httpRequest.getPathInfo();
         String requestURL = httpRequest.getRequestURL().toString();
 
-        // baseURL = schema://host:port/contextPath/servletPath
-        String baseURL = StringUtils.removeEnd(requestURL, pathInfo);
+        // servletUrl = schema://host:port/contextPath/servletPath
+        String servletURL = StringUtils.removeEnd(requestURL, pathInfo);
+        request.setAttribute(Consts.ATTRIBUTE_SERVLET_URL, servletURL);
+
+        // baseUrl = schema://host:port/contextPath
+        String baseURL = StringUtils.removeEnd(servletURL, httpRequest.getServletPath());
         request.setAttribute(Consts.ATTRIBUTE_BASE_URL, baseURL);
 
         // webLocator = schema://host:port

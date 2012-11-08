@@ -128,7 +128,7 @@ Create Git Repository and Gerrit Project
           <input id="related" type="radio" name="proposeExistingGroups" value="related"
             <c:if test="${param.proposeExistingGroups == 'related'}">checked="checked"</c:if>
             onclick="submitGitGerritForm('toggle')" />
-          <label for="related">Choose from an existing Gerrit group related to this project</label><br/>
+          <label for="related">Choose an existing Gerrit group related to this project</label><br/>
           <input id="all" type="radio" name="proposeExistingGroups" value="all"
             <c:if test="${param.proposeExistingGroups == 'all'}">checked="checked"</c:if>
             onclick="submitGitGerritForm('toggle')" />
@@ -163,6 +163,10 @@ Create Git Repository and Gerrit Project
             <c:if test="${empty param.proposeExistingProjects || param.proposeExistingProjects == 'new'}">checked="checked"</c:if>
             onclick="submitGitGerritForm('toggle')" />
           <label for="new">Enter a parent project</label><br/>
+          <input id="related" type="radio" name="proposeExistingProjects" value="related"
+            <c:if test="${param.proposeExistingProjects == 'related'}">checked="checked"</c:if>
+            onclick="submitGitGerritForm('toggle')" />
+          <label for="related">Choose from related projects</label><br/>
           <input id="permissions" type="radio" name="proposeExistingProjects" value="permissions"
             <c:if test="${param.proposeExistingProjects == 'permissions'}">checked="checked"</c:if>
             onclick="submitGitGerritForm('toggle')" />
@@ -177,7 +181,9 @@ Create Git Repository and Gerrit Project
             <td class="formlabel">Parent Project</td>
             <td>
               <c:choose>
-                <c:when test="${(param.proposeExistingProjects == 'permissions') || (param.proposeExistingProjects == 'all')}">
+                <c:when test="${(param.proposeExistingProjects == 'permissions')
+                    || (param.proposeExistingProjects == 'related') 
+                    || (param.proposeExistingProjects == 'all')}">
                   <select name="<%= GitGerritFilter.PARAMETER_PARENT %>" class="formfield">
                     <c:forEach var="project" items="${proposedExistingProjects}">
                       <option <c:if test="${project == proposedParent}">selected="selected"</c:if>>${project}</option>
@@ -350,7 +356,7 @@ Create Git Repository and Gerrit Project
     </c:when>
   </c:choose>
   <c:if test="${not empty gerritContact}">
-    <div><a href="${gerritContact}" target="_blank">Gerrit Contacts</a></div>
+    <div><a href="mailto:${gerritContact}">Gerrit Contacts</a></div>
   </c:if>
 </div>
 </body>

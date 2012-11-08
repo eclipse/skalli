@@ -31,9 +31,10 @@ import org.eclipse.skalli.gerrit.client.exception.GerritClientException;
  */
 public interface GerritClient {
 
-    public enum SubmitType {
-        FAST_FORWARD_ONLY, MERGE_IF_NECESSARY, MERGE_ALWAYS, CHERRY_PICK
-    }
+    /**
+     * The Gerrit default port (@value).
+     */
+    public static final int DEFAULT_PORT = 29418;
 
     /**
      * Connects the SSH client

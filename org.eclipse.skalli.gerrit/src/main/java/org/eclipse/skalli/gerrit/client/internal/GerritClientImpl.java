@@ -30,12 +30,14 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritFeature;
 import org.eclipse.skalli.gerrit.client.GerritVersion;
-import org.eclipse.skalli.gerrit.client.JSONUtil;
+import org.eclipse.skalli.gerrit.client.SubmitType;
+import org.eclipse.skalli.gerrit.client.config.GerritConfig;
 import org.eclipse.skalli.gerrit.client.exception.CommandException;
 import org.eclipse.skalli.gerrit.client.exception.ConnectionException;
 import org.eclipse.skalli.gerrit.client.internal.GSQL.ResultFormat;
@@ -65,45 +67,28 @@ public class GerritClientImpl implements GerritClient {
     private final String ACCOUNTS_PREFIX = "username:";
     private final int ACCOUNTS_QUERY_BLOCKSIZE = 100;
 
-    private final String user;
-    private final String host;
-    private final int port;
-    private final String privateKey;
-    private final String password;
-    private final String onBehalfOfUserId;
-
     private final Pattern UNSUPPORTED_GSQL = Pattern.compile(
             ".*(show|insert|update|delete|merge|create|alter|rename|truncate|drop)\\s.*", Pattern.CASE_INSENSITIVE
                     | Pattern.MULTILINE);
+
+    final GerritConfig gerritConfig;
+    final int port;
+    final String onBehalfOf;
 
     JSch client = null;
     Session session = null;
     ChannelExec channel = null;
     GerritVersion serverVersion = null;
 
-    public GerritClientImpl(final String host, final int port, final String user, final String privateKey,
-            final String password, String onBehalfOfUserId) {
-        if (host == null) {
-            throw new IllegalArgumentException("Host must not be null.");
-        }
-        if (port < 0) {
-            throw new IllegalArgumentException("Port must be a non negative integer.");
-        }
-        if (onBehalfOfUserId == null) {
-            throw new IllegalArgumentException("'on behalf of' user must not be null.");
-        }
-
-        this.host = host;
-        this.port = port;
-        this.user = user;
-        this.privateKey = privateKey;
-        this.password = password;
-        this.onBehalfOfUserId = onBehalfOfUserId;
+    GerritClientImpl(GerritConfig gerritConfig, String onBehalfOf) {
+        this.gerritConfig = gerritConfig;
+        this.port = NumberUtils.toInt(gerritConfig.getPort(),  GerritClient.DEFAULT_PORT);
+        this.onBehalfOf = onBehalfOf;
     }
 
     @Override
     public void connect() throws ConnectionException {
-        LOG.info(String.format("Trying to connect to Gerrit %s:%s.", host, port));
+        LOG.info(MessageFormat.format("Trying to connect to Gerrit {0}:{1}.", gerritConfig.getHost(), port));
 
         File privateKeyFile = null;
         try {
@@ -114,9 +99,9 @@ public class GerritClientImpl implements GerritClient {
             config.put("server_host_key", "ssh-rsa");
             JSch.setConfig(config);
 
-            privateKeyFile = getPrivateKeyFile(privateKey);
-            client.addIdentity(privateKeyFile.getAbsolutePath(), password);
-            session = client.getSession(user, host, port);
+            privateKeyFile = getPrivateKeyFile(gerritConfig.getPrivateKey());
+            client.addIdentity(privateKeyFile.getAbsolutePath(), gerritConfig.getPassphrase());
+            session = client.getSession(gerritConfig.getUser(), gerritConfig.getHost(), port);
             session.setTimeout(TIMEOUT);
             session.connect();
         } catch (JSchException e) {
@@ -126,7 +111,8 @@ public class GerritClientImpl implements GerritClient {
                 privateKeyFile.delete();
             }
         }
-        LOG.info(String.format("Connected to Gerrit %s:%s (%s)", host, port, session.getServerVersion()));
+        LOG.info(String.format("Connected to Gerrit %s:%s (%s)",
+                gerritConfig.getHost(), port, session.getServerVersion()));
     }
 
     @Override
@@ -379,7 +365,10 @@ public class GerritClientImpl implements GerritClient {
         if (StringUtils.isBlank(name)) {
             return "Group names must not be blank";
         }
-        if (containsWhitespace(name)) {
+        if (StringUtils.trim(name).length() < name.length()) {
+            return "Group names must not start or end with whitespace";
+        }
+        if (containsWhitespace(name, true)) {
             return "Group names must not contain whitespace";
         }
         if (HtmlUtils.containsTags(name)) {
@@ -393,7 +382,10 @@ public class GerritClientImpl implements GerritClient {
         if (StringUtils.isBlank(name)) {
             return "Repository names must not be blank";
         }
-        if (containsWhitespace(name)) {
+        if (StringUtils.trim(name).length() < name.length()) {
+            return "Repository names must not start or end with whitespace";
+        }
+        if (containsWhitespace(name, false)) {
             return "Repository names must not contain whitespace";
         }
         if (name.startsWith("/")) {
@@ -417,9 +409,16 @@ public class GerritClientImpl implements GerritClient {
         return null;
     }
 
-    private boolean containsWhitespace(String s) {
-        for (int i = 0; i < s.length(); i++) {
-            if (Character.isWhitespace(s.charAt(i))) {
+    private boolean containsWhitespace(String s, boolean allowBlanks) {
+        for (int i = 0; i < s.length() ; i++) {
+            char c = s.charAt(i);
+            if (allowBlanks && c == ' ') {
+                continue;
+            }
+            if (Character.isWhitespace(c)) {
+                return true;
+            }
+            if (c == '\0') {
                 return true;
             }
         }
@@ -520,7 +519,7 @@ public class GerritClientImpl implements GerritClient {
      * @throws CommandException    in case of unsuccessful commands
      */
     private List<String> sshCommand(final String command) throws ConnectionException, CommandException {
-        LOG.info(String.format("Sending on behalf of '%s': '%s'", onBehalfOfUserId, command));
+        LOG.info(MessageFormat.format("Sending on behalf of ''{0}'': ''{1}''", onBehalfOf, command));
 
         boolean manuallyConnected = false;
 

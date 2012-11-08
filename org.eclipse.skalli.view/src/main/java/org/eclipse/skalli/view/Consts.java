@@ -39,6 +39,7 @@ public class Consts {
 
     public static final String ATTRIBUTE_WEBLOCATOR = "webLocator";
     public static final String ATTRIBUTE_BASE_URL = "baseUrl";
+    public static final String ATTRIBUTE_SERVLET_URL = "servletUrl";
     public static final String ATTRIBUTE_WINDOWNAME = "windowName";
 
     public static final String ATTRIBUTE_USERID = "userId";
