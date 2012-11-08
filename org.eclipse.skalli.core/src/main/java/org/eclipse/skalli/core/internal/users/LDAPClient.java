@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.users;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,6 +31,7 @@ import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.User;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.jndi.JNDIConstants;
@@ -40,136 +42,146 @@ public class LDAPClient {
 
     private final static Logger LOG = LoggerFactory.getLogger(LDAPClient.class);
 
-    private final String factory;
-    private final String hostname;
-    private final String password;
-    private final String username;
-    private final String usersGroup;
+    private static final String LDAPS_SCHEME = "ldaps:"; //$NON-NLS-1$
+    private static final String SIMPLE_AUTHENTICATION = "simple"; //$NON-NLS-1$
+    private static final String JNDI_SOCKET_FACTORY = "java.naming.ldap.factory.socket"; //$NON-NLS-1$
+    private static final String DEFAULT_CONTEXT_FACTORY = "com.sun.jndi.ldap.LdapCtxFactory"; //$NON-NLS-1$
+    private static final String USE_CONNECTION_POOLING = "com.sun.jndi.ldap.connect.pool"; //$NON-NLS-1$
+    private static final String CONNECT_POOL_PROTOCOLS = "com.sun.jndi.ldap.connect.pool.protocol"; //$NON-NLS-1$
 
-    public LDAPClient(final String factory, final String hostname, final String username,
-            final String password, final String usersGroup) {
-        this.factory = factory;
-        this.hostname = hostname;
-        this.username = username;
-        this.password = password;
-        this.usersGroup = usersGroup;
+    static {
+        // heaven knows why this is a system property while all other params can be set per context...
+        System.setProperty(CONNECT_POOL_PROTOCOLS, "plain ssl"); //$NON-NLS-1$
     }
 
-    private LdapContext getConnection() throws AuthException {
-        try {
-            if (StringUtils.isBlank(password) || StringUtils.isBlank(username)
-                    || StringUtils.isBlank(hostname) || StringUtils.isBlank(factory)) {
-                throw new AuthException("LDAP not configured");
+    private LDAPConfig config;
+
+    public LDAPClient(LDAPConfig config) {
+        this.config = config;
+    }
+
+    private LdapContext getLdapContext() throws NamingException, AuthenticationException {
+        if (config == null) {
+            throw new NamingException("LDAP not configured");
+        }
+        if (StringUtils.isBlank(config.getProviderUrl())) {
+            throw new NamingException("No LDAP server available");
+        }
+        if (StringUtils.isBlank(config.getUsername()) || StringUtils.isBlank(config.getPassword())) {
+            throw new AuthenticationException("No LDAP credentials available");
+        }
+        String ctxFactory = config.getCtxFactory();
+        if (StringUtils.isBlank(ctxFactory)) {
+            ctxFactory = DEFAULT_CONTEXT_FACTORY;
+        }
+        String authentication = config.getAuthentication();
+        if (StringUtils.isBlank(authentication)) {
+            authentication = SIMPLE_AUTHENTICATION;
+        }
+
+        Hashtable<String, Object> env = new Hashtable<String, Object>();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, ctxFactory);
+        env.put(Context.PROVIDER_URL, config.getProviderUrl());
+        env.put(Context.SECURITY_PRINCIPAL, config.getUsername());
+        env.put(Context.SECURITY_CREDENTIALS, config.getPassword());
+        env.put(Context.SECURITY_AUTHENTICATION, authentication);
+        if (StringUtils.isNotBlank(config.getReferral())) {
+            env.put(Context.REFERRAL, config.getReferral());
+        }
+        if (config.getProviderUrl().startsWith(LDAPS_SCHEME)) {
+            env.put(Context.SECURITY_PROTOCOL, "ssl"); //$NON-NLS-1$
+            if (config.isSslNoVerify()) {
+                env.put(JNDI_SOCKET_FACTORY, LDAPTrustAllSocketFactory.class.getName());
             }
-            Hashtable<String, Object> env = new Hashtable<String, Object>();
-            env.put(Context.INITIAL_CONTEXT_FACTORY, factory);
-            env.put(Context.PROVIDER_URL, hostname);
-            env.put(Context.SECURITY_PRINCIPAL, username);
-            env.put(Context.SECURITY_CREDENTIALS, password);
-            env.put(Context.SECURITY_AUTHENTICATION, "simple"); //$NON-NLS-1$
-            env.put(JNDIConstants.BUNDLE_CONTEXT,
-                    FrameworkUtil.getBundle(LDAPClient.class).getBundleContext());
-            InitialLdapContext ctx = new InitialLdapContext(env, null);
-            return ctx;
-        } catch (AuthenticationException e) {
-            throw new AuthException(e);
-        } catch (NamingException e) {
-            throw new RuntimeException(e);
+        }
+        // Gemini-specific properties
+        env.put(JNDIConstants.BUNDLE_CONTEXT,
+                FrameworkUtil.getBundle(LDAPClient.class).getBundleContext());
+
+        // com.sun.jndi.ldap.LdapCtxFactory specific properties
+        env.put(USE_CONNECTION_POOLING, "true"); //$NON-NLS-1$
+
+        // extremly ugly classloading workaround:
+        // com.sun.jndi.ldap.LdapCtxFactory uses Class.forName() to load the socket factory, shame on them!
+        InitialLdapContext ctx = null;
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(LDAPTrustAllSocketFactory.class.getClassLoader());
+            ctx = new InitialLdapContext(env, null);
+        } finally {
+            if (classloader != null) {
+                Thread.currentThread().setContextClassLoader(classloader);
+            }
+        }
+        return ctx;
+    }
+
+    private void closeQuietly(LdapContext ldap) {
+        if (ldap != null) {
+            try {
+                ldap.close();
+            } catch (NamingException e) {
+                LOG.error("Failed to close LDAP connection", e);
+            }
         }
     }
 
     public User searchUserById(String userId) {
         LdapContext ldap = null;
         try {
-            try {
-                ldap = getConnection();
-            } catch (AuthException e1) {
-                LOG.debug("Could not authenticate to LDAP");
-                return new User(userId);
-            }
-            try {
-                return searchUserById(ldap, userId);
-            } catch (NamingException e) {
-                throw new RuntimeException(e);
-            }
+            ldap = getLdapContext();
+            return searchUserById(ldap, userId);
+        }  catch (Exception e) {
+            LOG.debug(MessageFormat.format("Failed to retrieve user ''{0}''", userId), e);
+            return new User(userId);
         } finally {
-            if (ldap != null) {
-                try {
-                    ldap.close();
-                } catch (NamingException e) {
-                    // Makes no sense while closing...
-                    throw new RuntimeException();
-                }
-            }
+            closeQuietly(ldap);
         }
     }
 
     public Set<User> searchUsersByIds(Set<String> userIds) {
         LdapContext ldap = null;
-        Set<User> ret = new HashSet<User>();
         try {
-            try {
-                ldap = getConnection();
-            } catch (AuthException e1) {
-                LOG.debug("Could not authenticate to LDAP");
-                return ret;
+            Set<User> ret = new HashSet<User>();
+            ldap = getLdapContext();
+            for (String userId : userIds) {
+                ret.add(searchUserById(ldap, userId));
             }
-            try {
-                for (String userId : userIds) {
-                    ret.add(searchUserById(ldap, userId));
-                }
-                return ret;
-            } catch (NamingException e) {
-                throw new RuntimeException(e);
-            }
+            return ret;
+        } catch (Exception e) {
+            LOG.debug(MessageFormat.format("Failed to retrieve users {0}",
+                    CollectionUtils.toString(userIds, ',')), e);
+            return Collections.emptySet();
         } finally {
-            if (ldap != null) {
-                try {
-                    ldap.close();
-                } catch (NamingException e) {
-                    // Makes no sense while closing...
-                    throw new RuntimeException();
-                }
-            }
+            closeQuietly(ldap);
         }
     }
 
     public List<User> searchUserByName(String name) {
         LdapContext ldap = null;
         try {
-            try {
-                ldap = getConnection();
-            } catch (AuthException e1) {
-                return Collections.emptyList();
-            }
-            try {
-                return searchUserByName(ldap, name);
-            } catch (NamingException e) {
-                throw new RuntimeException(e);
-            }
+            ldap = getLdapContext();
+            return searchUserByName(ldap, name);
+        } catch (Exception e) {
+            LOG.debug(MessageFormat.format("Failed to search user ''{0}''", name), e);
+            return Collections.emptyList();
         } finally {
-            if (ldap != null) {
-                try {
-                    ldap.close();
-                } catch (NamingException e) {
-                    // Makes no sense while closing...
-                    throw new RuntimeException();
-                }
-            }
+            closeQuietly(ldap);
         }
     }
 
     private User searchUserById(LdapContext ldap, String userId) throws NamingException {
-        SearchControls sc = new SearchControls();
-        sc.setReturningAttributes(LDAPAttributeNames.getAll());
-        NamingEnumeration<SearchResult> results = ldap.search(usersGroup,
-                "(&(objectClass=user)(sAMAccountName=" + userId + "))", sc);
+        SearchControls sc = getSearchControls();
+        NamingEnumeration<SearchResult> results = ldap.search(config.getBaseDN(),
+                MessageFormat.format("(&(objectClass=user)(sAMAccountName={0}))", userId), sc); //$NON-NLS-1$
         while (results != null && results.hasMore()) {
             SearchResult entry = results.next();
             User user = processEntry(entry);
             if (user != null) {
-                LOG.debug("Success reading from LDAP: " + user.getUserId() + ", " + user.getDisplayName()
-                        + " <" + user.getEmail() + ">");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(MessageFormat.format("Success reading from LDAP: {0}, {1} <{2}>", //$NON-NLS-1$
+                            user.getUserId(), user.getDisplayName(), user.getEmail()));
+                }
                 return user;
             }
         }
@@ -181,31 +193,33 @@ public class LDAPClient {
         try {
             boolean somethingAdded = false;
             SearchControls sc = new SearchControls();
-            sc.setReturningAttributes(LDAPAttributeNames.getAll());
-
-            String[] parts = StringUtils.split(NormalizeUtil.normalize(name), " ,");
+            String[] parts = StringUtils.split(NormalizeUtil.normalize(name), " ,"); //$NON-NLS-1$
             if (parts.length == 1) {
                 somethingAdded = search(parts[0], ret, ldap, sc);
             }
             else if (parts.length > 1) {
                 // givenname surname ('Michael Ochmann'), or surname givenname('Ochmann, Michael')
                 NamingEnumeration<SearchResult> results = ldap.search(
-                        usersGroup,
-                        "(&(objectClass=user)(givenName=" + parts[0] + "*)(sn=" + parts[1] + "*))", sc);
+                        config.getBaseDN(),
+                        MessageFormat.format("(&(objectClass=user)(givenName={0}*)(sn={1}*))", //$NON-NLS-1$
+                                parts[0], parts[1]), sc);
                 somethingAdded |= addLDAPSearchResult(ret, results);
                 results = ldap.search(
-                        usersGroup,
-                        "(&(objectClass=user)(sn=" + parts[0] + "*)(givenName=" + parts[1] + "*))", sc);
+                        config.getBaseDN(),
+                        MessageFormat.format("(&(objectClass=user)(sn={0}*)(givenName={1}*))", //$NON-NLS-1$
+                                parts[0], parts[1]), sc);
                 somethingAdded |= addLDAPSearchResult(ret, results);
                 // givenname initial surname, e.g. 'Michael R. Ochmann'
                 if (parts.length > 2) {
                     results = ldap.search(
-                            usersGroup,
-                            "(&(objectClass=user)(givenName=" + parts[0] + "*)(sn=" + parts[2] + "*))", sc);
+                            config.getBaseDN(),
+                            MessageFormat.format("(&(objectClass=user)(givenName={0}*)(sn={1}*))", //$NON-NLS-1$
+                                    parts[0], parts[2]), sc);
                     somethingAdded |= addLDAPSearchResult(ret, results);
                     results = ldap.search(
-                            usersGroup,
-                            "(&(objectClass=user)(sn=" + parts[0] + "*)(givenName=" + parts[2] + "*))", sc);
+                            config.getBaseDN(),
+                            MessageFormat.format("(&(objectClass=user)(sn={0}*)(givenName={1}*))", //$NON-NLS-1$
+                                    parts[0], parts[2]), sc);
                     somethingAdded |= addLDAPSearchResult(ret, results);
                 }
                 if (!somethingAdded) {
@@ -217,7 +231,7 @@ public class LDAPClient {
             }
         } catch (SizeLimitExceededException e) {
             // 1000 is good enough at the moment for this use case...
-            LOG.warn("LDAP query size limit exceeded while searching for '" + name + "'", e);
+            LOG.warn(MessageFormat.format("LDAP query size limit exceeded while searching for ''{0}''", name), e);
         }
         return ret;
     }
@@ -225,23 +239,23 @@ public class LDAPClient {
     private boolean search(String s, List<User> ret, LdapContext ldap, SearchControls sc) throws NamingException {
         // try a match with surname*
         NamingEnumeration<SearchResult> results = ldap.search(
-                usersGroup,
-                "(&(objectClass=user)(|(sn=" + s + "*)(givenName=" + s + "*)))", sc);
+                config.getBaseDN(),
+                MessageFormat.format("(&(objectClass=user)(|(sn={0}*)(givenName={1}*)))", s, s), sc); //$NON-NLS-1$
         boolean somethingAdded = addLDAPSearchResult(ret, results);
         if (!somethingAdded) {
             // try a match with the account name and mail address
             results = ldap.search(
-                    usersGroup,
-                    "(&(objectClass=user)(sAMAccountName=" + s + "*))", sc);
+                    config.getBaseDN(),
+                    MessageFormat.format("(&(objectClass=user)(sAMAccountName={0}*))", s), sc); //$NON-NLS-1$
             somethingAdded |= addLDAPSearchResult(ret, results);
             if (!somethingAdded) {
                 // try to match surname~= or givenname~=
-                results = ldap.search(usersGroup,
-                        "(&(objectClass=user)(|(sn~=" + s + ")(givenName~=" + s + ")))", sc);
+                results = ldap.search(config.getBaseDN(),
+                        MessageFormat.format("(&(objectClass=user)(|(sn~={0})(givenName~={1})))", s, s), sc); //$NON-NLS-1$
                 somethingAdded |= addLDAPSearchResult(ret, results);
                 if (!somethingAdded) {
-                    results = ldap.search(usersGroup,
-                            "(&(objectClass=user)(mail=" + s + "*))", sc);
+                    results = ldap.search(config.getBaseDN(),
+                            MessageFormat.format("(&(objectClass=user)(mail={0}*))", s), sc); //$NON-NLS-1$
                     somethingAdded |= addLDAPSearchResult(ret, results);
                 }
             }
@@ -258,8 +272,10 @@ public class LDAPClient {
             SearchResult entry = results.next();
             User user = processEntry(entry);
             if (user != null) {
-                LOG.debug("Success reading from LDAP: " + user.getUserId() + ", " + user.getDisplayName()
-                        + " <" + user.getEmail() + ">");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(MessageFormat.format("Success reading from LDAP: {0}, {1} <{2}>",
+                            user.getUserId(), user.getDisplayName(), user.getEmail()));
+                }
                 users.add(user);
                 somethingAdded = true;
             }
@@ -303,6 +319,20 @@ public class LDAPClient {
         user.setCompany(getStringValue(attrs, LDAPAttributeNames.COMPANY));
         user.setSip(getStringValue(attrs, LDAPAttributeNames.SIP));
         return user;
+    }
+
+    @SuppressWarnings("nls")
+    private SearchControls getSearchControls() {
+        SearchControls sc = new SearchControls();
+        if ("base".equalsIgnoreCase(config.getSearchScope())) {
+            sc.setSearchScope(SearchControls.OBJECT_SCOPE);
+        } else if ("onelevel".equalsIgnoreCase(config.getSearchScope())) {
+            sc.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+        } else if ("subtree".equalsIgnoreCase(config.getSearchScope())) {
+            sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        }
+        sc.setReturningAttributes(LDAPAttributeNames.getAll());
+        return sc;
     }
 
 }

@@ -10,15 +10,26 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.users;
 
-class AuthException extends Exception {
-    private static final long serialVersionUID = -768757611391126038L;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
-    public AuthException(String message) {
-        super(message);
+import javax.net.ssl.X509TrustManager;
+
+class LDAPTrustAllX509Manager implements X509TrustManager {
+
+    @Override
+    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        return;
     }
 
-    public AuthException(Throwable cause) {
-        super(cause);
+    @Override
+    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        return;
+    }
+
+    @Override
+    public X509Certificate[] getAcceptedIssuers() {
+        return null;
     }
 
 }

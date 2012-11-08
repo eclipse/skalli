@@ -34,8 +34,7 @@ public class LDAPClientTest {
 
     @Test
     public void testSearchUserById_nonExisting() throws Exception {
-        LDAPClient client = new LDAPClient(MockInitialDirContextFactory.class.getName(),
-                "ldap://thisIsIgnoredInTests", "hello", "world", USERS_GROUP);
+        LDAPClient client = getLDAPClient();
         DirContext mockContext = MockInitialDirContextFactory.getLatestMockContext();
 
         EasyMock.reset(mockContext);
@@ -58,8 +57,7 @@ public class LDAPClientTest {
 
     @Test
     public void testSearchUsersById_nonExisting() throws Exception {
-        LDAPClient client = new LDAPClient(MockInitialDirContextFactory.class.getName(),
-                "ldap://thisIsIgnoredInTests", "hello", "world", USERS_GROUP);
+        LDAPClient client = getLDAPClient();
         DirContext mockContext = MockInitialDirContextFactory.getLatestMockContext();
 
         EasyMock.reset(mockContext);
@@ -82,6 +80,16 @@ public class LDAPClientTest {
         Assert.assertEquals(user.size(), 2);
 
         EasyMock.verify(mockContext);
+    }
+
+    private LDAPClient getLDAPClient() {
+        LDAPConfig config = new LDAPConfig();
+        config.setCtxFactory(MockInitialDirContextFactory.class.getName());
+        config.setProviderUrl("ldap://thisIsIgnoredInTests");
+        config.setUsername("hello");
+        config.setPassword("world");
+        config.setBaseDN(USERS_GROUP);
+        return new LDAPClient(config);
     }
 
 }

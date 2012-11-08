@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.users;
 
+import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,6 +27,7 @@ import org.eclipse.skalli.services.event.EventConfigUpdate;
 import org.eclipse.skalli.services.event.EventListener;
 import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.user.UserService;
+import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,13 +49,15 @@ public class LDAPUserServiceImpl implements UserService, EventListener<EventConf
     private ConfigurationService configurationService;
 
     protected void activate(ComponentContext context) {
+        LOG.info(MessageFormat.format("[LDAPUserService] {0} : activated", //$NON-NLS-1$
+                (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
         eventService.registerListener(EventConfigUpdate.class, this);
         initializeCache();
-        LOG.info("LDAP User Service activated");
     }
 
     protected void deactivate(ComponentContext context) {
-        LOG.info("LDAP User Service deactivated");
+        LOG.info(MessageFormat.format("[LDAPUserService] {0} : deactivated", //$NON-NLS-1$
+                (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
     protected void bindEventService(EventService eventService) {
@@ -68,43 +73,37 @@ public class LDAPUserServiceImpl implements UserService, EventListener<EventConf
         initializeCache();
     }
 
-    protected void unbindEventService(ConfigurationService configurationService) {
+    protected void unbindConfigurationService(ConfigurationService configurationService) {
         this.configurationService = null;
     }
 
     private synchronized void initializeCache() {
         int cacheSize = DEFAULT_CACHE_SIZE;
         if (configurationService != null) {
-            cacheSize = NumberUtils.toInt(configurationService.readString(ConfigKeyLDAP.CACHE_SIZE), DEFAULT_CACHE_SIZE);
+            LDAPConfig config = configurationService.readCustomization(LDAPResource.KEY, LDAPConfig.class);
+            if (config != null) {
+                cacheSize = NumberUtils.toInt(config.getCacheSize(), DEFAULT_CACHE_SIZE);
+            }
         }
         cache = new GroundhogCache<String, User>(cacheSize, cache);
     }
 
     private LDAPClient getLDAPClient() {
-        String password = null;
-        String username = null;
-        String hostname = null;
-        String factory = null;
-        String usersGroup = null;
         if (configurationService != null) {
-            password = configurationService.readString(ConfigKeyLDAP.PASSWORD);
-            username = configurationService.readString(ConfigKeyLDAP.USERNAME);
-            hostname = configurationService.readString(ConfigKeyLDAP.HOSTNAME);
-            factory = configurationService.readString(ConfigKeyLDAP.FACTORY);
-            usersGroup = configurationService.readString(ConfigKeyLDAP.USERS_GROUP);
-        } else {
-            LOG.warn("Failed to read LDAP configuration - no instance of "
-                    + ConfigurationService.class.getName() + "available. Either provide a suitable "
-                    + "configuration service or switch to another user service, for example Local User Service.");
+            LDAPConfig config = configurationService.readCustomization(LDAPResource.KEY, LDAPConfig.class);
+            if (config != null) {
+                return new LDAPClient(config);
+            }
         }
-        LDAPClient ldapClient = new LDAPClient(factory, hostname, username, password, usersGroup);
-        return ldapClient;
+        return null;
     }
 
     @Override
     public synchronized List<User> findUser(String searchText) {
-        // get from server
         LDAPClient ldap = getLDAPClient();
+        if (ldap == null) {
+            return Collections.emptyList();
+        }
         List<User> users = ldap.searchUserByName(searchText);
         for (User user : users) {
             if (user != null) {
@@ -122,6 +121,9 @@ public class LDAPUserServiceImpl implements UserService, EventListener<EventConf
         if (user == null) {
             // get from server
             LDAPClient ldap = getLDAPClient();
+            if (ldap == null) {
+                return null;
+            }
             user = ldap.searchUserById(userId);
             if (user != null) {
                 cache.put(StringUtils.lowerCase(user.getUserId()), user);
@@ -152,6 +154,9 @@ public class LDAPUserServiceImpl implements UserService, EventListener<EventConf
         // search unknown in ldap
         if (userIdsToSearch.size() > 0) {
             LDAPClient ldap = getLDAPClient();
+            if (ldap == null) {
+                return users;
+            }
             Set<User> ldapUsers = ldap.searchUsersByIds(userIdsToSearch);
             for (User user : ldapUsers) {
                 if (user != null) {

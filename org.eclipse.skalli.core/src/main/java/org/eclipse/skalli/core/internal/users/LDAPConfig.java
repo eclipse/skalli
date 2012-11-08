@@ -10,16 +10,26 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.internal.users;
 
+import org.eclipse.skalli.services.configuration.rest.Protect;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("ldap")
 public class LDAPConfig {
 
+    @Protect
     private String password;
+    @Protect
     private String username;
-    private String hostname;
+    private String authentication;
+    private String referral;
+    private String providerUrl;
     private String ctxFactory;
-    private String usersGroup;
+    private boolean sslNoVerify;
+
+    private String baseDN;
+    private String searchScope;
+
     private String cacheSize;
 
     public String getPassword() {
@@ -38,12 +48,12 @@ public class LDAPConfig {
         this.username = username;
     }
 
-    public String getHostname() {
-        return hostname;
+    public String getProviderUrl() {
+        return providerUrl;
     }
 
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
+    public void setProviderUrl(String providerUrl) {
+        this.providerUrl = providerUrl;
     }
 
     public String getCtxFactory() {
@@ -54,12 +64,12 @@ public class LDAPConfig {
         this.ctxFactory = ctxFactory;
     }
 
-    public String getUsersGroup() {
-        return usersGroup;
+    public String getBaseDN() {
+        return baseDN;
     }
 
-    public void setUsersGroup(String usersGroup) {
-        this.usersGroup = usersGroup;
+    public void setBaseDN(String baseDN) {
+        this.baseDN = baseDN;
     }
 
     public String getCacheSize() {
@@ -68,5 +78,68 @@ public class LDAPConfig {
 
     public void setCacheSize(String cacheSize) {
         this.cacheSize = cacheSize;
+    }
+
+    /**
+     * @return the authentication
+     */
+    public String getAuthentication() {
+        return authentication;
+    }
+
+    /**
+     * @param authentication the authentication to set
+     */
+    public void setAuthentication(String authentication) {
+        this.authentication = authentication;
+    }
+
+    /**
+     * @return the referral
+     */
+    public String getReferral() {
+        return referral;
+    }
+
+    /**
+     * @param referral the referral to set
+     */
+    public void setReferral(String referral) {
+        this.referral = referral;
+    }
+
+    /**
+     * @return the sslVerify
+     */
+    public boolean isSslNoVerify() {
+        return sslNoVerify;
+    }
+
+    /**
+     * @param sslVerify the sslVerify to set
+     */
+    public void setSslNoVerify(boolean sslNoVerify) {
+        this.sslNoVerify = sslNoVerify;
+    }
+
+    /**
+     * Returns the desired search scope.
+     *
+     * @return either "base" or "onelevel", or "subtree".
+     */
+    public String getSearchScope() {
+        return searchScope;
+    }
+
+    /**
+     * Specifies the desired search scope, i.e. either
+     * "base", if only the given {@link #getBaseDN() base path) should be searched,
+     * "onelevel", if one level below the base path should be searched, or
+     * "subtree", if the whole subtree rooted by the base path should be searched.
+     *
+     * @param searchScope the desired search scope. Default is "onelevel".
+     */
+    public void setSearchScope(String searchScope) {
+        this.searchScope = searchScope;
     }
 }
