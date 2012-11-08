@@ -75,6 +75,7 @@ public class LuceneIndex<T extends EntityBase> {
 
     private Directory directory = new RAMDirectory();
     private Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_30);
+    private boolean initialized;
 
     private final EntityService<T> entityService;
 
@@ -83,7 +84,15 @@ public class LuceneIndex<T extends EntityBase> {
     }
 
     public synchronized void reindexAll() {
-        reindex(entityService.getAll());
+        directory = new RAMDirectory();
+        addEntitiesToIndex(entityService.getAll());
+        initialized = true;
+    }
+
+    public synchronized void reindex(Collection<T> entities) {
+        directory = new RAMDirectory();
+        addEntitiesToIndex(entities);
+        initialized = true;
     }
 
     private List<IndexEntry> indexEntity(T entity) {
@@ -164,11 +173,6 @@ public class LuceneIndex<T extends EntityBase> {
         }
     }
 
-    public synchronized void reindex(final Collection<T> entities) {
-        directory = new RAMDirectory();
-        addEntitiesToIndex(entities);
-    }
-
     private String doHighlight(final Highlighter highlighter, final List<String> fields, final String fieldName,
             String fieldContents) throws IOException {
         String highlighted = fieldContents;
@@ -209,6 +213,9 @@ public class LuceneIndex<T extends EntityBase> {
     }
 
     public synchronized void remove(final Collection<T> entities) {
+        if (!initialized) {
+            return;
+        }
         IndexSearcher searcher = null;
         try {
             searcher = new IndexSearcher(directory, false);
@@ -228,10 +235,10 @@ public class LuceneIndex<T extends EntityBase> {
     }
 
     public synchronized void update(final Collection<T> entities) {
-        // first delete entities from index
+        if (!initialized) {
+            return;
+        }
         remove(entities);
-
-        // now add them again
         addEntitiesToIndex(entities);
     }
 
@@ -268,48 +275,54 @@ public class LuceneIndex<T extends EntityBase> {
     }
 
     public synchronized SearchResult<T> moreLikeThis(T entity, String[] fields, int count) {
+        long start = System.nanoTime();
         SearchResult<T> moreLikeThis = new SearchResult<T>();
         List<SearchHit<T>> searchHits = new LinkedList<SearchHit<T>>();
-        IndexSearcher searcher = null;
-        try {
-            searcher = new IndexSearcher(directory, true);
-            ScoreDoc baseDoc = getDocByUUID(searcher, entity.getUuid());
-            if (baseDoc == null) {
-                // entity!=null && baseDoc == null, can happen if deleted flag is set
-                moreLikeThis.setPagingInfo(new PagingInfo(0, 0));
-                moreLikeThis.setResultCount(0);
-            } else {
-                MoreLikeThis mlt = new MoreLikeThis(searcher.getIndexReader());
-                mlt.setFieldNames(fields);
-                mlt.setMinWordLen(2);
-                mlt.setBoost(true);
-                mlt.setMinDocFreq(0);
-                mlt.setMinTermFreq(0);
-                mlt.setAnalyzer(analyzer);
-                Query query = mlt.like(baseDoc.doc);
-                int numHits = Math.min(count + 1, entityService.size()); // count + 1: baseDoc will be one of the hits
-                TopScoreDocCollector collector = TopScoreDocCollector.create(numHits, false);
-                searcher.search(query, collector);
+        PagingInfo pagingInfo = new PagingInfo(0, 0);
+        int totalHitCount = 0;
+        if (initialized) {
+            IndexSearcher searcher = null;
+            try {
+                searcher = new IndexSearcher(directory, true);
+                ScoreDoc baseDoc = getDocByUUID(searcher, entity.getUuid());
+                if (baseDoc != null) {
+                    MoreLikeThis mlt = new MoreLikeThis(searcher.getIndexReader());
+                    mlt.setFieldNames(fields);
+                    mlt.setMinWordLen(2);
+                    mlt.setBoost(true);
+                    mlt.setMinDocFreq(0);
+                    mlt.setMinTermFreq(0);
+                    mlt.setAnalyzer(analyzer);
+                    Query query = mlt.like(baseDoc.doc);
+                    int numHits = Math.min(count + 1, entityService.size()); // count + 1: baseDoc will be one of the hits
+                    TopScoreDocCollector collector = TopScoreDocCollector.create(numHits, false);
+                    searcher.search(query, collector);
 
-                List<String> fieldList = Arrays.asList(fields);
-                Highlighter highlighter = new Highlighter(formatter, new QueryScorer(query));
-                for (ScoreDoc hit : collector.topDocs().scoreDocs) {
-                    if (hit.doc != baseDoc.doc) {
-                        Document doc = searcher.doc(hit.doc);
-                        SearchHit<T> searchHit = getSearchHit(doc, fieldList, hit.score, highlighter);
-                        searchHits.add(searchHit);
+                    List<String> fieldList = Arrays.asList(fields);
+                    Highlighter highlighter = new Highlighter(formatter, new QueryScorer(query));
+                    for (ScoreDoc hit : collector.topDocs().scoreDocs) {
+                        if (hit.doc != baseDoc.doc) {
+                            Document doc = searcher.doc(hit.doc);
+                            SearchHit<T> searchHit = getSearchHit(doc, fieldList, hit.score, highlighter);
+                            searchHits.add(searchHit);
+                        }
                     }
+                    pagingInfo = new PagingInfo(0, count);
+                    totalHitCount = collector.getTotalHits() - 1;
                 }
-                moreLikeThis.setPagingInfo(new PagingInfo(0, count));
-                moreLikeThis.setResultCount(collector.getTotalHits() - 1);
+            } catch (Exception e) {
+                LOG.error(MessageFormat.format("Searching for entities similiar to ''{0}'' failed", entity.getUuid()), e);
+            } finally {
+                closeQuietly(searcher);
             }
-        } catch (Exception e) {
-            LOG.error(MessageFormat.format("Searching for entities similiar to ''{0}'' failed", entity.getUuid()), e);
-            moreLikeThis.setPagingInfo(new PagingInfo(0, 0));
-            moreLikeThis.setResultCount(0);
-        } finally {
-            closeQuietly(searcher);
         }
+
+        long nanoDuration = System.nanoTime() - start;
+        long milliDuration = Math.round(nanoDuration / 1000000d);
+        moreLikeThis.setPagingInfo(pagingInfo);
+        moreLikeThis.setResultCount(totalHitCount);
+        moreLikeThis.setResult(searchHits);
+        moreLikeThis.setDuration(milliDuration);
 
         moreLikeThis.setResult(searchHits);
         return moreLikeThis;
@@ -348,7 +361,7 @@ public class LuceneIndex<T extends EntityBase> {
                     Math.min(pagingInfo.getStart() + pagingInfo.getCount(), allEntities.size()));
             resultList.addAll(entitiesToHit(sublist));
             totalHitCount = allEntities.size();
-        } else {
+        } else if (initialized) {
             List<String> fieldList = Arrays.asList(fields);
             IndexSearcher searcher = null;
             try {

@@ -97,7 +97,7 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public void update(final Project project) {
+    public void update(Project project) {
         update(Collections.singleton(project));
     }
 
