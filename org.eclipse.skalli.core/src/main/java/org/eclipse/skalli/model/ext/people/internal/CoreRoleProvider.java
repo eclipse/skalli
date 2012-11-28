@@ -11,7 +11,6 @@
 package org.eclipse.skalli.model.ext.people.internal;
 
 import java.text.MessageFormat;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -55,31 +54,34 @@ public final class CoreRoleProvider extends RoleProviderBase {
 
     @Override
     public Map<String, SortedSet<Member>> getMembersByRole(Project project) {
-        PeopleExtension ext = project.getExtension(PeopleExtension.class);
-        if (ext == null) {
-            return Collections.emptyMap();
-        }
         Map<String, SortedSet<Member>> ret = new HashMap<String, SortedSet<Member>>();
-        ret.put(ROLE_LEAD, ext.getLeads());
-        ret.put(ROLE_MEMBER, ext.getMembers());
+        if (project != null) {
+            PeopleExtension ext = project.getExtension(PeopleExtension.class);
+            if (ext != null) {
+                ret.put(ROLE_LEAD, ext.getLeads());
+                ret.put(ROLE_MEMBER, ext.getMembers());
+            }
+        }
         return ret;
     }
 
     @Override
     public SortedSet<Member> getMembers(Project project) {
         TreeSet<Member> result = new TreeSet<Member>();
-        PeopleExtension ext = project.getExtension(PeopleExtension.class);
-        if (ext == null) {
-            return result;
+        if (project != null) {
+            PeopleExtension ext = project.getExtension(PeopleExtension.class);
+            if (ext == null) {
+                return result;
+            }
+            result.addAll(ext.getLeads());
+            result.addAll(ext.getMembers());
         }
-        result.addAll(ext.getLeads());
-        result.addAll(ext.getMembers());
         return result;
     }
 
     @Override
     public boolean addMember(Project project, Member person, String role) {
-        if (!SUPPORTED_ROLES.contains(role)) {
+        if (project == null || !SUPPORTED_ROLES.contains(role)) {
             return false;
         }
         if (project.isInherited(PeopleExtension.class)) {

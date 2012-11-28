@@ -41,7 +41,7 @@ public class ProjectUtils {
         if (StringUtils.isBlank(userId) || project == null) {
             return false;
         }
-        for (Member member : Services.getRequiredService(ProjectService.class).getMembers(project)) {
+        for (Member member : Services.getRequiredService(ProjectService.class).getMembers(project.getUuid())) {
             if (StringUtils.equalsIgnoreCase(member.getUserID(), userId)) {
                 return true;
             }

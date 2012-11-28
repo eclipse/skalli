@@ -138,6 +138,22 @@ public class ProjectServiceImplTest {
         projects.add(createProject(uuids[8], "comp3", projects.get(2), new String[] {}));
         projects.get(5).setProjectTemplateId("comptemplate1");
 
+        m1 = new Member("M1");
+        m2 = new Member("M2");
+        l1 = new Member("L1");
+        l2 = new Member("L2");
+
+        Project p = new Project();
+        p.setUuid(uuids[0]);
+        PeopleExtension ext = new PeopleExtension();
+        ext.addMember(m1);
+        ext.addMember(m2);
+        ext.addMember(l1);
+        ext.addLead(l1);
+        ext.addLead(l2);
+        p.addExtension(ext);
+        projects.add(p);
+
         mockIPS = createNiceMock(PersistenceService.class);
         mockTS = createNiceMock(ProjectTemplateService.class);
         mocks = new Object[] { mockIPS, mockTS };
@@ -149,11 +165,6 @@ public class ProjectServiceImplTest {
         reset(mocks);
         recordMocks();
         replay(mocks);
-
-        m1 = new Member("M1");
-        m2 = new Member("M2");
-        l1 = new Member("L1");
-        l2 = new Member("L2");
     }
 
     protected void recordMocks() {
@@ -177,6 +188,9 @@ public class ProjectServiceImplTest {
 
         mockIPS.getEntity(eq(Project.class), eq(uuids[8]));
         expectLastCall().andReturn(projects.get(5)).anyTimes();
+
+        mockIPS.getEntity(eq(Project.class), eq(uuids[0]));
+        expectLastCall().andReturn(projects.get(6)).anyTimes();
 
         mockIPS.getDeletedEntity(eq(Project.class), eq(uuids[4]));
         expectLastCall().andReturn(deletedprojects.get(0)).anyTimes();
@@ -204,7 +218,7 @@ public class ProjectServiceImplTest {
     public void testGetProjects() {
         List<Project> res = ps.getAll();
         Assert.assertNotNull(res);
-        Assert.assertEquals(6, res.size());
+        Assert.assertEquals(7, res.size());
 
         verify(mocks);
     }
@@ -219,7 +233,7 @@ public class ProjectServiceImplTest {
             }
         });
         Assert.assertNotNull(res);
-        Assert.assertEquals(6, res.size());
+        Assert.assertEquals(7, res.size());
 
         Assert.assertEquals(uuids[3], res.get(0).getUuid());
         Assert.assertEquals(uuids[2], res.get(1).getUuid());
@@ -415,16 +429,7 @@ public class ProjectServiceImplTest {
 
     @Test
     public void testGetAllPeople() {
-        Project p = new Project();
-        PeopleExtension ext = new PeopleExtension();
-        ext.addMember(m1);
-        ext.addMember(m2);
-        ext.addMember(l1);
-        ext.addLead(l1);
-        ext.addLead(l2);
-        p.addExtension(ext);
-
-        Set<Member> res1 = ps.getMembers(p);
+        Set<Member> res1 = ps.getMembers(uuids[0]);
         Assert.assertEquals(4, res1.size());
         Assert.assertTrue(res1.contains(m1));
         Assert.assertTrue(res1.contains(m2));
@@ -435,16 +440,7 @@ public class ProjectServiceImplTest {
 
     @Test
     public void testGetAllPeopleByRole() {
-        Project p = new Project();
-        PeopleExtension ext = new PeopleExtension();
-        ext.addMember(m1);
-        ext.addMember(m2);
-        ext.addMember(l1);
-        ext.addLead(l1);
-        ext.addLead(l2);
-        p.addExtension(ext);
-
-        Map<String, SortedSet<Member>> res2 = ps.getMembersByRole(p);
+        Map<String, SortedSet<Member>> res2 = ps.getMembersByRole(uuids[0]);
         Assert.assertEquals(2, res2.size());
 
         Set<Member> res2members = res2.get("projectmember");

@@ -224,23 +224,27 @@ public interface ProjectService extends EntityService<Project>, Issuer {
     /**
      * Returns the members of a {@link Project} regardless of their roles.
      *
-     * @param project  the project to evaluate.
+     * @param uuid
+     *          a project's UUID (see
+     *          {@link org.eclipse.skalli.services.projects.Project#getUuid()}).
      *
      * @return  a set of members, or an empty set.
      */
-    public SortedSet<Member> getMembers(Project project);
+    public SortedSet<Member> getMembers(UUID uuid);
 
     /**
      * Returns the members of a {@link Project} that are assigned to certain roles.
      *
-     * @param project  the project to evaluate.
+     * @param uuid
+     *          a project's UUID (see
+     *          {@link org.eclipse.skalli.services.projects.Project#getUuid()}).
      * @param roles  one or more role names to search for.
      *
      * @return a set of members matching the given roles, or an empty set.
      * If <code>roles</code> is <code>null</code> or an empty array, an empty set
      * is returned.
      */
-    public SortedSet<Member> getMembers(Project project, String... roles);
+    public SortedSet<Member> getMembers(UUID uuid, String... roles);
 
     /**
      * Returns all people involved in a {@link Project} together with their
@@ -250,8 +254,10 @@ public interface ProjectService extends EntityService<Project>, Issuer {
      * Therefore, if a person has multiple roles in a project, there will be several entries
      * in the different sets accordingly.
      * </p>
-     * @param project  the project to evaluate.
+     * @param uuid
+     *          a project's UUID (see
+     *          {@link org.eclipse.skalli.services.projects.Project#getUuid()}).
      * @return a map of project members with role names as keys, or an empty map.
      */
-    public Map<String, SortedSet<Member>> getMembersByRole(Project project);
+    public Map<String, SortedSet<Member>> getMembersByRole(UUID uuid);
 }

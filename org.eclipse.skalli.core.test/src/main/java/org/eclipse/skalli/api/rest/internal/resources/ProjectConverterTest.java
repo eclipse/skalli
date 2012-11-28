@@ -140,7 +140,7 @@ public class ProjectConverterTest {
             expected.append("  </subprojects>");
         }
 
-        Set<Member> allPeople = projectService.getMembers(project);
+        Set<Member> allPeople = projectService.getMembers(project.getUuid());
         if (allPeople.size() > 0) {
             expected.append("  <members>");
             for (Member member : allPeople) {
@@ -148,7 +148,7 @@ public class ProjectConverterTest {
                 expected.append("      <userId>").append(enc(member.getUserID())).append("</userId>");
                 expected.append("      <link rel=\"user\" href=\"https://localhost/api/user/");
                 expected.append(enc(member.getUserID())).append("\"/>");
-                for (Entry<String, SortedSet<Member>> entry : projectService.getMembersByRole(project).entrySet()) {
+                for (Entry<String, SortedSet<Member>> entry : projectService.getMembersByRole(project.getUuid()).entrySet()) {
                     if (entry.getValue().contains(member)) {
                         expected.append("      <role>").append(enc(entry.getKey())).append("</role>");
                     }

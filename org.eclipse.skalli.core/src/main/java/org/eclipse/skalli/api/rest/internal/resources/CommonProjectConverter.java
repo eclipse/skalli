@@ -65,6 +65,8 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         Project project = (Project) source;
+        UUID uuid = project.getUuid();
+
         String host = getHost();
         if (!omitNSAttributes) {
             marshalNSAttributes(writer);
@@ -72,15 +74,15 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
         marshalCommonAttributes(writer, project);
 
         ProjectService projectService = Services.getRequiredService(ProjectService.class);
-        writeNode(writer, "uuid", project.getUuid().toString()); //$NON-NLS-1$
+        writeNode(writer, "uuid", uuid.toString()); //$NON-NLS-1$
         writeNode(writer, "id", project.getProjectId()); //$NON-NLS-1$
-        writeNode(writer, "nature", projectService.getProjectNature(project.getUuid())); //$NON-NLS-1$
+        writeNode(writer, "nature", projectService.getProjectNature(uuid)); //$NON-NLS-1$
         writeNode(writer, "template", project.getProjectTemplateId()); //$NON-NLS-1$
         writeNode(writer, "name", project.getName()); //$NON-NLS-1$
         writeNode(writer, "shortName", project.getShortName()); //$NON-NLS-1$
-        writeProjectLink(writer, PROJECT_RELATION, project.getUuid());
+        writeProjectLink(writer, PROJECT_RELATION, uuid);
         writeLink(writer, BROWSE_RELATION, host + RestUtils.URL_BROWSE + project.getProjectId());
-        writeLink(writer, ISSUES_RELATION, host + RestUtils.URL_PROJECTS + project.getUuid().toString() + RestUtils.URL_ISSUES);
+        writeLink(writer, ISSUES_RELATION, host + RestUtils.URL_PROJECTS + uuid.toString() + RestUtils.URL_ISSUES);
         writeNode(writer, "phase", project.getPhase()); //$NON-NLS-1$
         writeNode(writer, "description", project.getDescription()); //$NON-NLS-1$
         UUID parent = project.getParentProject();
@@ -90,9 +92,9 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
 
         List<Project> subprojectList = null;
         if (subprojects != null) {
-            subprojectList = subprojects.get(project.getUuid());
+            subprojectList = subprojects.get(uuid);
         } else {
-            subprojectList = projectService.getSubProjects(project.getUuid());
+            subprojectList = projectService.getSubProjects(uuid);
         }
         if (subprojectList != null && subprojectList.size() > 0) {
             writer.startNode("subprojects"); //$NON-NLS-1$
@@ -102,18 +104,18 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
             writer.endNode();
         }
 
-        marshalMembers(project, projectService, writer);
+        marshalMembers(uuid, projectService, writer);
         marshalExtensions(project, writer, context);
     }
 
-    private void marshalMembers(Project project, ProjectService projectService, HierarchicalStreamWriter writer) {
+    private void marshalMembers(UUID uuid, ProjectService projectService, HierarchicalStreamWriter writer) {
         if (allExtensions || extensions.contains("members")) { //$NON-NLS-1$
             writer.startNode("members"); //$NON-NLS-1$
-            for (Member member : projectService.getMembers(project)) {
+            for (Member member : projectService.getMembers(uuid)) {
                 writer.startNode("member"); //$NON-NLS-1$
                 writeNode(writer, "userId", member.getUserID()); //$NON-NLS-1$
                 writeUserLink(writer, USER_RELATION, member.getUserID());
-                for (Entry<String, SortedSet<Member>> entry : projectService.getMembersByRole(project).entrySet()) {
+                for (Entry<String, SortedSet<Member>> entry : projectService.getMembersByRole(uuid).entrySet()) {
                     if (entry.getValue().contains(member)) {
                         writeNode(writer, "role", entry.getKey()); //$NON-NLS-1$
                     }

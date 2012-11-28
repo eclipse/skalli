@@ -561,8 +561,9 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
     }
 
     @Override
-    public SortedSet<Member> getMembers(Project project) {
+    public SortedSet<Member> getMembers(UUID uuid) {
         TreeSet<Member> ret = new TreeSet<Member>();
+        Project project = getByUUID(uuid);
         for (RoleProvider roleProvider : roleProviders) {
             ret.addAll(roleProvider.getMembers(project));
         }
@@ -570,8 +571,9 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
     }
 
     @Override
-    public SortedSet<Member> getMembers(Project project, String... roles) {
+    public SortedSet<Member> getMembers(UUID uuid, String... roles) {
         TreeSet<Member> ret = new TreeSet<Member>();
+        Project project = getByUUID(uuid);
         for (RoleProvider roleProvider : roleProviders) {
             ret.addAll(roleProvider.getMembers(project, roles));
         }
@@ -579,8 +581,9 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
     }
 
     @Override
-    public Map<String, SortedSet<Member>> getMembersByRole(Project project) {
+    public Map<String, SortedSet<Member>> getMembersByRole(UUID uuid) {
         Map<String, SortedSet<Member>> ret = new HashMap<String, SortedSet<Member>>();
+        Project project = getByUUID(uuid);
         for (RoleProvider roleProvider : roleProviders) {
             ret.putAll(roleProvider.getMembersByRole(project));
         }
