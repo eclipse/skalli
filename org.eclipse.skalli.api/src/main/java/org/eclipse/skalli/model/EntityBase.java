@@ -95,6 +95,7 @@ public abstract class EntityBase implements Comparable<Object> {
      * Date of last modification.
      */
     private transient String lastModified;
+    private transient long lastModifiedMillis;
 
     /**
      * Unique identifier of the last modifier.
@@ -189,23 +190,34 @@ public abstract class EntityBase implements Comparable<Object> {
     }
 
     /**
+     * Returns the date/time of the last modification of this entity
+     * measured in milliseconds since midnight, January 1, 1970 UTC,
+     * or -1 if the entity has not yet been persisted.
+     */
+    public long getLastModifiedMillis() {
+        return lastModifiedMillis;
+    }
+
+    /**
      * Sets the date/time of the last modification. Note, this method
      * should not be called directly. The date/time of the last modification
-     * is set automatically when the entity is persisted.
+     * is set/overwritten when the entity is persisted.
      *
      * @param lastModified  an ISO8061-compliant date/time string following the
      * pattern <tt>[-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm]</tt> as defined for
      * type <tt>xsd:dateTime</tt>) in <tt>"XML Schema Part 2: Datatypes"</tt>,
-     * or <code>null</code>.
+     * or <code>null</code> to indicate that the entity has not yet been
+     * persisted or the date/time of last modification is unknown.
      *
      * @throws IllegalArgumentException  if the date/time string does not conform to
      * type <tt>xsd:dateTime</tt>.
      */
     public void setLastModified(String lastModified) {
         if (StringUtils.isBlank(lastModified)) {
+            this.lastModifiedMillis = -1L;
             this.lastModified = null;
         } else {
-            DatatypeConverter.parseDateTime(lastModified);
+            this.lastModifiedMillis = DatatypeConverter.parseDateTime(lastModified).getTimeInMillis();
             this.lastModified = lastModified;
         }
     }

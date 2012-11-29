@@ -69,10 +69,13 @@ public class EntityBaseTest {
         String lastModified = DatatypeConverter.printDateTime(now);
         entity.setLastModified(lastModified);
         Assert.assertEquals(lastModified, entity.getLastModified());
+        Assert.assertEquals(now.getTimeInMillis(), entity.getLastModifiedMillis());
         entity.setLastModified(null);
         Assert.assertNull(entity.getLastModified());
+        Assert.assertEquals(-1L, entity.getLastModifiedMillis());
         entity.setLastModified("");
         Assert.assertNull(entity.getLastModified());
+        Assert.assertEquals(-1L, entity.getLastModifiedMillis());
     }
 
     @Test(expected = IllegalArgumentException.class)
