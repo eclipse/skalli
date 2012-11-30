@@ -10,9 +10,11 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.internal.admin;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
+import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.permit.Permits;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -31,9 +33,13 @@ public class StatisticsResource extends ResourceBase {
         }
 
         StatisticsQuery query = new StatisticsQuery(getQueryAttributes());
+        String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
+        if (StringUtils.isNotBlank(id)) {
+            query.setIncludes(id);
+        }
         Statistics statistics = Statistics.getDefault();
         return new ResourceRepresentation<Statistics>(statistics,
-                new StatisticsConverter(getRequest().getResourceRef().getHostIdentifier(), query.getFrom(), query.getTo()));
+                new StatisticsConverter(getRequest().getResourceRef().getHostIdentifier(), query));
     }
 
     @Delete

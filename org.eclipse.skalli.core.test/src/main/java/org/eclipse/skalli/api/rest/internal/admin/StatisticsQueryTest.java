@@ -220,6 +220,54 @@ public class StatisticsQueryTest {
         assertFromPeriodQuery("-3m", 3, TimeUnit.MINUTES);
     }
 
+    @Test
+    public void testAllQuery() throws Exception {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("all", null);
+        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        Assert.assertEquals(0, query.getFrom());
+        Assert.assertEquals(0, query.getTo());
+    }
+
+    @Test
+    public void testSetIncludes() throws Exception {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("include", "a,b");
+        params.put("exclude", "c");
+        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        query.setIncludes("foobar");
+        Assert.assertTrue(query.marshal("foobar"));
+        Assert.assertFalse(query.marshal("a"));
+        Assert.assertFalse(query.marshal("b"));
+        Assert.assertFalse(query.marshal("c"));
+    }
+
+    @Test
+    public void testShow() throws Exception {
+        assertShow(new String[]{"a", "b", "c"}, new String[]{"foo"}, "a,b,c", null);
+        assertShow(new String[]{"a;b;c"}, new String[]{"a", "b", "c", "foo"}, "a;b;c", null);
+        assertShow(new String[]{"a", "b", "c"}, new String[]{"a;b;c"}, null, "a;b;c");
+        assertShow(new String[]{"a", "b", "c"}, new String[]{"foo"}, "a,b,c", "");
+        assertShow(new String[]{"foo", "bar"}, new String[]{"a", "b", "c"}, null, "a,b,c");
+        assertShow(new String[]{"foo", "bar"}, new String[]{"a", "b", "c"}, "", "a,b,c");
+        assertShow(new String[]{"foo", "bar"}, new String[]{"a", "b", "c", "foobar"}, "foo,bar", "a,b,c");
+        assertShow(new String[]{"a", "b", "c"}, new String[0], null, null);
+        assertShow(new String[]{"a", "b", "c"}, new String[0], "", "");
+    }
+
+    private void assertShow(String[] included, String[] excluded, String include, String exclude) {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("include", include);
+        params.put("exclude", exclude);
+        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        for (String s: included) {
+            Assert.assertTrue(query.marshal(s));
+        }
+        for (String s: excluded) {
+            Assert.assertFalse(query.marshal(s));
+        }
+    }
+
     private void assertFromPeriodQuery(String period, int value, TimeUnit unit) {
         Calendar cal = Calendar.getInstance();
         long now = cal.getTimeInMillis();

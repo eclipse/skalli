@@ -10,10 +10,15 @@
  *******************************************************************************/
 package org.eclipse.skalli.api.rest.internal.admin;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.UUID;
 
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.eclipse.skalli.commons.FormatUtils;
@@ -21,7 +26,13 @@ import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.commons.Statistics.SearchInfo;
 import org.eclipse.skalli.commons.Statistics.StatisticsInfo;
 import org.eclipse.skalli.commons.Statistics.UsageInfo;
+import org.eclipse.skalli.commons.Statistics.UserInfo;
+import org.eclipse.skalli.model.Member;
+import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.eclipse.skalli.services.extension.rest.RestUtils;
+import org.eclipse.skalli.services.project.ProjectService;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -33,162 +44,377 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Admin"; //$NON-NLS-1$
 
-    private final long startDate;
-    private final long endDate;
+    private final StatisticsQuery query;
 
-    public StatisticsConverter(String host, long startDate, long endDate) {
+    public StatisticsConverter(String host, StatisticsQuery query) {
         super(Statistics.class, "statistics", host); //$NON-NLS-1$
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.query = query;
     }
 
+    @SuppressWarnings("nls")
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         Statistics statistics = (Statistics) source;
+
         marshalNSAttributes(writer);
         marshalApiVersion(writer);
-        writer.startNode("info"); //$NON-NLS-1$
-        writeNode(writer, "instance-start", FormatUtils.formatUTCWithMillis(statistics.getStartTimestamp())); //$NON-NLS-1$
+
+        writeNode(writer, "instance-start", FormatUtils.formatUTCWithMillis(statistics.getStartupTime()));
         writeNode(writer, "instance-uptime",  DurationFormatUtils.formatPeriodISO( //$NON-NLS-1$
-                statistics.getStartTimestamp(), System.currentTimeMillis()));
-        writeNode(writer, "from", FormatUtils.formatUTCWithMillis(startDate > 0? startDate : statistics.getStartTimestamp())); //$NON-NLS-1$
-        writeNode(writer, "to", FormatUtils.formatUTCWithMillis(endDate > 0 ? endDate : System.currentTimeMillis())); //$NON-NLS-1$
-        writeNode(writer, "period", DurationFormatUtils.formatPeriodISO( //$NON-NLS-1$
-                (startDate > 0? startDate : statistics.getStartTimestamp()),
-                (endDate > 0? endDate : System.currentTimeMillis())));
-        writer.endNode();
+                statistics.getStartupTime(), System.currentTimeMillis()));
+        long from = query.getFrom() > 0? query.getFrom() : statistics.getStartupTime();
+        long to = query.getTo() > 0 ? query.getTo() : System.currentTimeMillis();
+        writeNode(writer, "from", FormatUtils.formatUTCWithMillis(from));
+        writeNode(writer, "to", FormatUtils.formatUTCWithMillis(to));
+        writeNode(writer, "period", DurationFormatUtils.formatPeriodISO(from, to));
 
-        writer.startNode("users"); //$NON-NLS-1$
-        Map<String,Long> users = statistics.getUserCount(startDate, endDate);
-        appendUniqueCount(writer, users);
-        appendTotalCount(writer, users);
-        writeEntries(writer, "user", users); //$NON-NLS-1$
-        writer.endNode();
+        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        List<UUID> uuids = new ArrayList<UUID>(projectService.keySet());
 
-        Map<String,Long> avgResponseTimes = statistics.getAverageResponseTimes(startDate, endDate);
+        if (query.marshal("projects")) {
+            marshalProjectsSection(writer, projectService, uuids, from, to);
+        }
+        if (query.marshal("members")) {
+            marshalMembersSection(writer, projectService, uuids);
+        }
+        if (query.marshal("users")) {
+            marshalUsersSection(writer, statistics, from, to);
+        }
+        if (query.marshal("departments")) {
+            marshalDepartmentsSection(writer, statistics, from, to);
+        }
+        if (query.marshal("locations")) {
+            marshalLocationsSection(writer, statistics, from, to);
+        }
+        if (query.marshal("searches")) {
+            marshalSearchesSection(writer, statistics, from, to);
+        }
+        if (query.marshal("browsers")) {
+            marshalBrowsersSection(writer, statistics, from, to);
+        }
+        if (query.marshal("referers")) {
+            marshalReferersSection(writer, statistics, from, to);
+        }
+        if (query.marshal("requests")) {
+            marshalRequestsSection(writer, statistics, from, to);
+        }
+        if (query.marshal("tracks")) {
+            marshalTracksSection(writer, statistics, from, to);
+        }
+    }
 
-        writer.startNode("usages"); //$NON-NLS-1$
-        Map<String,Long> usages = statistics.getUsageCount(startDate, endDate);
-        appendUniqueCount(writer, usages);
-        appendTotalCount(writer, usages);
-        writeUsageEntries(writer, usages, avgResponseTimes);
-        writer.endNode();
-
-        writer.startNode("avgResponseTimes"); //$NON-NLS-1$
-        for (Entry<String, Long> entry : avgResponseTimes.entrySet()) {
-            writer.startNode("avgResponseTime"); //$NON-NLS-1$
-            writer.addAttribute("path", entry.getKey()); //$NON-NLS-1$
-            writer.setValue(Long.toString(entry.getValue()));
-            writer.endNode();
+    @SuppressWarnings("nls")
+    private void marshalProjectsSection(HierarchicalStreamWriter writer, ProjectService projectService,
+            List<UUID> uuids, long from, long to) {
+        writer.startNode("projects");
+        List<Project> newProjects = new ArrayList<Project>();
+        List<Project> modifiedProjects = new ArrayList<Project>();
+        for (UUID uuid: uuids) {
+            Project project = projectService.getByUUID(uuid);
+            if (project != null) {
+                if (isInRange(project.getRegistered(), from, to)) {
+                    newProjects.add(project);
+                } else if (isInRange(project.getLastModifiedMillis(), from, to)) {
+                    modifiedProjects.add(project);
+                }
+            }
+        }
+        writeNode(writer, "totalCount", uuids.size());
+        writer.startNode("created");
+        writeNode(writer, "totalCount", newProjects.size());
+        writer.startNode("byDate");
+        for (Project newProject: newProjects) {
+            writeProjectInfo(writer, newProject, newProject.getRegistered());
         }
         writer.endNode();
-
-        writer.startNode("searches"); //$NON-NLS-1$
-        Map<String,Long> searches = statistics.getSearchCount(startDate, endDate);
-        appendUniqueCount(writer, searches);
-        appendTotalCount(writer, searches);
-        writeEntries(writer, "search", searches); //$NON-NLS-1$
         writer.endNode();
-
-        writer.startNode("locations"); //$NON-NLS-1$
-        Map<String,Long> locations = statistics.getLocationCount(startDate, endDate);
-        appendUniqueCount(writer, locations);
-        appendTotalCount(writer, locations);
-        writeEntries(writer, "location", locations); //$NON-NLS-1$
+        writer.startNode("modified");
+        writeNode(writer, "totalCount", modifiedProjects.size());
+        writer.startNode("byDate");
+        for (Project modifiedProject: modifiedProjects) {
+            writeProjectInfo(writer, modifiedProject, modifiedProject.getLastModifiedMillis());
+        }
         writer.endNode();
-
-        writer.startNode("departments"); //$NON-NLS-1$
-        Map<String,Long> departments = statistics.getDepartmentCount(startDate, endDate);
-        appendUniqueCount(writer, departments);
-        appendTotalCount(writer, departments);
-        writeEntries(writer, "department", departments); //$NON-NLS-1$
         writer.endNode();
-
-        writer.startNode("browsers"); //$NON-NLS-1$
-        Map<String,Long> browsers = statistics.getBrowserCount(startDate, endDate);
-        appendUniqueCount(writer, browsers);
-        appendTotalCount(writer, browsers);
-        writeEntries(writer, "browser", browsers); //$NON-NLS-1$
         writer.endNode();
+    }
 
-        writer.startNode("referers"); //$NON-NLS-1$
-        Map<String,Long> referers = statistics.getRefererCount(startDate, endDate);
-        appendUniqueCount(writer, referers);
-        appendTotalCount(writer, referers);
-        writeEntries(writer, "referer", referers); //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    private void marshalMembersSection(HierarchicalStreamWriter writer, ProjectService projectService,
+            List<UUID> uuids) {
+        writer.startNode("members");
+        Map<String, SortedSet<Member>> uniqueMembers = collectUniqueMembers(projectService, uuids);
+        writeNode(writer, "totalCount", countUniqueMembers(uniqueMembers));
+        writer.startNode("byRole");
+        for (Entry<String, SortedSet<Member>> entry: uniqueMembers.entrySet()) {
+            writeNode(writer, entry.getKey(), entry.getValue().size());
+        }
         writer.endNode();
+        writer.endNode();
+    }
 
-        writer.startNode("tracks"); //$NON-NLS-1$
-        Map<String, SortedSet<StatisticsInfo>> tracks = statistics.getUsageTracks(startDate, endDate);
+    private Map<String, SortedSet<Member>> collectUniqueMembers(ProjectService projectService, List<UUID> uuids) {
+        Map<String, SortedSet<Member>> uniqueMembers = new HashMap<String, SortedSet<Member>>();
+        for (UUID uuid: uuids) {
+            Map<String, SortedSet<Member>> membersByRole = projectService.getMembersByRole(uuid);
+            for (Entry<String,SortedSet<Member>> entry: membersByRole.entrySet()) {
+                SortedSet<Member> members = uniqueMembers.get(entry.getKey());
+                if (members == null) {
+                    members = new TreeSet<Member>();
+                    uniqueMembers.put(entry.getKey(), members);
+                }
+                members.addAll(entry.getValue());
+            }
+        }
+        return uniqueMembers;
+    }
+
+    private int countUniqueMembers(Map<String, SortedSet<Member>> uniqueMembers) {
+        int count = 0;
+        for (SortedSet<Member> members: uniqueMembers.values()) {
+            count += members.size();
+        }
+        return count;
+    }
+
+    @SuppressWarnings("nls")
+    private void marshalUsersSection(HierarchicalStreamWriter writer, Statistics statistics, long from, long to) {
+        writer.startNode("users");
+        Map<String,Long> users = statistics.getUserCount(from, to);
+        writeUniqueCount(writer, users);
+        writeTotalCount(writer, users);
+        writer.startNode("byCount");
+        writeCounts(writer, "user", users);
+        writer.endNode();
+        writer.startNode("byDate");
+        SortedSet<Statistics.UserInfo> userInfos = statistics.getUserInfo();
+        for (Statistics.UserInfo userInfo: userInfos) {
+            writeInfoEntry(writer, userInfo);
+        }
+        writer.endNode();
+        writer.endNode();
+    }
+
+    @SuppressWarnings("nls")
+    private void marshalDepartmentsSection(HierarchicalStreamWriter writer, Statistics statistics, long from, long to) {
+        writer.startNode("departments");
+        Map<String,Long> departments = statistics.getDepartmentCount(from, to);
+        writeUniqueCount(writer, departments);
+        writeTotalCount(writer, departments);
+        writer.startNode("byCount");
+        writeCounts(writer, "department", departments);
+        writer.endNode();
+        writer.endNode();
+    }
+
+    @SuppressWarnings("nls")
+    private void marshalLocationsSection(HierarchicalStreamWriter writer, Statistics statistics, long from, long to) {
+        writer.startNode("locations");
+        Map<String,Long> locations = statistics.getLocationCount(from, to);
+        writeUniqueCount(writer, locations);
+        writeTotalCount(writer, locations);
+        writer.startNode("byCount");
+        writeCounts(writer, "location", locations);
+        writer.endNode();
+        writer.endNode();
+    }
+
+    @SuppressWarnings("nls")
+    private void marshalSearchesSection(HierarchicalStreamWriter writer, Statistics statistics, long from, long to) {
+        writer.startNode("searches");
+        Map<String,Long> searches = statistics.getSearchCount(from, to);
+        writeUniqueCount(writer, searches);
+        writeTotalCount(writer, searches);
+        writer.startNode("byCount");
+        writeCounts(writer, "search", searches);
+        writer.endNode();
+        writer.startNode("byDate");
+        SortedSet<Statistics.SearchInfo> searchInfos = statistics.getSearchInfo();
+        for (Statistics.SearchInfo searchInfo: searchInfos) {
+            writeInfoEntry(writer, searchInfo);
+        }
+        writer.endNode();
+        writer.endNode();
+    }
+
+    @SuppressWarnings("nls")
+    private void marshalBrowsersSection(HierarchicalStreamWriter writer, Statistics statistics, long from, long to) {
+        writer.startNode("browsers");
+        Map<String,Long> browsers = statistics.getBrowserCount(from, to);
+        writeUniqueCount(writer, browsers);
+        writeTotalCount(writer, browsers);
+        writer.startNode("byCount");
+        writeCounts(writer, "browser", browsers);
+        writer.endNode();
+        writer.endNode();
+    }
+
+    @SuppressWarnings("nls")
+    private void marshalReferersSection(HierarchicalStreamWriter writer, Statistics statistics, long from, long to) {
+        writer.startNode("referers");
+        Map<String,Long> referers = statistics.getRefererCount(from, to);
+        writeUniqueCount(writer, referers);
+        writeTotalCount(writer, referers);
+        writer.startNode("byCount");
+        writeCounts(writer, "referer", referers);
+        writer.endNode();
+        writer.endNode();
+    }
+
+    @SuppressWarnings("nls")
+    private void marshalRequestsSection(HierarchicalStreamWriter writer, Statistics statistics, long from, long to) {
+        Map<String,Long> avgResponseTimes = statistics.getAverageResponseTimes(from, to);
+        writer.startNode("requests");
+        Map<String,Long> usages = statistics.getUsageCount(from, to);
+        writeUniqueCount(writer, usages);
+        writeTotalCount(writer, usages);
+        writer.startNode("byCount");
+        writeRequestCounts(writer, usages, avgResponseTimes);
+        writer.endNode();
+        writer.startNode("byAvgResponseTime");
+        writeAverageResponseTimes(writer, avgResponseTimes);
+        writer.endNode();
+        writer.startNode("byDate");
+        writeRequestInfos(writer, statistics.getUsageInfo());
+        writer.endNode();
+        writer.endNode();
+    }
+
+    @SuppressWarnings("nls")
+    private void marshalTracksSection(HierarchicalStreamWriter writer, Statistics statistics, long from, long to) {
+        writer.startNode("tracks");
+        Map<String, SortedSet<StatisticsInfo>> tracks = statistics.getUsageTracks(from, to);
         for (Entry<String, SortedSet<StatisticsInfo>> entries: tracks.entrySet()) {
             writer.startNode("track");
             SortedSet<StatisticsInfo> track = entries.getValue();
             writeNode(writer, "user", entries.getKey());
             for (StatisticsInfo info: track) {
-                writeEntry(writer, info);
+                writeInfoEntry(writer, info);
             }
             writer.endNode();
         }
         writer.endNode();
     }
 
-    private void writeEntries(HierarchicalStreamWriter writer, String nodeName, Map<String,Long> entries) {
+    @SuppressWarnings("nls")
+    void writeCounts(HierarchicalStreamWriter writer, String nodeName, Map<String,Long> entries) {
         for (Entry<String, Long> entry : entries.entrySet()) {
             writer.startNode(nodeName);
-            writer.addAttribute("count", entry.getValue().toString()); //$NON-NLS-1$
-            writer.setValue(entry.getKey() != null ? entry.getKey() : ""); //$NON-NLS-1$
+            writer.addAttribute("count", entry.getValue().toString());
+            writeValue(writer, entry.getKey());
             writer.endNode();
         }
     }
 
-    private void writeUsageEntries(HierarchicalStreamWriter writer,
-            Map<String,Long> usages, Map<String,Long> avgResponseTimes) {
-        for (Entry<String, Long> usage : usages.entrySet()) {
-            writer.startNode("usage"); //$NON-NLS-1$
-            writer.addAttribute("count", usage.getValue().toString()); //$NON-NLS-1$
-            Long avgResponseTime = avgResponseTimes.get(usage.getKey());
-            if (avgResponseTime != null) {
-                writer.addAttribute("avgResponseTime", Long.toString(avgResponseTime)); //$NON-NLS-1$
-            }
-            writer.setValue(usage.getKey() != null ? usage.getKey() : ""); //$NON-NLS-1$
-            writer.endNode();
-        }
-    }
-
-
-
-    private void writeEntry(HierarchicalStreamWriter writer, StatisticsInfo info) {
-        if (info instanceof UsageInfo) {
+    @SuppressWarnings("nls")
+    void writeRequestCounts(HierarchicalStreamWriter writer,
+            Map<String,Long> requests, Map<String,Long> avgResponseTimes) {
+        for (Entry<String, Long> request : requests.entrySet()) {
             writer.startNode("request");
-            writer.addAttribute("timestamp", FormatUtils.formatUTCWithMillis(info.getTimestamp())); //$NON-NLS-1$
-            writeNode(writer, "path", (((UsageInfo)info).getPath()));
-            writeNode(writer, "referer", (((UsageInfo)info).getReferer()));
+            writer.addAttribute("count", request.getValue().toString());
+            Long avgResponseTime = avgResponseTimes.get(request.getKey());
+            if (avgResponseTime != null) {
+                writer.addAttribute("avgResponseTime", Long.toString(avgResponseTime));
+            }
+            writeValue(writer, request.getKey());
+            writer.endNode();
+        }
+    }
+
+    @SuppressWarnings("nls")
+    void writeAverageResponseTimes(HierarchicalStreamWriter writer, Map<String,Long> avgResponseTimes) {
+        for (Entry<String, Long> entry : avgResponseTimes.entrySet()) {
+            writer.startNode("request");
+            writer.addAttribute("avgResponseTime", Long.toString(entry.getValue()) );
+            writeValue(writer, entry.getKey());
+            writer.endNode();
+        }
+    }
+
+    void writeRequestInfos(HierarchicalStreamWriter writer, SortedSet<UsageInfo> usageInfos) {
+        for (UsageInfo usageInfo: usageInfos) {
+            writeInfoEntry(writer, usageInfo);
+        }
+    }
+
+    @SuppressWarnings("nls")
+    void writeProjectInfo(HierarchicalStreamWriter writer, Project project, long timestamp) {
+        writer.startNode("project");
+        writer.addAttribute("date", FormatUtils.formatUTCWithMillis(timestamp));
+        writer.addAttribute("timestamp", Long.toString(timestamp));
+        UUID uuid = project.getUuid();
+        writeNode(writer, "uuid", uuid.toString()); //$NON-NLS-1$
+        writeNode(writer, "id", project.getProjectId()); //$NON-NLS-1$
+        writeNode(writer, "name", project.getName()); //$NON-NLS-1$
+        writeProjectLink(writer, PROJECT_RELATION, uuid);
+        writeLink(writer, BROWSE_RELATION, getHost() + RestUtils.URL_BROWSE + project.getProjectId());
+        writer.endNode();
+    }
+
+    @SuppressWarnings("nls")
+    void writeInfoEntry(HierarchicalStreamWriter writer, StatisticsInfo info) {
+        if (info instanceof UsageInfo) {
+            UsageInfo usageInfo = (UsageInfo)info;
+            writer.startNode("request");
+            writer.addAttribute("date", FormatUtils.formatUTCWithMillis(usageInfo.getTimestamp()));
+            writer.addAttribute("timestamp", Long.toString(usageInfo.getTimestamp()));
+            writer.addAttribute("user", usageInfo.getUserHash());
+            if (usageInfo.getReferer() != null) {
+                writer.addAttribute("referer", usageInfo.getReferer());
+            }
+            writeValue(writer, usageInfo.getPath());
             writer.endNode();
         } else if (info instanceof SearchInfo) {
+            SearchInfo searchInfo = (SearchInfo)info;
             writer.startNode("search");
-            writer.addAttribute("timestamp", FormatUtils.formatUTCWithMillis(info.getTimestamp())); //$NON-NLS-1$
-            writeNode(writer, "queryString", ((SearchInfo)info).getQueryString());
-            writeNode(writer, "resultCount", ((SearchInfo)info).getResultCount());
-            writeNode(writer, "duration", ((SearchInfo)info).getDuration());
+            writer.addAttribute("date", FormatUtils.formatUTCWithMillis(searchInfo.getTimestamp()));
+            writer.addAttribute("timestamp", Long.toString(searchInfo.getTimestamp()));
+            writer.addAttribute("user", searchInfo.getUserHash());
+            writer.addAttribute("resultCount", Integer.toString(searchInfo.getResultCount()));
+            writer.addAttribute("duration", Long.toString(searchInfo.getDuration()));
+            writeValue(writer, searchInfo.getQueryString());
+            writer.endNode();
+        } else if (info instanceof UserInfo) {
+            UserInfo userInfo = (UserInfo)info;
+            writer.startNode("user");
+            writer.addAttribute("date", FormatUtils.formatUTCWithMillis(userInfo.getTimestamp()));
+            writer.addAttribute("timestamp", Long.toString(userInfo.getTimestamp()));
+            if (userInfo.getDepartment() != null) {
+                writer.addAttribute("department", userInfo.getDepartment());
+            }
+            if (userInfo.getLocation() != null) {
+                writer.addAttribute("location", userInfo.getLocation());
+            }
+            writeValue(writer, userInfo.getUserHash());
             writer.endNode();
         }
     }
 
-    private void appendUniqueCount(HierarchicalStreamWriter writer, Map<String,Long> entries) {
-        writer.addAttribute("uniqueCount", Integer.toString(entries.size())); //$NON-NLS-1$
+    @SuppressWarnings("nls")
+    void writeUniqueCount(HierarchicalStreamWriter writer, Map<String,Long> entries) {
+        writer.addAttribute("uniqueCount", Integer.toString(entries.size()));
     }
 
-    private void appendTotalCount(HierarchicalStreamWriter writer, Map<String,Long> entries) {
+    @SuppressWarnings("nls")
+    void writeTotalCount(HierarchicalStreamWriter writer, Map<String,Long> entries) {
         Iterator<Long> it = entries.values().iterator();
         int count = 0;
         for (; it.hasNext(); count += it.next()) {
         }
-        writer.addAttribute("totalCount", Integer.toString(count)); //$NON-NLS-1$
+        writer.addAttribute("totalCount", Integer.toString(count));
+    }
+
+    void writeValue(HierarchicalStreamWriter writer, String value) {
+        writer.setValue(value != null? value : ""); //$NON-NLS-1$
+    }
+
+    private boolean isInRange(long timestamp, long from, long to) {
+        return (from <= 0 || from <=  timestamp) && (to <= 0 || timestamp <= to);
     }
 
     @Override
     public Object unmarshal(HierarchicalStreamReader arg0, UnmarshallingContext arg1) {
-        // don't support that yet
+        // not supported
         return null;
     }
 

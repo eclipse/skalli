@@ -56,6 +56,7 @@ public class RestApplication extends Application {
 
         router.attach("/admin/status", StatusResource.class); //$NON-NLS-1$
         router.attach("/admin/statistics", StatisticsResource.class); //$NON-NLS-1$
+        router.attach("/admin/statistics/{id}", StatisticsResource.class); //$NON-NLS-1$
         router.attach("/admin/backup", ProjectBackupResource.class); //$NON-NLS-1$
         attachServiceMonitors("/admin/services/", router); //$NON-NLS-1$
 

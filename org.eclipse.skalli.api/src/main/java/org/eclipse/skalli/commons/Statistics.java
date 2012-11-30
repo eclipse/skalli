@@ -31,10 +31,12 @@ public class Statistics {
     public static class StatisticsInfo implements Comparable<StatisticsInfo> {
         private final String userHash;
         private final long timestamp;
+        private final long sequenceNumber;
 
-        public StatisticsInfo(String userId) {
+        public StatisticsInfo(String userId, long sequenceNumber) {
             this.timestamp = System.currentTimeMillis();
             this.userHash = hash(userId);
+            this.sequenceNumber = sequenceNumber;
         }
         public String getUserHash() {
             return userHash;
@@ -48,11 +50,7 @@ public class Statistics {
 
         @Override
         public int compareTo(StatisticsInfo o) {
-            int result = Long.signum(timestamp - o.timestamp);
-            if (result == 0) {
-                result = userHash.compareTo(o.userHash);
-            }
-            return result;
+            return Long.signum(sequenceNumber - o.sequenceNumber);
         }
     }
 
@@ -60,8 +58,8 @@ public class Statistics {
         private final String department;
         private final String location;
 
-        public UserInfo(String userId, String department, String location) {
-            super(userId);
+        public UserInfo(String userId, String department, String location, long id) {
+            super(userId, id);
             this.department = department;
             this.location = location;
         }
@@ -77,8 +75,8 @@ public class Statistics {
         private final String path;
         private final String referer;
 
-        public UsageInfo(String userId, String path, String referer) {
-            super(userId);
+        public UsageInfo(String userId, String path, String referer, long id) {
+            super(userId, id);
             this.path = path;
             this.referer = referer;
         }
@@ -93,8 +91,8 @@ public class Statistics {
     public static class RefererInfo extends StatisticsInfo {
         private final String referer;
 
-        public RefererInfo(String userId, String referer) {
-            super(userId);
+        public RefererInfo(String userId, String referer, long id) {
+            super(userId, id);
             this.referer = referer;
         }
         public String getReferer() {
@@ -105,8 +103,8 @@ public class Statistics {
     public static class BrowserInfo extends StatisticsInfo {
         private final String userAgent;
 
-        public BrowserInfo(String userId, String userAgent) {
-            super(userId);
+        public BrowserInfo(String userId, String userAgent, long id) {
+            super(userId, id);
             this.userAgent = userAgent;
         }
         public String getUserAgent() {
@@ -119,8 +117,8 @@ public class Statistics {
         private final int resultCount;
         private final long duration;
 
-        public SearchInfo(String userId, String queryString, int resultCount, long duration) {
-            super(userId);
+        public SearchInfo(String userId, String queryString, int resultCount, long duration, long id) {
+            super(userId, id);
             this.queryString = queryString;
             this.resultCount = resultCount;
             this.duration = duration;
@@ -140,8 +138,8 @@ public class Statistics {
         private final String path;
         private final long responseTime; // in milliseconds
 
-        public ResponseTimeInfo(String userId, String path, long responseTime) {
-            super(userId);
+        public ResponseTimeInfo(String userId, String path, long responseTime, long id) {
+            super(userId, id);
             this.path = path;
             this.responseTime = responseTime > 0 ? responseTime : 1L;
         }
@@ -153,56 +151,53 @@ public class Statistics {
         }
     }
 
-    public static final String ANONYMOUS = "anonymous"; //$NON-NLS-1$
+    private static final String ANONYMOUS = "anonymous"; //$NON-NLS-1$
 
-    private static final SortedSet<UserInfo> users = new TreeSet<UserInfo>();
-    private static final SortedSet<UsageInfo> usages = new TreeSet<UsageInfo>();
-    private static final SortedSet<RefererInfo> referers = new TreeSet<RefererInfo>();
-    private static final SortedSet<BrowserInfo> browsers = new TreeSet<BrowserInfo>();
-    private static final SortedSet<SearchInfo> searches = new TreeSet<SearchInfo>();
-    private static final SortedSet<ResponseTimeInfo> responseTimes = new TreeSet<ResponseTimeInfo>();
+    private SortedSet<UserInfo> users = new TreeSet<UserInfo>();
+    private SortedSet<UsageInfo> usages = new TreeSet<UsageInfo>();
+    private SortedSet<RefererInfo> referers = new TreeSet<RefererInfo>();
+    private SortedSet<BrowserInfo> browsers = new TreeSet<BrowserInfo>();
+    private SortedSet<SearchInfo> searches = new TreeSet<SearchInfo>();
+    private SortedSet<ResponseTimeInfo> responseTimes = new TreeSet<ResponseTimeInfo>();
 
-    private long startTimestamp;
+    private long startupTime =  System.currentTimeMillis();
+    private long sequenceNumber = 0;
+
+    private static Statistics instance = new Statistics();
 
     private Statistics() {
-        startTimestamp = System.currentTimeMillis();
     }
 
-    private static Statistics instance = null;
-
-    public static synchronized Statistics getDefault() {
-        if (instance == null) {
-            instance = new Statistics();
-        }
+    public static Statistics getDefault() {
         return instance;
     }
 
-    public long getStartTimestamp() {
-        return startTimestamp;
+    public long getStartupTime() {
+        return startupTime;
     }
 
     public synchronized void trackUsage(String userId, String path, String referer) {
-        usages.add(new UsageInfo(userId, path, referer));
+        usages.add(new UsageInfo(userId, path, referer, sequenceNumber++));
     }
 
     public synchronized void trackUser(String userId, String department, String location) {
-        users.add(new UserInfo(userId, department, location));
+        users.add(new UserInfo(userId, department, location, sequenceNumber++));
     }
 
     public synchronized void trackBrowser(String userId, String userAgent) {
-        browsers.add(new BrowserInfo(userId, userAgent));
+        browsers.add(new BrowserInfo(userId, userAgent, sequenceNumber++));
     }
 
     public synchronized void trackSearch(String userId, String queryString, int resultCount, long duration) {
-        searches.add(new SearchInfo(userId, queryString, resultCount, duration));
+        searches.add(new SearchInfo(userId, queryString, resultCount, duration, sequenceNumber++));
     }
 
     public synchronized void trackReferer(String userId, String referer) {
-        referers.add(new RefererInfo(userId, referer));
+        referers.add(new RefererInfo(userId, referer, sequenceNumber++));
     }
 
     public synchronized void trackResponseTime(String userId, String path, long responseTime) {
-        responseTimes.add(new ResponseTimeInfo(userId, path, responseTime));
+        responseTimes.add(new ResponseTimeInfo(userId, path, responseTime, sequenceNumber++));
     }
 
     public synchronized void remove(long startDate, long endDate) {
@@ -227,6 +222,10 @@ public class Statistics {
             }
         }
         return sortedByFrequencyDescending(result);
+    }
+
+    public SortedSet<UserInfo> getUserInfo() {
+        return Collections.unmodifiableSortedSet(users);
     }
 
     public Map<String, Long> getDepartmentCount(long startDate, long endDate) {
@@ -276,6 +275,10 @@ public class Statistics {
         return sortedByFrequencyDescending(result);
     }
 
+    public SortedSet<BrowserInfo> getBrowserInfo() {
+        return Collections.unmodifiableSortedSet(browsers);
+    }
+
     public Map<String, Long> getRefererCount(long startDate, long endDate) {
         Map<String, Long> result = new TreeMap<String, Long>();
         for (RefererInfo refererInfo: referers) {
@@ -289,6 +292,10 @@ public class Statistics {
             }
         }
         return sortedByFrequencyDescending(result);
+    }
+
+    public SortedSet<RefererInfo> getRefererInfo() {
+        return Collections.unmodifiableSortedSet(referers);
     }
 
     public Map<String, Long> getUsageCount(long startDate, long endDate) {
@@ -306,6 +313,10 @@ public class Statistics {
         return sortedByFrequencyDescending(result);
     }
 
+    public SortedSet<UsageInfo> getUsageInfo() {
+        return Collections.unmodifiableSortedSet(usages);
+    }
+
     public Map<String, Long> getSearchCount(long startDate, long endDate) {
         Map<String, Long> result = new TreeMap<String, Long>();
         for (SearchInfo searchInfo: searches) {
@@ -319,6 +330,10 @@ public class Statistics {
             }
         }
         return sortedByFrequencyDescending(result);
+    }
+
+    public SortedSet<SearchInfo> getSearchInfo() {
+        return Collections.unmodifiableSortedSet(searches);
     }
 
     public Map<String, Long> getAverageResponseTimes(long startDate, long endDate) {
@@ -349,6 +364,10 @@ public class Statistics {
             entry.setValue(entry.getValue() / count);
         }
         return sortedByFrequencyDescending(result);
+    }
+
+    public SortedSet<ResponseTimeInfo> getResponseTimeInfo() {
+        return Collections.unmodifiableSortedSet(responseTimes);
     }
 
     public Map<String, SortedSet<StatisticsInfo>> getUsageTracks(long startDate, long endDate) {
