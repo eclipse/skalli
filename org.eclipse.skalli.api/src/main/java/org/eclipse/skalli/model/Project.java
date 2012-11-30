@@ -207,9 +207,6 @@ public class Project extends ExtensibleEntityBase {
     }
 
     public long getRegistered() {
-        if (registered <= 0) {
-            registered = System.currentTimeMillis();
-        }
         return registered;
     }
 

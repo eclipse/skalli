@@ -42,6 +42,14 @@
     </xsd:restriction>
   </xsd:simpleType>
 
+  <xsd:complexType name="Timestamp">
+      <xsd:simpleContent>
+        <xsd:extension base="xsd:dateTime">
+            <xsd:attribute name="millis" type="xsd:long" use="required" />
+        </xsd:extension>
+      </xsd:simpleContent>
+  </xsd:complexType>
+
   <xsd:simpleType name="ProjectId">
     <xsd:annotation>
       <xsd:documentation xml:lang="EN">

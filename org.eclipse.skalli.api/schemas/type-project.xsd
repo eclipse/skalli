@@ -102,6 +102,14 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
+      <xsd:element name="registered" type="Timestamp" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="EN">
+            The creation timestamp of the project in xsd:dateTime format
+            and an additional attribute "millis" for the time in milliseconds.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
       <xsd:element name="description" type="xsd:string" minOccurs="0">
         <xsd:annotation>
           <xsd:documentation xml:lang="EN">

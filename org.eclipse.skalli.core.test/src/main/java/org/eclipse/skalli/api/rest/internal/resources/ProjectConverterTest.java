@@ -21,6 +21,7 @@ import java.util.TimeZone;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.FormatUtils;
 import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
@@ -123,6 +124,10 @@ public class ProjectConverterTest {
         expected.append("  <link rel=\"issues\" href=\"https://localhost/api/projects/");
         expected.append(project.getUuid().toString()).append("/issues\"/>");
         expected.append("  <phase>").append(enc(project.getPhase())).append("</phase>");
+        if (project.getRegistered() > 0) {
+            expected.append("  <registered millis=\"").append(project.getRegistered()).append("\">");
+            expected.append(FormatUtils.formatUTC(project.getRegistered())).append("</registered>");
+        }
         if (StringUtils.isNotBlank(enc(project.getDescription()))) {
             expected.append("  <description>").append(enc(project.getDescription())).append("</description>");
         }

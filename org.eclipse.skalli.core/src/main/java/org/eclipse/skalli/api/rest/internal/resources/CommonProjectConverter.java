@@ -84,6 +84,9 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
         writeLink(writer, BROWSE_RELATION, host + RestUtils.URL_BROWSE + project.getProjectId());
         writeLink(writer, ISSUES_RELATION, host + RestUtils.URL_PROJECTS + uuid.toString() + RestUtils.URL_ISSUES);
         writeNode(writer, "phase", project.getPhase()); //$NON-NLS-1$
+        if (project.getRegistered() > 0) {
+            writeDateTime(writer, "registered", project.getRegistered()); //$NON-NLS-1$
+        }
         writeNode(writer, "description", project.getDescription()); //$NON-NLS-1$
         UUID parent = project.getParentProject();
         if (parent != null) {

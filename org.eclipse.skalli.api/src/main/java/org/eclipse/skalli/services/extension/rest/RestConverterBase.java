@@ -12,13 +12,10 @@ package org.eclipse.skalli.services.extension.rest;
 
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Locale;
-import java.util.TimeZone;
 import java.util.UUID;
 
-import javax.xml.bind.DatatypeConverter;
-
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.FormatUtils;
 import org.eclipse.skalli.model.EntityBase;
 
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
@@ -321,17 +318,20 @@ public abstract class RestConverterBase<T> implements RestConverter {
      * Marshals a node with a <tt>xsd:dateTime</tt> content and a given name.
      * The given timestamp is first converted to a {@link Calendar date} with timezone
      * UTC and locale EN; afterwards the date is converted to <tt>xsd:dateTime</tt>
-     * format.
+     * format. The given timestamp in milliseconds argument is rendered also
+     * as attribute <tt>millis</tt>.
      *
      * @param writer  the writer to use for marshaling.
      * @param nodeName  the name of the node.
-     * @param millis  the timestamp to marshal.
+     * @param millis  the timestamp to marshal. If the value is zero ior negative,
+     * nothing will be marshalled.
      */
     protected void writeDateTime(HierarchicalStreamWriter writer, String nodeName, long millis) {
-        if (millis >= 0) {
-            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ENGLISH); //$NON-NLS-1$
-            calendar.setTimeInMillis(millis);
-            writeNode(writer, nodeName, DatatypeConverter.printDateTime(calendar));
+        if (millis > 0) {
+            writer.startNode(nodeName);
+            writer.addAttribute("millis", Long.toString(millis)); //$NON-NLS-1$
+            writer.setValue(FormatUtils.formatUTC(millis));
+            writer.endNode();
         }
     }
 }
