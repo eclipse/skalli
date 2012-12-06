@@ -1,9 +1,9 @@
 /.metadata
 target/
 org.eclipse.skalli.target/jetty/logs/
-org.eclipse.skalli.target/target-platform-3rdparty/
 org.eclipse.skalli.target/workdir/logs/
-org.eclipse.skalli.target/workdir/skalli-log.*
+org.eclipse.skalli.target/workdir/SkalliDB/
+org.eclipse.skalli.target/workdir/*.log
 org.eclipse.skalli.selenium/workdir/storage/
 org.eclipse.skalli.selenium/logs/
 derby.log
