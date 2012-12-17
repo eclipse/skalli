@@ -17,12 +17,15 @@ import java.util.Map;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.Member;
+import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ext.commons.PeopleExtension;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServiceBase;
 import org.eclipse.skalli.services.extension.Indexer;
+import org.eclipse.skalli.services.extension.PropertyValidator;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
+import org.eclipse.skalli.services.extension.validators.MembersValidator;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +110,17 @@ public class ExtensionServicePeople
     @Override
     public Indexer<PeopleExtension> getIndexer() {
         return new PeopleIndexer();
+    }
+
+    @Override
+    public List<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
+        caption = getCaption(propertyName, caption);
+        List<PropertyValidator> validators = new ArrayList<PropertyValidator>();
+        if (PeopleExtension.PROPERTY_LEADS.equals(propertyName)
+                || PeopleExtension.PROPERTY_MEMBERS.equals(propertyName)) {
+            validators.add(new MembersValidator(Severity.ERROR, getExtensionClass(), propertyName, caption));
+        }
+        return validators;
     }
 
     @Override

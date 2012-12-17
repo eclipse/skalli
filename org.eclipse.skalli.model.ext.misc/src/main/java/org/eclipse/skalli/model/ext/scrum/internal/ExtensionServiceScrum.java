@@ -24,6 +24,7 @@ import org.eclipse.skalli.services.extension.Indexer;
 import org.eclipse.skalli.services.extension.PropertyValidator;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.eclipse.skalli.services.extension.validators.HostReachableValidator;
+import org.eclipse.skalli.services.extension.validators.MembersValidator;
 import org.eclipse.skalli.services.extension.validators.URLValidator;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -139,6 +140,9 @@ public class ExtensionServiceScrum
         if (ScrumProjectExt.PROPERTY_BACKLOG_URL.equals(propertyName)) {
             validators.add(new URLValidator(Severity.FATAL, getExtensionClass(), propertyName, caption));
             validators.add(new HostReachableValidator(getExtensionClass(), propertyName));
+        } else if (ScrumProjectExt.PROPERTY_PRODUCT_OWNERS.equals(propertyName)
+                || ScrumProjectExt.PROPERTY_SCRUM_MASTERS.equals(propertyName)) {
+            validators.add(new MembersValidator(Severity.ERROR, getExtensionClass(), propertyName, caption));
         }
         return validators;
     }
