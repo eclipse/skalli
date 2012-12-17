@@ -15,7 +15,7 @@ import java.util.SortedSet;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Severity;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.jsoup.safety.Whitelist;
 import org.junit.Assert;
@@ -29,9 +29,9 @@ public class WhitelistValidatorTest {
         WhitelistValidator validator = new WhitelistValidator(Severity.FATAL, TestExtension.class,
                 TestExtension.PROPERTY_STR, Whitelist.basic());
 
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "foobar"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "<b>foobar</b>"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "<script>alert('Gotcha!')</script>"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "foobar"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "<b>foobar</b>"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "<script>alert('Gotcha!')</script>"));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class WhitelistValidatorTest {
     private void assertNoIssues(String s) {
         WhitelistValidator validator = new WhitelistValidator(Severity.FATAL, TestExtension.class,
                 TestExtension.PROPERTY_STR, Whitelist.basic());
-        SortedSet<Issue> issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], s, Severity.FATAL);
+        SortedSet<Issue> issues = validator.validate(TestUUIDs.TEST_UUIDS[0], s, Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(0, issues.size());
     }
@@ -55,10 +55,10 @@ public class WhitelistValidatorTest {
     private void assertHasIssue(String s) {
         WhitelistValidator validator = new WhitelistValidator(Severity.FATAL, TestExtension.class,
                 TestExtension.PROPERTY_STR, Whitelist.basic());
-        SortedSet<Issue> issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], s, Severity.FATAL);
+        SortedSet<Issue> issues = validator.validate(TestUUIDs.TEST_UUIDS[0], s, Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(1, issues.size());
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[0], issues.first().getEntityId());
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0], issues.first().getEntityId());
         Assert.assertEquals(TestExtension.class, issues.first().getExtension());
         Assert.assertEquals(TestExtension.PROPERTY_STR, issues.first().getPropertyId());
         Assert.assertEquals(Severity.FATAL, issues.first().getSeverity());

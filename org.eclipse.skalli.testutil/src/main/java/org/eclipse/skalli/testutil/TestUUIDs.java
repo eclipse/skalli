@@ -10,18 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.testutil;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
 import java.util.UUID;
 
-import javax.xml.bind.DatatypeConverter;
-
-import org.eclipse.skalli.model.EntityBase;
-
-public class PropertyHelperUtils {
+public class TestUUIDs {
 
     public static final UUID[] TEST_UUIDS = new UUID[] {
             UUID.fromString("e4d78581-08da-4f04-8a90-a7dac41f6247"),
@@ -38,23 +29,5 @@ public class PropertyHelperUtils {
             UUID.fromString("92129b24-df47-422d-9d20-2706daa9d47b"),
             UUID.fromString("1349368c-9864-4aff-ae0b-92da92cee677")
     };
-
-    public static Map<String, Object> getValues() {
-        HashMap<String, Object> values = new HashMap<String, Object>();
-        values.put(EntityBase.PROPERTY_UUID, TEST_UUIDS[0]);
-        values.put(EntityBase.PROPERTY_DELETED, Boolean.FALSE);
-        TestExtensibleEntityBase parent = new TestExtensibleEntityBase(TEST_UUIDS[1]);
-        values.put(EntityBase.PROPERTY_PARENT_ENTITY, parent);
-        values.put(EntityBase.PROPERTY_PARENT_ENTITY_ID, TEST_UUIDS[1]);
-        Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ENGLISH); //$NON-NLS-1$
-        String lastModified = DatatypeConverter.printDateTime(now);
-        values.put(EntityBase.PROPERTY_LAST_MODIFIED, lastModified);
-        values.put(EntityBase.PROPERTY_LAST_MODIFIED_BY, "homer"); //$NON-NLS-1$
-        return values;
-    }
-
-    public static Map<Class<?>, String[]> getRequiredProperties() {
-        return new HashMap<Class<?>, String[]>();
-    }
 }
 

@@ -40,7 +40,7 @@ import org.eclipse.skalli.services.scheduler.Task;
 import org.eclipse.skalli.services.validation.Validation;
 import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.BundleManager;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.eclipse.skalli.testutil.TestEntityBase2;
 import org.eclipse.skalli.testutil.TestEntityService;
@@ -57,12 +57,12 @@ public class ValidationServiceImplTest {
     private static final String USERID1 = "foobar";
 
     private static final SortedSet<Issue> ISSUES1 = CollectionUtils.asSortedSet(
-            new Issue(Severity.ERROR, TestEntityService.class, PropertyHelperUtils.TEST_UUIDS[0]),
-            new Issue(Severity.WARNING, TestEntityService.class, PropertyHelperUtils.TEST_UUIDS[0]));
+            new Issue(Severity.ERROR, TestEntityService.class, TestUUIDs.TEST_UUIDS[0]),
+            new Issue(Severity.WARNING, TestEntityService.class, TestUUIDs.TEST_UUIDS[0]));
     private static final Map<UUID,SortedSet<Issue>> ISSUES_MAP = new HashMap<UUID,SortedSet<Issue>>();
     static {
-        for (int i = 0; i < PropertyHelperUtils.TEST_UUIDS.length; ++i) {
-            ISSUES_MAP.put(PropertyHelperUtils.TEST_UUIDS[i], ISSUES1);
+        for (int i = 0; i < TestUUIDs.TEST_UUIDS.length; ++i) {
+            ISSUES_MAP.put(TestUUIDs.TEST_UUIDS[i], ISSUES1);
         }
     }
 
@@ -111,15 +111,15 @@ public class ValidationServiceImplTest {
     public void setup() throws Exception {
         entities1 = new ArrayList<TestEntityBase1>();
         issues1 = new ArrayList<Issues>();
-        for (int i = 0; i < PropertyHelperUtils.TEST_UUIDS.length; ++i) {
-            entities1.add(new TestEntityBase1(PropertyHelperUtils.TEST_UUIDS[i]));
-            issues1.add(new Issues(PropertyHelperUtils.TEST_UUIDS[i]));
+        for (int i = 0; i < TestUUIDs.TEST_UUIDS.length; ++i) {
+            entities1.add(new TestEntityBase1(TestUUIDs.TEST_UUIDS[i]));
+            issues1.add(new Issues(TestUUIDs.TEST_UUIDS[i]));
         }
         issues2 = new ArrayList<Issues>();
         entities2 = new ArrayList<TestEntityBase2>();
-        for (int i = 0; i < PropertyHelperUtils.TEST_UUIDS.length; ++i) {
-            entities2.add(new TestEntityBase2(PropertyHelperUtils.TEST_UUIDS[i]));
-            issues2.add(new Issues(PropertyHelperUtils.TEST_UUIDS[i]));
+        for (int i = 0; i < TestUUIDs.TEST_UUIDS.length; ++i) {
+            entities2.add(new TestEntityBase2(TestUUIDs.TEST_UUIDS[i]));
+            issues2.add(new Issues(TestUUIDs.TEST_UUIDS[i]));
         }
 
         configs = new ValidationConfig[4];
@@ -169,11 +169,11 @@ public class ValidationServiceImplTest {
     }
 
     private void initQueueMocks() throws Exception {
-        mockISS.getByUUID(eq(PropertyHelperUtils.TEST_UUIDS[0]));
+        mockISS.getByUUID(eq(TestUUIDs.TEST_UUIDS[0]));
         expectLastCall().andReturn(issues1.get(0)).anyTimes();
-        mockISS.getByUUID(eq(PropertyHelperUtils.TEST_UUIDS[1]));
+        mockISS.getByUUID(eq(TestUUIDs.TEST_UUIDS[1]));
         expectLastCall().andReturn(issues1.get(1)).anyTimes();
-        mockISS.getByUUID(eq(PropertyHelperUtils.TEST_UUIDS[2]));
+        mockISS.getByUUID(eq(TestUUIDs.TEST_UUIDS[2]));
         expectLastCall().andReturn(issues2.get(2)).anyTimes();
         mockISS.persist(eq(issues1.get(0)), eq(USERID));
         expectLastCall().times(1);
@@ -184,8 +184,8 @@ public class ValidationServiceImplTest {
     }
 
     private void initQueueAllMocks() throws Exception {
-        for (int i = 0; i < PropertyHelperUtils.TEST_UUIDS.length; ++i) {
-            mockISS.getByUUID(eq(PropertyHelperUtils.TEST_UUIDS[i]));
+        for (int i = 0; i < TestUUIDs.TEST_UUIDS.length; ++i) {
+            mockISS.getByUUID(eq(TestUUIDs.TEST_UUIDS[i]));
             expectLastCall().andReturn(issues1.get(i)).anyTimes();
             mockISS.persist(eq(issues1.get(i)), eq(USERID));
             expectLastCall().times(1);
@@ -193,17 +193,17 @@ public class ValidationServiceImplTest {
     }
 
     private void initValidateMocks() throws Exception {
-        mockISS.getByUUID(eq(PropertyHelperUtils.TEST_UUIDS[0]));
+        mockISS.getByUUID(eq(TestUUIDs.TEST_UUIDS[0]));
         expectLastCall().andReturn(issues1.get(0)).anyTimes();
-        mockISS.persist(eq(PropertyHelperUtils.TEST_UUIDS[0]), eq(ISSUES1), eq(USERID));
+        mockISS.persist(eq(TestUUIDs.TEST_UUIDS[0]), eq(ISSUES1), eq(USERID));
         expectLastCall().times(1);
     }
 
     private void initValidateAllMocks() throws Exception {
-        for (int i = 0; i < PropertyHelperUtils.TEST_UUIDS.length; ++i) {
-            mockISS.getByUUID(eq(PropertyHelperUtils.TEST_UUIDS[i]));
+        for (int i = 0; i < TestUUIDs.TEST_UUIDS.length; ++i) {
+            mockISS.getByUUID(eq(TestUUIDs.TEST_UUIDS[i]));
             expectLastCall().andReturn(issues1.get(i)).anyTimes();
-            mockISS.persist(eq(PropertyHelperUtils.TEST_UUIDS[i]), eq(ISSUES1), eq(USERID));
+            mockISS.persist(eq(TestUUIDs.TEST_UUIDS[i]), eq(ISSUES1), eq(USERID));
             expectLastCall().times(1);
         }
     }
@@ -215,25 +215,25 @@ public class ValidationServiceImplTest {
 
     private void initSchedulerServiceMock() {
         mockSS.registerSchedule(eq((TestRunnableSchedule) configs[0].getSchedule()));
-        expectLastCall().andReturn(PropertyHelperUtils.TEST_UUIDS[0]).anyTimes();
+        expectLastCall().andReturn(TestUUIDs.TEST_UUIDS[0]).anyTimes();
         mockSS.registerSchedule(eq((TestRunnableSchedule) configs[1].getSchedule()));
-        expectLastCall().andReturn(PropertyHelperUtils.TEST_UUIDS[1]).anyTimes();
+        expectLastCall().andReturn(TestUUIDs.TEST_UUIDS[1]).anyTimes();
         mockSS.registerSchedule(eq((TestRunnableSchedule) configs[2].getSchedule()));
-        expectLastCall().andReturn(PropertyHelperUtils.TEST_UUIDS[2]).anyTimes();
+        expectLastCall().andReturn(TestUUIDs.TEST_UUIDS[2]).anyTimes();
         mockSS.registerSchedule(eq((TestRunnableSchedule) configs[3].getSchedule()));
-        expectLastCall().andReturn(PropertyHelperUtils.TEST_UUIDS[3]).anyTimes();
+        expectLastCall().andReturn(TestUUIDs.TEST_UUIDS[3]).anyTimes();
 
-        mockSS.unregisterSchedule(eq(PropertyHelperUtils.TEST_UUIDS[0]));
+        mockSS.unregisterSchedule(eq(TestUUIDs.TEST_UUIDS[0]));
         expectLastCall().andReturn((TestRunnableSchedule) configs[0].getSchedule()).anyTimes();
-        mockSS.unregisterSchedule(eq(PropertyHelperUtils.TEST_UUIDS[1]));
+        mockSS.unregisterSchedule(eq(TestUUIDs.TEST_UUIDS[1]));
         expectLastCall().andReturn((TestRunnableSchedule) configs[1].getSchedule()).anyTimes();
-        mockSS.unregisterSchedule(eq(PropertyHelperUtils.TEST_UUIDS[2]));
+        mockSS.unregisterSchedule(eq(TestUUIDs.TEST_UUIDS[2]));
         expectLastCall().andReturn((TestRunnableSchedule) configs[2].getSchedule()).anyTimes();
-        mockSS.unregisterSchedule(eq(PropertyHelperUtils.TEST_UUIDS[3]));
+        mockSS.unregisterSchedule(eq(TestUUIDs.TEST_UUIDS[3]));
         expectLastCall().andReturn((TestRunnableSchedule) configs[3].getSchedule()).anyTimes();
 
         mockSS.registerTask(isA(Task.class));
-        expectLastCall().andReturn(PropertyHelperUtils.TEST_UUIDS[3]).anyTimes();
+        expectLastCall().andReturn(TestUUIDs.TEST_UUIDS[3]).anyTimes();
     }
 
     @Test
@@ -244,13 +244,13 @@ public class ValidationServiceImplTest {
 
         TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS);
         Validation<TestEntityBase1> validation1 = new Validation<TestEntityBase1>(
-                TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[0], Severity.WARNING, USERID);
+                TestEntityBase1.class, TestUUIDs.TEST_UUIDS[0], Severity.WARNING, USERID);
         Validation<TestEntityBase2> validation2 = new Validation<TestEntityBase2>(
-                TestEntityBase2.class, PropertyHelperUtils.TEST_UUIDS[2], Severity.INFO, USERID1);
+                TestEntityBase2.class, TestUUIDs.TEST_UUIDS[2], Severity.INFO, USERID1);
         Validation<TestEntityBase1> validation3 = new Validation<TestEntityBase1>(
-                TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[1], Severity.ERROR, USERID);
+                TestEntityBase1.class, TestUUIDs.TEST_UUIDS[1], Severity.ERROR, USERID);
         Validation<TestEntityBase1> validation4 = new Validation<TestEntityBase1>(
-                TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[0], Severity.INFO, USERID1); // same as but with different severity/userId
+                TestEntityBase1.class, TestUUIDs.TEST_UUIDS[0], Severity.INFO, USERID1); // same as but with different severity/userId
 
         validationService.queue(validation1);
         validationService.queue(validation2);
@@ -277,16 +277,16 @@ public class ValidationServiceImplTest {
         TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS);
         validationService.queueAll(TestEntityBase1.class, Severity.ERROR, USERID);
 
-        for (int i = 0; i < PropertyHelperUtils.TEST_UUIDS.length; ++i) {
+        for (int i = 0; i < TestUUIDs.TEST_UUIDS.length; ++i) {
             Assert.assertTrue(validationService.isQueued(entities1.get(i)));
         }
 
         ArrayList<Validation<? extends EntityBase>> queued = new ArrayList<Validation<? extends EntityBase>>();
         ArrayList<Validation<? extends EntityBase>> expected = new ArrayList<Validation<? extends EntityBase>>();
-        for (int i = 0; i < PropertyHelperUtils.TEST_UUIDS.length; ++i) {
+        for (int i = 0; i < TestUUIDs.TEST_UUIDS.length; ++i) {
             queued.add(validationService.pollNextQueueEntry());
             expected.add(new Validation<TestEntityBase1>(
-                    TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[i], Severity.ERROR, USERID));
+                    TestEntityBase1.class, TestUUIDs.TEST_UUIDS[i], Severity.ERROR, USERID));
         }
         Assert.assertNull(validationService.pollNextQueueEntry());
         AssertUtils.assertEqualsAnyOrder("all", expected, queued);
@@ -301,7 +301,7 @@ public class ValidationServiceImplTest {
         replay(mocks);
 
         TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS);
-        validationService.validate(TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[0], Severity.WARNING, USERID);
+        validationService.validate(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[0], Severity.WARNING, USERID);
 
         verify(mocks);
     }
@@ -327,7 +327,7 @@ public class ValidationServiceImplTest {
 
         TestValidationService validationService = new TestValidationService(mockISS, mockCS, mockSS);
         Assert.assertEquals(configs.length, validationService.getRegisteredSchedules().size());
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[3], validationService.getTaskIdQueueValidator());
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[3], validationService.getTaskIdQueueValidator());
         validationService.stopAllTasks();
         Assert.assertEquals(0, validationService.getRegisteredSchedules().size());
         Assert.assertNull(validationService.getTaskIdQueueValidator());
@@ -399,8 +399,8 @@ public class ValidationServiceImplTest {
 
     private void assertQueueEntries(TestValidationService validationService, int config,
             Class<? extends EntityBase> entityClass1, Class<? extends EntityBase> entityClass2) {
-        Set<UUID> uuids1 = CollectionUtils.asSet(PropertyHelperUtils.TEST_UUIDS);
-        Set<UUID> uuids2 = CollectionUtils.asSet(PropertyHelperUtils.TEST_UUIDS);
+        Set<UUID> uuids1 = CollectionUtils.asSet(TestUUIDs.TEST_UUIDS);
+        Set<UUID> uuids2 = CollectionUtils.asSet(TestUUIDs.TEST_UUIDS);
         Validation<? extends EntityBase> next = validationService.pollNextQueueEntry();
         while (next != null) {
             Assert.assertNotNull(next.getEntityClass());
@@ -416,12 +416,12 @@ public class ValidationServiceImplTest {
         if (entityClass1 != null) {
             Assert.assertTrue(uuids1.isEmpty());
         } else {
-            Assert.assertEquals(uuids1.size(), PropertyHelperUtils.TEST_UUIDS.length);
+            Assert.assertEquals(uuids1.size(), TestUUIDs.TEST_UUIDS.length);
         }
         if (entityClass2 != null) {
             Assert.assertTrue(uuids2.isEmpty());
         } else {
-            Assert.assertEquals(uuids2.size(), PropertyHelperUtils.TEST_UUIDS.length);
+            Assert.assertEquals(uuids2.size(), TestUUIDs.TEST_UUIDS.length);
         }
     }
 }

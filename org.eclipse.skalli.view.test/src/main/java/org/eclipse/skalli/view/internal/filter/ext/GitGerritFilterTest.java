@@ -28,7 +28,7 @@ import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ext.commons.InfoExtension;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.testutil.AssertUtils;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
@@ -41,7 +41,7 @@ public class GitGerritFilterTest {
 
     private static final String EXPECTED_SCM_LOCATION = "ssh:example.org:29418:foo/bar:branch:" +
             "homer:Homer Simpson:homer:Homer:Simpson:homer@example.org:Springfield:"+
-            PropertyHelperUtils.TEST_UUIDS[0].toString() +
+            TestUUIDs.TEST_UUIDS[0].toString() +
             ":technology.skalli:Skalli:Extensible system for organizing project:http://example.org";
 
     private static final String DESCRIPTION_WITH_ALL_VARIABLES =
@@ -51,7 +51,7 @@ public class GitGerritFilterTest {
 
     private static final String EXPECTED_DESCRIPTION =
             "homer:Homer Simpson:homer:Homer:Simpson:homer@example.org:Springfield:"+
-            PropertyHelperUtils.TEST_UUIDS[0].toString() +
+            TestUUIDs.TEST_UUIDS[0].toString() +
             ":technology.skalli:Skalli:Extensible system for organizing project:http://example.org" +
             ":http://example.org/projects/technology.skalli:bar";
 
@@ -118,8 +118,8 @@ public class GitGerritFilterTest {
         Set<String> names = filter.getRepositoryNames(projects, scmPattern);
         assertNotNull(names);
         AssertUtils.assertEquals("getRepositoryNames", names,
-                "skalli" + PropertyHelperUtils.TEST_UUIDS[0].toString(),
-                "skalli" + PropertyHelperUtils.TEST_UUIDS[3].toString());
+                "skalli" + TestUUIDs.TEST_UUIDS[0].toString(),
+                "skalli" + TestUUIDs.TEST_UUIDS[3].toString());
     }
 
     private GerritConfig createGerritConfig(String scmPattern) {
@@ -144,7 +144,7 @@ public class GitGerritFilterTest {
 
     private Project createProject() {
         Project project = new Project();
-        project.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
+        project.setUuid(TestUUIDs.TEST_UUIDS[0]);
         project.setProjectId("technology.skalli");
         project.setName("Skalli");
         project.setDescription("Extensible system for organizing project");
@@ -156,13 +156,13 @@ public class GitGerritFilterTest {
 
     private List<Project> createProjectsWithScmLocations() {
         List<Project> projects = new ArrayList<Project>();
-        projects.add(createProjectWithScmLocation(PropertyHelperUtils.TEST_UUIDS[0], MATCHING_SCM_PATTERN, false));
-        projects.add(createProjectWithScmLocation(PropertyHelperUtils.TEST_UUIDS[1], NOT_MATCHING_SCM_PATTERN, false));
-        projects.add(createProjectWithScmLocation(PropertyHelperUtils.TEST_UUIDS[2], NOT_MATCHING_SCM_PATTERN, false));
-        projects.add(createProjectWithScmLocation(PropertyHelperUtils.TEST_UUIDS[3], MATCHING_SCM_PATTERN, false));
-        projects.add(createProjectWithScmLocation(PropertyHelperUtils.TEST_UUIDS[4], null, false));
-        projects.add(createProjectWithScmLocation(PropertyHelperUtils.TEST_UUIDS[5], null, true));
-        projects.add(createProjectWithScmLocation(PropertyHelperUtils.TEST_UUIDS[0], MATCHING_SCM_PATTERN, false));
+        projects.add(createProjectWithScmLocation(TestUUIDs.TEST_UUIDS[0], MATCHING_SCM_PATTERN, false));
+        projects.add(createProjectWithScmLocation(TestUUIDs.TEST_UUIDS[1], NOT_MATCHING_SCM_PATTERN, false));
+        projects.add(createProjectWithScmLocation(TestUUIDs.TEST_UUIDS[2], NOT_MATCHING_SCM_PATTERN, false));
+        projects.add(createProjectWithScmLocation(TestUUIDs.TEST_UUIDS[3], MATCHING_SCM_PATTERN, false));
+        projects.add(createProjectWithScmLocation(TestUUIDs.TEST_UUIDS[4], null, false));
+        projects.add(createProjectWithScmLocation(TestUUIDs.TEST_UUIDS[5], null, true));
+        projects.add(createProjectWithScmLocation(TestUUIDs.TEST_UUIDS[0], MATCHING_SCM_PATTERN, false));
         return projects;
     }
 

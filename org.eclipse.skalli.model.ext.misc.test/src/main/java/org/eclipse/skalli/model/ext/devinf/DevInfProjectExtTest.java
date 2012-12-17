@@ -13,10 +13,8 @@ package org.eclipse.skalli.model.ext.devinf;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+import org.eclipse.skalli.testutil.PropertyTestUtil;
 import org.junit.Test;
-
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
 
 public class DevInfProjectExtTest {
 
@@ -24,7 +22,7 @@ public class DevInfProjectExtTest {
 
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
+        Map<String, Object> values = PropertyTestUtil.getValues();
         values.put(DevInfProjectExt.PROPERTY_SCM_URL, URL + "scm");
         values.put(DevInfProjectExt.PROPERTY_BUGTRACKER_URL, URL + "bugtracker");
         values.put(DevInfProjectExt.PROPERTY_CI_URL, URL + "ci");
@@ -39,9 +37,9 @@ public class DevInfProjectExtTest {
         javadocs.add(URL + "javadoc2");
         javadocs.add(URL + "javadoc3");
         values.put(DevInfProjectExt.PROPERTY_JAVADOCS_URL, javadocs);
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
 
-        PropertyHelper.checkPropertyDefinitions(DevInfProjectExt.class, requiredProperties, values);
+        PropertyTestUtil.checkPropertyDefinitions(DevInfProjectExt.class, requiredProperties, values);
     }
 
 }

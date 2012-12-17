@@ -14,14 +14,13 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.eclipse.skalli.model.Member;
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.PropertyTestUtil;
 import org.junit.Test;
 
 public class ScrumProjectExtTest {
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
+        Map<String, Object> values = PropertyTestUtil.getValues();
         values.put(ScrumProjectExt.PROPERTY_BACKLOG_URL, "http://devinf.example.org/skalli/backlog");
         TreeSet<Member> scrumMasters = new TreeSet<Member>();
         scrumMasters.add(new Member("homer"));
@@ -30,7 +29,7 @@ public class ScrumProjectExtTest {
         TreeSet<Member> productOwners = new TreeSet<Member>();
         productOwners.add(new Member("matt"));
         values.put(ScrumProjectExt.PROPERTY_PRODUCT_OWNERS, productOwners);
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
-        PropertyHelper.checkPropertyDefinitions(ScrumProjectExt.class, requiredProperties, values);
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
+        PropertyTestUtil.checkPropertyDefinitions(ScrumProjectExt.class, requiredProperties, values);
     }
 }

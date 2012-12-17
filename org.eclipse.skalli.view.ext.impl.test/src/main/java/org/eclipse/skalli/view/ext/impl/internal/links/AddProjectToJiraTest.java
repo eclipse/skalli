@@ -11,7 +11,7 @@
 package org.eclipse.skalli.view.ext.impl.internal.links;
 
 import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,7 +21,7 @@ public class AddProjectToJiraTest {
     @Test
     public void testGetUri() {
         Project project = new Project();
-        project.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
+        project.setUuid(TestUUIDs.TEST_UUIDS[0]);
         project.setProjectId("foobar");
         AddProjectToJira jira = new AddProjectToJira();
         Assert.assertEquals("/create/jira?id=foobar", jira.getUri(project).toString());

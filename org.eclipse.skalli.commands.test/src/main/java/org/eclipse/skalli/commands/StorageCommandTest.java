@@ -18,13 +18,13 @@ import java.io.ByteArrayInputStream;
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.testutil.HashMapStorageService;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;
 
 public class StorageCommandTest {
     static final String CATEGORY_PROJECT = "Project";
-    static final String KEY_1 = PropertyHelperUtils.TEST_UUIDS[0].toString();
-    static final String KEY_2 = PropertyHelperUtils.TEST_UUIDS[1].toString();
+    static final String KEY_1 = TestUUIDs.TEST_UUIDS[0].toString();
+    static final String KEY_2 = TestUUIDs.TEST_UUIDS[1].toString();
     static final String TEST_CONTENT_1 = "test content bla bal";
     static final String TEST_CONTENT_2 = "test content hello world";
 

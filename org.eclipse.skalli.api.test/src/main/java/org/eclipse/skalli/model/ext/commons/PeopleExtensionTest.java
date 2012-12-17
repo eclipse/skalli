@@ -14,15 +14,14 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.eclipse.skalli.model.Member;
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.PropertyTestUtil;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
 public class PeopleExtensionTest {
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
+        Map<String, Object> values = PropertyTestUtil.getValues();
 
         TreeSet<Member> members = new TreeSet<Member>();
         Member HOMER = new Member("homer");
@@ -38,9 +37,9 @@ public class PeopleExtensionTest {
         leads.add(MARGE);
         values.put(PeopleExtension.PROPERTY_LEADS, leads);
 
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
 
-        PropertyHelper.checkPropertyDefinitions(PeopleExtension.class, requiredProperties, values);
+        PropertyTestUtil.checkPropertyDefinitions(PeopleExtension.class, requiredProperties, values);
     }
 
 }

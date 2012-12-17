@@ -20,11 +20,11 @@ import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.eclipse.skalli.storage.db.PersistenceDB;
 import org.eclipse.skalli.storage.db.entities.HistoryStorageItem;
-import org.eclipse.skalli.testutil.AbstractStorageServiceTest;
+import org.eclipse.skalli.testutil.StorageServiceTestBase;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.junit.Test;
 
-public class PersistenceDBTest extends AbstractStorageServiceTest {
+public class PersistenceDBTest extends StorageServiceTestBase {
 
     @Override
     protected StorageService createNewStorageServiceForTest() throws Exception {

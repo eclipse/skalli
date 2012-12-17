@@ -23,7 +23,7 @@ import org.eclipse.skalli.commons.Statistics.SearchInfo;
 import org.eclipse.skalli.commons.Statistics.UsageInfo;
 import org.eclipse.skalli.commons.Statistics.UserInfo;
 import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.StringBufferHierarchicalStreamWriter;
 import org.junit.Before;
 import org.junit.Test;
@@ -132,7 +132,7 @@ public class StatisticsConverterTest {
     @Test
     public void testWriteProjectInfo() throws Exception {
         Project project = new Project();
-        project.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
+        project.setUuid(TestUUIDs.TEST_UUIDS[0]);
         long now = System.currentTimeMillis();
         project.setRegistered(now);
         project.setProjectId("testproject");
@@ -147,7 +147,7 @@ public class StatisticsConverterTest {
                 "  <link rel=\"browse\" href=\"http://localhost/projects/testproject\"/>\n" +
                 "</project>",
                 FormatUtils.formatUTCWithMillis(4711L), Long.toString(4711L),
-                PropertyHelperUtils.TEST_UUIDS[0].toString()));
+                TestUUIDs.TEST_UUIDS[0].toString()));
     }
 
     private void assertWriter(StringBufferHierarchicalStreamWriter writer, String expected) {

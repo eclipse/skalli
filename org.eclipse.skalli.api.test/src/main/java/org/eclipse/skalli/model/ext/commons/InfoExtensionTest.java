@@ -13,11 +13,8 @@ package org.eclipse.skalli.model.ext.commons;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+import org.eclipse.skalli.testutil.PropertyTestUtil;
 import org.junit.Test;
-
-import org.eclipse.skalli.model.ext.commons.InfoExtension;
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
 
 public class InfoExtensionTest {
 
@@ -25,7 +22,7 @@ public class InfoExtensionTest {
 
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
+        Map<String, Object> values = PropertyTestUtil.getValues();
 
         values.put(InfoExtension.PROPERTY_PAGE_URL, PAGE_URL);
         LinkedHashSet<String> mailingLists = new LinkedHashSet<String>();
@@ -33,9 +30,9 @@ public class InfoExtensionTest {
         mailingLists.add("marge@listserv.springfield.net");
         values.put(InfoExtension.PROPERTY_MAILING_LIST, mailingLists);
 
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
 
-        PropertyHelper.checkPropertyDefinitions(InfoExtension.class, requiredProperties, values);
+        PropertyTestUtil.checkPropertyDefinitions(InfoExtension.class, requiredProperties, values);
 
     }
 }

@@ -14,8 +14,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.eclipse.skalli.commons.Link;
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.PropertyTestUtil;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
@@ -25,7 +24,7 @@ public class LinkGroupsProjectExtTest {
 
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
+        Map<String, Object> values = PropertyTestUtil.getValues();
         LinkedHashSet<LinkGroup> linkGroups = new LinkedHashSet<LinkGroup>();
 
         LinkGroup linkGroup1 = new LinkGroup();
@@ -41,9 +40,9 @@ public class LinkGroupsProjectExtTest {
         linkGroups.add(linkGroup2);
 
         values.put(LinkGroupsProjectExt.PROPERTY_LINKGROUPS, linkGroups);
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
 
-        PropertyHelper.checkPropertyDefinitions(LinkGroupsProjectExt.class, requiredProperties, values);
+        PropertyTestUtil.checkPropertyDefinitions(LinkGroupsProjectExt.class, requiredProperties, values);
     }
 
 }

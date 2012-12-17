@@ -13,24 +13,22 @@ package org.eclipse.skalli.model.ext.misc;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.skalli.testutil.PropertyTestUtil;
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
 
 public class ReviewProjectExtTest {
 
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
+        Map<String, Object> values = PropertyTestUtil.getValues();
 
         values.put(ReviewProjectExt.PROPERTY_ALLOW_ANONYMOUS, true);
         values.put(ReviewProjectExt.PROPERTY_RATING_STYLE, ProjectRatingStyle.FIVE_STATES);
 
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
 
-        PropertyHelper.checkPropertyDefinitions(ReviewProjectExt.class, requiredProperties, values);
+        PropertyTestUtil.checkPropertyDefinitions(ReviewProjectExt.class, requiredProperties, values);
     }
 
     @Test

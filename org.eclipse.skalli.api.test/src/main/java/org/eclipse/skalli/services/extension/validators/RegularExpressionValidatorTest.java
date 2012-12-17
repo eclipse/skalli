@@ -15,7 +15,7 @@ import java.util.SortedSet;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.services.extension.PropertyValidatorTestUtils;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,11 +28,11 @@ public class RegularExpressionValidatorTest {
         RegularExpressionValidator validator = new RegularExpressionValidator(Severity.FATAL, TestExtension.class,
                 TestExtension.PROPERTY_STR, "proj.*");
 
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "project"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "proj"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "proj6%7ä"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "foobar"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "pr"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "project"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "proj"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "proj6%7ä"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "foobar"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "pr"));
     }
 
     @Test
@@ -40,34 +40,34 @@ public class RegularExpressionValidatorTest {
         RegularExpressionValidator validator = new RegularExpressionValidator(Severity.FATAL, TestExtension.class,
                 TestExtension.PROPERTY_STR, "proj.*");
 
-        SortedSet<Issue> issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], "project", Severity.FATAL);
+        SortedSet<Issue> issues = validator.validate(TestUUIDs.TEST_UUIDS[0], "project", Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(0, issues.size());
 
         String value = "foobar";
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], value, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], value, Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(1, issues.size());
         Assert.assertEquals(validator.getDefaultInvalidMessage(value), issues.first().getMessage());
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[0], issues.first().getEntityId());
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0], issues.first().getEntityId());
         Assert.assertEquals(TestExtension.class, issues.first().getExtension());
         Assert.assertEquals(TestExtension.PROPERTY_STR, issues.first().getPropertyId());
         Assert.assertEquals(Severity.FATAL, issues.first().getSeverity());
 
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], null, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], null, Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(0, issues.size());
 
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], "", Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], "", Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(0, issues.size());
 
         validator.setValueRequired(true);
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], null, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], null, Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(1, issues.size());
 
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], "", Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], "", Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(1, issues.size());
     }
@@ -78,17 +78,17 @@ public class RegularExpressionValidatorTest {
 
         RegularExpressionValidator validator = new RegularExpressionValidator(Severity.FATAL, TestExtension.class,
                 TestExtension.PROPERTY_STR, "proj.*");
-        SortedSet<Issue> issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], value, Severity.FATAL);
+        SortedSet<Issue> issues = validator.validate(TestUUIDs.TEST_UUIDS[0], value, Severity.FATAL);
         Assert.assertEquals(validator.getDefaultInvalidMessage(value), issues.first().getMessage());
 
         validator = new RegularExpressionValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR,
                 "Foobar Caption", "proj.*");
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], value, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], value, Severity.FATAL);
         Assert.assertEquals(validator.getInvalidMessageFromCaption(value), issues.first().getMessage());
 
         validator = new RegularExpressionValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR,
                 "Invalid Foobar", "Undefined Foobar", "proj.*");
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], value, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], value, Severity.FATAL);
         Assert.assertEquals("Invalid Foobar", issues.first().getMessage());
     }
 
@@ -102,19 +102,19 @@ public class RegularExpressionValidatorTest {
         RegularExpressionValidator validator = new RegularExpressionValidator(Severity.FATAL, TestExtension.class,
                 TestExtension.PROPERTY_STR, "proj.*");
         validator.setValueRequired(true);
-        SortedSet<Issue> issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], value, Severity.FATAL);
+        SortedSet<Issue> issues = validator.validate(TestUUIDs.TEST_UUIDS[0], value, Severity.FATAL);
         PropertyValidatorTestUtils.assertIsDefaultMessage(validator, issues.first().getMessage());
 
         validator = new RegularExpressionValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR,
                 "Foobar Caption", "proj.*");
         validator.setValueRequired(true);
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], value, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], value, Severity.FATAL);
         PropertyValidatorTestUtils.assertIsUndefinedMessageFromCaption(validator, issues.first().getMessage());
 
         validator = new RegularExpressionValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR,
                 "Invalid Foobar", "Undefined Foobar", "proj.*");
         validator.setValueRequired(true);
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], value, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], value, Severity.FATAL);
         Assert.assertEquals("Undefined Foobar", issues.first().getMessage());
     }
 }

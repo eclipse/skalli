@@ -28,16 +28,16 @@ import org.eclipse.skalli.services.feed.FeedPersistenceService;
 import org.eclipse.skalli.services.feed.FeedService;
 import org.eclipse.skalli.services.feed.FeedServiceException;
 import org.eclipse.skalli.testutil.BundleManager;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.osgi.framework.BundleException;
 
 public class JPAFeedServiceTest {
-    final private static UUID defaultProjectUuid = PropertyHelperUtils.TEST_UUIDS[0];
-    final private static UUID allFieldsProjectUuid = PropertyHelperUtils.TEST_UUIDS[1];
-    final private static UUID notPersistedProjectUuid = PropertyHelperUtils.TEST_UUIDS[2];
-    final private static UUID testFindProjectUuid = PropertyHelperUtils.TEST_UUIDS[3];
+    final private static UUID defaultProjectUuid = TestUUIDs.TEST_UUIDS[0];
+    final private static UUID allFieldsProjectUuid = TestUUIDs.TEST_UUIDS[1];
+    final private static UUID notPersistedProjectUuid = TestUUIDs.TEST_UUIDS[2];
+    final private static UUID testFindProjectUuid = TestUUIDs.TEST_UUIDS[3];
 
     private static JPAFeedService jPAFeedService;
     private static JPAFeedPersistenceService jPAFeedPersistenceService;

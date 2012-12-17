@@ -17,7 +17,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.eclipse.skalli.testutil.AssertUtils;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestExtension;
 
 public class ValidationExceptionTest implements Issuer {
@@ -28,10 +28,10 @@ public class ValidationExceptionTest implements Issuer {
     @Test
     public void testGetMessage() {
         TreeSet<Issue> issues = new TreeSet<Issue>();
-        issues.add(new Issue(Severity.WARNING, ISSUER, PropertyHelperUtils.TEST_UUIDS[0], "IssueWarn"));
-        issues.add(new Issue(Severity.ERROR, ISSUER, PropertyHelperUtils.TEST_UUIDS[1], "IssueError"));
-        issues.add(new Issue(Severity.INFO, ISSUER, PropertyHelperUtils.TEST_UUIDS[2], "IssueInfo"));
-        issues.add(new Issue(Severity.ERROR, ISSUER, PropertyHelperUtils.TEST_UUIDS[3], "IssueAnotherError"));
+        issues.add(new Issue(Severity.WARNING, ISSUER, TestUUIDs.TEST_UUIDS[0], "IssueWarn"));
+        issues.add(new Issue(Severity.ERROR, ISSUER, TestUUIDs.TEST_UUIDS[1], "IssueError"));
+        issues.add(new Issue(Severity.INFO, ISSUER, TestUUIDs.TEST_UUIDS[2], "IssueInfo"));
+        issues.add(new Issue(Severity.ERROR, ISSUER, TestUUIDs.TEST_UUIDS[3], "IssueAnotherError"));
         ValidationException e = new ValidationException("Message", issues);
         Assert.assertEquals("Message\n - IssueAnotherError\n - IssueError\n - IssueWarn\n - IssueInfo",
                 e.getMessage());
@@ -39,17 +39,17 @@ public class ValidationExceptionTest implements Issuer {
         Assert.assertTrue("hasIssues()", e.hasIssues());
         Assert.assertFalse("hasIssues()", e.hasFatalIssues());
 
-        Issue issue0 = new Issue(Severity.WARNING, ISSUER, PropertyHelperUtils.TEST_UUIDS[0], "");
-        Issue issue1 = new Issue(Severity.ERROR, ISSUER, PropertyHelperUtils.TEST_UUIDS[1], null);
-        Issue issue2 = new Issue(Severity.INFO, ISSUER, PropertyHelperUtils.TEST_UUIDS[2], "IssueInfo");
-        Issue issue3 = new Issue(Severity.ERROR, ISSUER, PropertyHelperUtils.TEST_UUIDS[3], "");
+        Issue issue0 = new Issue(Severity.WARNING, ISSUER, TestUUIDs.TEST_UUIDS[0], "");
+        Issue issue1 = new Issue(Severity.ERROR, ISSUER, TestUUIDs.TEST_UUIDS[1], null);
+        Issue issue2 = new Issue(Severity.INFO, ISSUER, TestUUIDs.TEST_UUIDS[2], "IssueInfo");
+        Issue issue3 = new Issue(Severity.ERROR, ISSUER, TestUUIDs.TEST_UUIDS[3], "");
         Issue[] issuesArray = new Issue[] { issue0, issue1, issue2, issue3 };
         Issue[] expectedIssuesArray = new Issue[] { issue3, issue1, issue0, issue2 };
         e = new ValidationException("Message", issuesArray);
         Assert.assertEquals("Message\n" +
-                " - Entity " + PropertyHelperUtils.TEST_UUIDS[3] + " is invalid\n" +
-                " - Entity " + PropertyHelperUtils.TEST_UUIDS[1] + " is invalid\n" +
-                " - Entity " + PropertyHelperUtils.TEST_UUIDS[0] + " is invalid\n" +
+                " - Entity " + TestUUIDs.TEST_UUIDS[3] + " is invalid\n" +
+                " - Entity " + TestUUIDs.TEST_UUIDS[1] + " is invalid\n" +
+                " - Entity " + TestUUIDs.TEST_UUIDS[0] + " is invalid\n" +
                 " - IssueInfo",
                 e.getMessage());
         AssertUtils.assertEquals("getIssues()", Arrays.asList(expectedIssuesArray), e.getIssues());
@@ -57,33 +57,33 @@ public class ValidationExceptionTest implements Issuer {
         Assert.assertFalse("hasIssues()", e.hasFatalIssues());
 
         issues = new TreeSet<Issue>();
-        issues.add(new Issue(Severity.WARNING, ISSUER, PropertyHelperUtils.TEST_UUIDS[0], null));
-        issues.add(new Issue(Severity.ERROR, ISSUER, PropertyHelperUtils.TEST_UUIDS[1], ""));
+        issues.add(new Issue(Severity.WARNING, ISSUER, TestUUIDs.TEST_UUIDS[0], null));
+        issues.add(new Issue(Severity.ERROR, ISSUER, TestUUIDs.TEST_UUIDS[1], ""));
         e = new ValidationException(issues);
         Assert.assertEquals(
-                " - Entity " + PropertyHelperUtils.TEST_UUIDS[1] + " is invalid\n" +
-                        " - Entity " + PropertyHelperUtils.TEST_UUIDS[0] + " is invalid",
+                " - Entity " + TestUUIDs.TEST_UUIDS[1] + " is invalid\n" +
+                        " - Entity " + TestUUIDs.TEST_UUIDS[0] + " is invalid",
                 e.getMessage());
         AssertUtils.assertEquals("getIssues()", issues, e.getIssues());
         Assert.assertTrue("hasIssues()", e.hasIssues());
         Assert.assertFalse("hasIssues()", e.hasFatalIssues());
 
         issues = new TreeSet<Issue>();
-        issues.add(new Issue(Severity.FATAL, ISSUER, PropertyHelperUtils.TEST_UUIDS[0], null));
+        issues.add(new Issue(Severity.FATAL, ISSUER, TestUUIDs.TEST_UUIDS[0], null));
         e = new ValidationException("Message", issues);
         Assert.assertEquals(
                 "Message\n" +
-                        " - Entity " + PropertyHelperUtils.TEST_UUIDS[0] + " is invalid",
+                        " - Entity " + TestUUIDs.TEST_UUIDS[0] + " is invalid",
                 e.getMessage());
         AssertUtils.assertEquals("getIssues()", issues, e.getIssues());
         Assert.assertTrue("hasIssues()", e.hasIssues());
         Assert.assertTrue("hasIssues()", e.hasFatalIssues());
 
         issues = new TreeSet<Issue>();
-        issues.add(new Issue(Severity.WARNING, ISSUER, PropertyHelperUtils.TEST_UUIDS[0], null));
+        issues.add(new Issue(Severity.WARNING, ISSUER, TestUUIDs.TEST_UUIDS[0], null));
         e = new ValidationException(issues);
         Assert.assertEquals(
-                "Entity " + PropertyHelperUtils.TEST_UUIDS[0] + " is invalid",
+                "Entity " + TestUUIDs.TEST_UUIDS[0] + " is invalid",
                 e.getMessage());
         AssertUtils.assertEquals("getIssues()", issues, e.getIssues());
         Assert.assertTrue("hasIssues()", e.hasIssues());
@@ -112,14 +112,14 @@ public class ValidationExceptionTest implements Issuer {
         Assert.assertTrue("getIssues()", e.getIssues().isEmpty());
         Assert.assertFalse("hasIssues()", e.hasIssues());
         Assert.assertFalse("hasIssues()", e.hasFatalIssues());
-        e.addIssue(new Issue(Severity.FATAL, ISSUER, PropertyHelperUtils.TEST_UUIDS[0]));
+        e.addIssue(new Issue(Severity.FATAL, ISSUER, TestUUIDs.TEST_UUIDS[0]));
         Assert.assertTrue("hasIssues()", e.hasIssues());
         Assert.assertTrue("hasIssues()", e.hasFatalIssues());
 
-        e = new ValidationException(ISSUER, PropertyHelperUtils.TEST_UUIDS[0], TestExtension.class);
+        e = new ValidationException(ISSUER, TestUUIDs.TEST_UUIDS[0], TestExtension.class);
         Assert.assertEquals(
                 "Extension " + TestExtension.class.getName()
-                        + " of entity " + PropertyHelperUtils.TEST_UUIDS[0] + " is invalid",
+                        + " of entity " + TestUUIDs.TEST_UUIDS[0] + " is invalid",
                 e.getMessage());
         Assert.assertTrue("getIssues()", e.getIssues().size() == 1);
         Assert.assertTrue("hasIssues()", e.hasIssues());
@@ -128,15 +128,15 @@ public class ValidationExceptionTest implements Issuer {
         Assert.assertNotNull(issue);
         Assert.assertEquals(Severity.FATAL, issue.getSeverity());
         Assert.assertEquals(ISSUER, issue.getIssuer());
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[0], issue.getEntityId());
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0], issue.getEntityId());
         Assert.assertEquals(TestExtension.class, issue.getExtension());
         Assert.assertEquals(e.getMessage(), issue.getMessage());
 
-        e = new ValidationException(ISSUER, PropertyHelperUtils.TEST_UUIDS[0], TestExtension.class,
+        e = new ValidationException(ISSUER, TestUUIDs.TEST_UUIDS[0], TestExtension.class,
                 TestExtension.PROPERTY_STR);
         Assert.assertEquals(
                 "Property " + TestExtension.PROPERTY_STR + " of extension " + TestExtension.class.getName()
-                        + " of entity " + PropertyHelperUtils.TEST_UUIDS[0] + " is invalid",
+                        + " of entity " + TestUUIDs.TEST_UUIDS[0] + " is invalid",
                 e.getMessage());
         Assert.assertTrue("getIssues()", e.getIssues().size() == 1);
         Assert.assertTrue("hasIssues()", e.hasIssues());
@@ -145,12 +145,12 @@ public class ValidationExceptionTest implements Issuer {
         Assert.assertNotNull(issue);
         Assert.assertEquals(Severity.FATAL, issue.getSeverity());
         Assert.assertEquals(ISSUER, issue.getIssuer());
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[0], issue.getEntityId());
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0], issue.getEntityId());
         Assert.assertEquals(TestExtension.class, issue.getExtension());
         Assert.assertEquals(TestExtension.PROPERTY_STR, issue.getPropertyId());
         Assert.assertEquals(e.getMessage(), issue.getMessage());
 
-        e = new ValidationException(ISSUER, PropertyHelperUtils.TEST_UUIDS[0], TestExtension.class,
+        e = new ValidationException(ISSUER, TestUUIDs.TEST_UUIDS[0], TestExtension.class,
                 TestExtension.PROPERTY_STR, "Message");
         Assert.assertEquals("Message", e.getMessage());
         Assert.assertTrue("getIssues()", e.getIssues().size() == 1);
@@ -160,7 +160,7 @@ public class ValidationExceptionTest implements Issuer {
         Assert.assertNotNull(issue);
         Assert.assertEquals(Severity.FATAL, issue.getSeverity());
         Assert.assertEquals(ISSUER, issue.getIssuer());
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[0], issue.getEntityId());
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0], issue.getEntityId());
         Assert.assertEquals(TestExtension.class, issue.getExtension());
         Assert.assertEquals(TestExtension.PROPERTY_STR, issue.getPropertyId());
         Assert.assertEquals(e.getMessage(), issue.getMessage());

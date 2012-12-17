@@ -27,7 +27,7 @@ import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
 import org.eclipse.skalli.services.project.ProjectService;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -78,7 +78,7 @@ public class MavenResolverRunnableTest {
         private MavenReactor mavenReactor;
 
         public MavenResolverMock(MavenPomResolver pathResolver) {
-            super(PropertyHelperUtils.TEST_UUIDS[0], pathResolver);
+            super(TestUUIDs.TEST_UUIDS[0], pathResolver);
         }
 
         @Override

@@ -12,19 +12,17 @@ package org.eclipse.skalli.model.ext.maven;
 
 import java.util.Map;
 
+import org.eclipse.skalli.testutil.PropertyTestUtil;
 import org.junit.Test;
-
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
 
 public class MavenReactorProjectExtTest {
 
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
+        Map<String, Object> values = PropertyTestUtil.getValues();
         values.put(MavenReactorProjectExt.PROPERTY_MAVEN_REACTOR, getReactor());
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
-        PropertyHelper.checkPropertyDefinitions(MavenReactorProjectExt.class, requiredProperties, values);
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
+        PropertyTestUtil.checkPropertyDefinitions(MavenReactorProjectExt.class, requiredProperties, values);
     }
 
     private MavenReactor getReactor() {

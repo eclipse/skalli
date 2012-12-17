@@ -13,7 +13,7 @@ package org.eclipse.skalli.services.extension;
 import static org.junit.Assert.*;
 
 import org.eclipse.skalli.commons.XMLUtils;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.eclipse.skalli.testutil.TestExtension1;
@@ -327,7 +327,7 @@ public class MigrationUtilsTest {
         appendNode(xml, TestExtension.PROPERTY_BOOL, Boolean.TRUE);
         appendNode(xml, TestExtension.PROPERTY_STR, PROPERTY_STR_VALUE);
         appendNode(xml, TestExtension.PROPERTY_DELETED, Boolean.FALSE);
-        appendNode(xml, TestExtension.PROPERTY_UUID, PropertyHelperUtils.TEST_UUIDS[0]);
+        appendNode(xml, TestExtension.PROPERTY_UUID, TestUUIDs.TEST_UUIDS[0]);
         endNode(xml, TESTEXTENSION_TAG);
     }
 

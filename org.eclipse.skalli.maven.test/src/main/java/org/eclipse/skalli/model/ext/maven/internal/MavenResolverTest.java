@@ -13,7 +13,7 @@ import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.maven.MavenModule;
 import org.eclipse.skalli.model.ext.maven.MavenPomResolver;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
@@ -66,7 +66,7 @@ public class MavenResolverTest {
         MavenReactor expected = new MavenReactor();
         expected.setCoordinate(TEST_PARENT_COORD);
 
-        MavenResolver resolver = new MavenResolver(PropertyHelperUtils.TEST_UUIDS[0], pomReslover);
+        MavenResolver resolver = new MavenResolver(TestUUIDs.TEST_UUIDS[0], pomReslover);
         assertThat(resolver.resolve(SCM_LOCATION, RELATIVE_ROOT_POM_PATH), is(expected));
     }
 
@@ -82,7 +82,7 @@ public class MavenResolverTest {
         MavenReactor expected = new MavenReactor();
         expected.setCoordinate(TEST_PARENT_COORD);
 
-        MavenResolver resolver = new MavenResolver(PropertyHelperUtils.TEST_UUIDS[0], pomReslover);
+        MavenResolver resolver = new MavenResolver(TestUUIDs.TEST_UUIDS[0], pomReslover);
         assertThat(resolver.resolve(SCM_LOCATION, RELATIVE_ROOT_POM_PATH), is(expected));
     }
 
@@ -104,7 +104,7 @@ public class MavenResolverTest {
         expected.addModule(getModuleCoordinate(MODULE1));
         expected.addModule(getModuleCoordinate(MODULE2));
 
-        MavenResolver resolver = new MavenResolver(PropertyHelperUtils.TEST_UUIDS[0], pomReslover);
+        MavenResolver resolver = new MavenResolver(TestUUIDs.TEST_UUIDS[0], pomReslover);
         assertThat(resolver.resolve(SCM_LOCATION, RELATIVE_ROOT_POM_PATH), is(expected));
     }
 
@@ -126,7 +126,7 @@ public class MavenResolverTest {
         expected.addModule(getModuleCoordinate(MODULE1));
         expected.addModule(getModuleCoordinate(MODULE2));
 
-        MavenResolver resolver = new MavenResolver(PropertyHelperUtils.TEST_UUIDS[0], pomReslover);
+        MavenResolver resolver = new MavenResolver(TestUUIDs.TEST_UUIDS[0], pomReslover);
         assertThat(resolver.resolve(SCM_LOCATION, RELATIVE_ROOT_POM_PATH), is(expected));
 
     }

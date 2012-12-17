@@ -17,15 +17,14 @@ import static org.junit.Assert.assertThat;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.PropertyTestUtil;
 import org.junit.Test;
 
 public class MavenReactorTest {
 
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
+        Map<String, Object> values = PropertyTestUtil.getValues();
 
         values.put(MavenReactor.PROPERTY_COORDINATE, MavenCoordinateUtil.TEST_COORD);
 
@@ -34,8 +33,8 @@ public class MavenReactorTest {
 
         values.put(MavenReactor.PROPERTY_MODULES, modules);
 
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
-        PropertyHelper.checkPropertyDefinitions(MavenReactor.class, requiredProperties, values);
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
+        PropertyTestUtil.checkPropertyDefinitions(MavenReactor.class, requiredProperties, values);
     }
 
     @Test

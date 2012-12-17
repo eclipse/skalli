@@ -19,8 +19,8 @@ import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.testutil.AssertUtils;
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.PropertyTestUtil;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,26 +30,26 @@ public class IssuesTest implements Issuer {
     private static final Class<? extends Issuer> ISSUER = IssuesTest.class;
 
     private static Issue[] ISSUES = new Issue[] {
-            new Issue(Severity.ERROR, ISSUER, PropertyHelperUtils.TEST_UUIDS[1]),
-            new Issue(Severity.FATAL, ISSUER, PropertyHelperUtils.TEST_UUIDS[0]),
-            new Issue(Severity.WARNING, ISSUER, PropertyHelperUtils.TEST_UUIDS[0]),
-            new Issue(Severity.INFO, ISSUER, PropertyHelperUtils.TEST_UUIDS[0]),
-            new Issue(Severity.ERROR, ISSUER, PropertyHelperUtils.TEST_UUIDS[0])
+            new Issue(Severity.ERROR, ISSUER, TestUUIDs.TEST_UUIDS[1]),
+            new Issue(Severity.FATAL, ISSUER, TestUUIDs.TEST_UUIDS[0]),
+            new Issue(Severity.WARNING, ISSUER, TestUUIDs.TEST_UUIDS[0]),
+            new Issue(Severity.INFO, ISSUER, TestUUIDs.TEST_UUIDS[0]),
+            new Issue(Severity.ERROR, ISSUER, TestUUIDs.TEST_UUIDS[0])
     };
 
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
+        Map<String, Object> values = PropertyTestUtil.getValues();
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
         values.put(Issues.PROPERTY_ISSUES, CollectionUtils.asSortedSet(ISSUES));
         values.put(Issues.PROPERTY_STALE, true);
-        PropertyHelper.checkPropertyDefinitions(Issues.class, requiredProperties, values);
+        PropertyTestUtil.checkPropertyDefinitions(Issues.class, requiredProperties, values);
     }
 
     @Test
     public void testGetIssues() {
         SortedSet<Issue> set = CollectionUtils.asSortedSet(ISSUES);
-        Issues issues = new Issues(PropertyHelperUtils.TEST_UUIDS[0], set);
+        Issues issues = new Issues(TestUUIDs.TEST_UUIDS[0], set);
         AssertUtils.assertEquals("getIssues(WARNING)",
                 Arrays.asList(ISSUES[1], ISSUES[0], ISSUES[4], ISSUES[2]),
                 issues.getIssues(Severity.WARNING));

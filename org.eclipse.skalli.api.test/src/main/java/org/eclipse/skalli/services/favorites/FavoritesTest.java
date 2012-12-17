@@ -13,8 +13,8 @@ package org.eclipse.skalli.services.favorites;
 import java.util.Map;
 
 import org.eclipse.skalli.commons.UUIDList;
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.PropertyTestUtil;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
@@ -22,15 +22,15 @@ public class FavoritesTest {
 
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
+        Map<String, Object> values = PropertyTestUtil.getValues();
         values.put(Favorites.PROPERTY_USERID, "homer");
         UUIDList projects = new UUIDList();
-        projects.add(PropertyHelperUtils.TEST_UUIDS[0]);
-        projects.add(PropertyHelperUtils.TEST_UUIDS[1]);
-        projects.add(PropertyHelperUtils.TEST_UUIDS[2]);
+        projects.add(TestUUIDs.TEST_UUIDS[0]);
+        projects.add(TestUUIDs.TEST_UUIDS[1]);
+        projects.add(TestUUIDs.TEST_UUIDS[2]);
         values.put(Favorites.PROPERTY_PROJECTS, projects);
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
-        PropertyHelper.checkPropertyDefinitions(Favorites.class, requiredProperties, values);
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
+        PropertyTestUtil.checkPropertyDefinitions(Favorites.class, requiredProperties, values);
     }
 
 }

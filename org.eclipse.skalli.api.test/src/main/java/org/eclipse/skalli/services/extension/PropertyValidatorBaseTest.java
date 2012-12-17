@@ -16,7 +16,7 @@ import java.util.UUID;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Severity;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.junit.Assert;
 import org.junit.Test;
@@ -125,21 +125,21 @@ public class PropertyValidatorBaseTest {
     }
 
     private void assertValidIssue(TestPropertyValidator validator) {
-        SortedSet<Issue> issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], "valid", Severity.FATAL);
+        SortedSet<Issue> issues = validator.validate(TestUUIDs.TEST_UUIDS[0], "valid", Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(0, issues.size());
     }
 
     private Issue assertInvalidIssue(TestPropertyValidator validator, String testValue) {
         // validation failes => assert issue set with one entry, assert issue correctly initialized
-        SortedSet<Issue> issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], testValue, Severity.ERROR);
+        SortedSet<Issue> issues = validator.validate(TestUUIDs.TEST_UUIDS[0], testValue, Severity.ERROR);
         Assert.assertNotNull(issues);
         Assert.assertEquals(1, issues.size());
         Issue issue = issues.first();
         Assert.assertNotNull(issue);
         Assert.assertEquals(Severity.FATAL, issue.getSeverity());
         Assert.assertEquals(TestPropertyValidator.class, issue.getIssuer());
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[0], issue.getEntityId());
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0], issue.getEntityId());
         Assert.assertEquals(TestExtension.class, issue.getExtension());
         Assert.assertEquals(TestExtension.PROPERTY_STR, issue.getPropertyId());
         return issue;
@@ -147,7 +147,7 @@ public class PropertyValidatorBaseTest {
 
     private Issue assertUndefinedIssue(TestPropertyValidator validator, boolean emptyString) {
         validator.setValueRequired(true);
-        SortedSet<Issue> issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], emptyString ? "" : null,
+        SortedSet<Issue> issues = validator.validate(TestUUIDs.TEST_UUIDS[0], emptyString ? "" : null,
                 Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(1, issues.size());
@@ -155,7 +155,7 @@ public class PropertyValidatorBaseTest {
         Assert.assertNotNull(issue);
         Assert.assertEquals(Severity.FATAL, issue.getSeverity());
         Assert.assertEquals(TestPropertyValidator.class, issue.getIssuer());
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[0], issue.getEntityId());
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0], issue.getEntityId());
         Assert.assertEquals(TestExtension.class, issue.getExtension());
         Assert.assertEquals(TestExtension.PROPERTY_STR, issue.getPropertyId());
         validator.setValueRequired(false);

@@ -14,11 +14,11 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.skalli.services.persistence.StorageService;
-import org.eclipse.skalli.testutil.AbstractStorageServiceTest;
+import org.eclipse.skalli.testutil.StorageServiceTestBase;
 import org.eclipse.skalli.testutil.TestUtils;
 
 @SuppressWarnings("nls")
-public class FileStorageServiceTest extends AbstractStorageServiceTest {
+public class FileStorageServiceTest extends StorageServiceTestBase {
 
     private File storageBase;
 

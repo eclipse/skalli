@@ -19,7 +19,7 @@ import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.PropertyName;
 import org.eclipse.skalli.model.Severity;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class MinMaxSizeValidatorTest {
 
     @Test
     public void testValidateServerityIsLess() {
-        SortedSet<Issue> itmes = createValidator(0, 1).validate(PropertyHelperUtils.TEST_UUIDS[0], items,
+        SortedSet<Issue> itmes = createValidator(0, 1).validate(TestUUIDs.TEST_UUIDS[0], items,
                 Severity.INFO);
         Assert.assertEquals(1, itmes.size());
     }
@@ -68,21 +68,21 @@ public class MinMaxSizeValidatorTest {
     @Test
     public void testValidateServerityIsEquals() {
         SortedSet<Issue> itmes = createValidator(0, 1)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], items, Severity.WARNING);
         Assert.assertEquals(1, itmes.size());
     }
 
     @Test
     public void testValidateServerityIsGreater() {
         SortedSet<Issue> itmes = createValidator(0, 1)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.FATAL);
+                .validate(TestUUIDs.TEST_UUIDS[0], items, Severity.FATAL);
         Assert.assertEquals(0, itmes.size());
     }
 
     @Test
     public void testValidateAtMost() {
         SortedSet<Issue> itmes = createValidator(0, 2)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], items, Severity.WARNING);
         Issue itme1 = itmes.first();
         Assert.assertEquals("Items should have at most 2 entries, but it currently has 3",
                 itme1.getMessage());
@@ -91,7 +91,7 @@ public class MinMaxSizeValidatorTest {
     @Test
     public void testValidateAtMostNoCaption() throws Exception {
         SortedSet<Issue> itmes = createValidatorNoCaption(0, 2)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], items, Severity.WARNING);
         Issue itme1 = itmes.first();
         Assert.assertEquals("Property 'items' should have at most 2 entries, but it currently has 3",
                 itme1.getMessage());
@@ -100,7 +100,7 @@ public class MinMaxSizeValidatorTest {
     @Test
     public void testValidateAtMostOne() {
         SortedSet<Issue> itmes = createValidator(0, 1)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], items, Severity.WARNING);
         Issue itme1 = itmes.first();
         Assert.assertEquals("Items should have at most one entry, but it currently has 3",
                 itme1.getMessage());
@@ -109,7 +109,7 @@ public class MinMaxSizeValidatorTest {
     @Test
     public void testValidateAtMostOneNoCaption() throws Exception {
         SortedSet<Issue> itmes = createValidatorNoCaption(0, 1)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], items, Severity.WARNING);
         Issue itme1 = itmes.first();
         Assert.assertEquals("Property 'items' should have at most one entry, but it currently has 3",
                 itme1.getMessage());
@@ -118,7 +118,7 @@ public class MinMaxSizeValidatorTest {
     @Test
     public void testValidateAtLeast() {
         SortedSet<Issue> itmes = createValidator(5, Integer.MAX_VALUE)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], items, Severity.WARNING);
         Assert.assertEquals(1, itmes.size());
         Issue itme1 = itmes.first();
         Assert.assertEquals("Items should have at least 5 entries, but it currently has only 3",
@@ -128,7 +128,7 @@ public class MinMaxSizeValidatorTest {
     @Test
     public void testValidateAtLeastNoCaption() {
         SortedSet<Issue> itmes = createValidatorNoCaption(5, Integer.MAX_VALUE)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], items, Severity.WARNING);
         Assert.assertEquals(1, itmes.size());
         Issue itme1 = itmes.first();
         Assert.assertEquals("Property 'items' should have at least 5 entries, but it currently has only 3",
@@ -138,7 +138,7 @@ public class MinMaxSizeValidatorTest {
     @Test
     public void testValidateAtLeastOne() {
         SortedSet<Issue> itmes = createValidator(1, Integer.MAX_VALUE)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], Collections.emptySet(), Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], Collections.emptySet(), Severity.WARNING);
         Assert.assertEquals(1, itmes.size());
         Issue itme1 = itmes.first();
         Assert.assertEquals("Items should have at least one entry",
@@ -148,7 +148,7 @@ public class MinMaxSizeValidatorTest {
     @Test
     public void testValidateAtLeastOneNoCaption() {
         SortedSet<Issue> itmes = createValidatorNoCaption(1, Integer.MAX_VALUE)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], Collections.emptySet(), Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], Collections.emptySet(), Severity.WARNING);
         Assert.assertEquals(1, itmes.size());
         Issue itme1 = itmes.first();
         Assert.assertEquals("Property 'items' should have at least one entry",
@@ -158,7 +158,7 @@ public class MinMaxSizeValidatorTest {
     @Test
     public void testValidateMinMaxIssues() {
         SortedSet<Issue> itmes = createValidator(5, 5)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], items, Severity.WARNING);
         Assert.assertEquals(1, itmes.size());
         int minIssues = 0;
         int maxIssues = 0;
@@ -177,42 +177,42 @@ public class MinMaxSizeValidatorTest {
     @Test
     public void testValidateMinMaxNoIssues() {
         SortedSet<Issue> itmes = createValidator(3, 3)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], items, Severity.WARNING);
         Assert.assertEquals(0, itmes.size());
     }
 
     @Test
     public void testValidateMinValue() {
         SortedSet<Issue> itmes = createValidator(1, Integer.MAX_VALUE)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], null, Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], null, Severity.WARNING);
         Assert.assertEquals(1, itmes.size());
     }
 
     @Test
     public void testValidatePropertyOptional() {
         SortedSet<Issue> itmes = createValidator(0, Integer.MAX_VALUE)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], null, Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], null, Severity.WARNING);
         Assert.assertEquals(0, itmes.size());
     }
 
     @Test
     public void testValidatePropertyNotOptionalButOccurrenceIs0() {
         SortedSet<Issue> itmes = createValidator(1, Integer.MAX_VALUE)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], null, Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], null, Severity.WARNING);
         Assert.assertEquals(1, itmes.size());
     }
 
     @Test
     public void testValidateMinMaxValueNoIssue() {
         SortedSet<Issue> itmes = createValidator(1, 1)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], "a single value", Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], "a single value", Severity.WARNING);
         Assert.assertEquals(0, itmes.size());
     }
 
     @Test
     public void testValidateMinMaxValueOneIssue() {
         SortedSet<Issue> itmes = createValidator(2, 2)
-                .validate(PropertyHelperUtils.TEST_UUIDS[0], "a single value", Severity.WARNING);
+                .validate(TestUUIDs.TEST_UUIDS[0], "a single value", Severity.WARNING);
         Assert.assertEquals(1, itmes.size());
     }
 

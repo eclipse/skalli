@@ -17,17 +17,42 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
+
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Derived;
+import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.PropertyName;
 import org.junit.Assert;
 
 @SuppressWarnings("nls")
-public class PropertyHelper {
+public class PropertyTestUtil {
+
+    public static Map<String, Object> getValues() {
+        HashMap<String, Object> values = new HashMap<String, Object>();
+        values.put(EntityBase.PROPERTY_UUID, TestUUIDs.TEST_UUIDS[0]);
+        values.put(EntityBase.PROPERTY_DELETED, Boolean.FALSE);
+        TestExtensibleEntityBase parent = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[1]);
+        values.put(EntityBase.PROPERTY_PARENT_ENTITY, parent);
+        values.put(EntityBase.PROPERTY_PARENT_ENTITY_ID, TestUUIDs.TEST_UUIDS[1]);
+        Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ENGLISH); //$NON-NLS-1$
+        String lastModified = DatatypeConverter.printDateTime(now);
+        values.put(EntityBase.PROPERTY_LAST_MODIFIED, lastModified);
+        values.put(EntityBase.PROPERTY_LAST_MODIFIED_BY, "homer"); //$NON-NLS-1$
+        return values;
+    }
+
+    public static Map<Class<?>, String[]> getRequiredProperties() {
+        return new HashMap<Class<?>, String[]>();
+    }
 
     public static final void checkPropertyDefinitions(Class<?> classToCheck,
             Map<Class<?>, String[]> requiredProperties, Map<String, Object> values)

@@ -22,8 +22,8 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.testutil.AssertUtils;
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.PropertyTestUtil;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.eclipse.skalli.testutil.TestEntityBase2;
 import org.eclipse.skalli.testutil.TestExtensibleEntityBase;
@@ -46,20 +46,20 @@ public class EntityBaseTest {
 
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
-        PropertyHelper.checkPropertyDefinitions(TestEntityBase1.class, requiredProperties, values);
+        Map<String, Object> values = PropertyTestUtil.getValues();
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
+        PropertyTestUtil.checkPropertyDefinitions(TestEntityBase1.class, requiredProperties, values);
     }
 
     @Test
     public void testSetUUIDTwice() {
         TestEntityBase1 entity = new TestEntityBase1();
-        entity.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[0], entity.getUuid());
-        entity.setUuid(PropertyHelperUtils.TEST_UUIDS[1]);
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[0], entity.getUuid()); // still old UUID!
+        entity.setUuid(TestUUIDs.TEST_UUIDS[0]);
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0], entity.getUuid());
+        entity.setUuid(TestUUIDs.TEST_UUIDS[1]);
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0], entity.getUuid()); // still old UUID!
         entity.setUuid(null);
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[0], entity.getUuid()); // still old UUID!
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0], entity.getUuid()); // still old UUID!
     }
 
     @Test
@@ -102,12 +102,12 @@ public class EntityBaseTest {
     @Test
     public void testSetResetParentEntity() {
         TestEntityBase1 entity1 = new TestEntityBase1();
-        entity1.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
+        entity1.setUuid(TestUUIDs.TEST_UUIDS[0]);
         TestEntityBase2 entity2 = new TestEntityBase2();
-        entity2.setUuid(PropertyHelperUtils.TEST_UUIDS[1]);
+        entity2.setUuid(TestUUIDs.TEST_UUIDS[1]);
         entity1.setParentEntity(entity2);
         Assert.assertEquals(entity2, entity1.getParentEntity());
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[1], entity1.getParentEntityId());
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[1], entity1.getParentEntityId());
         entity1.setParentEntity(null);
         Assert.assertNull(entity1.getParentEntity());
         Assert.assertNull(entity1.getParentEntityId());
@@ -116,14 +116,14 @@ public class EntityBaseTest {
     @Test(expected = IllegalArgumentException.class)
     public void testSetParentWithMissingUUID() {
         TestEntityBase1 entity1 = new TestEntityBase1();
-        entity1.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
+        entity1.setUuid(TestUUIDs.TEST_UUIDS[0]);
         TestEntityBase2 entity2 = new TestEntityBase2();
         entity1.setParentEntity(entity2);
     }
 
     @Test
     public void testGetPropertyNames() {
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
         TestExtension ext = new TestExtension();
         ext.setExtensibleEntity(base);
         AssertUtils.assertEqualsAnyOrder("getPropertyNames",
@@ -135,7 +135,7 @@ public class EntityBaseTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testGetProperty() throws Exception {
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
         TestExtension extBase = new TestExtension();
         extBase.setExtensibleEntity(base);
         extBase.setBool(true);
@@ -149,7 +149,7 @@ public class EntityBaseTest {
 
     @Test
     public void testGetPropertyWithNullValue() throws Exception {
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
         TestExtension extBase = new TestExtension();
         extBase.setExtensibleEntity(base);
         extBase.setStr(null);
@@ -158,13 +158,13 @@ public class EntityBaseTest {
 
     @Test(expected = NoSuchPropertyException.class)
     public void testGetUnknownProperty() throws Exception {
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
         base.getProperty("foobar");
     }
 
     @Test
     public void testSetProperty() throws Exception {
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
         TestExtension extBase = new TestExtension();
         extBase.setExtensibleEntity(base);
         extBase.setProperty(TestExtension.PROPERTY_BOOL, true);
@@ -178,7 +178,7 @@ public class EntityBaseTest {
 
     @Test
     public void testNullValue() throws Exception {
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
         TestExtension extBase = new TestExtension();
         extBase.setExtensibleEntity(base);
         extBase.setProperty(TestExtension.PROPERTY_STR, "Homer");
@@ -189,13 +189,13 @@ public class EntityBaseTest {
 
     @Test(expected = NoSuchPropertyException.class)
     public void testSetUnknownProperty() throws Exception {
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
         base.setProperty("foo", "bar");
     }
 
     @Test(expected = PropertyUpdateException.class)
     public void testSetPrimitivePropertyToNull() throws Exception {
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
         TestExtension extBase = new TestExtension();
         extBase.setExtensibleEntity(base);
         extBase.setProperty(TestExtension.PROPERTY_BOOL, null);
@@ -203,7 +203,7 @@ public class EntityBaseTest {
 
     @Test(expected = PropertyUpdateException.class)
     public void testSetValueWithIncompatibleType() throws Exception {
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
         TestExtension extBase = new TestExtension();
         extBase.setExtensibleEntity(base);
         extBase.setProperty(TestExtension.PROPERTY_BOOL, new String[]{});
@@ -211,7 +211,7 @@ public class EntityBaseTest {
 
     @Test(expected = PropertyUpdateException.class)
     public void testSetterThrowsException() throws Exception {
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
         TestExtension extBase = new TestExtension();
         extBase.setExtensibleEntity(base);
         extBase.setProperty(TestExtension.PROPERTY_ITEMS, null);
@@ -220,26 +220,26 @@ public class EntityBaseTest {
     @Test
     public void testToString() {
         TestEntityBase1 entity = new TestEntityBase1();
-        entity.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[0].toString(), entity.toString());
+        entity.setUuid(TestUUIDs.TEST_UUIDS[0]);
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0].toString(), entity.toString());
     }
 
     @Test
     public void testHashCode() {
         TestEntityBase1 entity = new TestEntityBase1();
         Assert.assertEquals(31, entity.hashCode());
-        entity.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
-        Assert.assertEquals(31 + PropertyHelperUtils.TEST_UUIDS[0].hashCode(), entity.hashCode());
+        entity.setUuid(TestUUIDs.TEST_UUIDS[0]);
+        Assert.assertEquals(31 + TestUUIDs.TEST_UUIDS[0].hashCode(), entity.hashCode());
     }
 
     @Test
     public void testEquals() {
         TestEntityBase1 entity1 = new TestEntityBase1();
-        entity1.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
+        entity1.setUuid(TestUUIDs.TEST_UUIDS[0]);
         TestEntityBase1 entity2 = new TestEntityBase1();
-        entity2.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
+        entity2.setUuid(TestUUIDs.TEST_UUIDS[0]);
         TestEntityBase1 entity3 = new TestEntityBase1();
-        entity3.setUuid(PropertyHelperUtils.TEST_UUIDS[1]);
+        entity3.setUuid(TestUUIDs.TEST_UUIDS[1]);
 
         Assert.assertTrue(entity1.equals(entity1));
 
@@ -249,15 +249,15 @@ public class EntityBaseTest {
         Assert.assertFalse(entity1.equals(entity3));
         Assert.assertFalse(entity3.equals(entity1));
 
-        Assert.assertFalse(entity1.equals(PropertyHelperUtils.TEST_UUIDS[1]));
+        Assert.assertFalse(entity1.equals(TestUUIDs.TEST_UUIDS[1]));
     }
 
     @Test
     public void testCompareTo() {
         TestEntityBase1 entity1 = new TestEntityBase1();
-        entity1.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
+        entity1.setUuid(TestUUIDs.TEST_UUIDS[0]);
         TestEntityBase2 entity2 = new TestEntityBase2();
-        entity2.setUuid(PropertyHelperUtils.TEST_UUIDS[1]);
+        entity2.setUuid(TestUUIDs.TEST_UUIDS[1]);
 
         Assert.assertEquals(0, entity1.compareTo(entity1));
         Assert.assertEquals(0, entity2.compareTo(entity2));

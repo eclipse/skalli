@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.eclipse.skalli.services.permit.Permit;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
@@ -36,113 +36,113 @@ public class PermitsConfigTest {
     public void testAdd() throws Exception {
         PermitsConfig permits = new PermitsConfig();
 
-        PermitConfig permit = getPermit(PropertyHelperUtils.TEST_UUIDS[0], -1, null);
+        PermitConfig permit = getPermit(TestUUIDs.TEST_UUIDS[0], -1, null);
         permits.add(permit);
         assertEquals(1, permits.getPermits().size());
-        assertEquals(permit, permits.get(PropertyHelperUtils.TEST_UUIDS[0]));
+        assertEquals(permit, permits.get(TestUUIDs.TEST_UUIDS[0]));
 
-        permit = getPermit(PropertyHelperUtils.TEST_UUIDS[0], -1, "/projects");
+        permit = getPermit(TestUUIDs.TEST_UUIDS[0], -1, "/projects");
         permits.add(permit);
         assertEquals(1, permits.getPermits().size());
-        assertEquals(permit, permits.get(PropertyHelperUtils.TEST_UUIDS[0]));
-        assertEquals("/projects", permits.get(PropertyHelperUtils.TEST_UUIDS[0]).getPath());
+        assertEquals(permit, permits.get(TestUUIDs.TEST_UUIDS[0]));
+        assertEquals("/projects", permits.get(TestUUIDs.TEST_UUIDS[0]).getPath());
 
-        permit = getPermit(PropertyHelperUtils.TEST_UUIDS[1], -1, null);
+        permit = getPermit(TestUUIDs.TEST_UUIDS[1], -1, null);
         permits.add(permit);
         assertEquals(2, permits.getPermits().size());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[0], permits.getPermits().get(0).getUuid());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[1], permits.getPermits().get(1).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[0], permits.getPermits().get(0).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[1], permits.getPermits().get(1).getUuid());
 
-        permit = getPermit(PropertyHelperUtils.TEST_UUIDS[1], 0, null);
+        permit = getPermit(TestUUIDs.TEST_UUIDS[1], 0, null);
         permits.add(permit);
         assertEquals(2, permits.getPermits().size());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[1], permits.getPermits().get(0).getUuid());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[0], permits.getPermits().get(1).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[1], permits.getPermits().get(0).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[0], permits.getPermits().get(1).getUuid());
 
-        permit = getPermit(PropertyHelperUtils.TEST_UUIDS[2], 1, null);
+        permit = getPermit(TestUUIDs.TEST_UUIDS[2], 1, null);
         permits.add(permit);
         assertEquals(3, permits.getPermits().size());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[1], permits.getPermits().get(0).getUuid());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[2], permits.getPermits().get(1).getUuid());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[0], permits.getPermits().get(2).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[1], permits.getPermits().get(0).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[2], permits.getPermits().get(1).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[0], permits.getPermits().get(2).getUuid());
     }
 
     @Test
     public void testGet() throws Exception {
         PermitsConfig permits = new PermitsConfig();
-        PermitConfig permit = getPermit(PropertyHelperUtils.TEST_UUIDS[0], -1, null);
+        PermitConfig permit = getPermit(TestUUIDs.TEST_UUIDS[0], -1, null);
         permits.add(permit);
-        assertEquals(permit, permits.get(PropertyHelperUtils.TEST_UUIDS[0]));
-        assertNull(permits.get(PropertyHelperUtils.TEST_UUIDS[1]));
+        assertEquals(permit, permits.get(TestUUIDs.TEST_UUIDS[0]));
+        assertNull(permits.get(TestUUIDs.TEST_UUIDS[1]));
         assertNull(permits.get(null));
     }
 
     @Test
     public void testRemove() throws Exception {
         PermitsConfig permits = new PermitsConfig();
-        assertNull(permits.remove(PropertyHelperUtils.TEST_UUIDS[0]));
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[0], -1, null));
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[1], -1, null));
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[2], -1, null));
+        assertNull(permits.remove(TestUUIDs.TEST_UUIDS[0]));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[0], -1, null));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[1], -1, null));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[2], -1, null));
         assertEquals(3, permits.getPermits().size());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[0], permits.getPermits().get(0).getUuid());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[1], permits.getPermits().get(1).getUuid());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[2], permits.getPermits().get(2).getUuid());
-        PermitConfig stored = permits.remove(PropertyHelperUtils.TEST_UUIDS[1]);
+        assertEquals(TestUUIDs.TEST_UUIDS[0], permits.getPermits().get(0).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[1], permits.getPermits().get(1).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[2], permits.getPermits().get(2).getUuid());
+        PermitConfig stored = permits.remove(TestUUIDs.TEST_UUIDS[1]);
         assertEquals(2, permits.getPermits().size());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[1], stored.getUuid());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[0], permits.getPermits().get(0).getUuid());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[2], permits.getPermits().get(1).getUuid());
-        stored = permits.remove(PropertyHelperUtils.TEST_UUIDS[1]);
+        assertEquals(TestUUIDs.TEST_UUIDS[1], stored.getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[0], permits.getPermits().get(0).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[2], permits.getPermits().get(1).getUuid());
+        stored = permits.remove(TestUUIDs.TEST_UUIDS[1]);
         assertEquals(2, permits.getPermits().size());
         assertNull(stored);
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[0], permits.getPermits().get(0).getUuid());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[2], permits.getPermits().get(1).getUuid());
-        stored = permits.remove(PropertyHelperUtils.TEST_UUIDS[2]);
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[2], stored.getUuid());
-        assertNull(permits.remove(PropertyHelperUtils.TEST_UUIDS[10]));
-        stored = permits.remove(PropertyHelperUtils.TEST_UUIDS[0]);
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[0], stored.getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[0], permits.getPermits().get(0).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[2], permits.getPermits().get(1).getUuid());
+        stored = permits.remove(TestUUIDs.TEST_UUIDS[2]);
+        assertEquals(TestUUIDs.TEST_UUIDS[2], stored.getUuid());
+        assertNull(permits.remove(TestUUIDs.TEST_UUIDS[10]));
+        stored = permits.remove(TestUUIDs.TEST_UUIDS[0]);
+        assertEquals(TestUUIDs.TEST_UUIDS[0], stored.getUuid());
         assertTrue(permits.getPermits().isEmpty());
-        assertNull(permits.remove(PropertyHelperUtils.TEST_UUIDS[0]));
+        assertNull(permits.remove(TestUUIDs.TEST_UUIDS[0]));
         assertNull(permits.remove(null));
     }
 
     @Test
     public void testSet() throws Exception {
         PermitsConfig permits = new PermitsConfig();
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[0], -1, null));
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[1], -5, null)); // all negatives are treated as pso undefined
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[2], -1, null));
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[1], permits.getPermits().get(1).getUuid());
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[0], -1, null));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[1], -5, null)); // all negatives are treated as pso undefined
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[2], -1, null));
+        assertEquals(TestUUIDs.TEST_UUIDS[1], permits.getPermits().get(1).getUuid());
 
         List<PermitConfig> c = Arrays.asList(
-                getPermit(PropertyHelperUtils.TEST_UUIDS[3], -1, null),
-                getPermit(PropertyHelperUtils.TEST_UUIDS[4], -1, null),
-                getPermit(PropertyHelperUtils.TEST_UUIDS[5], 0, null),
-                getPermit(PropertyHelperUtils.TEST_UUIDS[1], 2, null));
+                getPermit(TestUUIDs.TEST_UUIDS[3], -1, null),
+                getPermit(TestUUIDs.TEST_UUIDS[4], -1, null),
+                getPermit(TestUUIDs.TEST_UUIDS[5], 0, null),
+                getPermit(TestUUIDs.TEST_UUIDS[1], 2, null));
         permits.setPermits(c);
         assertEquals(4, permits.getPermits().size());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[5], permits.getPermits().get(0).getUuid());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[3], permits.getPermits().get(1).getUuid());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[1], permits.getPermits().get(2).getUuid());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[4], permits.getPermits().get(3).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[5], permits.getPermits().get(0).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[3], permits.getPermits().get(1).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[1], permits.getPermits().get(2).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[4], permits.getPermits().get(3).getUuid());
 
         List<PermitConfig> d = Arrays.asList(
-                getPermit(PropertyHelperUtils.TEST_UUIDS[5], 0, null),
-                getPermit(PropertyHelperUtils.TEST_UUIDS[1], 2, null)); // index out of bounds => add at end
+                getPermit(TestUUIDs.TEST_UUIDS[5], 0, null),
+                getPermit(TestUUIDs.TEST_UUIDS[1], 2, null)); // index out of bounds => add at end
         permits.setPermits(d);
         assertEquals(2, permits.getPermits().size());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[5], permits.getPermits().get(0).getUuid());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[1], permits.getPermits().get(1).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[5], permits.getPermits().get(0).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[1], permits.getPermits().get(1).getUuid());
 
         List<PermitConfig> e = Arrays.asList(
-                getPermit(PropertyHelperUtils.TEST_UUIDS[5], 0, null),
-                getPermit(PropertyHelperUtils.TEST_UUIDS[1], 0, null));
+                getPermit(TestUUIDs.TEST_UUIDS[5], 0, null),
+                getPermit(TestUUIDs.TEST_UUIDS[1], 0, null));
         permits.setPermits(e);
         assertEquals(2, permits.getPermits().size());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[1], permits.getPermits().get(0).getUuid());
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[5], permits.getPermits().get(1).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[1], permits.getPermits().get(0).getUuid());
+        assertEquals(TestUUIDs.TEST_UUIDS[5], permits.getPermits().get(1).getUuid());
 
         List<PermitConfig> empty = Collections.emptyList();
         permits.setPermits(empty);
@@ -156,17 +156,17 @@ public class PermitsConfigTest {
     @Test
     public void testGetByTypeOrOwner() throws Exception {
         PermitsConfig permits = new PermitsConfig();
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[0], PermitsConfig.GLOBAL_PERMIT, null));
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[1], PermitsConfig.ROLE_PERMIT, "c"));
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[2], PermitsConfig.GROUP_PERMIT, "foo"));
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[3], PermitsConfig.USER_PERMIT, "hugo"));
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[4], PermitsConfig.ROLE_PERMIT, "b"));
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[5], PermitsConfig.USER_PERMIT, "hugo"));
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[6], PermitsConfig.GLOBAL_PERMIT, null));
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[7], PermitsConfig.ROLE_PERMIT, "c"));
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[8], PermitsConfig.ROLE_PERMIT, "c"));
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[9], PermitsConfig.GLOBAL_PERMIT, null));
-        permits.add(getPermit(PropertyHelperUtils.TEST_UUIDS[10], "something", "whatever"));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[0], PermitsConfig.GLOBAL_PERMIT, null));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[1], PermitsConfig.ROLE_PERMIT, "c"));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[2], PermitsConfig.GROUP_PERMIT, "foo"));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[3], PermitsConfig.USER_PERMIT, "hugo"));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[4], PermitsConfig.ROLE_PERMIT, "b"));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[5], PermitsConfig.USER_PERMIT, "hugo"));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[6], PermitsConfig.GLOBAL_PERMIT, null));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[7], PermitsConfig.ROLE_PERMIT, "c"));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[8], PermitsConfig.ROLE_PERMIT, "c"));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[9], PermitsConfig.GLOBAL_PERMIT, null));
+        permits.add(getPermit(TestUUIDs.TEST_UUIDS[10], "something", "whatever"));
 
         Map<String, List<PermitConfig>> byType = permits.getByType();
         assertNotNull(byType);

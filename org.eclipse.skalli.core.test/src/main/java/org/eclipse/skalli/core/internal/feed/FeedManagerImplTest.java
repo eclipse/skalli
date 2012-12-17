@@ -31,14 +31,14 @@ import org.eclipse.skalli.services.feed.FeedEntry;
 import org.eclipse.skalli.services.feed.FeedProvider;
 import org.eclipse.skalli.services.feed.FeedUpdater;
 import org.eclipse.skalli.services.project.ProjectService;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.feeds.HashMapFeedService;
 import org.junit.Test;
 
 public class FeedManagerImplTest {
 
-    private static final UUID PROJECT1_UUID = PropertyHelperUtils.TEST_UUIDS[0];
-    private static final UUID PROJECT2_UUID = PropertyHelperUtils.TEST_UUIDS[1];
+    private static final UUID PROJECT1_UUID = TestUUIDs.TEST_UUIDS[0];
+    private static final UUID PROJECT2_UUID = TestUUIDs.TEST_UUIDS[1];
 
     @Test
     public void testUpdateAllFeeds() throws Exception {

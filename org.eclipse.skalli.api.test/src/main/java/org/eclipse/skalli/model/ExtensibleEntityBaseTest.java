@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.skalli.testutil.AssertUtils;
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.PropertyTestUtil;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestExtensibleEntityBase;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.eclipse.skalli.testutil.TestExtensionEntityBase1;
@@ -31,14 +31,14 @@ public class ExtensibleEntityBaseTest {
 
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
-        PropertyHelper.checkPropertyDefinitions(TestExtensibleEntityBase.class, requiredProperties, values);
+        Map<String, Object> values = PropertyTestUtil.getValues();
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
+        PropertyTestUtil.checkPropertyDefinitions(TestExtensibleEntityBase.class, requiredProperties, values);
     }
 
     @Test
     public void testExtension() {
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
         Assert.assertNull(base.getExtension(TestExtensionEntityBase1.class));
         Assert.assertNull(base.getExtension(null));
         Assert.assertTrue(base.getAllExtensions().isEmpty());
@@ -84,9 +84,9 @@ public class ExtensibleEntityBaseTest {
 
     @Test
     public void testInheritedExtension() {
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
-        TestExtensibleEntityBase parent = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[1]);
-        TestExtensibleEntityBase parentParent = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[2]);
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
+        TestExtensibleEntityBase parent = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[1]);
+        TestExtensibleEntityBase parentParent = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[2]);
 
         TestExtension ext1 = new TestExtension();
         ext1.setExtensibleEntity(base);

@@ -25,7 +25,7 @@ import org.eclipse.skalli.services.validation.Validation;
 import org.eclipse.skalli.services.validation.ValidationService;
 import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.BundleManager;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.junit.Assert;
 import org.junit.Before;
@@ -99,13 +99,13 @@ public class EntityServiceBaseTest {
     public void setup() throws Exception {
         BundleManager.startBundles();
 
-        validEntity = new TestEntityBase1(PropertyHelperUtils.TEST_UUIDS[0]);
+        validEntity = new TestEntityBase1(TestUUIDs.TEST_UUIDS[0]);
         noUuidEntity = new TestEntityBase1();
-        invalidEntity = new TestEntityBase1(PropertyHelperUtils.TEST_UUIDS[1]);
+        invalidEntity = new TestEntityBase1(TestUUIDs.TEST_UUIDS[1]);
 
         entities = new ArrayList<TestEntityBase1>();
-        for (int i = 0; i < PropertyHelperUtils.TEST_UUIDS.length; ++i) {
-            entities.add(new TestEntityBase1(PropertyHelperUtils.TEST_UUIDS[i]));
+        for (int i = 0; i < TestUUIDs.TEST_UUIDS.length; ++i) {
+            entities.add(new TestEntityBase1(TestUUIDs.TEST_UUIDS[i]));
         }
 
         mockIPS = createNiceMock(PersistenceService.class);
@@ -120,18 +120,18 @@ public class EntityServiceBaseTest {
     @Test
     public void testGetters() throws Exception {
         reset(mocks);
-        mockIPS.getEntity(eq(TestEntityBase1.class), eq(PropertyHelperUtils.TEST_UUIDS[0]));
+        mockIPS.getEntity(eq(TestEntityBase1.class), eq(TestUUIDs.TEST_UUIDS[0]));
         expectLastCall().andReturn(entities.get(0)).anyTimes();
         mockIPS.getEntities(eq(TestEntityBase1.class));
         expectLastCall().andReturn(entities).anyTimes();
-        mockIPS.loadEntity(eq(TestEntityBase1.class), eq(PropertyHelperUtils.TEST_UUIDS[0]));
+        mockIPS.loadEntity(eq(TestEntityBase1.class), eq(TestUUIDs.TEST_UUIDS[0]));
         expectLastCall().andReturn(entities.get(0)).anyTimes();
         replay(mocks);
 
-        Assert.assertEquals(entities.get(0), entityService.getByUUID(PropertyHelperUtils.TEST_UUIDS[0]));
+        Assert.assertEquals(entities.get(0), entityService.getByUUID(TestUUIDs.TEST_UUIDS[0]));
         AssertUtils.assertEquals("getAll()", entities, entityService.getAll());
         Assert.assertEquals(entities.get(0),
-                entityService.loadEntity(TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[0]));
+                entityService.loadEntity(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[0]));
 
         verify(mocks);
     }
@@ -145,7 +145,7 @@ public class EntityServiceBaseTest {
         expectLastCall();
         mockIPS.persist(eq(noUuidEntity), eq(USERID));
         expectLastCall();
-        mockVS.queue(eq(new Validation<TestEntityBase1>(TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[0],
+        mockVS.queue(eq(new Validation<TestEntityBase1>(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[0],
                 Severity.INFO, USERID)));
         expectLastCall();
         mockVS.queue(isA(Validation.class)); // test for concrete Validation not possible,
@@ -167,7 +167,7 @@ public class EntityServiceBaseTest {
         expectLastCall();
         mockIPS.persist(eq(noUuidEntity), eq(USERID));
         expectLastCall();
-        mockVS.queue(eq(new Validation<TestEntityBase1>(TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[0],
+        mockVS.queue(eq(new Validation<TestEntityBase1>(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[0],
                 Severity.INFO, USERID)));
         expectLastCall();
         mockVS.queue(isA(Validation.class)); // test for concrete Validation not possible,
@@ -208,11 +208,11 @@ public class EntityServiceBaseTest {
     }
 
     private static Issue[] ISSUES = new Issue[] {
-            new Issue(Severity.FATAL, ISSUER, PropertyHelperUtils.TEST_UUIDS[0]),
-            new Issue(Severity.ERROR, ISSUER, PropertyHelperUtils.TEST_UUIDS[0]),
-            new Issue(Severity.ERROR, ISSUER, PropertyHelperUtils.TEST_UUIDS[1]),
-            new Issue(Severity.WARNING, ISSUER, PropertyHelperUtils.TEST_UUIDS[0]),
-            new Issue(Severity.INFO, ISSUER, PropertyHelperUtils.TEST_UUIDS[0])
+            new Issue(Severity.FATAL, ISSUER, TestUUIDs.TEST_UUIDS[0]),
+            new Issue(Severity.ERROR, ISSUER, TestUUIDs.TEST_UUIDS[0]),
+            new Issue(Severity.ERROR, ISSUER, TestUUIDs.TEST_UUIDS[1]),
+            new Issue(Severity.WARNING, ISSUER, TestUUIDs.TEST_UUIDS[0]),
+            new Issue(Severity.INFO, ISSUER, TestUUIDs.TEST_UUIDS[0])
     };
 
     private static TreeSet<Issue> getIssues() {
@@ -235,7 +235,7 @@ public class EntityServiceBaseTest {
 
         TreeSet<Issue> issues = getIssues();
         assertTimestamps(issues, true);
-        service.validateIssues(PropertyHelperUtils.TEST_UUIDS[0], Severity.FATAL, issues);
+        service.validateIssues(TestUUIDs.TEST_UUIDS[0], Severity.FATAL, issues);
         Assert.assertTrue(issues.contains(ISSUES[0]));
         Assert.assertFalse(issues.contains(ISSUES[1]));
         Assert.assertFalse(issues.contains(ISSUES[2]));
@@ -245,7 +245,7 @@ public class EntityServiceBaseTest {
 
         issues = getIssues();
         assertTimestamps(issues, true);
-        service.validateIssues(PropertyHelperUtils.TEST_UUIDS[0], Severity.ERROR, issues);
+        service.validateIssues(TestUUIDs.TEST_UUIDS[0], Severity.ERROR, issues);
         Assert.assertTrue(issues.contains(ISSUES[0]));
         Assert.assertTrue(issues.contains(ISSUES[1]));
         Assert.assertFalse(issues.contains(ISSUES[2]));
@@ -255,7 +255,7 @@ public class EntityServiceBaseTest {
 
         issues = getIssues();
         assertTimestamps(issues, true);
-        service.validateIssues(PropertyHelperUtils.TEST_UUIDS[0], Severity.WARNING, issues);
+        service.validateIssues(TestUUIDs.TEST_UUIDS[0], Severity.WARNING, issues);
         Assert.assertTrue(issues.contains(ISSUES[0]));
         Assert.assertTrue(issues.contains(ISSUES[1]));
         Assert.assertFalse(issues.contains(ISSUES[2]));

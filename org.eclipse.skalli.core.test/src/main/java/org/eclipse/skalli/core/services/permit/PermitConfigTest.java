@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.services.permit.Permit;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
@@ -31,8 +31,8 @@ public class PermitConfigTest {
         assertEquals(0, config.getLevel());
         assertEquals(0, config.getPos());
         assertFalse(config.isOverride());
-        config.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
-        assertEquals(PropertyHelperUtils.TEST_UUIDS[0], config.getUuid());
+        config.setUuid(TestUUIDs.TEST_UUIDS[0]);
+        assertEquals(TestUUIDs.TEST_UUIDS[0], config.getUuid());
         config.setType(PermitsConfig.GROUP_PERMIT);
         assertEquals(PermitsConfig.GROUP_PERMIT, config.getType());
         config.setAction(Permit.ACTION_GET);
@@ -57,13 +57,13 @@ public class PermitConfigTest {
     public void testEquals() throws Exception {
         PermitConfig config1 = new PermitConfig();
         PermitConfig config2 = new PermitConfig();
-        config1.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
-        config2.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
+        config1.setUuid(TestUUIDs.TEST_UUIDS[0]);
+        config2.setUuid(TestUUIDs.TEST_UUIDS[0]);
         assertEquals(config1, config2);
         assertEquals(config2, config1);
         assertFalse(config1.equals(null));
-        assertFalse(config1.equals(PropertyHelperUtils.TEST_UUIDS[0]));
-        config2.setUuid(PropertyHelperUtils.TEST_UUIDS[1]);
+        assertFalse(config1.equals(TestUUIDs.TEST_UUIDS[0]));
+        config2.setUuid(TestUUIDs.TEST_UUIDS[1]);
         assertFalse(config1.equals(config2));
         assertFalse(config2.equals(config1));
 

@@ -23,7 +23,7 @@ import org.eclipse.skalli.services.entity.EntityService;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.HashMapStorageService;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.eclipse.skalli.testutil.TestExtensibleEntityBase;
 import org.eclipse.skalli.testutil.TestExtensibleEntityEntityService;
@@ -126,24 +126,24 @@ public class XStreamPersistenceServiceTest {
         XStreamPersistenceService p = new XStreamPersistenceService();
         p.registerEntityClass(TestEntityBase1.class);
 
-        EntityBase parent1 = new TestEntityBase1(PropertyHelperUtils.TEST_UUIDS[0]);
-        EntityBase parent2 = new TestEntityBase1(PropertyHelperUtils.TEST_UUIDS[1]);
+        EntityBase parent1 = new TestEntityBase1(TestUUIDs.TEST_UUIDS[0]);
+        EntityBase parent2 = new TestEntityBase1(TestUUIDs.TEST_UUIDS[1]);
         parent2.setDeleted(true);
 
         // non-deleted entities referencing non-deleted parent entities
         // hierarchy: entity2 -> entity1 -> parent1
-        EntityBase entity1 = new TestEntityBase1(PropertyHelperUtils.TEST_UUIDS[2], PropertyHelperUtils.TEST_UUIDS[0]);
-        EntityBase entity2 = new TestEntityBase1(PropertyHelperUtils.TEST_UUIDS[3], PropertyHelperUtils.TEST_UUIDS[2]);
+        EntityBase entity1 = new TestEntityBase1(TestUUIDs.TEST_UUIDS[2], TestUUIDs.TEST_UUIDS[0]);
+        EntityBase entity2 = new TestEntityBase1(TestUUIDs.TEST_UUIDS[3], TestUUIDs.TEST_UUIDS[2]);
 
         // non-deleted entity referencing a deleted parent entity
-        EntityBase entity3 = new TestEntityBase1(PropertyHelperUtils.TEST_UUIDS[4], PropertyHelperUtils.TEST_UUIDS[1]);
+        EntityBase entity3 = new TestEntityBase1(TestUUIDs.TEST_UUIDS[4], TestUUIDs.TEST_UUIDS[1]);
 
         // deleted entity referencing a deleted parent entity
-        EntityBase entity4 = new TestEntityBase1(PropertyHelperUtils.TEST_UUIDS[5], PropertyHelperUtils.TEST_UUIDS[1]);
+        EntityBase entity4 = new TestEntityBase1(TestUUIDs.TEST_UUIDS[5], TestUUIDs.TEST_UUIDS[1]);
         entity4.setDeleted(true);
 
         // deleted entity referencing a non-deleted parent entity
-        EntityBase entity5 = new TestEntityBase1(PropertyHelperUtils.TEST_UUIDS[6], PropertyHelperUtils.TEST_UUIDS[0]);
+        EntityBase entity5 = new TestEntityBase1(TestUUIDs.TEST_UUIDS[6], TestUUIDs.TEST_UUIDS[0]);
         entity5.setDeleted(true);
 
         p.updateCache(parent1);
@@ -156,24 +156,24 @@ public class XStreamPersistenceServiceTest {
 
         p.resolveParentEntities(TestEntityBase1.class);
 
-        Assert.assertNull(p.getEntity(TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[0]).getParentEntity());
-        Assert.assertNull(p.getDeletedEntity(TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[1])
+        Assert.assertNull(p.getEntity(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[0]).getParentEntity());
+        Assert.assertNull(p.getDeletedEntity(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[1])
                 .getParentEntity());
 
-        Assert.assertEquals(parent1, p.getEntity(TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[2])
+        Assert.assertEquals(parent1, p.getEntity(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[2])
                 .getParentEntity());
-        Assert.assertEquals(entity1, p.getEntity(TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[3])
+        Assert.assertEquals(entity1, p.getEntity(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[3])
                 .getParentEntity());
 
         // non-deleted entity MUST NOT  reference a deleted parent entity:
-        Assert.assertNull(p.getEntity(TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[4]).getParentEntity());
+        Assert.assertNull(p.getEntity(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[4]).getParentEntity());
 
         // deleted entity MAY reference a deleted parent entity
-        Assert.assertEquals(parent2, p.getDeletedEntity(TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[5])
+        Assert.assertEquals(parent2, p.getDeletedEntity(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[5])
                 .getParentEntity());
 
         // deleted entity MAY reference a non-deleted parent entity
-        Assert.assertEquals(parent1, p.getDeletedEntity(TestEntityBase1.class, PropertyHelperUtils.TEST_UUIDS[6])
+        Assert.assertEquals(parent1, p.getDeletedEntity(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[6])
                 .getParentEntity());
     }
 
@@ -183,33 +183,33 @@ public class XStreamPersistenceServiceTest {
             throws Exception {
         List<TestExtensibleEntityBase> entities = new LinkedList<TestExtensibleEntityBase>();
 
-        TestExtensibleEntityBase parentParent = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[2]);
+        TestExtensibleEntityBase parentParent = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[2]);
         entities.add(parentParent);
         ExtensionEntityBase exts2[] = { createExtension(TestExtension.class, true, "foo", "1", "2"),
                 createExtension(TestExtension1.class, false, "bar", "3") };
         addExtensions(parentParent, exts2);
 
-        TestExtensibleEntityBase parent = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[1]);
+        TestExtensibleEntityBase parent = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[1]);
         entities.add(parent);
         ExtensionEntityBase exts1[] = { createExtension(TestExtension.class, true, "Z", "F", "G", "H", "I"),
                 createExtension(TestExtension1.class, true, "Y", "D", "E") };
         addExtensions(parent, exts1);
         parent.setParentEntity(parentParent);
 
-        TestExtensibleEntityBase base = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtensibleEntityBase base = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
         entities.add(base);
         ExtensionEntityBase exts0[] = { createExtension(TestExtension.class, false, "X", "A", "B", "C") };
         base.setInherited(TestExtension1.class, true);
         addExtensions(base, exts0);
         base.setParentEntity(parent);
 
-        TestExtensibleEntityBase deletedParent = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[4]);
+        TestExtensibleEntityBase deletedParent = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[4]);
         deletedParent.setDeleted(true);
         entities.add(deletedParent);
         ExtensionEntityBase exts4[] = { createExtension(TestExtension1.class, false, "deleted parent", "d", "e") };
         addExtensions(deletedParent, exts4);
 
-        TestExtensibleEntityBase deleted = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[3]);
+        TestExtensibleEntityBase deleted = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[3]);
         deleted.setDeleted(true);
         entities.add(deleted);
         ExtensionEntityBase exts3[] = { createExtension(TestExtension.class, false, "deleted", "a", "b", "c") };

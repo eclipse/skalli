@@ -35,7 +35,7 @@ import org.eclipse.skalli.services.extension.DataMigration;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.eclipse.skalli.testutil.HashMapStorageService;
 import org.eclipse.skalli.testutil.HashMapStorageService.Key;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestExtensibleEntityBase;
 import org.eclipse.skalli.testutil.TestExtensibleEntityEntityService;
 import org.eclipse.skalli.testutil.TestExtension;
@@ -74,9 +74,9 @@ public class XStreamPersistenceTest {
 
     private static final String TEXT1 = "XStreamPersistenceTest greets the world!";
 
-    private static final String XML_WITH_VERSION = "<bla version=\"42\"><uuid>" + PropertyHelperUtils.TEST_UUIDS[0]
+    private static final String XML_WITH_VERSION = "<bla version=\"42\"><uuid>" + TestUUIDs.TEST_UUIDS[0]
             + "</uuid><hello>world</hello><blubb>noop</blubb></bla>";
-    private static final String XML_WITHOUT_VERSION = "<bla><uuid>" + PropertyHelperUtils.TEST_UUIDS[0]
+    private static final String XML_WITHOUT_VERSION = "<bla><uuid>" + TestUUIDs.TEST_UUIDS[0]
             + "</uuid><hello>world</hello><blubb>noop</blubb></bla>";
 
     private static final String XML_WITH_EXTENSIONS = createXML(TIME0, USER0, ALIASES, VALUES, LAST_MODIFIED, LAST_MODIFIED_BY);
@@ -100,7 +100,7 @@ public class XStreamPersistenceTest {
     }
 
     private static TestExtensibleEntityBase getExtensibleEntity() {
-        TestExtensibleEntityBase entity = new TestExtensibleEntityBase(PropertyHelperUtils.TEST_UUIDS[0]);
+        TestExtensibleEntityBase entity = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
         entity.addExtension(new TestExtension());
         entity.addExtension(new TestExtension1());
         return entity;

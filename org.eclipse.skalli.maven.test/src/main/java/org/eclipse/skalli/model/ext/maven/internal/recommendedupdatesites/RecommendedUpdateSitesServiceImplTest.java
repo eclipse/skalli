@@ -22,7 +22,7 @@ import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpda
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.UpdateSite;
 import org.eclipse.skalli.services.persistence.PersistenceService;
 import org.eclipse.skalli.testutil.HashMapStorageService;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class RecommendedUpdateSitesServiceImplTest {
 
     private static final String TEST_USER_ID = "User12345";
 
-    private UUID projectUUid = PropertyHelperUtils.TEST_UUIDS[1];
+    private UUID projectUUid = TestUUIDs.TEST_UUIDS[1];
 
     private RecommendedUpdateSitesServiceImpl recommendedUpdateSitesService;
 
@@ -64,7 +64,7 @@ public class RecommendedUpdateSitesServiceImplTest {
         RecommendedUpdateSites testUpdateSites = new RecommendedUpdateSites();
         testUpdateSites.setUserId("owner123");
         testUpdateSites.setDescription("My Test recommendedUpdatesites");
-        testUpdateSites.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
+        testUpdateSites.setUuid(TestUUIDs.TEST_UUIDS[0]);
         testUpdateSites.setId("updateSiteId1234");
 
         UpdateSite updateSite1 = createUpdatesite("1");
@@ -106,7 +106,7 @@ public class RecommendedUpdateSitesServiceImplTest {
         RecommendedUpdateSites testUpdateSites = new RecommendedUpdateSites();
         testUpdateSites.setUserId(userId);
         testUpdateSites.setDescription("My Test recommendedUpdatesites");
-        testUpdateSites.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
+        testUpdateSites.setUuid(TestUUIDs.TEST_UUIDS[0]);
         testUpdateSites.setId(updateSiteId);
 
         UpdateSite updateSite1 = createUpdatesite("testGetRecommended");

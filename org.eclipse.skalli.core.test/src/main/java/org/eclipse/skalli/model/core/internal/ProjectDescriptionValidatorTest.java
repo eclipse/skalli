@@ -14,7 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Severity;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -92,7 +92,7 @@ public class ProjectDescriptionValidatorTest {
 
     private Project getProject(String description, String format) {
         Project project = new Project();
-        project.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
+        project.setUuid(TestUUIDs.TEST_UUIDS[0]);
         project.setDescription(description);
         project.setDescriptionFormat(format);
         return project;

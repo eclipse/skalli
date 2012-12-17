@@ -16,19 +16,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.PropertyTestUtil;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;
 
 /**
  *
  */
 public class RecommendedUpdateSitesTest {
-    final UUID TEST_PROJECT_UUID = PropertyHelperUtils.TEST_UUIDS[0];
+    final UUID TEST_PROJECT_UUID = TestUUIDs.TEST_UUIDS[0];
 
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
+        Map<String, Object> values = PropertyTestUtil.getValues();
         values.put(RecommendedUpdateSites.PROPERTY_ID, "test_updatesite");
         values.put(RecommendedUpdateSites.PROPERTY_USERID, "jon");
         values.put(RecommendedUpdateSites.PROPERTY_NAME, "Test Updatesite");
@@ -42,7 +42,7 @@ public class RecommendedUpdateSitesTest {
         values.put(RecommendedUpdateSites.PROPERTY_UPDATESITES, updateSites );
 
         Map<Class<?>, String[]> requiredProperties = Collections.emptyMap();
-        PropertyHelper.checkPropertyDefinitions(RecommendedUpdateSites.class, requiredProperties, values);
+        PropertyTestUtil.checkPropertyDefinitions(RecommendedUpdateSites.class, requiredProperties, values);
     }
 
     /**

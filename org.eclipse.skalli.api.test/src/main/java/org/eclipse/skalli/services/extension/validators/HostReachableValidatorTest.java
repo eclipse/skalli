@@ -20,7 +20,7 @@ import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.HttpServerMock;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -125,9 +125,9 @@ public class HostReachableValidatorTest {
             Severity expectedSeverity = entry.getValue();
 
             if (expectedSeverity != null && expectedSeverity.compareTo(minSeverity) <= 0) {
-                assertIssues(hrv.validate(PropertyHelperUtils.TEST_UUIDS[0], expectedHost, minSeverity), minSeverity);
+                assertIssues(hrv.validate(TestUUIDs.TEST_UUIDS[0], expectedHost, minSeverity), minSeverity);
             } else {
-                assertNoIssues(hrv.validate(PropertyHelperUtils.TEST_UUIDS[0], expectedHost, minSeverity));
+                assertNoIssues(hrv.validate(TestUUIDs.TEST_UUIDS[0], expectedHost, minSeverity));
             }
         }
     }

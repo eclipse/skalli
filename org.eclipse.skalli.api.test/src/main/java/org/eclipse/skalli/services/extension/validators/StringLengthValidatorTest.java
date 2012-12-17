@@ -14,7 +14,7 @@ import java.util.SortedSet;
 
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Severity;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,44 +27,44 @@ public class StringLengthValidatorTest {
         StringLengthValidator validator = new StringLengthValidator(Severity.FATAL, TestExtension.class,
                 TestExtension.PROPERTY_STR, 3, 10);
 
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "123"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1234567890"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "12345678901"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1234567890123456789"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "12"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "123"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1234567890"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "12345678901"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1234567890123456789"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "12"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1"));
 
         validator = new StringLengthValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR, -1, 10);
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "123"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1234567890"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "12345678901"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1234567890123456789"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "12"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "123"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1234567890"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "12345678901"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1234567890123456789"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "12"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1"));
 
         validator = new StringLengthValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR, 3, -1);
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "123"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1234567890"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "12345678901"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1234567890123456789"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "12"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "123"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1234567890"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "12345678901"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1234567890123456789"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "12"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1"));
 
         validator = new StringLengthValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR, -1, -1);
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "123"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1234567890"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "12345678901"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1234567890123456789"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "12"));
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "123"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1234567890"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "12345678901"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1234567890123456789"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "12"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1"));
 
         validator = new StringLengthValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR, 3, 3);
-        Assert.assertTrue(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "123"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1234567890"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "12345678901"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1234567890123456789"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "12"));
-        Assert.assertFalse(validator.isValid(PropertyHelperUtils.TEST_UUIDS[0], "1"));
+        Assert.assertTrue(validator.isValid(TestUUIDs.TEST_UUIDS[0], "123"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1234567890"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "12345678901"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1234567890123456789"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "12"));
+        Assert.assertFalse(validator.isValid(TestUUIDs.TEST_UUIDS[0], "1"));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -82,34 +82,34 @@ public class StringLengthValidatorTest {
         StringLengthValidator validator = new StringLengthValidator(Severity.FATAL, TestExtension.class,
                 TestExtension.PROPERTY_STR, 3, 10);
 
-        SortedSet<Issue> issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], "1234", Severity.FATAL);
+        SortedSet<Issue> issues = validator.validate(TestUUIDs.TEST_UUIDS[0], "1234", Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(0, issues.size());
 
         String value = "12";
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], value, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], value, Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(1, issues.size());
         Assert.assertEquals(validator.getDefaultInvalidMessage(value), issues.first().getMessage());
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[0], issues.first().getEntityId());
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0], issues.first().getEntityId());
         Assert.assertEquals(TestExtension.class, issues.first().getExtension());
         Assert.assertEquals(TestExtension.PROPERTY_STR, issues.first().getPropertyId());
         Assert.assertEquals(Severity.FATAL, issues.first().getSeverity());
 
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], null, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], null, Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(0, issues.size());
 
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], "", Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], "", Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(0, issues.size());
 
         validator.setValueRequired(true);
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], null, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], null, Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(1, issues.size());
 
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], "", Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], "", Severity.FATAL);
         Assert.assertNotNull(issues);
         Assert.assertEquals(1, issues.size());
     }
@@ -119,7 +119,7 @@ public class StringLengthValidatorTest {
         String value = "12";
         StringLengthValidator validator = new StringLengthValidator(Severity.FATAL, TestExtension.class,
                 TestExtension.PROPERTY_STR, 3, 10);
-        SortedSet<Issue> issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], value, Severity.FATAL);
+        SortedSet<Issue> issues = validator.validate(TestUUIDs.TEST_UUIDS[0], value, Severity.FATAL);
         String defaultInvalidMessage = validator.getDefaultInvalidMessage(value);
         Assert.assertEquals(defaultInvalidMessage, issues.first().getMessage());
         Assert.assertTrue(defaultInvalidMessage.startsWith("Value"));
@@ -129,7 +129,7 @@ public class StringLengthValidatorTest {
 
         value = "1234567890123";
         validator = new StringLengthValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR, 0, 10);
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], value, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], value, Severity.FATAL);
         defaultInvalidMessage = validator.getDefaultInvalidMessage(value);
         Assert.assertEquals(defaultInvalidMessage, issues.first().getMessage());
         Assert.assertTrue(defaultInvalidMessage.startsWith("Value"));
@@ -139,7 +139,7 @@ public class StringLengthValidatorTest {
 
         value = "12";
         validator = new StringLengthValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR, 3, -1);
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], value, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], value, Severity.FATAL);
         defaultInvalidMessage = validator.getDefaultInvalidMessage(value);
         Assert.assertEquals(defaultInvalidMessage, issues.first().getMessage());
         Assert.assertTrue(defaultInvalidMessage.startsWith("Value"));
@@ -149,7 +149,7 @@ public class StringLengthValidatorTest {
 
         value = "12";
         validator = new StringLengthValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR, 3, 3);
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], value, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], value, Severity.FATAL);
         defaultInvalidMessage = validator.getDefaultInvalidMessage(value);
         Assert.assertEquals(defaultInvalidMessage, issues.first().getMessage());
         Assert.assertTrue(defaultInvalidMessage.startsWith("Value"));
@@ -160,7 +160,7 @@ public class StringLengthValidatorTest {
         String caption = "String Caption";
         validator = new StringLengthValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR, caption,
                 3, 10);
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], value, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], value, Severity.FATAL);
         String invalidMessage = validator.getInvalidMessageFromCaption(value);
         Assert.assertEquals(invalidMessage, issues.first().getMessage());
         Assert.assertTrue(invalidMessage.startsWith(caption));
@@ -170,7 +170,7 @@ public class StringLengthValidatorTest {
         value = "12";
         validator = new StringLengthValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR,
                 "Invalid String Length", "Undefined String", 3, 10);
-        issues = validator.validate(PropertyHelperUtils.TEST_UUIDS[0], value, Severity.FATAL);
+        issues = validator.validate(TestUUIDs.TEST_UUIDS[0], value, Severity.FATAL);
         Assert.assertEquals("Invalid String Length", issues.first().getMessage());
     }
 }

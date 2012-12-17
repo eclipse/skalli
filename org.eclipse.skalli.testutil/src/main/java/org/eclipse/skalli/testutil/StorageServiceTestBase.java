@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
-public abstract class AbstractStorageServiceTest {
+public abstract class StorageServiceTestBase {
 
     protected static final String TEST_ID = "test_id";
     protected static final String TEST_NONEXISTING_ID = "some_non_existing_id";

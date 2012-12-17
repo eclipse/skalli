@@ -12,8 +12,8 @@ package org.eclipse.skalli.model;
 
 import java.util.Map;
 
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.PropertyTestUtil;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ public class UserTest {
 
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
+        Map<String, Object> values = PropertyTestUtil.getValues();
         values.put(User.PROPERTY_USERID, "homer");
         values.put(User.PROPERTY_FIRSTNAME, "Homer");
         values.put(User.PROPERTY_LASTNAME, "Simpson");
@@ -36,9 +36,9 @@ public class UserTest {
         values.put(User.PROPERTY_COMPANY, "Springfield Nuclear Power Plant");
         values.put(User.PROPERTY_SIP, "homer@springfield.net");
 
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
 
-        PropertyHelper.checkPropertyDefinitions(User.class, requiredProperties, values);
+        PropertyTestUtil.checkPropertyDefinitions(User.class, requiredProperties, values);
     }
 
     @Test
@@ -104,8 +104,8 @@ public class UserTest {
         Assert.assertEquals("homer@springfield.net", user.getDisplayName());
 
         user = new User();
-        user.setUuid(PropertyHelperUtils.TEST_UUIDS[0]);
-        Assert.assertEquals(PropertyHelperUtils.TEST_UUIDS[0].toString(), user.getDisplayName());
+        user.setUuid(TestUUIDs.TEST_UUIDS[0]);
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0].toString(), user.getDisplayName());
     }
 
     @Test

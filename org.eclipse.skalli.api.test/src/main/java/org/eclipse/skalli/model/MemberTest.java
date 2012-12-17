@@ -12,8 +12,7 @@ package org.eclipse.skalli.model;
 
 import java.util.Map;
 
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.PropertyTestUtil;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
@@ -21,13 +20,13 @@ public class MemberTest {
 
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
+        Map<String, Object> values = PropertyTestUtil.getValues();
         values.put(Member.PROPERTY_USERID, "homer");
 
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
         requiredProperties.put(Member.class, new String[] { Member.PROPERTY_USERID });
 
-        PropertyHelper.checkPropertyDefinitions(Member.class, requiredProperties, values);
+        PropertyTestUtil.checkPropertyDefinitions(Member.class, requiredProperties, values);
     }
 
 }

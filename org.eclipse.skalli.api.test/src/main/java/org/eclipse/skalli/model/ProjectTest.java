@@ -13,8 +13,7 @@ package org.eclipse.skalli.model;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.eclipse.skalli.testutil.PropertyHelper;
-import org.eclipse.skalli.testutil.PropertyHelperUtils;
+import org.eclipse.skalli.testutil.PropertyTestUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,7 +22,7 @@ public class ProjectTest {
 
     @Test
     public void testPropertyDefinitions() throws Exception {
-        Map<String, Object> values = PropertyHelperUtils.getValues();
+        Map<String, Object> values = PropertyTestUtil.getValues();
         values.put(Project.PROPERTY_PROJECTID, "eclipse.skalli");
         values.put(Project.PROPERTY_TEMPLATEID, "default");
         values.put(Project.PROPERTY_PARENT_PROJECT, null);
@@ -38,8 +37,8 @@ public class ProjectTest {
         values.put(Project.PROPERTY_PHASE, "Gone Crazy!");
         values.put(Project.PROPERTY_REGISTERED, System.currentTimeMillis());
         values.put(Project.PROPERTY_SHORT_NAME, "ECLSKA");
-        Map<Class<?>, String[]> requiredProperties = PropertyHelperUtils.getRequiredProperties();
-        PropertyHelper.checkPropertyDefinitions(Project.class, requiredProperties, values);
+        Map<Class<?>, String[]> requiredProperties = PropertyTestUtil.getRequiredProperties();
+        PropertyTestUtil.checkPropertyDefinitions(Project.class, requiredProperties, values);
     }
 
     @Test
