@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.extension.validators;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
@@ -23,7 +24,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MinMaxOccurrencesPropertyValidatorTest {
+@SuppressWarnings("nls")
+public class MinMaxSizeValidatorTest {
 
     class TestExtension extends ExtensibleEntityBase {
         Set<String> items = new HashSet<String>();
@@ -43,13 +45,17 @@ public class MinMaxOccurrencesPropertyValidatorTest {
         items = new HashSet<String>();
         items.add("item1");
         items.add("item2");
+        items.add("item3");
     }
 
-    private MinMaxOccurrencesPropertyValidator createValidator(int minExpectedOccurrences,
-            int maxAllowedOccurrences)
-    {
-        return new MinMaxOccurrencesPropertyValidator(Severity.WARNING, TestExtension.class, "foo",
-                "bar", minExpectedOccurrences, maxAllowedOccurrences);
+    private MinMaxSizeValidator createValidator(int minExpectedOccurrences, int maxAllowedOccurrences) {
+        return new MinMaxSizeValidator(Severity.WARNING, TestExtension.class, TestExtension.PROPERTY_ITEMS,
+                "Items", minExpectedOccurrences, maxAllowedOccurrences);
+    }
+
+    private MinMaxSizeValidator createValidatorNoCaption(int minExpectedOccurrences, int maxAllowedOccurrences) {
+        return new MinMaxSizeValidator(Severity.WARNING, TestExtension.class, TestExtension.PROPERTY_ITEMS,
+                null, minExpectedOccurrences, maxAllowedOccurrences);
     }
 
     @Test
@@ -74,22 +80,79 @@ public class MinMaxOccurrencesPropertyValidatorTest {
     }
 
     @Test
-    public void testValidateMax() {
-        SortedSet<Issue> itmes = createValidator(0, 1)
+    public void testValidateAtMost() {
+        SortedSet<Issue> itmes = createValidator(0, 2)
                 .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
         Issue itme1 = itmes.first();
-        Assert.assertTrue("Property 'bar' of extension 'foo' should not have more than 1 values, but it currently has 2 values."
-                .compareTo(itme1.getMessage()) == 0);
+        Assert.assertEquals("Items should have at most 2 entries, but it currently has 3",
+                itme1.getMessage());
     }
 
     @Test
-    public void testValidateMin() {
+    public void testValidateAtMostNoCaption() throws Exception {
+        SortedSet<Issue> itmes = createValidatorNoCaption(0, 2)
+                .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
+        Issue itme1 = itmes.first();
+        Assert.assertEquals("Property 'items' should have at most 2 entries, but it currently has 3",
+                itme1.getMessage());
+    }
+
+    @Test
+    public void testValidateAtMostOne() {
+        SortedSet<Issue> itmes = createValidator(0, 1)
+                .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
+        Issue itme1 = itmes.first();
+        Assert.assertEquals("Items should have at most one entry, but it currently has 3",
+                itme1.getMessage());
+    }
+
+    @Test
+    public void testValidateAtMostOneNoCaption() throws Exception {
+        SortedSet<Issue> itmes = createValidatorNoCaption(0, 1)
+                .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
+        Issue itme1 = itmes.first();
+        Assert.assertEquals("Property 'items' should have at most one entry, but it currently has 3",
+                itme1.getMessage());
+    }
+
+    @Test
+    public void testValidateAtLeast() {
         SortedSet<Issue> itmes = createValidator(5, Integer.MAX_VALUE)
                 .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
         Assert.assertEquals(1, itmes.size());
         Issue itme1 = itmes.first();
-        Assert.assertTrue("Property 'bar' of extension 'foo' should have at least 5 values, but it currently has only 2 values."
-                .compareTo(itme1.getMessage()) == 0);
+        Assert.assertEquals("Items should have at least 5 entries, but it currently has only 3",
+                itme1.getMessage());
+    }
+
+    @Test
+    public void testValidateAtLeastNoCaption() {
+        SortedSet<Issue> itmes = createValidatorNoCaption(5, Integer.MAX_VALUE)
+                .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
+        Assert.assertEquals(1, itmes.size());
+        Issue itme1 = itmes.first();
+        Assert.assertEquals("Property 'items' should have at least 5 entries, but it currently has only 3",
+                itme1.getMessage());
+    }
+
+    @Test
+    public void testValidateAtLeastOne() {
+        SortedSet<Issue> itmes = createValidator(1, Integer.MAX_VALUE)
+                .validate(PropertyHelperUtils.TEST_UUIDS[0], Collections.emptySet(), Severity.WARNING);
+        Assert.assertEquals(1, itmes.size());
+        Issue itme1 = itmes.first();
+        Assert.assertEquals("Items should have at least one entry",
+                itme1.getMessage());
+    }
+
+    @Test
+    public void testValidateAtLeastOneNoCaption() {
+        SortedSet<Issue> itmes = createValidatorNoCaption(1, Integer.MAX_VALUE)
+                .validate(PropertyHelperUtils.TEST_UUIDS[0], Collections.emptySet(), Severity.WARNING);
+        Assert.assertEquals(1, itmes.size());
+        Issue itme1 = itmes.first();
+        Assert.assertEquals("Property 'items' should have at least one entry",
+                itme1.getMessage());
     }
 
     @Test
@@ -113,7 +176,7 @@ public class MinMaxOccurrencesPropertyValidatorTest {
 
     @Test
     public void testValidateMinMaxNoIssues() {
-        SortedSet<Issue> itmes = createValidator(2, 2)
+        SortedSet<Issue> itmes = createValidator(3, 3)
                 .validate(PropertyHelperUtils.TEST_UUIDS[0], items, Severity.WARNING);
         Assert.assertEquals(0, itmes.size());
     }

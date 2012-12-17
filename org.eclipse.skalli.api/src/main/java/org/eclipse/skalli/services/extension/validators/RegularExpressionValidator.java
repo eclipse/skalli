@@ -22,7 +22,7 @@ import org.eclipse.skalli.services.extension.PropertyValidatorBase;
 
 /**
  * Property validator that matches a string with a given regular expression.
- *
+ * This validator can be applied to single-valued properties and to {@link java.util.Collection collections}.
  */
 public class RegularExpressionValidator extends PropertyValidatorBase {
 
@@ -33,12 +33,12 @@ public class RegularExpressionValidator extends PropertyValidatorBase {
      *
      * @param severity  the severity that should be assigned to reported issues.
      * @param extension  the class of the model extension the property belongs to, or <code>null</code>.
-     * @param propertyName  the name of a property (see {@link PropertyName}).
-     * @param regex  the {@link java.util.regexp.Pattern regular expression}.
+     * @param property  the name of a property (see {@link PropertyName}).
+     * @param pattern  the {@link java.util.regexp.Pattern regular expression}.
      */
     public RegularExpressionValidator(Severity severity, Class<? extends ExtensionEntityBase> extension,
-            String property, String regex) {
-        this(severity, extension, property, null, regex);
+            String property, String pattern) {
+        this(severity, extension, property, null, pattern);
     }
 
     /**
@@ -46,15 +46,14 @@ public class RegularExpressionValidator extends PropertyValidatorBase {
      *
      * @param severity  the severity that should be assigned to reported issues.
      * @param extension  the class of the model extension the property belongs to, or <code>null</code>.
-     * @param propertyName  the name of a property (see {@link PropertyName}).
+     * @param property  the name of a property (see {@link PropertyName}).
      * @param caption  the caption of the property as shown to the user in the UI form.
-     * @param regex  the {@link java.util.regexp.Pattern regular expression}.
+     * @param pattern  the {@link java.util.regexp.Pattern regular expression}.
      */
     public RegularExpressionValidator(Severity severity, Class<? extends ExtensionEntityBase> extension,
-            String property,
-            String caption, String regex) {
+            String property, String caption, String pattern) {
         super(severity, extension, property, caption);
-        this.pattern = Pattern.compile(regex);
+        this.pattern = Pattern.compile(pattern);
     }
 
     /**
@@ -68,20 +67,19 @@ public class RegularExpressionValidator extends PropertyValidatorBase {
      * @param regex  the {@link java.util.regexp.Pattern regular expression}.
      */
     public RegularExpressionValidator(Severity severity, Class<? extends ExtensionEntityBase> extension,
-            String property,
-            String invalidValueMessage, String undefinedValueMessage, String regex) {
+            String property, String invalidValueMessage, String undefinedValueMessage, String pattern) {
         super(severity, extension, property, invalidValueMessage, undefinedValueMessage);
-        this.pattern = Pattern.compile(regex);
+        this.pattern = Pattern.compile(pattern);
     }
 
     @Override
     protected String getInvalidMessageFromCaption(Object value) {
-        return HtmlUtils.formatEscaped("''{0}'' does not match the pattern {1}", caption, pattern);
+        return HtmlUtils.formatEscaped("{0}: ''{1}'' does not match the pattern ''{2}''", caption, value, pattern);
     }
 
     @Override
     protected String getDefaultInvalidMessage(Object value) {
-        return HtmlUtils.formatEscaped("Value of property ''{0}'' does not match the pattern {1}", propertyName, pattern);
+        return HtmlUtils.formatEscaped("{0}: ''{1}'' does not match the pattern ''{2}''", property, value, pattern);
     }
 
     @Override

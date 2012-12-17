@@ -125,7 +125,7 @@ public class StringLengthValidatorTest {
         Assert.assertTrue(defaultInvalidMessage.startsWith("Value"));
         Assert.assertTrue(defaultInvalidMessage.indexOf(TestExtension.PROPERTY_STR) > 0);
         Assert.assertTrue(defaultInvalidMessage.indexOf("at least") > 0);
-        Assert.assertTrue(defaultInvalidMessage.indexOf("at max") > 0);
+        Assert.assertTrue(defaultInvalidMessage.indexOf("at most") > 0);
 
         value = "1234567890123";
         validator = new StringLengthValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR, 0, 10);
@@ -135,7 +135,7 @@ public class StringLengthValidatorTest {
         Assert.assertTrue(defaultInvalidMessage.startsWith("Value"));
         Assert.assertTrue(defaultInvalidMessage.indexOf(TestExtension.PROPERTY_STR) > 0);
         Assert.assertFalse(defaultInvalidMessage.indexOf("at least") > 0);
-        Assert.assertTrue(defaultInvalidMessage.indexOf("at max") > 0);
+        Assert.assertTrue(defaultInvalidMessage.indexOf("at most") > 0);
 
         value = "12";
         validator = new StringLengthValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR, 3, -1);
@@ -145,7 +145,7 @@ public class StringLengthValidatorTest {
         Assert.assertTrue(defaultInvalidMessage.startsWith("Value"));
         Assert.assertTrue(defaultInvalidMessage.indexOf(TestExtension.PROPERTY_STR) > 0);
         Assert.assertTrue(defaultInvalidMessage.indexOf("at least") > 0);
-        Assert.assertFalse(defaultInvalidMessage.indexOf("at max") > 0);
+        Assert.assertFalse(defaultInvalidMessage.indexOf("at most") > 0);
 
         value = "12";
         validator = new StringLengthValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR, 3, 3);
@@ -165,7 +165,7 @@ public class StringLengthValidatorTest {
         Assert.assertEquals(invalidMessage, issues.first().getMessage());
         Assert.assertTrue(invalidMessage.startsWith(caption));
         Assert.assertTrue(invalidMessage.indexOf("at least") > 0);
-        Assert.assertTrue(invalidMessage.indexOf("at max") > 0);
+        Assert.assertTrue(invalidMessage.indexOf("at most") > 0);
 
         value = "12";
         validator = new StringLengthValidator(Severity.FATAL, TestExtension.class, TestExtension.PROPERTY_STR,

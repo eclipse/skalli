@@ -35,7 +35,7 @@ import org.eclipse.skalli.model.Severity;
 public abstract class PropertyValidatorBase implements PropertyValidator, Issuer {
 
     protected Class<? extends ExtensionEntityBase> extension;
-    protected String propertyName;
+    protected String property;
     protected String caption;
     protected String invalidValueMessage;
     protected String undefinedValueMessage;
@@ -49,22 +49,22 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
      *
      * @param severity  the severity that should be assigned to reported issues.
      * @param extension  the class of the model extension the property belongs to.
-     * @param propertyName  the name of a property (see {@link PropertyName}).
+     * @param property  the name of a property (see {@link PropertyName}).
      */
     protected PropertyValidatorBase(Severity severity, Class<? extends ExtensionEntityBase> extension,
-            String propertyName) {
+            String property) {
         if (severity == null) {
-            throw new IllegalArgumentException("argument 'severity' must not be null");
+            throw new IllegalArgumentException("argument 'severity' must not be null"); //$NON-NLS-1$
         }
         if (extension == null) {
-            throw new IllegalArgumentException("argument 'extension' must not be null");
+            throw new IllegalArgumentException("argument 'extension' must not be null"); //$NON-NLS-1$
         }
-        if (StringUtils.isBlank(propertyName)) {
-            throw new IllegalArgumentException("argument 'propertyName' must not be null or an empty string");
+        if (StringUtils.isBlank(property)) {
+            throw new IllegalArgumentException("argument 'property' must not be null or an empty string"); //$NON-NLS-1$
         }
         this.severity = severity;
         this.extension = extension;
-        this.propertyName = propertyName;
+        this.property = property;
     }
 
     /**
@@ -75,12 +75,12 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
      *
      * @param severity  the severity that should be assigned to reported issues.
      * @param extension  the class of the model extension the property belongs to, or <code>null</code>.
-     * @param propertyName  the name of a property (see {@link PropertyName}).
+     * @param property  the name of a property (see {@link PropertyName}).
      * @param caption  the caption of the property as shown to the user in the UI form.
      */
     protected PropertyValidatorBase(Severity severity, Class<? extends ExtensionEntityBase> extension,
-            String propertyName, String caption) {
-        this(severity, extension, propertyName);
+            String property, String caption) {
+        this(severity, extension, property);
         this.caption = caption;
     }
 
@@ -93,13 +93,13 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
      *
      * @param severity  the severity that should be assigned to reported issues.
      * @param extension  the class of the model extension the property belongs to, or <code>null</code>.
-     * @param propertyName  the name of a property (see {@link PropertyName}).
+     * @param property  the name of a property (see {@link PropertyName}).
      * @param invalidValueMessage  the message to return in case the value invalid.
      * @param undefinedValueMessage  the message to return in case the value is undefined.
      */
     protected PropertyValidatorBase(Severity severity, Class<? extends ExtensionEntityBase> extension,
-            String propertyName, String invalidValueMessage, String undefinedValueMessage) {
-        this(severity, extension, propertyName);
+            String property, String invalidValueMessage, String undefinedValueMessage) {
+        this(severity, extension, property);
         this.invalidValueMessage = invalidValueMessage;
         this.undefinedValueMessage = undefinedValueMessage;
     }
@@ -226,9 +226,9 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
     protected String getDefaultInvalidMessage(Object value) {
         return extension != null ?
                 HtmlUtils.formatEscaped("''{0}'' is not a valid value for property ''{1}'' of extension ''{2}''",
-                        value, propertyName, extension.getName()) :
+                        value, property, extension.getName()) :
                 HtmlUtils.formatEscaped("''{0}'' is not a valid value for property ''{1}''",
-                        value, propertyName);
+                        value, property);
     }
 
     /**
@@ -238,9 +238,9 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
     protected String getDefaultUndefinedMessage() {
         return extension != null ?
                 HtmlUtils.formatEscaped("Property ''{0}'' of extension ''{1}'' must have a value",
-                        propertyName, extension.getName()) :
+                        property, extension.getName()) :
                 HtmlUtils.formatEscaped("Property ''{0}'' must have a value",
-                        propertyName);
+                        property);
     }
 
     /**
@@ -297,7 +297,7 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
                     if (StringUtils.isBlank(message)) {
                         message = getDefaultUndefinedMessage();
                     }
-                    issues.add(new Issue(severity, getClass(), entity, extension, propertyName,
+                    issues.add(new Issue(severity, getClass(), entity, extension, property,
                             0, message));
                 }
             }
@@ -324,7 +324,7 @@ public abstract class PropertyValidatorBase implements PropertyValidator, Issuer
             }
         }
         if (StringUtils.isNotBlank(message)) {
-            issues.add(new Issue(severity, getClass(), entity, extension, propertyName,
+            issues.add(new Issue(severity, getClass(), entity, extension, property,
                     item, message));
         }
     }

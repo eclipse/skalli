@@ -28,9 +28,20 @@ public class RelativePomPathValidator extends PropertyValidatorBase {
 
     @Override
     protected String getInvalidMessageFromCaption(Object value) {
-        return HtmlUtils.formatEscaped("''{0}'' is not a valid value for {1} - it must be a valid path, " +
-                "must not contain backslashes and /../ segments, and must not end with /pom.xml or a trailing slash",
-                value, caption);
+        return HtmlUtils.formatEscaped("{0}: ''{1}'' is not a valid path. If the reactor POM is in the project's " +
+                "root directory, leave the field empty. Otherwise enter the path relative to the project's root " +
+                "directory. Note that the path must not start or end with a slash, must not contain /../ segments " +
+                "or backslashes, and must not end with /pom.xml",
+                 caption, value);
+    }
+
+    @Override
+    protected String getDefaultInvalidMessage(Object value) {
+        return HtmlUtils.formatEscaped("{0}: ''{1}'' is not a valid path. If the reactor POM is in the project's " +
+                "root directory, leave the field empty. Otherwise enter the path relative to the project's root " +
+                "directory. Note that the path must not start or end with a slash, must not contain /../ segments " +
+                "or backslashes, and must not end with /pom.xml",
+                 property, value);
     }
 
     @Override

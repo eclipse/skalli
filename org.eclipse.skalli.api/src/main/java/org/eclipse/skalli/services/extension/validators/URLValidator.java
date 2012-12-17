@@ -20,30 +20,34 @@ import org.eclipse.skalli.model.PropertyName;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.services.extension.PropertyValidatorBase;
 
+/**
+ * Property validator to check {@link URL URLs}.
+ * This validator can be applied to single-valued properties and to {@link java.util.Collection collections}.
+ */
 public class URLValidator extends PropertyValidatorBase {
 
     /**
-     * Creates a URL validator.
+     * Creates an URL validator.
      *
      * @param severity  the severity that should be assigned to reported issues.
      * @param extension  the class of the model extension the property belongs to, or <code>null</code>.
-     * @param propertyName  the name of a property (see {@link PropertyName}).
+     * @param property  the name of a property (see {@link PropertyName}).
      */
-    public URLValidator(Severity severity, Class<? extends ExtensionEntityBase> extension, String propertyName) {
-        super(severity, extension, propertyName);
+    public URLValidator(Severity severity, Class<? extends ExtensionEntityBase> extension, String property) {
+        super(severity, extension, property);
     }
 
     /**
-     * Creates a URL validator.
+     * Creates an URL validator.
      *
      * @param severity  the severity that should be assigned to reported issues.
      * @param extension  the class of the model extension the property belongs to, or <code>null</code>.
-     * @param propertyName  the name of a property (see {@link PropertyName}).
+     * @param property  the name of a property (see {@link PropertyName}).
      * @param caption  the caption of the property as shown to the user in the UI form.
      */
-    public URLValidator(Severity severity, Class<? extends ExtensionEntityBase> extension, String propertyName,
+    public URLValidator(Severity severity, Class<? extends ExtensionEntityBase> extension, String property,
             String caption) {
-        super(severity, extension, propertyName, caption);
+        super(severity, extension, property, caption);
     }
 
     /**
@@ -51,23 +55,23 @@ public class URLValidator extends PropertyValidatorBase {
      *
      * @param severity  the severity that should be assigned to reported issues.
      * @param extension  the class of the model extension the property belongs to, or <code>null</code>.
-     * @param propertyName  the name of a property (see {@link PropertyName}).
+     * @param property  the name of a property (see {@link PropertyName}).
      * @param invalidValueMessage  the message to return in case the value invalid.
      * @param undefinedValueMessage  the message to return in case the value is undefined.
      */
-    public URLValidator(Severity severity, Class<? extends ExtensionEntityBase> extension, String propertyName,
+    public URLValidator(Severity severity, Class<? extends ExtensionEntityBase> extension, String property,
             String invalidValueMessage, String undefinedValueMessage) {
-        super(severity, extension, propertyName, invalidValueMessage, undefinedValueMessage);
+        super(severity, extension, property, invalidValueMessage, undefinedValueMessage);
     }
 
     @Override
     protected String getInvalidMessageFromCaption(Object value) {
-        return HtmlUtils.formatEscaped("{0} link must be a valid URL", caption);
+        return HtmlUtils.formatEscaped("{0}: ''{1}'' is not a valid URL", caption, value);
     }
 
     @Override
     protected String getDefaultInvalidMessage(Object value) {
-        return HtmlUtils.formatEscaped("''{0}'' is not a valid URL", value);
+        return HtmlUtils.formatEscaped("{0}: ''{1}'' is not a valid URL", property, value);
     }
 
     @Override

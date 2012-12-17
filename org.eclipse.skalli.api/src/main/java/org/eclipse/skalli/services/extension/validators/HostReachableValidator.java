@@ -24,6 +24,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
@@ -37,6 +38,7 @@ import org.eclipse.skalli.commons.URLUtils;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
+import org.eclipse.skalli.model.PropertyName;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.services.destination.Destinations;
 import org.eclipse.skalli.services.destination.HttpUtils;
@@ -45,14 +47,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>Validates that a host / URL is reachable by trying to establish a connection.</p>
+ * Property validator to check that a given host/URL is reachable by trying to establish a connection
+ * (using {@link Destinations#getClient(URL)} to create a suitable HTTP client).
+ * <p>
+ * Note, you may need to configure a proxy and required credentials for this validator to work properly
+ * for certain destinations. This validator never produces {@link Severity#FATAL} issues.
+ * <p>
  * <p>The following issue severities are covered:
  *   <ul>
- *     <li><strong>FATAL</strong> never</li>
- *     <li><strong>ERROR</strong> possible permanent problems</li>
- *     <li><strong>WARNING</strong> possible temporary problems</li>
- *     <li><strong>INFO</strong> informational / problems w/ validator implementation</li>
+ *     <li><strong>ERROR</strong> permanent and serious problems with a connection, such as malformed URL,
+ *     unknown host, unknown resource (404 NOT FOUND) or lack of permission (403 FORBIDDEN).</li>
+ *     <li><strong>WARNING</strong> likely temporary, but probably serious problems with a connection,
+ *     such as permanent redirects (301 MOVED PERMANENTLY) and server downtimes (503 SERVICE UNAVAILABLE).</li>
+ *     <li><strong>INFO</strong> temporary problems with a connection, such as temorary redirects
+ *     (307 TEMPORARY REDIRECT).</li>
  *   </ul>
+ * </p>
+ * <p>
+ *   This validator can be applied to single-valued properties and to {@link java.util.Collection collections}.
  * </p>
  */
 public class HostReachableValidator implements Issuer, PropertyValidator {
@@ -78,15 +90,27 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
     private static final int TIMEOUT = 10000;
 
     private final Class<? extends ExtensionEntityBase> extension;
-    private final String propertyId;
+    private final String property;
 
-    public HostReachableValidator(final Class<? extends ExtensionEntityBase> extension, final String propertyId) {
+    /**
+     * Creates a validator for checking of HTTP connections.
+     *
+     * @param extension  the class of the model extension the property belongs to, or <code>null</code>.
+     * @param property  the name of a property (see {@link PropertyName}).
+     */
+    public HostReachableValidator(Class<? extends ExtensionEntityBase> extension, String property) {
+        if (extension == null) {
+            throw new IllegalArgumentException("argument 'extension' must not be null");
+        }
+        if (StringUtils.isBlank(property)) {
+            throw new IllegalArgumentException("argument 'property' must not be null or an empty string");
+        }
         this.extension = extension;
-        this.propertyId = propertyId;
+        this.property = property;
     }
 
     @Override
-    public SortedSet<Issue> validate(final UUID entityId, final Object value, final Severity minSeverity) {
+    public SortedSet<Issue> validate(UUID entityId, Object value, Severity minSeverity) {
         final SortedSet<Issue> issues = new TreeSet<Issue>();
 
         // Do not participate in checks with Severity.FATAL & ignore null
@@ -107,7 +131,7 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
         return issues;
     }
 
-    protected void validate(final SortedSet<Issue> issues, final UUID entityId, final Object value,
+    protected void validate(SortedSet<Issue> issues, UUID entityId, Object value,
             final Severity minSeverity, int item) {
         if (value == null) {
             return;
@@ -173,8 +197,7 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
     /**
     * Returning an issue (Severity.ERROR) if host was not reachable, might be null
     */
-    private Issue getIssueByReachableHost(final Severity minSeverity, final UUID entityId, final int item,
-            final String host) {
+    private Issue getIssueByReachableHost(Severity minSeverity, UUID entityId, int item, String host) {
         if (Severity.ERROR.compareTo(minSeverity) <= 0) {
             try {
                 if (!InetAddress.getByName(host).isReachable(TIMEOUT)) {
@@ -193,7 +216,7 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
     /**
      * Returning an issue depending on the HTTP response code, might be null
      */
-    private Issue getIssueByResponseCode(final Severity minSeverity, final UUID entityId, int item,
+    private Issue getIssueByResponseCode(Severity minSeverity, UUID entityId, int item,
             StatusLine statusLine, String label) {
         // everything below HTTP 300 is OK. Do not generate issues...
         if (statusLine.getStatusCode() < 300) {
@@ -262,22 +285,19 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
                 return newIssue(Severity.ERROR, entityId, item, TXT_PERMANENT_SERVER_PROBLEM, label,
                         statusLine.getStatusCode(), statusLine.getReasonPhrase());
             }
+        case FATAL:
+            break;
+        default:
+            break;
         }
-
         return null;
     }
 
-    /**
-     * centralized issue generation (w/ message arguments)
-     */
     protected Issue newIssue(Severity severity, UUID entityId, int item, String message, Object... messageArguments) {
         return newIssue(severity, entityId, item, HtmlUtils.formatEscaped(message, messageArguments));
     }
 
-    /**
-     * centralized issue generation
-     */
     protected Issue newIssue(Severity severity, UUID entityId, int item, String message) {
-        return new Issue(severity, getClass(), entityId, extension, propertyId, item, message);
+        return new Issue(severity, getClass(), entityId, extension, property, item, message);
     }
 }

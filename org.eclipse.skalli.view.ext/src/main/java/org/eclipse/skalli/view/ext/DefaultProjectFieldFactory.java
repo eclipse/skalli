@@ -20,7 +20,7 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.PropertyValidator;
-import org.eclipse.skalli.services.extension.validators.MinMaxOccurrencesPropertyValidator;
+import org.eclipse.skalli.services.extension.validators.MinMaxSizeValidator;
 import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.slf4j.Logger;
@@ -190,7 +190,7 @@ public abstract class DefaultProjectFieldFactory<T extends ExtensionEntityBase> 
             field.setRequired(false);
             field.setRequiredError(null);
             LOG.warn("Required flag removed from field " + field.getCaption() + " of project " + project.getName()
-                    + ". Attach a " + MinMaxOccurrencesPropertyValidator.class.getName() + " to the field.");
+                    + ". Attach a " + MinMaxSizeValidator.class.getName() + " to the field.");
         }
         Collection<Validator> vaadinValidators = field.getValidators();
         if (vaadinValidators != null) {

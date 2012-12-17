@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Severity;
@@ -180,19 +181,24 @@ public class ExtensionServiceCore
             validators.add(new StringLengthValidator(Severity.FATAL, getExtensionClass(), propertyName, caption,
                     NAME_MIN_LENGHTH, NAME_MAX_LENGHTH));
             validators.add(new WhitelistValidator(Severity.FATAL,  getExtensionClass(), propertyName,
-                    MessageFormat.format("{0} must not contain any HTML tags", caption), null, Whitelist.none()));
+                    MessageFormat.format("{0} must not contain any HTML tags", caption),
+                    MessageFormat.format("Property ''{0}'' must not contain any HTML tags", propertyName),
+                    Whitelist.none()));
         }
         else if (Project.PROPERTY_SHORT_NAME.equals(propertyName)) {
             validators.add(new StringLengthValidator(Severity.FATAL, getExtensionClass(), propertyName, caption,
                     SHORT_NAME_MIN_LENGHTH, SHORT_NAME_MAX_LENGHTH));
             validators.add(new RegularExpressionValidator(Severity.FATAL, getExtensionClass(), propertyName,
                     MessageFormat.format("{0} must contain letters and digits only", caption),
-                    null, SHORT_NAME_REGEX));
+                    HtmlUtils.formatEscaped("Property ''{0}'' must contain letters and digits only", propertyName),
+                    SHORT_NAME_REGEX));
         } else if (Project.PROPERTY_DELETED.equals(propertyName)) {
             validators.add(new NoSubprojectsValidator());
         } else if (Project.PROPERTY_PHASE.equals(propertyName)) {
             validators.add(new WhitelistValidator(Severity.FATAL,  getExtensionClass(), propertyName,
-                    MessageFormat.format("{0} must not contain any HTML tags", caption), null, Whitelist.none()));
+                    MessageFormat.format("{0} must not contain any HTML tags", caption),
+                    MessageFormat.format("Property ''{0}'' must not contain any HTML tags", propertyName),
+                    Whitelist.none()));
         }
         return validators;
     }

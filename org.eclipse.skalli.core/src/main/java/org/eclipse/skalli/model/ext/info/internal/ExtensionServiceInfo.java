@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.info.internal;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -126,9 +125,7 @@ public class ExtensionServiceInfo
         caption = getCaption(propertyName, caption);
         List<PropertyValidator> validators = new ArrayList<PropertyValidator>();
         if (InfoExtension.PROPERTY_MAILING_LIST.equals(propertyName)) {
-            validators.add(new EmailValidator(Severity.FATAL, getExtensionClass(), propertyName,
-                    MessageFormat.format("{0} must be a valid e-mail address", caption),
-                    null));
+            validators.add(new EmailValidator(Severity.FATAL, getExtensionClass(), propertyName, caption));
         }
         else if (InfoExtension.PROPERTY_PAGE_URL.equals(propertyName)) {
             validators.add(new URLValidator(Severity.FATAL, getExtensionClass(), propertyName, caption));

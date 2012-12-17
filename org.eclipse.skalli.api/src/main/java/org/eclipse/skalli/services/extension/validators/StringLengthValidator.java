@@ -20,6 +20,7 @@ import org.eclipse.skalli.services.extension.PropertyValidatorBase;
 
 /**
  * Property validator to check a string for a minimal and/or maximal length.
+ * This validator can be applied to single-valued properties and to {@link java.util.Collection collections}.
  */
 public class StringLengthValidator extends PropertyValidatorBase {
 
@@ -31,7 +32,7 @@ public class StringLengthValidator extends PropertyValidatorBase {
      *
      * @param severity  the severity that should be assigned to reported issues.
      * @param extension  the class of the model extension the property belongs to, or <code>null</code>.
-     * @param propertyName  the name of a property (see {@link PropertyName}).
+     * @param property  the name of a property (see {@link PropertyName}).
      * @param minLength  the minimal length of the string, or -1 if there is no minimal length.
      * @param maxLength  the maximal length of the string, or -1 if there is no maximal length.
      */
@@ -45,7 +46,7 @@ public class StringLengthValidator extends PropertyValidatorBase {
      *
      * @param severity  the severity that should be assigned to reported issues.
      * @param extension  the class of the model extension the property belongs to, or <code>null</code>.
-     * @param propertyName  the name of a property (see {@link PropertyName}).
+     * @param property  the name of a property (see {@link PropertyName}).
      * @param caption  the caption of the property as shown to the user in the UI form.
      * @param minLength  the minimal length of the string, or -1 if there is no minimal length.
      * @param maxLength  the maximal length of the string, or -1 if there is no maximal length.
@@ -61,7 +62,7 @@ public class StringLengthValidator extends PropertyValidatorBase {
      *
      * @param severity  the severity that should be assigned to reported issues.
      * @param extension  the class of the model extension the property belongs to, or <code>null</code>.
-     * @param propertyName  the name of a property (see {@link PropertyName}).
+     * @param property  the name of a property (see {@link PropertyName}).
      * @param invalidValueMessage  the message to return in case the value invalid.
      * @param undefinedValueMessage  the message to return in case the value is undefined.
      * @param minLength  the minimal length of the string, or -1 if there is no minimal length.
@@ -77,10 +78,10 @@ public class StringLengthValidator extends PropertyValidatorBase {
         this.minLength = minLength < 0 ? 0 : minLength;
         this.maxLength = maxLength < 0 ? Integer.MAX_VALUE : maxLength;
         if (this.maxLength == 0) {
-            throw new IllegalArgumentException("maxLength = 0");
+            throw new IllegalArgumentException("'maxLength' must not be zero"); //$NON-NLS-1$
         }
         if (this.maxLength < this.minLength) {
-            throw new IllegalArgumentException("maxLength < minLength");
+            throw new IllegalArgumentException("'maxLength' must not be lower than 'minLength'"); //$NON-NLS-1$
         }
     }
 
@@ -90,11 +91,11 @@ public class StringLengthValidator extends PropertyValidatorBase {
         if (minLength == maxLength) {
             message = HtmlUtils.formatEscaped("{0} must be exactly {1} characters long", caption, minLength);
         } else if (minLength == 0 && maxLength > 0) {
-            message = HtmlUtils.formatEscaped("{0} must be at max {1} characters long", caption, maxLength);
+            message = HtmlUtils.formatEscaped("{0} must be at most {1} characters long", caption, maxLength);
         } else if (minLength > 0 && maxLength == Integer.MAX_VALUE) {
             message = HtmlUtils.formatEscaped("{0} must be at least {1} characters long", caption, minLength);
         } else if (minLength > 0 && maxLength > 0) {
-            message = HtmlUtils.formatEscaped("{0} must be at least {1} and at max {2} characters long", caption,
+            message = HtmlUtils.formatEscaped("{0} must be at least {1} and at most {2} characters long", caption,
                     minLength, maxLength);
         }
         return message;
@@ -105,16 +106,16 @@ public class StringLengthValidator extends PropertyValidatorBase {
         String message = null;
         if (minLength == maxLength) {
             message = HtmlUtils.formatEscaped("Value of property ''{0}'' must be exactly {1} characters long",
-                    propertyName, minLength);
+                    property, minLength);
         } else if (minLength == 0 && maxLength > 0) {
-            message = HtmlUtils.formatEscaped("Value of property ''{0}'' must be at max {1} characters long",
-                    propertyName, maxLength);
+            message = HtmlUtils.formatEscaped("Value of property ''{0}'' must be at most {1} characters long",
+                    property, maxLength);
         } else if (minLength > 0 && maxLength == Integer.MAX_VALUE) {
             message = HtmlUtils.formatEscaped("Value of property ''{0}'' must be at least {1} characters long",
-                    propertyName, minLength);
+                    property, minLength);
         } else if (minLength > 0 && maxLength > 0) {
             message = HtmlUtils.formatEscaped(
-                    "Value of property ''{0}'' must be at least {1} and at max {2} characters long", propertyName,
+                    "Value of property ''{0}'' must be at least {1} and at most {2} characters long", property,
                     minLength, maxLength);
         }
         return message;

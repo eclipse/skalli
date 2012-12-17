@@ -49,7 +49,7 @@ public class PropertyValidatorBaseTest {
     @Test
     public void testDefaultMessages() {
         TestPropertyValidator validator = new TestPropertyValidator(TestExtension.class, TestExtension.PROPERTY_STR);
-        Assert.assertEquals(TestExtension.PROPERTY_STR, validator.propertyName);
+        Assert.assertEquals(TestExtension.PROPERTY_STR, validator.property);
         Assert.assertEquals(TestExtension.class, validator.extension);
         Assert.assertNull(validator.caption);
         Assert.assertNull(validator.invalidValueMessage);
@@ -69,7 +69,7 @@ public class PropertyValidatorBaseTest {
     public void testInvalidMessageFromCaption() {
         TestPropertyValidator validator = new TestPropertyValidator(TestExtension.class, TestExtension.PROPERTY_STR,
                 "CAPTION");
-        Assert.assertEquals(TestExtension.PROPERTY_STR, validator.propertyName);
+        Assert.assertEquals(TestExtension.PROPERTY_STR, validator.property);
         Assert.assertEquals(TestExtension.class, validator.extension);
         Assert.assertEquals("CAPTION", validator.caption);
         Assert.assertNull(validator.invalidValueMessage);
@@ -89,7 +89,7 @@ public class PropertyValidatorBaseTest {
     public void testCustomInvalidMessage() {
         TestPropertyValidator validator = new TestPropertyValidator(TestExtension.class, TestExtension.PROPERTY_STR,
                 "invalid {0}", "undefined {0}"); //$NON-NLS-1$ //$NON-NLS-2$
-        Assert.assertEquals(TestExtension.PROPERTY_STR, validator.propertyName);
+        Assert.assertEquals(TestExtension.PROPERTY_STR, validator.property);
         Assert.assertEquals(TestExtension.class, validator.extension);
         Assert.assertNull(validator.caption);
         Assert.assertEquals("invalid {0}", validator.invalidValueMessage);
