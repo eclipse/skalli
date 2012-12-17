@@ -114,7 +114,6 @@ public class ExtensionServicePeople
 
     @Override
     public List<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
-        caption = getCaption(propertyName, caption);
         List<PropertyValidator> validators = new ArrayList<PropertyValidator>();
         if (PeopleExtension.PROPERTY_LEADS.equals(propertyName)
                 || PeopleExtension.PROPERTY_MEMBERS.equals(propertyName)) {

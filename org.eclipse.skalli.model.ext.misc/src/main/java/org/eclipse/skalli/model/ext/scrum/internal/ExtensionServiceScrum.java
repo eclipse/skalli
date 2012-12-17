@@ -135,7 +135,6 @@ public class ExtensionServiceScrum
 
     @Override
     public List<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
-        caption = getCaption(propertyName, caption);
         List<PropertyValidator> validators = new ArrayList<PropertyValidator>();
         if (ScrumProjectExt.PROPERTY_BACKLOG_URL.equals(propertyName)) {
             validators.add(new URLValidator(Severity.FATAL, getExtensionClass(), propertyName, caption));

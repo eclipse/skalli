@@ -122,7 +122,6 @@ public class ExtensionServiceMaven
 
     @Override
     public List<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
-        caption = getCaption(propertyName, caption);
         List<PropertyValidator> validators = new ArrayList<PropertyValidator>();
         if (MavenProjectExt.PROPERTY_GROUPID.equals(propertyName)) {
             validators.add(new MavenIdValidator(Severity.ERROR, getExtensionClass(), propertyName, caption));

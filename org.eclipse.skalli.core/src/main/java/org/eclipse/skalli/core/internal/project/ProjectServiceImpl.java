@@ -455,14 +455,19 @@ public class ProjectServiceImpl extends EntityServiceBase<Project> implements Pr
             ProjectTemplate projectTemplate, Set<Issue> issues, Severity minSeverity) {
         String extensionClassName = extensionService.getExtensionClass().getName();
 
-        // first run all property validators and determine the captions of the UI fields
         Map<String, String> captions = new HashMap<String, String>();
+
         Set<String> propertyNames = ext.getPropertyNames();
         for (String propertyName : propertyNames) {
+
+            // determine a suitable caption for the property, either from the template or the
+            // extension service; if neither is availablle, pass null to the validators
             String caption = projectTemplate.getCaption(extensionClassName, propertyName);
-            if (caption != null) {
-                captions.put(propertyName, caption);
+            if (StringUtils.isBlank(caption)) {
+                caption = extensionService.getCaption(propertyName);
             }
+            captions.put(propertyName, caption);
+
             List<PropertyValidator> propertyValidators = new ArrayList<PropertyValidator>();
             List<PropertyValidator> defaultValidators = extensionService.getPropertyValidators(propertyName, caption);
             if (defaultValidators == null) {

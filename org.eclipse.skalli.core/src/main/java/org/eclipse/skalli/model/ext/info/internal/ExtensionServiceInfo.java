@@ -122,7 +122,6 @@ public class ExtensionServiceInfo
 
     @Override
     public List<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
-        caption = getCaption(propertyName, caption);
         List<PropertyValidator> validators = new ArrayList<PropertyValidator>();
         if (InfoExtension.PROPERTY_MAILING_LIST.equals(propertyName)) {
             validators.add(new EmailValidator(Severity.FATAL, getExtensionClass(), propertyName, caption));

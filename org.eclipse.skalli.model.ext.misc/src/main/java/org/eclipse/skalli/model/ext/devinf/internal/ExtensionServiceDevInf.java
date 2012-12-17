@@ -147,7 +147,6 @@ public class ExtensionServiceDevInf
 
     @Override
     public List<PropertyValidator> getPropertyValidators(String propertyName, String caption) {
-        caption = getCaption(propertyName, caption);
         List<PropertyValidator> validators = new ArrayList<PropertyValidator>();
         if (DevInfProjectExt.PROPERTY_SCM_URL.equals(propertyName)) {
             validators.add(new URLValidator(Severity.FATAL, getExtensionClass(), propertyName, caption));

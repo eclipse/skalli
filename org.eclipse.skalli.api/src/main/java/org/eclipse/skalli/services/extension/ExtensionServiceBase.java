@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
@@ -100,16 +99,6 @@ public abstract class ExtensionServiceBase<T extends ExtensionEntityBase> implem
     @Override
     public String getDescription(String propertyName) {
         return DESCRIPTIONS.get(propertyName);
-    }
-
-    protected String getCaption(String propertyName, String caption) {
-        if (StringUtils.isBlank(caption)) {
-            caption = getCaption(propertyName);
-            if (StringUtils.isBlank(caption)) {
-                caption = propertyName;
-            }
-        }
-        return caption;
     }
 
     @Override
