@@ -286,23 +286,26 @@ public class ProjectsResource extends ResourceBase {
             RestSearchQuery queryParams) {
         String propertyName = queryParams.getPropertyName();
         ExtensionEntityBase extension = extensionClass != null ? project.getExtension(extensionClass) : project;
-        Object propertyValue = extension != null ? extension.getProperty(propertyName) : null;
-        if (propertyValue instanceof Collection) {
-            try {
-                updateCollectionProperty(project, extension, (Collection<String>) propertyValue, queryParams);
-            } catch (ClassCastException e) {
-                throw new UnsupportedOperationException(MessageFormat.format(
-                        "\"{0}\" is not a collection of strings", propertyName));
+        if (extension != null) {
+            Object propertyValue = extension.getProperty(propertyName);
+            if (propertyValue instanceof Collection) {
+                try {
+                    updateCollectionProperty(project, extension, (Collection<String>) propertyValue, queryParams);
+                } catch (ClassCastException e) {
+                    throw new UnsupportedOperationException(MessageFormat.format(
+                            "\"{0}\" is not a collection of strings", propertyName));
+                }
+            } else {
+                updateStringProperty(project, extension, propertyValue, queryParams);
             }
-        } else {
-            updateStringProperty(project, propertyValue, extension, queryParams);
         }
     }
 
-    private void updateStringProperty(Project project, Object propertyValue,
-            ExtensionEntityBase extension,  RestSearchQuery queryParams) {
-        String newValue = PropertyMapper.convert(propertyValue.toString(),
-                queryParams.getPattern(), queryParams.getTemplate(), project);
+    private void updateStringProperty(Project project, ExtensionEntityBase extension,
+            Object propertyValue, RestSearchQuery queryParams) {
+        String newValue = propertyValue != null?
+                PropertyMapper.convert(propertyValue.toString(), queryParams.getPattern(),
+                        queryParams.getTemplate(), project) : null;
         extension.setProperty(queryParams.getPropertyName(), newValue);
     }
 

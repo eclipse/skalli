@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.nexus;
 
-import java.net.URL;
+import java.net.URI;
 
 /**
  * Interface that represents an artifact in a Nexus search response.
@@ -22,7 +22,7 @@ public interface NexusArtifact {
     /**
      * Returns an URL that can be used to retrieve the artifact.
      */
-    public URL getResourceURI();
+    public URI getResourceURI();
 
     /**
      * Returns the group id of the artifact.
@@ -68,10 +68,10 @@ public interface NexusArtifact {
     /**
      * Returns an URL that can be used to retrieve the POM of the artifact.
      */
-    public URL getPomLink();
+    public URI getPomLink();
 
     /**
      * Returns an URL that can be used to retrieve the file of the artifact.
      */
-    public URL getArtifactLink();
+    public URI getArtifactLink();
 }

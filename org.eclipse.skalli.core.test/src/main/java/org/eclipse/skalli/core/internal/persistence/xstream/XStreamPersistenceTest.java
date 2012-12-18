@@ -35,11 +35,11 @@ import org.eclipse.skalli.services.extension.DataMigration;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.eclipse.skalli.testutil.HashMapStorageService;
 import org.eclipse.skalli.testutil.HashMapStorageService.Key;
-import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestExtensibleEntityBase;
 import org.eclipse.skalli.testutil.TestExtensibleEntityEntityService;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.eclipse.skalli.testutil.TestExtension1;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -139,7 +139,7 @@ public class XStreamPersistenceTest {
         }
 
         private Document getDocumentFromHashMap(TestExtensibleEntityBase entityKey) throws Exception {
-            return XMLUtils.documentFromString(new String(getContentFromHashMap(entityKey)));
+            return XMLUtils.documentFromString(new String(getContentFromHashMap(entityKey), "UTF-8"));
         }
 
     }

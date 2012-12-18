@@ -80,7 +80,7 @@ public abstract class StorageServiceTestBase {
     }
 
     private void writeContent(final String TEST_CATEGORY, String id, String content) throws Exception {
-        ByteArrayInputStream is = new ByteArrayInputStream(content.getBytes());
+        ByteArrayInputStream is = new ByteArrayInputStream(content.getBytes("UTF-8"));
         stroageService.write(TEST_CATEGORY, TEST_ID, is);
         is.close();
         return;
@@ -93,7 +93,7 @@ public abstract class StorageServiceTestBase {
         writeContent(TEST_CATEGORY, TEST_ID, TEST_CONTENT);
 
         //update the same key with TEST_CONTENT_UPDATED
-        ByteArrayInputStream is = new ByteArrayInputStream(TEST_CONTENT_UPDATED.getBytes());
+        ByteArrayInputStream is = new ByteArrayInputStream(TEST_CONTENT_UPDATED.getBytes("UTF-8"));
         stroageService.write(TEST_CATEGORY, TEST_ID, is);
 
         InputStream stream = stroageService.read(TEST_CATEGORY, TEST_ID);

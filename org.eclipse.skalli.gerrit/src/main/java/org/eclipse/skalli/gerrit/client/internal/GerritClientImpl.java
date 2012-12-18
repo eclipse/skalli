@@ -14,7 +14,6 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
@@ -28,6 +27,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -143,16 +143,12 @@ public class GerritClientImpl implements GerritClient {
 
     private File getPrivateKeyFile(String privateKey) {
         File privateKeyFile = null;
-        FileWriter fw = null;
         try {
             privateKeyFile = File.createTempFile("gerrit_key", "ssh");
-            fw = new FileWriter(privateKeyFile);
-            fw.write(privateKey);
+            FileUtils.writeStringToFile(privateKeyFile, privateKey, "ISO8859_1");
         } catch (IOException e) {
             LOG.error("Failed to write key file."); //$NON-NLS-1$
             throw new RuntimeException("Failed to write key file.", e); //$NON-NLS-1$
-        } finally {
-            IOUtils.closeQuietly(fw);
         }
         return privateKeyFile;
     }
@@ -546,7 +542,7 @@ public class GerritClientImpl implements GerritClient {
                 }
             }
             List<String> result = new LinkedList<String>();
-            InputStreamReader inR = new InputStreamReader(new ByteArrayInputStream(baosOut.toByteArray()));
+            InputStreamReader inR = new InputStreamReader(new ByteArrayInputStream(baosOut.toByteArray()), "ISO8859_1");
             BufferedReader buf = new BufferedReader(inR);
             String line;
             while ((line = buf.readLine()) != null) {

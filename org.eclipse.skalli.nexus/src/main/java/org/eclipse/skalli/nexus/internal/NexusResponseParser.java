@@ -10,13 +10,14 @@
  *******************************************************************************/
 package org.eclipse.skalli.nexus.internal;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.URLUtils;
 import org.eclipse.skalli.nexus.NexusClientException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -37,8 +38,9 @@ class NexusResponseParser {
         if (nodes.size() == 0) {
             return null;
         } else if (nodes.size() > 1) {
-            throw new NexusClientException("Root element '" + rootElement.getNodeName() + "' has " + nodes.size()
-                    + " nodes with the name '" + nodeName + "'");
+            throw new NexusClientException(MessageFormat.format(
+                    "Root element ''{0}'' has {1} nodes with name ''{2}''",
+                    rootElement.getNodeName(), nodes.size(), nodeName));
         }
         return nodes.get(0);
     }
@@ -53,7 +55,8 @@ class NexusResponseParser {
         return versionNode.getTextContent();
     }
 
-    static int getNodeTextContentAsInt(Element rootElement, String nodeName, int defaultValue) throws NexusClientException {
+    static int getNodeTextContentAsInt(Element rootElement, String nodeName, int defaultValue)
+            throws NexusClientException {
         int result;
         String fromStr = getNodeTextContent(rootElement, nodeName);
         if (StringUtils.isNotBlank(fromStr))
@@ -61,7 +64,9 @@ class NexusResponseParser {
             try {
                 result = Integer.parseInt(fromStr);
             } catch (NumberFormatException e) {
-                throw new NexusClientException("NodeContet '"+fromStr+ "' of node '"+nodeName+"' from Root element '" + rootElement.getNodeName() + "' is not an Integer");
+                throw new NexusClientException(MessageFormat.format(
+                        "NodeContet ''{0}'' of node ''{1}'' from Root element ''{2}'' is not an integer",
+                        fromStr, nodeName, rootElement.getNodeName()));
             }
         }
         else {
@@ -74,17 +79,16 @@ class NexusResponseParser {
         return BooleanUtils.toBoolean(getNodeTextContent(rootElement, nodeName));
     }
 
-    static URL getNodeTextContentAsURL(Element rootElement, String nodeName)
+    static URI getNodeTextContentAsURI(Element rootElement, String nodeName)
             throws NexusClientException {
         String textContent = getNodeTextContent(rootElement, nodeName);
         if (StringUtils.isBlank(textContent)) {
             return null;
         }
         try {
-            return new URL(textContent);
-        } catch (MalformedURLException e) {
-            throw new NexusClientException("The textContent = '" + textContent + "' for the node with name '"
-                    + nodeName + "' is not a valid URL.", e);
+            return URLUtils.stringToURL(textContent).toURI();
+        } catch (Exception e) {
+            throw new NexusClientException(MessageFormat.format("''{0}'' is not a valid URL", textContent), e);
         }
     }
 

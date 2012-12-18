@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.nexus.internal;
 
-import java.net.URL;
+import java.net.URI;
 
 import org.eclipse.skalli.nexus.NexusArtifact;
 import org.eclipse.skalli.nexus.NexusClientException;
@@ -18,7 +18,7 @@ import org.w3c.dom.Element;
 
 public class NexusArtifactImpl implements NexusArtifact {
 
-    private URL resourceURI;
+    private URI resourceURI;
     private String groupId;
     private String artifactId;
     private String version;
@@ -27,36 +27,34 @@ public class NexusArtifactImpl implements NexusArtifact {
     private String extension;
     private String repoId;
     private String contextId;
-    private URL pomLink;
-    private URL artifactLink;
+    private URI pomLink;
+    private URI artifactLink;
 
     public NexusArtifactImpl(Element rootElement) throws NexusClientException {
-
         if (rootElement == null) {
-            throw new IllegalArgumentException("Parameter rootElement must not be null.");
+            throw new IllegalArgumentException("argument 'rootElement' must not be null."); //$NON-NLS-1$
+        }
+        if (!"artifact".equals(rootElement.getNodeName())) { //$NON-NLS-1$
+            throw new IllegalArgumentException("root element must be 'artifact'"); //$NON-NLS-1$
         }
 
-        if (!"artifact".equals(rootElement.getNodeName())) {
-            throw new IllegalArgumentException("rootElement.getNodeName() must be 'artifact'");
-        }
+        groupId = NexusResponseParser.getNodeTextContent(rootElement, "groupId"); //$NON-NLS-1$
+        artifactId = NexusResponseParser.getNodeTextContent(rootElement, "artifactId"); //$NON-NLS-1$
+        version = NexusResponseParser.getNodeTextContent(rootElement, "version"); //$NON-NLS-1$
+        classifier = NexusResponseParser.getNodeTextContent(rootElement, "classifier"); //$NON-NLS-1$
+        packaging = NexusResponseParser.getNodeTextContent(rootElement, "packaging"); //$NON-NLS-1$
+        extension = NexusResponseParser.getNodeTextContent(rootElement, "extension"); //$NON-NLS-1$
+        repoId = NexusResponseParser.getNodeTextContent(rootElement, "repoId"); //$NON-NLS-1$
+        contextId = NexusResponseParser.getNodeTextContent(rootElement, "contextId"); //$NON-NLS-1$
 
-        groupId = NexusResponseParser.getNodeTextContent(rootElement, "groupId");
-        artifactId = NexusResponseParser.getNodeTextContent(rootElement, "artifactId");
-        version = NexusResponseParser.getNodeTextContent(rootElement, "version");
-        classifier = NexusResponseParser.getNodeTextContent(rootElement, "classifier");
-        packaging = NexusResponseParser.getNodeTextContent(rootElement, "packaging");
-        extension = NexusResponseParser.getNodeTextContent(rootElement, "extension");
-        repoId = NexusResponseParser.getNodeTextContent(rootElement, "repoId");
-        contextId = NexusResponseParser.getNodeTextContent(rootElement, "contextId");
-
-        resourceURI = NexusResponseParser.getNodeTextContentAsURL(rootElement, "resourceURI");
-        pomLink = NexusResponseParser.getNodeTextContentAsURL(rootElement, "pomLink");
-        artifactLink = NexusResponseParser.getNodeTextContentAsURL(rootElement, "artifactLink");
+        resourceURI = NexusResponseParser.getNodeTextContentAsURI(rootElement, "resourceURI"); //$NON-NLS-1$
+        pomLink = NexusResponseParser.getNodeTextContentAsURI(rootElement, "pomLink"); //$NON-NLS-1$
+        artifactLink = NexusResponseParser.getNodeTextContentAsURI(rootElement, "artifactLink"); //$NON-NLS-1$
 
     }
 
     @Override
-    public URL getResourceURI() {
+    public URI getResourceURI() {
         return resourceURI;
     }
 
@@ -101,18 +99,15 @@ public class NexusArtifactImpl implements NexusArtifact {
     }
 
     @Override
-    public URL getPomLink() {
+    public URI getPomLink() {
         return pomLink;
     }
 
     @Override
-    public URL getArtifactLink() {
+    public URI getArtifactLink() {
         return artifactLink;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -131,9 +126,6 @@ public class NexusArtifactImpl implements NexusArtifact {
         return result;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

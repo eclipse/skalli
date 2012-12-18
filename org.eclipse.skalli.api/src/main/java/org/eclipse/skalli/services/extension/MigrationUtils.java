@@ -58,9 +58,6 @@ public class MigrationUtils {
     public static Element getExtension(Document doc, String extensionAlias)
             throws MigrationException {
         Element extensionsElement = getElementOfEntity(doc, EXTENSIONS_TAGNAME);
-        if (extensionsElement == null) {
-            return null;
-        }
         return extensionsElement != null ? getChild(extensionsElement, extensionAlias) : null;
     }
 

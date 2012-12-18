@@ -94,7 +94,7 @@ public class HttpServerMock implements Runnable {
             while (true) {
                 Socket connection = server.accept();
 
-                request = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                request = new BufferedReader(new InputStreamReader(connection.getInputStream(), "ISO8859_1"));
                 response = new DataOutputStream(connection.getOutputStream());
 
                 String httpCode;

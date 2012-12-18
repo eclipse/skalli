@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
@@ -32,9 +33,11 @@ import org.apache.commons.lang.StringUtils;
 
 public class Historian {
 
-    private static final Pattern PATTERN_HISTORY = Pattern.compile(".*\\.([0-9]*)\\.history", Pattern.CASE_INSENSITIVE);
-    private static final String HISTORY_FILE = ".history";
-    private static final byte[] CRLF = "\r\n".getBytes();
+    private static final Pattern PATTERN_HISTORY =
+            Pattern.compile(".*\\.([0-9]*)\\.history", Pattern.CASE_INSENSITIVE); //$NON-NLS-1$
+
+    private static final String HISTORY_FILE = ".history"; //$NON-NLS-1$
+    private static final String CRLF = "\r\n"; //$NON-NLS-1$
 
     private File historyFile;
 
@@ -63,11 +66,12 @@ public class Historian {
             in = new BufferedInputStream(new FileInputStream(file));
             out = new BufferedOutputStream(new FileOutputStream(historyFile, historyFile.exists()));
             String id = getNextEntryName(FilenameUtils.getBaseName(file.getAbsolutePath()));
-            String header = id + ":" + file.length() + ":" + System.currentTimeMillis();
-            out.write(header.getBytes("UTF-8"));
-            out.write(CRLF);
+            String header = MessageFormat.format("{0}:{1}:{2}", id, Long.toString(file.length()), //$NON-NLS-1$
+                    Long.toString(System.currentTimeMillis()));
+            out.write(header.getBytes("UTF-8")); //$NON-NLS-1$
+            out.write(CRLF.getBytes("UTF-8")); //$NON-NLS-1$
             IOUtils.copy(in, out);
-            out.write(CRLF);
+            out.write(CRLF.getBytes("UTF-8")); //$NON-NLS-1$
         } finally {
             IOUtils.closeQuietly(in);
             IOUtils.closeQuietly(out);
@@ -86,14 +90,14 @@ public class Historian {
                     if (parts[0].startsWith(fileName)) {
                         ++count;
                     }
-                    skip(in, Integer.valueOf(parts[2]) + CRLF.length);
+                    skip(in, Integer.valueOf(parts[2]) + CRLF.length());
                     header = readLine(in);
                 }
             } finally {
                 IOUtils.closeQuietly(in);
             }
         }
-        return fileName + ":" + count;
+        return fileName + ":" + count; //$NON-NLS-1$
     }
 
     HistoryIterator getHistory() {
@@ -158,7 +162,7 @@ public class Historian {
                     if (id == null || id.equals(parts[0])) {
                         content = new byte[Integer.valueOf(parts[2])];
                         read(in, content);
-                        skip(in, CRLF.length);
+                        skip(in, CRLF.length());
                         break;
                     }
                     header = readLine(in);
@@ -171,7 +175,7 @@ public class Historian {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            HistoryEntry next = new HistoryEntry(parts[0], new String(content, "UTF-8"),
+            HistoryEntry next = new HistoryEntry(parts[0], new String(content, "UTF-8"), //$NON-NLS-1$
                     Integer.valueOf(parts[1]), Long.valueOf(parts[3]));
             content = null;
             return next;
@@ -191,7 +195,8 @@ public class Historian {
     File getNextHistoryFile(File file) {
         int last = getLastHistoryNumber(file);
         int next = last + 1;
-        File nextFile = new File(file.getAbsolutePath() + "." + next + ".history");
+        File nextFile = new File(MessageFormat.format("{0}.{1}.history", //$NON-NLS-1$
+                file.getAbsolutePath(), Integer.toString(next)));
         return nextFile;
     }
 
@@ -214,7 +219,7 @@ public class Historian {
     Collection<File> getHistoryFiles(final File file) {
         String prefix = FilenameUtils.getBaseName(file.getAbsolutePath());
         IOFileFilter fileFilter = FileFilterUtils.andFileFilter(FileFilterUtils.prefixFileFilter(prefix),
-                FileFilterUtils.suffixFileFilter("history"));
+                FileFilterUtils.suffixFileFilter("history")); //$NON-NLS-1$
         fileFilter = new IOFileFilter() {
             @Override
             public boolean accept(File arg0, String arg1) {
@@ -224,7 +229,7 @@ public class Historian {
             @Override
             public boolean accept(File historyFile) {
                 boolean ret = StringUtils.startsWithIgnoreCase(historyFile.getAbsolutePath(), file.getAbsolutePath());
-                ret &= StringUtils.endsWithIgnoreCase(historyFile.getAbsolutePath(), ".history");
+                ret &= StringUtils.endsWithIgnoreCase(historyFile.getAbsolutePath(), ".history"); //$NON-NLS-1$
                 return ret;
             }
         };

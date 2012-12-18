@@ -20,6 +20,7 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
+@SuppressWarnings("nls")
 public class MavenPomParserTest {
 
     @Test
@@ -64,7 +65,7 @@ public class MavenPomParserTest {
         MavenPomParser parser = new MavenPomParserImpl();
         InputStream in = null;
         try {
-            in = new ByteArrayInputStream(testContent.getBytes());
+            in = new ByteArrayInputStream(testContent.getBytes("UTF-8"));
             MavenPom pom = parser.parse(in);
             assertEquals(expectedPom, pom);
         } finally {

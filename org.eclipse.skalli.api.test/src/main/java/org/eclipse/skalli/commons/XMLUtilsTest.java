@@ -38,7 +38,7 @@ public class XMLUtilsTest {
 
     @Test
     public void testDocumentFromStream() throws Exception {
-        ByteArrayInputStream in = new ByteArrayInputStream(XML.getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(XML.getBytes("UTF-8"));
         Document res = XMLUtils.documentFromStream(in);
         Assert.assertNotNull(res);
         Assert.assertEquals(1, res.getElementsByTagName("hello").getLength());

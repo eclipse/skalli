@@ -14,10 +14,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
-import java.net.URL;
-
-import javax.xml.parsers.ParserConfigurationException;
+import java.net.URI;
 
 import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.nexus.NexusClientException;
@@ -25,33 +22,30 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 @SuppressWarnings("nls")
 public class NexusResponseParserTest {
 
-    private Element getElement(String xml) throws SAXException, IOException, ParserConfigurationException {
+    private Element getElement(String xml) throws Exception {
         Document doc = XMLUtils.documentFromString(xml);
         return doc.getDocumentElement();
     }
 
     @Test
-    public void testFindNode() throws SAXException, IOException, ParserConfigurationException, NexusClientException {
+    public void testFindNode() throws Exception {
         Element rootElement = getElement("<root><from>0</from></root>");
         Node node = NexusResponseParser.findNode(rootElement, "from");
         assertThat(node.getNodeName(), is("from"));
     }
 
     @Test
-    public void testFindNode_caseSensitive() throws SAXException, IOException, ParserConfigurationException,
-            NexusClientException {
+    public void testFindNode_caseSensitive() throws Exception {
         Element rootElement = getElement("<root><from>0</from></root>");
         assertThat(NexusResponseParser.findNode(rootElement, "From"), nullValue());
     }
 
     @Test
-    public void testFindNode_MoreThanOnce() throws SAXException, IOException, ParserConfigurationException,
-            NexusClientException {
+    public void testFindNode_MoreThanOnce() throws Exception {
         Element rootElement = getElement("<root><foo>0</foo><foo>1</foo></root>");
         try {
             NexusResponseParser.findNode(rootElement, "foo");
@@ -64,57 +58,49 @@ public class NexusResponseParserTest {
     }
 
     @Test
-    public void testFindNode_NotAvailaible() throws SAXException, IOException, ParserConfigurationException,
-            NexusClientException {
+    public void testFindNode_NotAvailaible() throws Exception {
         Element rootElement = getElement("<root></root>");
         assertThat(NexusResponseParser.findNode(rootElement, "foo"), nullValue());
     }
 
     @Test
-    public void testGetNodeTextContent() throws SAXException, IOException, ParserConfigurationException,
-            NexusClientException {
+    public void testGetNodeTextContent() throws Exception {
         Element rootElement = getElement("<root><foo>bar</foo></root>");
         assertThat(NexusResponseParser.getNodeTextContent(rootElement, "foo"), is("bar"));
     }
 
     @Test
-    public void testGetNodeTextContent_emptyContent() throws SAXException, IOException, ParserConfigurationException,
-            NexusClientException {
+    public void testGetNodeTextContent_emptyContent() throws Exception {
         Element rootElement = getElement("<root><foo></foo></root>");
         assertThat(NexusResponseParser.getNodeTextContent(rootElement, "foo"), is(""));
     }
 
     @Test
-    public void testGetNodeTextContent_blankContent() throws SAXException, IOException, ParserConfigurationException,
-            NexusClientException {
+    public void testGetNodeTextContent_blankContent() throws Exception {
         Element rootElement = getElement("<root><foo>   </foo></root>");
         assertThat(NexusResponseParser.getNodeTextContent(rootElement, "foo"), is("   "));
     }
 
     @Test
-    public void testGetNodeTextContent_NodeNotExisting() throws SAXException, IOException,
-            ParserConfigurationException, NexusClientException {
+    public void testGetNodeTextContent_NodeNotExisting() throws Exception {
         Element rootElement = getElement("<root></root>");
         assertThat(NexusResponseParser.getNodeTextContent(rootElement, "foo"), nullValue());
     }
 
     @Test
-    public void testGetNodeTextContentAsInt() throws SAXException, IOException, ParserConfigurationException,
-            NexusClientException {
+    public void testGetNodeTextContentAsInt() throws Exception {
         Element rootElement = getElement("<root><foo>4711</foo></root>");
         assertThat(NexusResponseParser.getNodeTextContentAsInt(rootElement, "foo", 0), is(4711));
     }
 
     @Test
-    public void testGetNodeTextContentAsInt_negativeValue() throws SAXException, IOException,
-            ParserConfigurationException, NexusClientException {
+    public void testGetNodeTextContentAsInt_negativeValue() throws Exception {
         Element rootElement = getElement("<root><foo>0</foo></root>");
         assertThat(NexusResponseParser.getNodeTextContentAsInt(rootElement, "foo",0), is(0));
     }
 
     @Test
-    public void testGetNodeTextContentAsInt_invalidInt() throws SAXException, IOException,
-            ParserConfigurationException, NexusClientException {
+    public void testGetNodeTextContentAsInt_invalidInt() throws Exception {
         try {
 
             Element rootElement = getElement("<root><foo>bar4711</foo></root>");
@@ -122,72 +108,58 @@ public class NexusResponseParserTest {
             fail("NexusClientException expected.");
         } catch (NexusClientException e) {
            assertThat(e.getMessage(), containsString("bar4711"));
-           assertThat(e.getMessage(), containsString("not an Integer"));
+           assertThat(e.getMessage(), containsString("not an integer"));
         }
-
-
     }
 
     @Test
-    public void testGetNodeTextContentAsBoolean_true() throws SAXException, IOException, ParserConfigurationException,
-            NexusClientException {
+    public void testGetNodeTextContentAsBoolean_true() throws Exception {
         Element rootElement = getElement("<root><foo>true</foo></root>");
         assertThat(NexusResponseParser.getNodeTextContentAsBoolean(rootElement, "foo"), is(true));
     }
 
     @Test
-    public void testGetNodeTextContentAsBoolean_true1() throws SAXException, IOException, ParserConfigurationException,
-            NexusClientException {
+    public void testGetNodeTextContentAsBoolean_true1() throws Exception {
         Element rootElement = getElement("<root><foo>TRUE</foo></root>");
         assertThat(NexusResponseParser.getNodeTextContentAsBoolean(rootElement, "foo"), is(true));
     }
 
     @Test
-    public void testGetNodeTextContentAsBoolean_true2() throws SAXException, IOException, ParserConfigurationException,
-            NexusClientException {
+    public void testGetNodeTextContentAsBoolean_true2() throws Exception {
         Element rootElement = getElement("<root><foo>True</foo></root>");
         assertThat(NexusResponseParser.getNodeTextContentAsBoolean(rootElement, "foo"), is(true));
     }
 
     @Test
-    public void testGetNodeTextContentAsBoolean_false() throws SAXException, IOException, ParserConfigurationException,
-            NexusClientException {
+    public void testGetNodeTextContentAsBoolean_false()throws Exception {
         Element rootElement = getElement("<root><foo>false</foo></root>");
         assertThat(NexusResponseParser.getNodeTextContentAsBoolean(rootElement, "foo"), is(false));
     }
 
     @Test
-    public void testGetNodeTextContentAsBoolean_false_1() throws SAXException, IOException,
-            ParserConfigurationException, NexusClientException {
+    public void testGetNodeTextContentAsBoolean_false_1() throws Exception {
         Element rootElement = getElement("<root><foo>bar</foo></root>");
         assertThat(NexusResponseParser.getNodeTextContentAsBoolean(rootElement, "foo"), is(false));
     }
 
     @Test
-    public void testGetNodeTextContentAsURL() throws SAXException, IOException, ParserConfigurationException,
-            NexusClientException
-    {
+    public void testGetNodeTextContentAsURL() throws Exception {
         Element rootElement = getElement("<root><foo>https://host.example.org/</foo></root>");
-        assertThat(NexusResponseParser.getNodeTextContentAsURL(rootElement, "foo"), is(new URL(
-                "https://host.example.org/")));
+        assertThat(NexusResponseParser.getNodeTextContentAsURI(rootElement, "foo"),
+                is(new URI("https://host.example.org/")));
     }
 
     @Test
-    public void testGetNodeTextContentAsURL_emptyUrl() throws SAXException, IOException, ParserConfigurationException,
-            NexusClientException
-    {
+    public void testGetNodeTextContentAsURL_emptyUrl() throws Exception {
         Element rootElement = getElement("<root><foo>  </foo></root>");
-        assertThat(NexusResponseParser.getNodeTextContentAsURL(rootElement, "foo"), nullValue());
+        assertThat(NexusResponseParser.getNodeTextContentAsURI(rootElement, "foo"), nullValue());
     }
 
     @Test
-    public void testGetNodeTextContentAsURL_invalid() throws SAXException, IOException, ParserConfigurationException,
-            NexusClientException
-    {
+    public void testGetNodeTextContentAsURL_invalid() throws Exception {
         Element rootElement = getElement("<root><foo>notAUrlString</foo></root>");
         try {
-
-            NexusResponseParser.getNodeTextContentAsURL(rootElement, "foo");
+            NexusResponseParser.getNodeTextContentAsURI(rootElement, "foo");
             fail("Exception expected");
         } catch (NexusClientException e) {
             assertThat(e.getMessage(), containsString("not a valid URL"));

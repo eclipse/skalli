@@ -23,13 +23,13 @@ import org.eclipse.skalli.services.entity.EntityService;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.HashMapStorageService;
-import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.eclipse.skalli.testutil.TestExtensibleEntityBase;
 import org.eclipse.skalli.testutil.TestExtensibleEntityEntityService;
 import org.eclipse.skalli.testutil.TestExtensibleEntityExtensionService;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.eclipse.skalli.testutil.TestExtension1;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -80,7 +80,7 @@ public class XStreamPersistenceServiceTest {
 
             byte[] blob = hashMapStorageService.getBlobStore().get(
                     new HashMapStorageService.Key(entity.getClass().getSimpleName(), entity.getUuid().toString()));
-            Document doc = XMLUtils.documentFromString(new String(blob));
+            Document doc = XMLUtils.documentFromString(new String(blob, "UTF-8"));
 
             // check that the extensible entity has been persisted with its default alias
             // and check some nodes (uuid, extensions etc.)

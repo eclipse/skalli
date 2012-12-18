@@ -16,11 +16,11 @@ import static org.junit.Assert.assertEquals;
 import java.io.ByteArrayInputStream;
 
 import org.eclipse.osgi.framework.console.CommandInterpreter;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.testutil.HashMapStorageService;
 import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;
 
+@SuppressWarnings("nls")
 public class StorageCommandTest {
     static final String CATEGORY_PROJECT = "Project";
     static final String KEY_1 = TestUUIDs.TEST_UUIDS[0].toString();
@@ -29,13 +29,13 @@ public class StorageCommandTest {
     static final String TEST_CONTENT_2 = "test content hello world";
 
     @Test
-    public void testCopy() throws StorageException {
+    public void testCopy() throws Exception {
         HashMapStorageService source = new HashMapStorageService();
         source.write(CATEGORY_PROJECT, KEY_1, new ByteArrayInputStream(
-                TEST_CONTENT_1.getBytes()));
+                TEST_CONTENT_1.getBytes("UTF-8")));
 
         source.write(CATEGORY_PROJECT, KEY_2, new ByteArrayInputStream(
-                TEST_CONTENT_2.getBytes()));
+                TEST_CONTENT_2.getBytes("UTF-8")));
 
         HashMapStorageService destination = new HashMapStorageService();
         CommandInterpreter intr = createMock(CommandInterpreter.class);

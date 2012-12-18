@@ -19,20 +19,14 @@ import java.util.SortedSet;
 
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.services.group.GroupService;
-import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("nls")
 public class GroupResourceTest {
-
-    private static GroupsResource groupResource;
-
-    @Before
-    public void before() {
-        groupResource = new GroupsResource();
-    }
 
     @Test
     public void testValidate_emptyGroupId() {
+        GroupsResource groupResource = new GroupsResource();
         SortedSet<Issue> issues = groupResource.validate(
                 new GroupsConfig(Arrays.asList(new GroupConfig("", Arrays.asList("jon")))), "admin");
         assertFalse(issues.isEmpty());
@@ -43,6 +37,7 @@ public class GroupResourceTest {
         final String loggedInUser = "admin";
 
         //no group at all
+        GroupsResource groupResource = new GroupsResource();
         SortedSet<Issue> issues = groupResource.validate(new GroupsConfig(), loggedInUser);
         assertFalse(Issue.hasFatalIssues(issues));
         assertFalse(issues.isEmpty());
@@ -59,7 +54,7 @@ public class GroupResourceTest {
     @Test
     public void testValidate_ok() {
         final String loggedInUser = "admin";
-
+        GroupsResource groupResource = new GroupsResource();
         SortedSet<Issue> issues = groupResource.validate(
                 new GroupsConfig(Arrays.asList(
                         new GroupConfig(GroupService.ADMIN_GROUP, Arrays.asList(loggedInUser)),
@@ -71,7 +66,7 @@ public class GroupResourceTest {
     @Test
     public void testValidate_memberEmpty() {
         final String loggedInUser = "admin";
-
+        GroupsResource groupResource = new GroupsResource();
         SortedSet<Issue> issues = groupResource.validate(
                 new GroupsConfig(Arrays.asList(new GroupConfig(GroupService.ADMIN_GROUP, Arrays
                         .asList(loggedInUser, "")))),
@@ -82,7 +77,7 @@ public class GroupResourceTest {
     @Test
     public void testValidate_groups_without_member() {
         final String loggedInUser = "admin";
-
+        GroupsResource groupResource = new GroupsResource();
         SortedSet<Issue> issues = groupResource.validate(
                 new GroupsConfig(Arrays.asList(//
                         new GroupConfig(GroupService.ADMIN_GROUP, Arrays.asList(loggedInUser)), //
@@ -96,7 +91,7 @@ public class GroupResourceTest {
     @Test
     public void testValidate_groups_doublye() {
         final String loggedInUser = "admin";
-
+        GroupsResource groupResource = new GroupsResource();
         SortedSet<Issue> issues = groupResource.validate(
                 new GroupsConfig(Arrays.asList(//
                         new GroupConfig(GroupService.ADMIN_GROUP, Arrays.asList(loggedInUser)), //
