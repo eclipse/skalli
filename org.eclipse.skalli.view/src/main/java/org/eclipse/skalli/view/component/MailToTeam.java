@@ -14,7 +14,6 @@ import java.text.MessageFormat;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ext.commons.PeopleExtension;
@@ -60,7 +59,7 @@ public class MailToTeam {
         sb.append("<a href=\"mailto:"); //$NON-NLS-1$
         sb.append(mailTo);
         sb.append("\">"); //$NON-NLS-1$
-        sb.append("Contact the team");
+        sb.append("Contact Team");
         sb.append("</a> "); //$NON-NLS-1$
         sb.append("</span>"); //$NON-NLS-1$
 
@@ -73,9 +72,8 @@ public class MailToTeam {
         if (sendTo.length() > 0) {
             sendTo.append(";");//$NON-NLS-1$
         }
-        String email = user.getEmail();
-        if (StringUtils.isNotBlank(email)) {
-            sendTo.append(email);
+        if (user.hasEmail()) {
+            sendTo.append(user.getEmail());
         }
     }
 

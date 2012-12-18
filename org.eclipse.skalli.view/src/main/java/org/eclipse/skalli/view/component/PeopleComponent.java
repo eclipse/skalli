@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.view.Consts;
@@ -60,12 +59,11 @@ public class PeopleComponent extends CustomComponent {
 
         sb.append("<span class=\"v-link-peoplecomponent\">"); //$NON-NLS-1$
 
-        if (!StringUtils.isBlank(user.getEmail()))
-        {
+        if (user.hasEmail()) {
             sb.append("<a class=\"link\" href=\"mailto:"); //$NON-NLS-1$
             sb.append(user.getEmail());
             sb.append("\">"); //$NON-NLS-1$
-            sb.append("mail");
+            sb.append("Mail");
             sb.append("</a> "); //$NON-NLS-1$
         }
 
@@ -73,7 +71,7 @@ public class PeopleComponent extends CustomComponent {
         sb.append(Consts.URL_PROJECTS_USER);
         sb.append(StringEscapeUtils.escapeHtml(user.getUserId()));
         sb.append("\">"); //$NON-NLS-1$
-        sb.append("projects");
+        sb.append("Projects");
         sb.append("</a> "); //$NON-NLS-1$
 
         sb.append("</span>"); //$NON-NLS-1$

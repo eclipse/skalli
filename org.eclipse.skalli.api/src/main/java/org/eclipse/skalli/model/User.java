@@ -134,6 +134,10 @@ public class User extends EntityBase {
         this.firstname = firstname;
     }
 
+    public boolean hasFirstname() {
+        return StringUtils.isNotBlank(firstname) && !"?".equals(firstname); //$NON-NLS-1$
+    }
+
     public String getLastname() {
         return lastname;
     }
@@ -142,12 +146,20 @@ public class User extends EntityBase {
         this.lastname = lastname;
     }
 
+    public boolean hasLastname() {
+        return StringUtils.isNotBlank(lastname) && !"?".equals(lastname); //$NON-NLS-1$
+    }
+
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean hasEmail() {
+        return StringUtils.isNotBlank(email) && !"?".equals(email); //$NON-NLS-1$
     }
 
     /**
