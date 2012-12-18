@@ -10,13 +10,26 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.devinf.internal;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.commons.ComparatorUtils;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingsConfig;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
+import org.eclipse.skalli.model.ext.devinf.internal.config.ScmLocationMappingResource;
+import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.event.EventCustomizingUpdate;
+import org.eclipse.skalli.services.event.EventListener;
+import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServiceBase;
 import org.eclipse.skalli.services.extension.Indexer;
@@ -30,7 +43,7 @@ import org.slf4j.LoggerFactory;
 
 public class ExtensionServiceDevInf
         extends ExtensionServiceBase<DevInfProjectExt>
-        implements ExtensionService<DevInfProjectExt>
+        implements ExtensionService<DevInfProjectExt>, EventListener<EventCustomizingUpdate>
 {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExtensionServiceDevInf.class);
@@ -77,6 +90,9 @@ public class ExtensionServiceDevInf
             { DevInfProjectExt.PROPERTY_REVIEW_URL, URL_INPUT_PROMPT },
             { DevInfProjectExt.PROPERTY_JAVADOCS_URL, URL_INPUT_PROMPT } });
 
+    private ConfigurationService configService;
+    private List<Pattern> indexPatterns;
+
     @Override
     public Class<DevInfProjectExt> getExtensionClass() {
         return DevInfProjectExt.class;
@@ -88,6 +104,27 @@ public class ExtensionServiceDevInf
 
     protected void deactivate(ComponentContext context) {
         LOG.info("deactivated model extension: " + getShortName()); //$NON-NLS-1$
+    }
+
+    protected void bindConfigurationService(ConfigurationService configService) {
+        LOG.info(MessageFormat.format("bindConfigurationService({0})", configService)); //$NON-NLS-1$
+        this.indexPatterns = getIndexPatterns(configService);
+        this.configService = configService;
+    }
+
+    protected void unbindConfigurationService(ConfigurationService configService) {
+        LOG.info(MessageFormat.format("unbindConfigurationService({0})", configService)); //$NON-NLS-1$
+        this.indexPatterns = null;
+        this.configService = null;
+    }
+
+    protected void bindEventService(EventService eventService) {
+        LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
+        eventService.registerListener(EventCustomizingUpdate.class, this);
+    }
+
+    protected void unbindEventService(EventService eventService) {
+        LOG.info(MessageFormat.format("unbindEventService({0})", eventService)); //$NON-NLS-1$
     }
 
     @Override
@@ -127,7 +164,7 @@ public class ExtensionServiceDevInf
 
     @Override
     public Indexer<DevInfProjectExt> getIndexer() {
-        return new DevInfIndexer();
+        return new DevInfIndexer(indexPatterns);
     }
 
     @Override
@@ -176,5 +213,37 @@ public class ExtensionServiceDevInf
             validators.add(new HostReachableValidator(getExtensionClass(), propertyName));
         }
         return validators;
+    }
+
+    private List<Pattern> getIndexPatterns(ConfigurationService configService) {
+        List<Pattern> patterns = new ArrayList<Pattern>();
+        if (configService != null) {
+            ScmLocationMappingsConfig mappingsConfig = configService.readCustomization(
+                    ScmLocationMappingResource.MAPPINGS_KEY, ScmLocationMappingsConfig.class);
+            if (mappingsConfig != null) {
+                List<ScmLocationMappingConfig> mappings = mappingsConfig.getScmMappings();
+                if (mappings != null) {
+                    for (ScmLocationMappingConfig mapping : mappings) {
+                        if (ComparatorUtils.equals(ScmLocationMapper.PURPOSE_INDEXING, mapping.getPurpose())
+                                && StringUtils.isNotBlank(mapping.getPattern())) {
+                            try {
+                                patterns.add(Pattern.compile(mapping.getPattern()));
+                            } catch (PatternSyntaxException e) {
+                                LOG.warn(MessageFormat.format("''{0}'' is not a valid regular expression",
+                                        mapping.getPattern()), e);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return patterns;
+    }
+
+    @Override
+    public void onEvent(EventCustomizingUpdate event) {
+        if (ScmLocationMappingResource.MAPPINGS_KEY.equals(event.getCustomizationName())) {
+            indexPatterns = getIndexPatterns(configService);
+        }
     }
 }
