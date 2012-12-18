@@ -68,8 +68,12 @@ public class UserContainer extends IndexedContainer implements Serializable {
 
     public static synchronized UserContainer createWithData() {
         if (container == null) {
+            List<User> users = Collections.emptyList();
             UserService userService = UserServices.getUserService();
-            container = new UserContainer(userService.getUsers());
+            if (userService != null) {
+                users = userService.getUsers();
+            }
+            container = new UserContainer(users);
         }
         return container;
     }
@@ -131,12 +135,14 @@ public class UserContainer extends IndexedContainer implements Serializable {
     private static List<Item> findAndAddUser(String searchText) {
         List<Item> items = new ArrayList<Item>();
         UserService userService = UserServices.getUserService();
-        List<User> users = userService.findUser(searchText);
-        if (users != null) {
-            for (User user : users) {
-                Item item = container.addItem(user);
-                if (item != null) {
-                    items.add(item);
+        if (userService != null) {
+            List<User> users = userService.findUser(searchText);
+            if (users != null) {
+                for (User user : users) {
+                    Item item = container.addItem(user);
+                    if (item != null) {
+                        items.add(item);
+                    }
                 }
             }
         }
@@ -158,11 +164,17 @@ public class UserContainer extends IndexedContainer implements Serializable {
         }
         if (userIds.size() > 0) {
             UserService userService = UserServices.getUserService();
-            Set<User> fetchedUsers = userService.getUsersById(userIds);
-            for (User user : fetchedUsers) {
-                container.addItem(user);
+            if (userService != null) {
+                Set<User> fetchedUsers = userService.getUsersById(userIds);
+                for (User user : fetchedUsers) {
+                    container.addItem(user);
+                }
+                users.addAll(fetchedUsers);
+            } else {
+                for (String userId : userIds) {
+                    users.add(new User(userId));
+                }
             }
-            users.addAll(fetchedUsers);
         }
         return users;
     }

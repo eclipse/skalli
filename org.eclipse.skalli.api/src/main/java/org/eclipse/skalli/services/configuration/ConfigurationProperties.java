@@ -33,6 +33,8 @@ public class ConfigurationProperties {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationProperties.class);
 
+    private static Properties propertyCache = getBundleProperties();
+
     public static String getProperty(String propertyName) {
         return getProperty(propertyName, null);
     }
@@ -40,42 +42,45 @@ public class ConfigurationProperties {
     public static String getProperty(String propertyName, String defaultValue) {
         String propertyValue = System.getProperty(propertyName);
         if (propertyValue == null) {
-            LOG.debug(MessageFormat.format("System property ''{0}'' is undefined", propertyName)); //$NON-NLS-1$
-            propertyValue = getPropertyFromBundles(propertyName);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(MessageFormat.format("System property ''{0}'' is undefined", propertyName)); //$NON-NLS-1$
+            }
+            propertyValue = propertyCache.getProperty(propertyName);
         }
         if (propertyValue == null && StringUtils.isNotBlank(defaultValue)) {
-            LOG.debug(MessageFormat.format("Using default value ''{0}'' for property ''{0}''", defaultValue, propertyName)); //$NON-NLS-1$
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(MessageFormat.format("Using default value ''{0}'' for property ''{0}''", //$NON-NLS-1$
+                        defaultValue, propertyName));
+            }
             propertyValue = defaultValue;
         }
         return propertyValue;
     }
 
-    private static String getPropertyFromBundles(String propertyName) {
-        String propertyValue = null;
+    private static Properties getBundleProperties() {
+        Properties bundleProperties = new Properties();
         Iterator<URL> resources = Services.findResources("/", PROPERTIES_RESOURCE, false, FilterMode.ALL, //$NON-NLS-1$
                 new BundleFilter.AcceptAll()).iterator();
-        while (propertyValue == null && resources.hasNext()) {
-            propertyValue = getPropertyFromURL(propertyName, resources.next());
+        while (resources.hasNext()) {
+            addBundleProperties(resources.next(), bundleProperties);
         }
-        return propertyValue;
+        return bundleProperties;
     }
 
-    private static String getPropertyFromURL(String propertyName, URL resource) {
-        String propertValue = null;
+    private static void addBundleProperties(URL resource, Properties bundleProperties) {
         InputStream in = null;
         try {
             in = resource.openStream();
             if (in != null) {
                 Properties properties = new Properties();
                 properties.load(in);
-                propertValue = (String) properties.get(propertyName);
+                bundleProperties.putAll(properties);
             }
         } catch (Exception e) {
-            LOG.info(MessageFormat.format("Failed to retrieve property ''{0}'' from resource ''{1}''", //$NON-NLS-1$
-                    propertyName, resource));
+            LOG.info(MessageFormat.format("Failed to retrieve properties from resource ''{1}''", //$NON-NLS-1$
+                    resource));
         } finally {
             IOUtils.closeQuietly(in);
         }
-        return propertValue;
     }
 }

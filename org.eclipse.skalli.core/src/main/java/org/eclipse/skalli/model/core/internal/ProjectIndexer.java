@@ -30,7 +30,6 @@ public class ProjectIndexer extends IndexerBase<Project> {
 
     @Override
     protected void indexFields(Project project) {
-        UserService userService = UserServices.getUserService();
         TreeSet<Member> members = new TreeSet<Member>();
         for (RoleProvider roleProvider : Services.getServices(RoleProvider.class)) {
             members.addAll(roleProvider.getMembers(project));
@@ -50,9 +49,12 @@ public class ProjectIndexer extends IndexerBase<Project> {
         for (Member member : members) {
             userIds.add(member.getUserID());
         }
-        Set<User> users =  userService.getUsersById(userIds);
-        for (User user: users) {
-            addField(MEMBERS_DISPLAY_NAME, user.getDisplayName(), false, true);
+        UserService userService = UserServices.getUserService();
+        if (userService != null) {
+            Set<User> users =  userService.getUsersById(userIds);
+            for (User user: users) {
+                addField(MEMBERS_DISPLAY_NAME, user.getDisplayName(), false, true);
+            }
         }
     }
 

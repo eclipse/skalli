@@ -52,8 +52,8 @@ public class UserServicesTest {
 
         EasyMock.reset(mocks);
 
-        mockConfig.readString(EasyMock.eq(ConfigKeyUserStore.TYPE));
-        EasyMock.expectLastCall().andReturn("local");
+        mockConfig.readCustomization("userStore", UserStoreConfig.class);
+        EasyMock.expectLastCall().andReturn(createUserStoreConfig("local", true));
 
         EasyMock.replay(mocks);
 
@@ -70,11 +70,8 @@ public class UserServicesTest {
 
         EasyMock.reset(mocks);
 
-        mockConfig.readString(EasyMock.eq(ConfigKeyUserStore.TYPE));
-        EasyMock.expectLastCall().andReturn("gaga");
-
-        mockConfig.readString(EasyMock.eq(ConfigKeyUserStore.USE_LOCAL_FALLBACK));
-        EasyMock.expectLastCall().andReturn("true");
+        mockConfig.readCustomization("userStore", UserStoreConfig.class);
+        EasyMock.expectLastCall().andReturn(createUserStoreConfig("foobar", true));
 
         EasyMock.replay(mocks);
 
@@ -84,22 +81,10 @@ public class UserServicesTest {
         EasyMock.verify(mocks);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testGetConfiguredUserService_unknown() {
-
-        Object[] mocks = new Object[] { mockConfig };
-
-        EasyMock.reset(mocks);
-
-        mockConfig.readString(EasyMock.eq(ConfigKeyUserStore.TYPE));
-        EasyMock.expectLastCall().andReturn("gaga");
-
-        mockConfig.readString(EasyMock.eq(ConfigKeyUserStore.USE_LOCAL_FALLBACK));
-        EasyMock.expectLastCall().andReturn("false");
-
-        EasyMock.replay(mocks);
-
-        new TestUSU().getConfiguredUserService();
+    private UserStoreConfig createUserStoreConfig(String type, boolean useLocalFallback) {
+        UserStoreConfig config = new UserStoreConfig();
+        config.setType(type);
+        config.setUseLocalFallback(useLocalFallback);
+        return config;
     }
-
 }
