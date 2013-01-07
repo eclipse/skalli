@@ -15,7 +15,7 @@ import org.eclipse.skalli.services.user.UserStoreConfig;
 
 public class UserStoreResource extends CustomizingResource<UserStoreConfig> {
 
-    public static final String KEY = "userstore"; //$NON-NLS-1$
+    public static final String KEY = "userStore"; //$NON-NLS-1$
 
     @Override
     protected String getKey() {

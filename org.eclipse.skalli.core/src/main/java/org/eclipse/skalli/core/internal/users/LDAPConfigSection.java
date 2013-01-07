@@ -19,7 +19,7 @@ public class LDAPConfigSection extends ConfigSectionBase implements ConfigSectio
 
     @Override
     public String getName() {
-        return "ldap";
+        return "ldap"; //$NON-NLS-1$
     }
 
     @Override
