@@ -236,15 +236,19 @@ public class EntityManagerServiceBase implements EntityManagerService {
     private void logConfiguredProperties(String jpaUnitName, Map<String, Object> properties) {
         if (LOG.isInfoEnabled()) {
             StringBuilder msg = new StringBuilder("persistence.unit = '" + jpaUnitName + "': ");
-            msg.append(PersistenceUnitProperties.TARGET_DATABASE).append(" = ")
-                    .append(properties.get(PersistenceUnitProperties.TARGET_DATABASE)).append("; ");
-            msg.append(PersistenceUnitProperties.JDBC_DRIVER).append(" = ")
-                    .append(properties.get(PersistenceUnitProperties.JDBC_DRIVER)).append("; ");
-            msg.append(PersistenceUnitProperties.JDBC_URL).append(" = ")
-                    .append(properties.get(PersistenceUnitProperties.JDBC_URL)).append("; ");
-            msg.append(PersistenceUnitProperties.JDBC_USER).append(" = ")
-                    .append(properties.get(PersistenceUnitProperties.JDBC_USER));
+            appendConfiguredProperty(msg, PersistenceUnitProperties.TARGET_DATABASE, properties);
+            appendConfiguredProperty(msg, PersistenceUnitProperties.JDBC_DRIVER, properties);
+            appendConfiguredProperty(msg, PersistenceUnitProperties.JDBC_URL, properties);
+            appendConfiguredProperty(msg, PersistenceUnitProperties.JDBC_USER, properties);
             LOG.info(msg.toString());
+        }
+    }
+
+    @SuppressWarnings("nls")
+    private void appendConfiguredProperty(StringBuilder msg, String propertyName, Map<String, Object> properties) {
+        String propertyValue = (String)properties.get(propertyName);
+        if (StringUtils.isNotBlank(propertyValue)) {
+            msg.append(propertyName).append(" = '").append(propertyValue).append("'; ");
         }
     }
 
