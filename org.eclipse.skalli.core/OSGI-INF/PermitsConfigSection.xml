@@ -8,11 +8,10 @@
     Contributors:
         SAP AG - initial API and implementation
  -->
-
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.config.permissions">
-   <implementation class="org.eclipse.skalli.core.services.permit.PermitsConfigSection"/>
-   <service>
-      <provide interface="org.eclipse.skalli.services.configuration.rest.ConfigSection"/>
-   </service>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.config.permits">
+    <implementation class="org.eclipse.skalli.core.permit.PermitsConfigSection"/>
+    <service>
+        <provide interface="org.eclipse.skalli.services.configuration.rest.ConfigSection"/>
+     </service>
 </scr:component>
 

@@ -18,7 +18,6 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.services.configuration.ConfigurationProperties;
-import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 import org.slf4j.Logger;
@@ -41,6 +40,9 @@ import org.slf4j.LoggerFactory;
  *     bind="bindEntityManagerFactoryBuilder"
  *     unbind="unbindEntityManagerFactoryBuilder"/&gt;
  * </pre>
+ * <p>
+ * Furthermore, derived implementations must call {@link #activate(ComponentContext)} and
+ * {@link #deactivate(ComponentContext)}.
  */
 public class EntityManagerServiceBase implements EntityManagerService {
 
@@ -71,14 +73,10 @@ public class EntityManagerServiceBase implements EntityManagerService {
 
     protected void activate(ComponentContext context) {
         this.context = context;
-        LOG.info(MessageFormat.format("[EntityManagerService] {0} : activated",
-                (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
     protected void deactivate(ComponentContext context) {
         this.context = null;
-        LOG.info(MessageFormat.format("[EntityManagerService] {0} : deactivated",
-                (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
     protected EntityManagerFactory locateEntityManagerFactory() {

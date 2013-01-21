@@ -21,7 +21,7 @@
         <description></description>
         <display-name>SkalliAPI</display-name>
         <servlet-name>SkalliAPI</servlet-name>
-        <servlet-class>org.eclipse.skalli.api.rest.internal.RestletServlet</servlet-class>
+        <servlet-class>org.eclipse.skalli.core.rest.RestletServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>SkalliAPI</servlet-name>
@@ -30,7 +30,7 @@
 
     <context-param>
         <param-name>org.restlet.application</param-name>
-        <param-value>org.eclipse.skalli.api.rest.internal.RestApplication</param-value>
+        <param-value>org.eclipse.skalli.core.rest.RestApplication</param-value>
     </context-param>
 
     <security-constraint>

@@ -9,11 +9,10 @@
     Contributors:
         SAP AG - initial API and implementation
  -->
-
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.feed.internal.config.feedUpdaterConfigSection">
-   <implementation class="org.eclipse.skalli.core.internal.feed.FeedUpdaterConfigSection"/>
-   <service>
-      <provide interface="org.eclipse.skalli.services.configuration.rest.ConfigSection"/>
-   </service>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.config.feedupdater">
+    <implementation class="org.eclipse.skalli.core.feed.FeedUpdaterConfigSection"/>
+    <service>
+        <provide interface="org.eclipse.skalli.services.configuration.rest.ConfigSection"/>
+    </service>
 </scr:component>
 

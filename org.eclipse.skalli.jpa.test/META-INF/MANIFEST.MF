@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Skalli Database Storage Tests (Incubation)
+Bundle-SymbolicName: org.eclipse.skalli.jpa.test
+Bundle-Version: 0.2.0.qualifier
+Fragment-Host: org.eclipse.skalli.jpa
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.junit,
+ org.eclipse.skalli.testutil,
+ org.eclipse.skalli.api
+Import-Package: org.apache.commons.codec.digest,
+ org.hamcrest,
+ org.osgi.framework

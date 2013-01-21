@@ -9,11 +9,10 @@
     Contributors:
         SAP AG - initial API and implementation
  -->
-
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.config.roles">
-   <implementation class="org.eclipse.skalli.core.services.role.RolesConfigSection"/>
-   <service>
-      <provide interface="org.eclipse.skalli.services.configuration.rest.ConfigSection"/>
-   </service>
+    <implementation class="org.eclipse.skalli.core.role.RolesConfigSection"/>
+    <service>
+        <provide interface="org.eclipse.skalli.services.configuration.rest.ConfigSection"/>
+    </service>
 </scr:component>
 

@@ -35,8 +35,8 @@ import org.eclipse.skalli.services.feed.Entry;
 import org.eclipse.skalli.services.feed.FeedManager;
 import org.eclipse.skalli.services.feed.FeedProvider;
 import org.eclipse.skalli.services.feed.FeedService;
-import org.eclipse.skalli.services.feed.FeedServiceException;
 import org.eclipse.skalli.services.feed.FeedUpdater;
+import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.view.component.FloatLayout;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;
@@ -112,7 +112,7 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
 
     @Override
     public String getShortName() {
-        return "timeline";
+        return "timeline"; //$NON-NLS-1$
     }
 
     @Override
@@ -167,9 +167,9 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
     private List<String> getSources(Project project) {
         try {
             return feedService.findSources(project.getUuid());
-        } catch (FeedServiceException e) {
-            LOG.error(MessageFormat.format("Failed to retrieve feed sources for project {0}", project.getProjectId()),
-                    e);
+        } catch (StorageException e) {
+            LOG.error(MessageFormat.format("Failed to retrieve feed sources for project {0}",
+                    project.getProjectId()), e);
         }
         return Collections.emptyList();
     }
@@ -212,9 +212,9 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
                     addMoreButton(layout, project, sourceFilter);
                 }
             }
-        } catch (FeedServiceException e) {
-            LOG.error(MessageFormat.format("Failed to retrieve feed entries for project {0}", project.getProjectId()),
-                    e);
+        } catch (StorageException e) {
+            LOG.error(MessageFormat.format("Failed to retrieve feed entries for project {0}",
+                    project.getProjectId()), e);
         }
     }
 
@@ -267,7 +267,7 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
                 renderContentPanel(parentLayout, project, sourceFilter);
             }
         });
-        layout.addComponent(cb, "margin-right:10px;");
+        layout.addComponent(cb, "margin-right:10px;"); //$NON-NLS-1$
     }
 
     @SuppressWarnings("nls")
@@ -312,15 +312,15 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
         List<Link> mappedScmLinks = mapper.getMappedLinks(configService, project.getUuid().toString(), link,
                 ScmLocationMapper.PURPOSE_FEED_LINK);
         if (mappedScmLinks.size() == 0) {
-            LOG.debug("no mapping for feed link ='" + link + "' with purpose = '" + ScmLocationMapper.PURPOSE_FEED_LINK
-                    + "' defined.");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(MessageFormat.format("no mapping for feed link =''{0}'' with purpose = ''{1}'' defined.",
+                        link, ScmLocationMapper.PURPOSE_FEED_LINK));
+            }
             return link;
         }
 
-
-            // take the first found mapping
-            return mappedScmLinks.get(0).getUrl();
-
+        // take the first found mapping
+        return mappedScmLinks.get(0).getUrl();
     }
 
     @SuppressWarnings("nls")

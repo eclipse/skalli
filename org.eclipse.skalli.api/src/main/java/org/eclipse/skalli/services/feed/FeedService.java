@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.eclipse.skalli.services.persistence.StorageException;
+
 /**
  * Interface for a service that provides a timeline for a certain project, such as commits in a
  * source code repository, mails received on a mailing list, changes to a project Wiki, or changes
@@ -37,9 +39,9 @@ public interface FeedService {
      * @return a list of timeline entries sorted by descending
      * {@link Entry#getPublished() publishing date}, or an empty list.
      *
-     * @throws FeedServiceException if the method failed to retrieve the timeline entries.
+     * @throws StorageException if the method failed to retrieve the timeline entries.
      */
-    List<Entry> findEntries(UUID projectId, int maxResults) throws FeedServiceException;
+    List<Entry> findEntries(UUID projectId, int maxResults) throws StorageException;
 
     /**
      * Returns up to <code>maxResult</code> timeline entries for a project coming
@@ -54,9 +56,9 @@ public interface FeedService {
      * @return a list of timeline entries ordered by descending
      * {@link Entry#getPublished() publishing date}, or an empty list.
      *
-     * @throws FeedServiceException if the method failed to retrieve the timeline entries.
+     * @throws StorageException if the method failed to retrieve the timeline entries.
      */
-    List<Entry> findEntries(UUID projectId, Collection<String> sources, int maxResults) throws FeedServiceException;
+    List<Entry> findEntries(UUID projectId, Collection<String> sources, int maxResults) throws StorageException;
 
     /**
      * Returns a list of sources of timeline entries this service can provide for a given project.
@@ -71,7 +73,7 @@ public interface FeedService {
      *
      * @return a list of source identifiers sorted alphanumerically, or an empty list.
      *
-     * @throws FeedServiceException if the method failed to retrieve the sources.
+     * @throws StorageException if the method failed to retrieve the sources.
      */
-    List<String> findSources(UUID projectId) throws FeedServiceException;
+    List<String> findSources(UUID projectId) throws StorageException;
 }

@@ -9,6 +9,14 @@
       <provider>git</provider>
     </org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig>
     <org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig>
+      <id>indexing.git.eclipse.org</id>
+      <purpose>indexing</purpose>
+      <pattern>^scm:git:git://git.eclipse.org/gitroot/(.+)\.git$</pattern>
+      <template></template>
+      <name>Index Git Repositories on Eclipse.org</name>
+      <provider>git</provider>
+    </org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig>
+    <org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig>
       <id>createBug.bugs.eclipse.org</id>
       <purpose>create_bug</purpose>
       <pattern>^https://bugs.eclipse.org/bugs/buglist.cgi?.*(product=[^&amp;]*).*</pattern>

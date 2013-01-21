@@ -19,12 +19,10 @@
         <module>org.eclipse.skalli.parent</module>
         <module>org.eclipse.skalli.api</module>
         <module>org.eclipse.skalli.core</module>
-        <module>org.eclipse.skalli.storage.db</module>
-        <module>org.eclipse.skalli.storage.db.entities</module>
+        <module>org.eclipse.skalli.jpa</module>
+        <module>org.eclipse.skalli.jpa.test</module>
         <module>org.eclipse.skalli.commands</module>
         <module>org.eclipse.skalli.model.ext.misc</module>
-        <module>org.eclipse.skalli.feed.db</module>
-        <module>org.eclipse.skalli.feed.db.entities</module>
         <module>org.eclipse.skalli.view</module>
         <module>org.eclipse.skalli.view.ext</module>
         <module>org.eclipse.skalli.view.ext.impl</module>
@@ -41,8 +39,7 @@
         <module>org.eclipse.skalli.view.ext.impl.test</module>
         <module>org.eclipse.skalli.maven.test</module>
         <module>org.eclipse.skalli.nexus.test</module>
-        <module>org.eclipse.skalli.examples</module>
-        <!-- modules building the update site:-->
+        <!-- modules building the update site: -->
         <module>org.eclipse.skalli.feature</module>
         <module>org.eclipse.skalli.orbit.feature</module>
         <module>org.eclipse.skalli.eclipse.feature</module>
@@ -50,16 +47,10 @@
         <module>org.eclipse.skalli.testing.feature</module>
         <module>org.eclipse.skalli.site</module>
         <module>org.eclipse.skalli.product</module>
+        <module>org.eclipse.skalli.examples</module>
     </modules>
 
     <profiles>
-        <profile>
-            <id>db</id>
-            <modules>
-                <module>org.eclipse.skalli.storage.db.test</module>
-                <module>org.eclipse.skalli.feed.db.test</module>
-            </modules>
-        </profile>
         <profile>
             <id>gerrit</id>
             <modules>

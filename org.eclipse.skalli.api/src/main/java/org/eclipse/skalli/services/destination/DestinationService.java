@@ -14,6 +14,9 @@ import java.net.URL;
 
 import org.apache.http.client.HttpClient;
 
+/**
+ * Service providing preconfigured {@link HttpClient HTTP clients} for various destinations.
+ */
 public interface DestinationService {
 
     /**

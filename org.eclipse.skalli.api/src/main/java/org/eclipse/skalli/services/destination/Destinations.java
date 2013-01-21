@@ -1,6 +1,7 @@
 package org.eclipse.skalli.services.destination;
 
 import java.net.URL;
+import java.text.MessageFormat;
 
 import org.apache.http.client.HttpClient;
 import org.osgi.framework.BundleContext;
@@ -12,9 +13,9 @@ import org.slf4j.LoggerFactory;
 
 public class Destinations {
 
-    private static final String DEFAULT = "default";
+    private static final String DEFAULT = "default"; //$NON-NLS-1$
 
-    private static final String DESTINATION_SERVICE_TYPE = "destinationService.type";
+    private static final String DESTINATION_SERVICE_TYPE = "destinationService.type"; //$NON-NLS-1$
 
     private static final Logger LOG = LoggerFactory.getLogger(Destinations.class);
 
@@ -31,7 +32,7 @@ public class Destinations {
         try {
             serviceRefs = context.getAllServiceReferences(DestinationService.class.getName(), null);
         } catch (InvalidSyntaxException e) {
-            LOG.error("Can't get any " + DestinationService.class.getName(), e);
+            LOG.error("No destination service registered", e);
         }
 
         if (serviceRefs != null) {
@@ -51,14 +52,11 @@ public class Destinations {
             if (defaultServiceRef != null) {
                 client = getClient(defaultServiceRef, url);
                 if (client == null) {
-                    LOG.info("Default destination service ("
-                            + context.getService(defaultServiceRef).getClass().getName() + ") does not support URL "
-                            + url.toExternalForm());
+                    LOG.info(MessageFormat.format("Default destination service cannot handle {0}", url.toExternalForm()));
                 }
 
             } else {
-                LOG.error("No destination service implementation found with property \"" + DESTINATION_SERVICE_TYPE
-                        + "\" = \"" + DEFAULT + "\"");
+                LOG.error("No default destination service registered");
 
             }
         }

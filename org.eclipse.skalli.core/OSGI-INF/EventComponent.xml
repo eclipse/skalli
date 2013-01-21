@@ -9,9 +9,8 @@
     Contributors:
         SAP AG - initial API and implementation
  -->
-
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.event">
-    <implementation class="org.eclipse.skalli.core.internal.event.EventComponent"/>
+    <implementation class="org.eclipse.skalli.core.event.EventComponent"/>
     <service>
         <provide interface="org.eclipse.skalli.services.event.EventService"/>
     </service>

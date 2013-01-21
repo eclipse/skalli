@@ -4,11 +4,9 @@ Bundle-Name: Skalli Core Tests (Incubation)
 Bundle-SymbolicName: org.eclipse.skalli.core.test
 Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
-Fragment-Host: org.eclipse.skalli.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: javax.persistence.criteria,
- javax.persistence.metamodel,
- org.apache.commons.io,
+Fragment-Host: org.eclipse.skalli.core
+Import-Package: org.apache.commons.io,
  org.apache.http.client,
  org.apache.http.client.methods,
  org.easymock,

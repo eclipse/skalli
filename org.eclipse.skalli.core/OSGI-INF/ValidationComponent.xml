@@ -9,12 +9,11 @@
     Contributors:
         SAP AG - initial API and implementation
  -->
-
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.validation">
-    <implementation class="org.eclipse.skalli.core.internal.validation.ValidationServiceImpl"/>
+    <implementation class="org.eclipse.skalli.core.validation.ValidationComponent"/>
     <service>
         <provide interface="org.eclipse.skalli.services.validation.ValidationService"/>
-        <provide interface="org.eclipse.skalli.api.rest.monitor.Monitorable"/>
+        <provide interface="org.eclipse.skalli.core.rest.monitor.Monitorable"/>
     </service>
     <reference
         name="ConfigurationService"

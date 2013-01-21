@@ -9,7 +9,7 @@
         SAP AG - initial API and implementation
  -->
 
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.model.ext.maven.config.resolver">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.ext.maven.config.resolver">
    <implementation class="org.eclipse.skalli.model.ext.maven.internal.config.MavenResolverConfigSection"/>
    <service>
       <provide interface="org.eclipse.skalli.services.configuration.rest.ConfigSection"/>

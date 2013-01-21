@@ -39,6 +39,13 @@
          unpack="false"/>
 
    <plugin
+         id="org.eclipse.skalli.jpa"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="org.eclipse.skalli.model.ext.misc"
          download-size="0"
          install-size="0"
@@ -74,6 +81,13 @@
          unpack="false"/>
 
    <plugin
+         id="org.eclipse.skalli.gerrit"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
          id="org.eclipse.skalli.maven"
          download-size="0"
          install-size="0"
@@ -93,41 +107,6 @@
          install-size="0"
          version="0.0.0"
          fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.skalli.storage.db"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.skalli.storage.db.entities"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.skalli.gerrit"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.skalli.feed.db"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.skalli.feed.db.entities"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
          unpack="false"/>
 
 </feature>

@@ -5,6 +5,7 @@ Bundle-SymbolicName: org.eclipse.skalli.core
 Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
 Import-Package: com.thoughtworks.xstream,
  com.thoughtworks.xstream.annotations,
  com.thoughtworks.xstream.converters,
@@ -16,7 +17,6 @@ Import-Package: com.thoughtworks.xstream,
  javax.naming,
  javax.naming.ldap,
  javax.net.ssl,
- javax.persistence,
  javax.servlet,
  javax.servlet.http,
  javax.xml.bind,
@@ -46,7 +46,6 @@ Import-Package: com.thoughtworks.xstream,
  org.apache.velocity.app,
  org.apache.velocity.context,
  org.custommonkey.xmlunit,
- org.eclipse.persistence.config,
  org.eclipse.skalli.commons,
  org.eclipse.skalli.model,
  org.eclipse.skalli.model.ext.commons,
@@ -79,7 +78,6 @@ Import-Package: com.thoughtworks.xstream,
  org.osgi.framework,
  org.osgi.service.component,
  org.osgi.service.jndi,
- org.osgi.service.jpa,
  org.restlet,
  org.restlet.data,
  org.restlet.ext.servlet,
@@ -91,14 +89,18 @@ Import-Package: com.thoughtworks.xstream,
  org.slf4j,
  org.w3c.dom,
  org.xml.sax
+Require-Bundle: org.apache.lucene.core;bundle-version="3.0.3",
+ org.apache.lucene.highlighter;bundle-version="3.0.3",
+ org.apache.lucene.queries;bundle-version="3.0.3",
+ org.apache.lucene.memory;bundle-version="3.0.3"
 Service-Component: OSGI-INF/PermitComponent.xml,
  OSGI-INF/PermitsConfigSection.xml,
  OSGI-INF/EventComponent.xml,
- OSGI-INF/PersistenceComponent.xml,
+ OSGI-INF/XStreamPersistenceComponent.xml,
  OSGI-INF/ConfigurationComponent.xml,
  OSGI-INF/MailComponent.xml,
- OSGI-INF/SearchComponent.xml,
- OSGI-INF/TemplateComponent.xml,
+ OSGI-INF/LuceneSearchComponent.xml,
+ OSGI-INF/ProjectTemplateComponent.xml,
  OSGI-INF/ProjectComponent.xml,
  OSGI-INF/TaggingComponent.xml,
  OSGI-INF/FavoritesComponent.xml,
@@ -128,11 +130,7 @@ Service-Component: OSGI-INF/PermitComponent.xml,
  OSGI-INF/ValidationComponent.xml,
  OSGI-INF/FeedUpdaterConfigSection.xml,
  OSGI-INF/FeedManagerComponent.xml,
- OSGI-INF/FeedUpdaterRunnable.xml
+ OSGI-INF/FeedUpdaterComponent.xml
 Web-ContextPath: /api
 Webapp-Context: /api
-Bundle-ActivationPolicy: lazy
-Require-Bundle: org.apache.lucene.core;bundle-version="3.0.3",
- org.apache.lucene.highlighter;bundle-version="3.0.3",
- org.apache.lucene.queries;bundle-version="3.0.3",
- org.apache.lucene.memory;bundle-version="3.0.3"
+

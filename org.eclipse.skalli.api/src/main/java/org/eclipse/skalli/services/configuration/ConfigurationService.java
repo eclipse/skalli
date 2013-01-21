@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.configuration;
 
+/**
+ * Service providing configuration settings.
+ */
 public interface ConfigurationService {
 
     public String readString(ConfigKey key);

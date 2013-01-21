@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Skalli Database Storage (Incubation)
+Bundle-SymbolicName: org.eclipse.skalli.jpa
+Bundle-Version: 0.2.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: javax.persistence,
+ org.apache.commons.collections,
+ org.apache.commons.io,
+ org.apache.commons.lang,
+ org.eclipse.persistence.annotations,
+ org.eclipse.skalli.commons,
+ org.eclipse.skalli.services.feed,
+ org.eclipse.skalli.services.persistence,
+ org.osgi.service.component,
+ org.slf4j
+Service-Component: OSGI-INF/JPAStorageComponent.xml,
+ OSGI-INF/JPAFeedComponent.xml,
+ OSGI-INF/JPAFeedPersistenceComponent.xml
+Meta-Persistence: META-INF/persistence.xml
+

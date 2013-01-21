@@ -35,13 +35,13 @@ public abstract class InfoBoxBase implements InfoBox {
     protected static final String HSPACE = "&nbsp;&nbsp;&nbsp;&nbsp;"; //$NON-NLS-1$
     protected static final String DEFAULT_TARGET = HtmlBuilder.DEFAULT_TARGET;
 
-    private static final String LAST_MODIFIED ="last modified";
+    private static final String LAST_MODIFIED = "last modified"; //$NON-NLS-1$
 
     protected void bindClipboard(Clipboard clipboard) {
         this.clipboard = clipboard;
     }
 
-    protected void unbindConfigurationService(Clipboard clipboard) {
+    protected void unbindClipboard(Clipboard clipboard) {
         this.clipboard = null;
     }
 

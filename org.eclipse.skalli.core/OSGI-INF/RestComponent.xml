@@ -9,8 +9,8 @@
     Contributors:
         SAP AG - initial API and implementation
  -->
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.api.rest">
-    <implementation class="org.eclipse.skalli.api.rest.internal.RestApplication"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.rest">
+    <implementation class="org.eclipse.skalli.core.rest.RestApplication"/>
     <reference
         name="ConfigSection"
         interface="org.eclipse.skalli.services.configuration.rest.ConfigSection"
@@ -20,7 +20,7 @@
         policy="dynamic" />
     <reference
         name="Monitorable"
-        interface="org.eclipse.skalli.api.rest.monitor.Monitorable"
+        interface="org.eclipse.skalli.core.rest.monitor.Monitorable"
         bind="bindMonitorable"
         unbind="unbindMonitorable"
         cardinality="0..n"

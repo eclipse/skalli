@@ -1,12 +1,12 @@
-<org.eclipse.skalli.core.services.permit.PermitsConfig>
+<org.eclipse.skalli.core.permit.PermitsConfig>
   <permits>
-    <org.eclipse.skalli.core.services.permit.PermitConfig>
+    <org.eclipse.skalli.core.permit.PermitConfig>
       <uuid>f4e989fe-4dc9-4a87-a3b5-476aae3e1d6d</uuid>
       <type>global</type>
       <action>**</action>
       <path>/</path>
       <level>1</level>
       <override>false</override>
-    </org.eclipse.skalli.core.services.permit.PermitConfig>
+    </org.eclipse.skalli.core.permit.PermitConfig>
   </permits>
-</org.eclipse.skalli.core.services.permit.PermitsConfig>
+</org.eclipse.skalli.core.permit.PermitsConfig>

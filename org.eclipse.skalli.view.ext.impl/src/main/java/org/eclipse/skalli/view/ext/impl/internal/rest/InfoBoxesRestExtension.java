@@ -15,7 +15,7 @@ import org.restlet.resource.ServerResource;
 
 public class InfoBoxesRestExtension implements RestExtension {
 
-    private static final String INFOBOXES_PATH = "/infoboxes";
+    private static final String INFOBOXES_PATH = "/infoboxes"; //$NON-NLS-1$
 
     @Override
     public String[] getResourcePaths() {

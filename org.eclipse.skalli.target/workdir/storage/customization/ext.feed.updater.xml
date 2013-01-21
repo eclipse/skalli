@@ -1,7 +1,0 @@
-<org.eclipse.skalli.core.internal.feed.FeedUpdaterConfig>
-<schedule>
-  <daysOfWeek>*</daysOfWeek>
-  <hours>6</hours>
-  <minutes>10</minutes>
-  </schedule>
-</org.eclipse.skalli.core.internal.feed.FeedUpdaterConfig>

@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!--
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
     Copyright (c) 2010, 2011 SAP AG and others.
     All rights reserved. This program and the accompanying materials
     are made available under the terms of the Eclipse Public License v1.0
@@ -8,11 +9,11 @@
     Contributors:
         SAP AG - initial API and implementation
  -->
-
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.core.component.role">
-   <implementation class="org.eclipse.skalli.model.ext.people.internal.CoreRoleProvider"/>
-   <service>
-      <provide interface="org.eclipse.skalli.services.role.RoleProvider"/>
-   </service>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true"
+        name="org.eclipse.skalli.ext.people.roles">
+    <implementation class="org.eclipse.skalli.core.extension.people.CoreRoleProvider"/>
+    <service>
+        <provide interface="org.eclipse.skalli.services.role.RoleProvider"/>
+    </service>
 </scr:component>
 

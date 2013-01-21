@@ -20,9 +20,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.params.HttpParams;
+import org.eclipse.skalli.commons.HttpUtils;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.destination.Destinations;
-import org.eclipse.skalli.services.destination.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

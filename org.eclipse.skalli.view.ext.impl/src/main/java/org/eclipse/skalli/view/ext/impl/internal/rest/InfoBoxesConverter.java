@@ -28,7 +28,7 @@ public class InfoBoxesConverter extends RestConverterBase<InfoBoxes> {
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API"; //$NON-NLS-1$
 
     public InfoBoxesConverter(String host) {
-        super(InfoBoxes.class, "infoboxes", host);
+        super(InfoBoxes.class, "infoboxes", host); //$NON-NLS-1$
     }
 
     @Override
@@ -43,7 +43,7 @@ public class InfoBoxesConverter extends RestConverterBase<InfoBoxes> {
 
     @Override
     public String getXsdFileName() {
-        return "infoboxes.xsd";
+        return "infoboxes.xsd"; //$NON-NLS-1$
     }
 
     @Override
@@ -54,8 +54,8 @@ public class InfoBoxesConverter extends RestConverterBase<InfoBoxes> {
             List<String> actions = infoBox.getSupportedActions();
             String shortName = infoBox.getShortName();
             if (StringUtils.isNotBlank(shortName)) {
-                writer.startNode("infobox");
-                writeNode(writer, "shortName", shortName);
+                writer.startNode("infobox"); //$NON-NLS-1$
+                writeNode(writer, "shortName", shortName); //$NON-NLS-1$
                 if (CollectionUtils.isNotBlank(actions)) {
                     writeActions(writer, actions);
                 }
@@ -65,9 +65,9 @@ public class InfoBoxesConverter extends RestConverterBase<InfoBoxes> {
     }
 
     private void writeActions(HierarchicalStreamWriter writer, List<String> actions) {
-        writer.startNode("actions");
+        writer.startNode("actions"); //$NON-NLS-1$
         for (String action : actions) {
-            writeNode(writer, "action", action);
+            writeNode(writer, "action", action); //$NON-NLS-1$
         }
         writer.endNode();
     }

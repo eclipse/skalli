@@ -13,16 +13,12 @@ package org.eclipse.skalli.testutil;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
@@ -39,26 +35,10 @@ public abstract class StorageServiceTestBase {
             "</entity-project>";
     protected static final String TEST_CONTENT_UPDATED = "updated_data";
 
-    private StorageService stroageService;
-
     /**
      * Creates the {@link StorageService} instance under test.
      */
-    abstract protected StorageService createNewStorageServiceForTest() throws Exception;
-
-    protected StorageService getStorageService() {
-        return stroageService;
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        stroageService = createNewStorageServiceForTest();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        stroageService = null;
-    }
+    protected abstract StorageService getStorageService() throws Exception;
 
     @Test
     public void testReadWrite() throws Exception {
@@ -72,16 +52,18 @@ public abstract class StorageServiceTestBase {
 
     }
 
-    private String readContent(final String TEST_CATEGORY) throws StorageException, IOException {
-        InputStream stream = stroageService.read(TEST_CATEGORY, TEST_ID);
+    private String readContent(final String TEST_CATEGORY) throws Exception {
+        StorageService storageService = getStorageService();
+        InputStream stream = storageService.read(TEST_CATEGORY, TEST_ID);
         String outputText = IOUtils.toString(stream, "UTF-8");
         stream.close();
         return outputText;
     }
 
     private void writeContent(final String TEST_CATEGORY, String id, String content) throws Exception {
+        StorageService storageService = getStorageService();
         ByteArrayInputStream is = new ByteArrayInputStream(content.getBytes("UTF-8"));
-        stroageService.write(TEST_CATEGORY, TEST_ID, is);
+        storageService.write(TEST_CATEGORY, TEST_ID, is);
         is.close();
         return;
     }
@@ -94,9 +76,11 @@ public abstract class StorageServiceTestBase {
 
         //update the same key with TEST_CONTENT_UPDATED
         ByteArrayInputStream is = new ByteArrayInputStream(TEST_CONTENT_UPDATED.getBytes("UTF-8"));
-        stroageService.write(TEST_CATEGORY, TEST_ID, is);
 
-        InputStream stream = stroageService.read(TEST_CATEGORY, TEST_ID);
+        StorageService storageService = getStorageService();
+        storageService.write(TEST_CATEGORY, TEST_ID, is);
+
+        InputStream stream = storageService.read(TEST_CATEGORY, TEST_ID);
         String outputText = IOUtils.toString(stream, "UTF-8");
 
         assertEquals(TEST_CONTENT_UPDATED, outputText);
@@ -106,7 +90,8 @@ public abstract class StorageServiceTestBase {
 
     @Test
     public void testReadNonExistingId() throws Exception {
-        InputStream stream = stroageService.read(TEST_NONEXISTING_CATEGORY, TEST_NONEXISTING_ID);
+        StorageService storageService = getStorageService();
+        InputStream stream = storageService.read(TEST_NONEXISTING_CATEGORY, TEST_NONEXISTING_ID);
         assertNull(stream);
     }
 
@@ -114,12 +99,13 @@ public abstract class StorageServiceTestBase {
     public void testKeys() throws Exception {
         final String TEST_CATEGORY = "test_keys";
 
-        List<String> ids = stroageService.keys(TEST_CATEGORY);
+        StorageService storageService = getStorageService();
+        List<String> ids = storageService.keys(TEST_CATEGORY);
         assertTrue(ids.isEmpty());
 
         writeContent(TEST_CATEGORY, TEST_ID, TEST_CONTENT);
 
-        ids = stroageService.keys(TEST_CATEGORY);
+        ids = storageService.keys(TEST_CATEGORY);
         assertTrue(ids.size() == 1);
         assertEquals(TEST_ID, ids.get(0));
     }
@@ -134,7 +120,8 @@ public abstract class StorageServiceTestBase {
 
         writeContent(TEST_CATEGORY, TEST_ID, bigString);
 
-        InputStream stream = stroageService.read(TEST_CATEGORY, TEST_ID);
+        StorageService storageService = getStorageService();
+        InputStream stream = storageService.read(TEST_CATEGORY, TEST_ID);
         String outputText = IOUtils.toString(stream, "UTF-8");
         assertEquals(bigString, outputText);
 
