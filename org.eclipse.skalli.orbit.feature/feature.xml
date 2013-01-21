@@ -160,14 +160,28 @@
          id="org.eclipse.gemini.jpa"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.1.0.RELEASE"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.gemini.dbaccess.util"
+         download-size="0"
+         install-size="0"
+         version="1.1.0.RELEASE"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.gemini.dbaccess.derby"
          download-size="0"
          install-size="0"
-         version="1.0.0.RELEASE"
+         version="1.1.0.RELEASE"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.gemini.naming"
+         download-size="0"
+         install-size="0"
+         version="1.0.1.RELEASE"
          unpack="false"/>
 
    <plugin
