@@ -201,7 +201,7 @@ Create Git Repository and Gerrit Project
         <p class="formheader">
           Create the project as <b>Permissions-Only Project</b>.
           The sole purpose of this kind of Gerrit projects is to serve as parent for other projects and
-          define access rights anf permissions.
+          define access rights and permissions.
         </p>
         <p>
           <input type="checkbox" id="permitsOnly" name="<%= GitGerritFilter.PARAMETER_PERMITS_ONLY %>"
