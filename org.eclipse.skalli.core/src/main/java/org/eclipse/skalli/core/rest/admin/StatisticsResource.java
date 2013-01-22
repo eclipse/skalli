@@ -14,7 +14,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
-import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.permit.Permits;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -26,6 +25,9 @@ public class StatisticsResource extends ResourceBase {
     private static final String ID_PREFIX = "rest:api/admin/statistics:"; //$NON-NLS-1$
     private static final String ERROR_ID_INVALID_QUERY = ID_PREFIX + "20"; //$NON-NLS-1$
 
+    public static final String PARAM_SECTION = "section"; //$NON-NLS-1$
+    public static final String PARAM_FILTER = "filter"; //$NON-NLS-1$
+
     @Get
     public Representation retrieve() {
         if (!Permits.isAllowed(getAction(), getPath())) {
@@ -33,9 +35,13 @@ public class StatisticsResource extends ResourceBase {
         }
 
         StatisticsQuery query = new StatisticsQuery(getQueryAttributes());
-        String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
-        if (StringUtils.isNotBlank(id)) {
-            query.setIncludes(id);
+        String section = (String) getRequestAttributes().get(PARAM_SECTION);
+        if (StringUtils.isNotBlank(section)) {
+            query.setSection(section);
+        }
+        String filter = (String) getRequestAttributes().get(PARAM_FILTER);
+        if (StringUtils.isNotBlank(filter)) {
+            query.setFilter(filter);
         }
         Statistics statistics = Statistics.getDefault();
         return new ResourceRepresentation<Statistics>(statistics,
@@ -53,7 +59,7 @@ public class StatisticsResource extends ResourceBase {
         }
         StatisticsQuery query = new StatisticsQuery(getQueryAttributes());
         Statistics statistics = Statistics.getDefault();
-        statistics.remove(query.getFrom(), query.getTo());
+        statistics.clear(query.getFrom(), query.getTo());
         setStatus(Status.SUCCESS_NO_CONTENT);
         return null;
     }

@@ -18,7 +18,8 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.core.rest.admin.StatisticsQuery;
+import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.testutil.AssertUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -97,6 +98,12 @@ public class StatisticsQueryTest {
         StatisticsQuery query = new StatisticsQuery(getParams(null, toStr, null), now);
         Assert.assertEquals(0, query.getFrom());
         Assert.assertEquals(toMillis, query.getTo());
+    }
+
+    @Test
+    public void testToPeriodQuery() throws Exception {
+        assertToPeriodQuery("3m", 3, TimeUnit.MINUTES);
+        assertToPeriodQuery("-3m", 3, TimeUnit.MINUTES);
     }
 
     @Test
@@ -231,20 +238,31 @@ public class StatisticsQueryTest {
     }
 
     @Test
-    public void testSetIncludes() throws Exception {
+    public void testSection() throws Exception {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("include", "a,b");
         params.put("exclude", "c");
         StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
-        query.setIncludes("foobar");
-        Assert.assertTrue(query.marshal("foobar"));
-        Assert.assertFalse(query.marshal("a"));
-        Assert.assertFalse(query.marshal("b"));
-        Assert.assertFalse(query.marshal("c"));
+        query.setSection("foobar");
+        Assert.assertTrue(query.showSection("foobar"));
+        Assert.assertFalse(query.showSection("a"));
+        Assert.assertFalse(query.showSection("b"));
+        Assert.assertFalse(query.showSection("c"));
+        Assert.assertEquals("foobar", query.getSection());
     }
 
     @Test
-    public void testShow() throws Exception {
+    public void testFilter() throws Exception {
+        HashMap<String, String> params = new HashMap<String, String>();
+        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        query.setFilter("byDate");
+        Assert.assertTrue(query.showByFilter("byDate"));
+        Assert.assertFalse(query.showByFilter("foobar"));
+        Assert.assertEquals("byDate", query.getFilter());
+    }
+
+    @Test
+    public void testShowSection() throws Exception {
         assertShow(new String[]{"a", "b", "c"}, new String[]{"foo"}, "a,b,c", null);
         assertShow(new String[]{"a;b;c"}, new String[]{"a", "b", "c", "foo"}, "a;b;c", null);
         assertShow(new String[]{"a", "b", "c"}, new String[]{"a;b;c"}, null, "a;b;c");
@@ -256,16 +274,32 @@ public class StatisticsQueryTest {
         assertShow(new String[]{"a", "b", "c"}, new String[0], "", "");
     }
 
+    @Test
+    public void testIncluded() throws Exception {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("include", "a,b,c");
+        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        AssertUtils.assertEqualsAnyOrder("includes", CollectionUtils.asSet("a", "b", "c"), query.getIncluded());
+    }
+
+    @Test
+    public void testExcluded() throws Exception {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("exclude", "foo,bar");
+        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        AssertUtils.assertEqualsAnyOrder("includes", CollectionUtils.asSet("foo", "bar"), query.getExcluded());
+    }
+
     private void assertShow(String[] included, String[] excluded, String include, String exclude) {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("include", include);
         params.put("exclude", exclude);
         StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
         for (String s: included) {
-            Assert.assertTrue(query.marshal(s));
+            Assert.assertTrue(query.showSection(s));
         }
         for (String s: excluded) {
-            Assert.assertFalse(query.marshal(s));
+            Assert.assertFalse(query.showSection(s));
         }
     }
 
@@ -278,12 +312,6 @@ public class StatisticsQueryTest {
         StatisticsQuery query = new StatisticsQuery(getParams(fromStr, null, period), now);
         Assert.assertEquals(fromMillis, query.getFrom());
         Assert.assertEquals(fromMillis + TimeUnit.MILLISECONDS.convert(value, unit), query.getTo());
-    }
-
-    @Test
-    public void testToPeriodQuery() throws Exception {
-        assertToPeriodQuery("3m", 3, TimeUnit.MINUTES);
-        assertToPeriodQuery("-3m", 3, TimeUnit.MINUTES);
     }
 
     private void assertToPeriodQuery(String period, int value, TimeUnit unit) {

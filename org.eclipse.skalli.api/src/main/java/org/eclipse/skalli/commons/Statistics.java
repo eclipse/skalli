@@ -44,10 +44,12 @@ public class Statistics {
         public long getTimestamp() {
             return timestamp;
         }
+        public long getSequenceNumber() {
+            return sequenceNumber;
+        }
         public boolean inRange(long startDate, long endDate) {
             return (startDate <= 0 || startDate <=  timestamp) && (endDate <= 0 || timestamp <= endDate);
         }
-
         @Override
         public int compareTo(StatisticsInfo o) {
             return Long.signum(sequenceNumber - o.sequenceNumber);
@@ -153,6 +155,11 @@ public class Statistics {
 
     private static final String ANONYMOUS = "anonymous"; //$NON-NLS-1$
 
+    private long startupTime;
+    private long startDate;
+    private long endDate;
+    private long sequenceNumber;
+
     private SortedSet<UserInfo> users = new TreeSet<UserInfo>();
     private SortedSet<UsageInfo> usages = new TreeSet<UsageInfo>();
     private SortedSet<RefererInfo> referers = new TreeSet<RefererInfo>();
@@ -160,12 +167,18 @@ public class Statistics {
     private SortedSet<SearchInfo> searches = new TreeSet<SearchInfo>();
     private SortedSet<ResponseTimeInfo> responseTimes = new TreeSet<ResponseTimeInfo>();
 
-    private long startupTime =  System.currentTimeMillis();
-    private long sequenceNumber = 0;
-
     private static Statistics instance = new Statistics();
 
-    private Statistics() {
+    public Statistics() {
+        startupTime = System.currentTimeMillis();
+        sequenceNumber = 0;
+    }
+
+    public Statistics(Statistics statistics, long startDate, long endDate) {
+        this.startupTime = statistics.getStartupTime();
+        this.startDate = startDate;
+        this.endDate = endDate;
+        copyAll(statistics);
     }
 
     public static Statistics getDefault() {
@@ -174,6 +187,14 @@ public class Statistics {
 
     public long getStartupTime() {
         return startupTime;
+    }
+
+    public long getStartDate() {
+        return startDate > 0? startDate : startupTime;
+    }
+
+    public long getEndDate() {
+        return endDate > 0? endDate : System.currentTimeMillis();
     }
 
     public synchronized void trackUsage(String userId, String path, String referer) {
@@ -200,13 +221,32 @@ public class Statistics {
         responseTimes.add(new ResponseTimeInfo(userId, path, responseTime, sequenceNumber++));
     }
 
-    public synchronized void remove(long startDate, long endDate) {
+    public synchronized void clear() {
+        users.clear();
+        usages.clear();
+        referers.clear();
+        browsers.clear();
+        searches.clear();
+        responseTimes.clear();
+        sequenceNumber = 0;
+    }
+
+    public synchronized void clear(long startDate, long endDate) {
         remove(usages, startDate, endDate);
         remove(users, startDate, endDate);
         remove(browsers, startDate, endDate);
         remove(searches, startDate, endDate);
         remove(referers, startDate, endDate);
         remove(responseTimes, startDate, endDate);
+    }
+
+    public synchronized void restore(Statistics statistics) {
+        if (statistics != null) {
+            clear();
+            this.startDate = 0;
+            this.endDate = 0;
+            copyAll(statistics);
+        }
     }
 
     public Map<String, Long> getUserCount(long startDate, long endDate) {
@@ -399,6 +439,25 @@ public class Statistics {
             StatisticsInfo next = it.next();
             if (next.inRange(startDate, endDate)) {
                 it.remove();
+            }
+        }
+    }
+
+    private void copyAll(Statistics statistics) {
+        copy(statistics.getUserInfo(), users, startDate, endDate);
+        copy(statistics.getUsageInfo(), usages, startDate, endDate);
+        copy(statistics.getRefererInfo(), referers, startDate, endDate);
+        copy(statistics.getBrowserInfo(), browsers, startDate, endDate);
+        copy(statistics.getSearchInfo(), searches, startDate, endDate);
+        copy(statistics.getResponseTimeInfo(), responseTimes, startDate, endDate);
+    }
+
+    private <T extends StatisticsInfo> void copy(SortedSet<T> source, SortedSet<T> target,
+            long startDate, long endDate) {
+        for (T next: source) {
+            if (next.inRange(startDate, endDate)) {
+                target.add(next);
+                sequenceNumber = Math.max(sequenceNumber, next.getSequenceNumber());
             }
         }
     }

@@ -38,6 +38,9 @@ public class StatisticsQuery {
     private Set<String> included;
     private Set<String> excluded;
 
+    private String section;
+    private String filter;
+
     public StatisticsQuery(Map<String, String> params)  {
         this(params, System.currentTimeMillis());
     }
@@ -120,18 +123,46 @@ public class StatisticsQuery {
         return to;
     }
 
-    public void setIncludes(String id) {
-        included = CollectionUtils.asSet(id);
+    public String getFilter() {
+        return filter;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
+
+    public String getSection() {
+        return section;
+    }
+
+    public void setSection(String section) {
+        this.section = section;
+        included = CollectionUtils.asSet(section);
         excluded = Collections.emptySet();
     }
 
-    public boolean marshal(String tagName) {
-        if (excluded.contains(tagName)) {
+    public Set<String> getIncluded() {
+        return included;
+    }
+
+    public Set<String> getExcluded() {
+        return excluded;
+    }
+
+    public boolean showSection(String sectionName) {
+        if (excluded.contains(sectionName)) {
             return false;
         }
         if (included.isEmpty()) {
             return true;
         }
-        return included.contains(tagName);
+        return included.contains(sectionName);
+    }
+
+    public boolean showByFilter(String filterName) {
+        if (StringUtils.isBlank(filter)) {
+            return true;
+        }
+        return filterName.equals(filter);
     }
 }

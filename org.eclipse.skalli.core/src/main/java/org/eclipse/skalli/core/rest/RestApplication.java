@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.skalli.core.rest.admin.ProjectBackupResource;
+import org.eclipse.skalli.core.rest.admin.StatisticsBackupResource;
 import org.eclipse.skalli.core.rest.admin.StatisticsResource;
 import org.eclipse.skalli.core.rest.admin.StatusResource;
 import org.eclipse.skalli.core.rest.monitor.Monitorable;
@@ -58,6 +59,7 @@ public class RestApplication extends Application {
         router.attach("/admin/statistics", StatisticsResource.class); //$NON-NLS-1$
         router.attach("/admin/statistics/{section}", StatisticsResource.class); //$NON-NLS-1$
         router.attach("/admin/statistics/{section}/{filter}", StatisticsResource.class); //$NON-NLS-1$
+        router.attach("/admin/statistics/backup", StatisticsBackupResource.class); //$NON-NLS-1$
         router.attach("/admin/backup", ProjectBackupResource.class); //$NON-NLS-1$
         attachServiceMonitors("/admin/services/", router); //$NON-NLS-1$
 

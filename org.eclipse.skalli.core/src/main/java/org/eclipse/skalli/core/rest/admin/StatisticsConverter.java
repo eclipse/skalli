@@ -71,34 +71,34 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         ProjectService projectService = Services.getRequiredService(ProjectService.class);
         List<UUID> uuids = new ArrayList<UUID>(projectService.keySet());
 
-        if (query.marshal("projects")) {
+        if (query.showSection("projects")) {
             marshalProjectsSection(writer, projectService, uuids, from, to);
         }
-        if (query.marshal("members")) {
+        if (query.showSection("members")) {
             marshalMembersSection(writer, projectService, uuids);
         }
-        if (query.marshal("users")) {
+        if (query.showSection("users")) {
             marshalUsersSection(writer, statistics, from, to);
         }
-        if (query.marshal("departments")) {
+        if (query.showSection("departments")) {
             marshalDepartmentsSection(writer, statistics, from, to);
         }
-        if (query.marshal("locations")) {
+        if (query.showSection("locations")) {
             marshalLocationsSection(writer, statistics, from, to);
         }
-        if (query.marshal("searches")) {
+        if (query.showSection("searches")) {
             marshalSearchesSection(writer, statistics, from, to);
         }
-        if (query.marshal("browsers")) {
+        if (query.showSection("browsers")) {
             marshalBrowsersSection(writer, statistics, from, to);
         }
-        if (query.marshal("referers")) {
+        if (query.showSection("referers")) {
             marshalReferersSection(writer, statistics, from, to);
         }
-        if (query.marshal("requests")) {
+        if (query.showSection("requests")) {
             marshalRequestsSection(writer, statistics, from, to);
         }
-        if (query.marshal("tracks")) {
+        if (query.showSection("tracks")) {
             marshalTracksSection(writer, statistics, from, to);
         }
     }
@@ -122,19 +122,23 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         writeNode(writer, "totalCount", uuids.size());
         writer.startNode("created");
         writeNode(writer, "totalCount", newProjects.size());
-        writer.startNode("byDate");
-        for (Project newProject: newProjects) {
-            writeProjectInfo(writer, newProject, newProject.getRegistered());
+        if (query.showByFilter("byDate")) {
+            writer.startNode("byDate");
+            for (Project newProject: newProjects) {
+                writeProjectInfo(writer, newProject, newProject.getRegistered());
+            }
+            writer.endNode();
         }
-        writer.endNode();
         writer.endNode();
         writer.startNode("modified");
         writeNode(writer, "totalCount", modifiedProjects.size());
-        writer.startNode("byDate");
-        for (Project modifiedProject: modifiedProjects) {
-            writeProjectInfo(writer, modifiedProject, modifiedProject.getLastModifiedMillis());
+        if (query.showByFilter("byDate")) {
+            writer.startNode("byDate");
+            for (Project modifiedProject: modifiedProjects) {
+                writeProjectInfo(writer, modifiedProject, modifiedProject.getLastModifiedMillis());
+            }
+            writer.endNode();
         }
-        writer.endNode();
         writer.endNode();
         writer.endNode();
     }
@@ -145,11 +149,13 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         writer.startNode("members");
         Map<String, SortedSet<Member>> uniqueMembers = collectUniqueMembers(projectService, uuids);
         writeNode(writer, "totalCount", countUniqueMembers(uniqueMembers));
-        writer.startNode("byRole");
-        for (Entry<String, SortedSet<Member>> entry: uniqueMembers.entrySet()) {
-            writeNode(writer, entry.getKey(), entry.getValue().size());
+        if (query.showByFilter("byRole")) {
+            writer.startNode("byRole");
+            for (Entry<String, SortedSet<Member>> entry: uniqueMembers.entrySet()) {
+                writeNode(writer, entry.getKey(), entry.getValue().size());
+            }
+            writer.endNode();
         }
-        writer.endNode();
         writer.endNode();
     }
 
@@ -183,15 +189,19 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         Map<String,Long> users = statistics.getUserCount(from, to);
         writeUniqueCount(writer, users);
         writeTotalCount(writer, users);
-        writer.startNode("byCount");
-        writeCounts(writer, "user", users);
-        writer.endNode();
-        writer.startNode("byDate");
-        SortedSet<Statistics.UserInfo> userInfos = statistics.getUserInfo();
-        for (Statistics.UserInfo userInfo: userInfos) {
-            writeInfoEntry(writer, userInfo);
+        if (query.showByFilter("byCount")) {
+            writer.startNode("byCount");
+            writeCounts(writer, "user", users);
+            writer.endNode();
         }
-        writer.endNode();
+        if (query.showByFilter("byDate")) {
+            writer.startNode("byDate");
+            SortedSet<Statistics.UserInfo> userInfos = statistics.getUserInfo();
+            for (Statistics.UserInfo userInfo: userInfos) {
+                writeInfoEntry(writer, userInfo);
+            }
+            writer.endNode();
+        }
         writer.endNode();
     }
 
@@ -201,9 +211,11 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         Map<String,Long> departments = statistics.getDepartmentCount(from, to);
         writeUniqueCount(writer, departments);
         writeTotalCount(writer, departments);
-        writer.startNode("byCount");
-        writeCounts(writer, "department", departments);
-        writer.endNode();
+        if (query.showByFilter("byCount")) {
+            writer.startNode("byCount");
+            writeCounts(writer, "department", departments);
+            writer.endNode();
+        }
         writer.endNode();
     }
 
@@ -213,9 +225,11 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         Map<String,Long> locations = statistics.getLocationCount(from, to);
         writeUniqueCount(writer, locations);
         writeTotalCount(writer, locations);
-        writer.startNode("byCount");
-        writeCounts(writer, "location", locations);
-        writer.endNode();
+        if (query.showByFilter("byCount")) {
+            writer.startNode("byCount");
+            writeCounts(writer, "location", locations);
+            writer.endNode();
+        }
         writer.endNode();
     }
 
@@ -225,15 +239,19 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         Map<String,Long> searches = statistics.getSearchCount(from, to);
         writeUniqueCount(writer, searches);
         writeTotalCount(writer, searches);
-        writer.startNode("byCount");
-        writeCounts(writer, "search", searches);
-        writer.endNode();
-        writer.startNode("byDate");
-        SortedSet<Statistics.SearchInfo> searchInfos = statistics.getSearchInfo();
-        for (Statistics.SearchInfo searchInfo: searchInfos) {
-            writeInfoEntry(writer, searchInfo);
+        if (query.showByFilter("byCount")) {
+            writer.startNode("byCount");
+            writeCounts(writer, "search", searches);
+            writer.endNode();
         }
-        writer.endNode();
+        if (query.showByFilter("byDate")) {
+            writer.startNode("byDate");
+            SortedSet<Statistics.SearchInfo> searchInfos = statistics.getSearchInfo();
+            for (Statistics.SearchInfo searchInfo: searchInfos) {
+                writeInfoEntry(writer, searchInfo);
+            }
+            writer.endNode();
+        }
         writer.endNode();
     }
 
@@ -243,9 +261,11 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         Map<String,Long> browsers = statistics.getBrowserCount(from, to);
         writeUniqueCount(writer, browsers);
         writeTotalCount(writer, browsers);
-        writer.startNode("byCount");
-        writeCounts(writer, "browser", browsers);
-        writer.endNode();
+        if (query.showByFilter("byCount")) {
+            writer.startNode("byCount");
+            writeCounts(writer, "browser", browsers);
+            writer.endNode();
+        }
         writer.endNode();
     }
 
@@ -255,9 +275,11 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         Map<String,Long> referers = statistics.getRefererCount(from, to);
         writeUniqueCount(writer, referers);
         writeTotalCount(writer, referers);
-        writer.startNode("byCount");
-        writeCounts(writer, "referer", referers);
-        writer.endNode();
+        if (query.showByFilter("byCount")) {
+            writer.startNode("byCount");
+            writeCounts(writer, "referer", referers);
+            writer.endNode();
+        }
         writer.endNode();
     }
 
@@ -268,15 +290,21 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         Map<String,Long> usages = statistics.getUsageCount(from, to);
         writeUniqueCount(writer, usages);
         writeTotalCount(writer, usages);
-        writer.startNode("byCount");
-        writeRequestCounts(writer, usages, avgResponseTimes);
-        writer.endNode();
-        writer.startNode("byAvgResponseTime");
-        writeAverageResponseTimes(writer, avgResponseTimes);
-        writer.endNode();
-        writer.startNode("byDate");
-        writeRequestInfos(writer, statistics.getUsageInfo());
-        writer.endNode();
+        if (query.showByFilter("byCount")) {
+            writer.startNode("byCount");
+            writeRequestCounts(writer, usages, avgResponseTimes);
+            writer.endNode();
+        }
+        if (query.showByFilter("byAvgResponseTime")) {
+            writer.startNode("byAvgResponseTime");
+            writeAverageResponseTimes(writer, avgResponseTimes);
+            writer.endNode();
+        }
+        if (query.showByFilter("byDate")) {
+            writer.startNode("byDate");
+            writeRequestInfos(writer, statistics.getUsageInfo());
+            writer.endNode();
+        }
         writer.endNode();
     }
 
