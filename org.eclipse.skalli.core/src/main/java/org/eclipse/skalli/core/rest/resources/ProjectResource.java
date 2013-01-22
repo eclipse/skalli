@@ -69,8 +69,8 @@ public class ProjectResource extends ResourceBase {
 
         String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
         ResourceRepresentation<Project> representation = new ResourceRepresentation<Project>();
-        representation.setConverters(new ProjectConverter());
-        representation.setAnnotatedClasses(Project.class);
+        representation.addConverter(new ProjectConverter());
+        representation.addAnnotatedClass(Project.class);
         Project project = null;
         try {
             project = representation.read(entity, Project.class);

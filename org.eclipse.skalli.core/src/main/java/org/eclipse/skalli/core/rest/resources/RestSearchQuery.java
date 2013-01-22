@@ -24,8 +24,8 @@ public class RestSearchQuery extends SearchQuery {
         this(form);
         if (entity != null) {
             ResourceRepresentation<PropertyUpdate> representation = new ResourceRepresentation<PropertyUpdate>();
-            representation.setConverters(new PropertyUpdateConverter());
-            representation.setAnnotatedClasses(PropertyUpdate.class);
+            representation.addConverter(new PropertyUpdateConverter());
+            representation.addAnnotatedClass(PropertyUpdate.class);
             PropertyUpdate propertyUpdate = null;
             propertyUpdate = representation.read(entity, PropertyUpdate.class);
             template = propertyUpdate.getTemplate();

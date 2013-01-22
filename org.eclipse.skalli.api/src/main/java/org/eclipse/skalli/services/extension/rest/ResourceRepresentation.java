@@ -11,8 +11,15 @@
 package org.eclipse.skalli.services.extension.rest;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.representation.WriterRepresentation;
@@ -31,8 +38,9 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
 
     private T object;
     private XStream xstream;
-    private Class<?>[] annotatedClasses;
-    private RestConverter[] converters;
+    private Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
+    private Set<RestConverter> converters = new HashSet<RestConverter>();
+    private Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
     private ClassLoader classLoader;
     private boolean compact;
 
@@ -54,7 +62,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
         this();
         this.object = object;
         if (object != null) {
-            setAnnotatedClasses(object.getClass());
+            addAnnotatedClass(object.getClass());
         }
     }
 
@@ -69,7 +77,11 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      */
     public ResourceRepresentation(T object, RestConverter... converters) {
         this(object);
-        setConverters(converters);
+        if (converters != null) {
+            for (RestConverter converter: converters) {
+                addConverter(converter);
+            }
+        }
     }
 
     @Override
@@ -90,7 +102,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      * or a socket) and initializes a bean instance from it.
      *
      * @param representation  the representation from which to read the XML representation of the bean.
-     * @param c  the class of the bean ton instantiate.
+     * @param c  the class of the bean to instantiate.
      *
      * @return an instance of the requested bean class initialized from it XML representation.
      *
@@ -99,36 +111,70 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      * requested class.
      */
     public T read(Representation representation, Class<T> c) throws IOException {
-        return c.cast(getXStream().fromXML(representation.getStream()));
+        return read(representation.getStream(), c);
     }
 
     /**
-     * Adds additional classes with XStream annotations that represent parts of the
-     * inner structure of the bean, e.g. the entries of a collection-like property,
-     * to the converter. If the bean class and the classes representing its
-     * inner structure live in different bundle, calling this method is mandatory.
+     * Reads the XML representation of a bean from a given input stream and initializes
+     * a bean instance from it.
+     *
+     * @param in  the stream to read.
+     * @param c  the class of the bean to instantiate.
+     *
+     * @return an instance of the requested bean class initialized from it XML representation.
+     *
+     * @throws IOException  if reading the bean caused an i/o error.
+     * @throws ClassCastExeption  if the XML representation of the bean cannot be casted to the
+     * requested class.
+     */
+    public T read(InputStream in, Class<T> c) throws IOException {
+        return c.cast(getXStream().fromXML(in));
+    }
+
+    /**
+     * Adds an additional class with XStream annotations that represents an inner structure
+     * of the class to convert, e.g. the entries of a collection-like property. If the class
+     * to convert and the classes representing its inner structure live in different bundles,
+     * calling this method is mandatory.
      * <p>
-     * The bean class itself is automatically added to the conversion.
+     * The class to convert is automatically added.
      *
-     * @param annotatedClasses  a list of classes to add to the conversion.
+     * @param annotatedClass  the class to add to the conversion.
      */
-    public void setAnnotatedClasses(Class<?>... annotatedClasses) {
-        this.annotatedClasses = annotatedClasses;
+    public void addAnnotatedClass(Class<?> annotatedClass) {
+        if (annotatedClass != null) {
+            annotatedClasses.add(annotatedClass);
+        }
     }
 
     /**
-     * Sets additional converters that may be necessary for the conversion of certain properties
-     * or inner beans of the bean, which are not supported by XStream out-of-box.
+     * Adds an alias name for a given type.
      *
-     * @param converters  a list of converters necessary for the conversion.
+     * @param name  the alias.
+     * @param type  the class for which to use the alias.
      */
-    public void setConverters(RestConverter... converters) {
-        this.converters = converters;
+    public void addAlias(String name, Class<?> type) {
+        if (StringUtils.isNotBlank(name) && type != null) {
+            aliases.put(name,  type);
+        }
+    }
+
+    /**
+     * Adds an additional converter for the conversion of certain properties
+     * or inner classes, which are not supported by XStream out-of-the-box.
+     *
+     * @param converter  the REST converter to add.
+     */
+    public void addConverter(RestConverter converter) {
+        if (converter != null) {
+            converters.add(converter);
+        }
     }
 
     /**
      * Sets an alternative classloader for the conversion.
-     * @param classLoader  the classloader to use, not <code>null</code>.
+     * @param classLoader  the classloader to use, or <code>null</code>
+     * if the default classloader should be used.
      */
     public void setClassLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
@@ -138,7 +184,8 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      * Sets an alternative {@link XStream} instance. By default, a suitable
      * <code>XStream</code> instance is constructed automatically.
      *
-     * @param xstream  a <code>XStream</code> instance, not <code>null</code>.
+     * @param xstream  a <code>XStream</code> instance, or <code>null</code>
+     * if the default <code>XStream</code> instance should be used.
      */
     public void setXStream(XStream xstream) {
         this.xstream = xstream;
@@ -178,16 +225,15 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
                 return new MapperWrapperIgnoreUnknownElements(next);
             }
         };
-        if (converters != null) {
-            for (RestConverter converter : converters) {
-                result.registerConverter(converter);
-                result.alias(converter.getAlias(), converter.getConversionClass());
-            }
+        for (RestConverter converter : converters) {
+            result.registerConverter(converter);
+            result.alias(converter.getAlias(), converter.getConversionClass());
         }
-        if (annotatedClasses != null) {
-            for (Class<?> annotatedClass : annotatedClasses) {
-                result.processAnnotations(annotatedClass);
-            }
+        for (Class<?> annotatedClass : annotatedClasses) {
+            result.processAnnotations(annotatedClass);
+        }
+        for (Entry<String, Class<?>> alias: aliases.entrySet()) {
+            result.alias(alias.getKey(), alias.getValue());
         }
         if (classLoader != null) {
             result.setClassLoader(classLoader);

@@ -77,8 +77,8 @@ public class UpdateSitesServerResource extends ResourceBase {
         }
 
         ResourceRepresentation<RecommendedUpdateSites> representation = new ResourceRepresentation<RecommendedUpdateSites>();
-        representation.setConverters(new UpdateSitesConverter());
-        representation.setAnnotatedClasses(RecommendedUpdateSites.class);
+        representation.addConverter(new UpdateSitesConverter());
+        representation.addAnnotatedClass(RecommendedUpdateSites.class);
         representation.setClassLoader(RecommendedUpdateSites.class.getClassLoader());
         RecommendedUpdateSites updateSites = null;
         try {
