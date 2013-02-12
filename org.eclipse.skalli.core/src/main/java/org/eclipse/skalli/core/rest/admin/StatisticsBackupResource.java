@@ -129,11 +129,11 @@ public class StatisticsBackupResource extends ResourceBase {
     @SuppressWarnings("nls")
     private static void addAliases(ResourceRepresentation<Statistics> representation) {
         representation.addAlias("statistics", Statistics.class);
-        representation.addAlias("users", UserInfo.class);
-        representation.addAlias("usages", UsageInfo.class);
-        representation.addAlias("referers", RefererInfo.class);
-        representation.addAlias("browsers", BrowserInfo.class);
-        representation.addAlias("searches", SearchInfo.class);
-        representation.addAlias("responseTimes", ResponseTimeInfo.class);
+        representation.addAlias("user", UserInfo.class);
+        representation.addAlias("usage", UsageInfo.class);
+        representation.addAlias("referer", RefererInfo.class);
+        representation.addAlias("browser", BrowserInfo.class);
+        representation.addAlias("search", SearchInfo.class);
+        representation.addAlias("responseTime", ResponseTimeInfo.class);
     }
 }
