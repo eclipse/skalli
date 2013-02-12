@@ -29,6 +29,7 @@ public class StatisticsQuery {
     public static final String PARAM_TO = "to"; //$NON-NLS-1$
     public static final String PARAM_INCLUDE = "include"; //$NON-NLS-1$
     public static final String PARAM_EXCLUDE = "exclude"; //$NON-NLS-1$
+    public static final String PARAM_FILTERS = "filters"; //$NON-NLS-1$
 
     private String unitSymbols = "dDhHmM"; //$NON-NLS-1$
 
@@ -37,9 +38,7 @@ public class StatisticsQuery {
     private long to = 0;
     private Set<String> included;
     private Set<String> excluded;
-
-    private String section;
-    private String filter;
+    private Set<String> filters;
 
     public StatisticsQuery(Map<String, String> params)  {
         this(params, System.currentTimeMillis());
@@ -72,6 +71,10 @@ public class StatisticsQuery {
 
         included =  CollectionUtils.asSet(StringUtils.split(params.get(PARAM_INCLUDE), ','));
         excluded =  CollectionUtils.asSet(StringUtils.split(params.get(PARAM_EXCLUDE), ','));
+        filters =  CollectionUtils.asSet(StringUtils.split(params.get(PARAM_FILTERS), ','));
+        if (filters.contains("summary")) { //$NON-NLS-1$
+            setFilter("summary"); //$NON-NLS-1$
+        }
     }
 
     private long getTimeInterval(String param) {
@@ -123,20 +126,11 @@ public class StatisticsQuery {
         return to;
     }
 
-    public String getFilter() {
-        return filter;
-    }
-
     public void setFilter(String filter) {
-        this.filter = filter;
-    }
-
-    public String getSection() {
-        return section;
+        filters = CollectionUtils.asSet(filter);
     }
 
     public void setSection(String section) {
-        this.section = section;
         included = CollectionUtils.asSet(section);
         excluded = Collections.emptySet();
     }
@@ -160,9 +154,6 @@ public class StatisticsQuery {
     }
 
     public boolean showByFilter(String filterName) {
-        if (StringUtils.isBlank(filter)) {
-            return true;
-        }
-        return filterName.equals(filter);
+        return filters.isEmpty() || filters.contains(filterName);
     }
 }

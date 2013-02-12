@@ -248,17 +248,53 @@ public class StatisticsQueryTest {
         Assert.assertFalse(query.showSection("a"));
         Assert.assertFalse(query.showSection("b"));
         Assert.assertFalse(query.showSection("c"));
-        Assert.assertEquals("foobar", query.getSection());
     }
 
     @Test
-    public void testFilter() throws Exception {
+    public void testNoFilters() throws Exception {
+        HashMap<String, String> params = new HashMap<String, String>();
+        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        Assert.assertTrue(query.showByFilter("byDate"));
+    }
+
+    @Test
+    public void testSetFilter() throws Exception {
         HashMap<String, String> params = new HashMap<String, String>();
         StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
         query.setFilter("byDate");
         Assert.assertTrue(query.showByFilter("byDate"));
         Assert.assertFalse(query.showByFilter("foobar"));
-        Assert.assertEquals("byDate", query.getFilter());
+    }
+
+    @Test
+    public void testFiltersAttribute() throws Exception {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("filters", "byDate,byRole");
+        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        Assert.assertTrue(query.showByFilter("byDate"));
+        Assert.assertTrue(query.showByFilter("byRole"));
+        Assert.assertFalse(query.showByFilter("foobar"));
+    }
+
+    @Test
+    public void testSetFilterOverwritesFiltersAttribute() throws Exception {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("filters", "byDate,byRole");
+        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        query.setFilter("byDate");
+        Assert.assertTrue(query.showByFilter("byDate"));
+        Assert.assertFalse(query.showByFilter("byRole"));
+        Assert.assertFalse(query.showByFilter("foobar"));
+    }
+
+    @Test
+    public void testSummaryFilter() throws Exception {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("filters", "byDate,byRole,summary");
+        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        Assert.assertFalse(query.showByFilter("byDate"));
+        Assert.assertFalse(query.showByFilter("byRole"));
+        Assert.assertTrue(query.showByFilter("summary"));
     }
 
     @Test
