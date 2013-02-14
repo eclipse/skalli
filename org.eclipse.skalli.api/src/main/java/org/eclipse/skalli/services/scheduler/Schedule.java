@@ -84,7 +84,12 @@ public class Schedule {
      * @param schedule  the schedule to initialize from.
      */
     public Schedule(Schedule schedule) {
-        this(schedule.getDaysOfWeek(), schedule.getHours(), schedule.getMinutes());
+        this();
+        if (schedule != null) {
+            setDaysOfWeek(schedule.getDaysOfWeek());
+            setHours(schedule.getHours());
+            setMinutes(schedule.getMinutes());
+        }
     }
 
     /**
@@ -155,7 +160,7 @@ public class Schedule {
      *      optionally followed by <tt>"/n"</tt> which means: "every n minutes".
      */
     public void setMinutes(String minutes) {
-        this.minutes = minutes;
+        this.minutes = StringUtils.isNotBlank(minutes)? minutes : ASTERISK;
         initMinutesSet();
     }
 
@@ -183,7 +188,7 @@ public class Schedule {
      *      by <tt>"-"</tt>, optionally followed by <tt>"/n"</tt> which means: "every nth hour".
      */
     public void setHours(String hours) {
-        this.hours = hours;
+        this.hours = StringUtils.isNotBlank(hours)? hours : ASTERISK;
         initHoursSet();
     }
 
@@ -214,7 +219,7 @@ public class Schedule {
      *      Numbers and symbolic names can be mixed arbitrarily.
      */
     public void setDaysOfWeek(String daysOfWeek) {
-        this.daysOfWeek = daysOfWeek;
+        this.daysOfWeek = StringUtils.isNotBlank(daysOfWeek)? daysOfWeek : ASTERISK;
         initDaysOfWeekSet();
     }
 
