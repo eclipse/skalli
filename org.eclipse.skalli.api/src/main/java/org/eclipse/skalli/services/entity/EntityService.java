@@ -19,10 +19,15 @@ import java.util.UUID;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.extension.DataMigration;
 
+/**
+ * Interface for a service that manages and provides {@link EntityBase entities},
+ * e.g. {@link Project projects}.
+ */
 public interface EntityService<T extends EntityBase> {
 
     /**
@@ -69,7 +74,7 @@ public interface EntityService<T extends EntityBase> {
 
     /**
      * Returns the unique identifiers of all existing entities.
-     * @return a list of unique identifiers, or an empty set.
+     * @return a set of unique identifiers, or an empty set.
      */
     public Set<UUID> keySet();
 

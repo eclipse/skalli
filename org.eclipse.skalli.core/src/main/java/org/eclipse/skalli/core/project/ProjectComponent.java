@@ -262,6 +262,11 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
     }
 
     @Override
+    public Set<UUID> deletedSet() {
+        return getPersistenceService().deletedSet(Project.class);
+    }
+
+    @Override
     public List<Project> getDeletedProjects() {
         return getPersistenceService().getDeletedEntities(Project.class);
     }

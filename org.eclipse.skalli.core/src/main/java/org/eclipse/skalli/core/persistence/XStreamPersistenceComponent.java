@@ -385,6 +385,12 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
     }
 
     @Override
+    public <T extends EntityBase> Set<UUID> deletedSet(Class<T> entityClass) {
+        loadModel(entityClass);
+        return deleted.keySet(entityClass);
+    }
+
+    @Override
     public <T extends EntityBase> T getDeletedEntity(Class<T> entityClass, UUID uuid) {
         loadModel(entityClass);
         return deleted.getEntity(entityClass, uuid);

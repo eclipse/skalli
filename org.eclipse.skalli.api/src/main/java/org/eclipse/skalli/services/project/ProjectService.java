@@ -13,6 +13,7 @@ package org.eclipse.skalli.services.project;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.UUID;
 
@@ -188,6 +189,12 @@ public interface ProjectService extends EntityService<Project>, Issuer {
      *          <code>null</code> if no such project exists.
      */
     public Project getProjectByProjectId(String projectId);
+
+    /**
+     * Returns the unique identifiers of all deleted projects.
+     * @return a set of unique identifiers, or an empty set.
+     */
+    public Set<UUID> deletedSet();
 
     /**
      * Returns all deleted projects.
