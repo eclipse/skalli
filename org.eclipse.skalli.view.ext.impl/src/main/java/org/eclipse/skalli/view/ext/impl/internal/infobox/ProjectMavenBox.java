@@ -280,7 +280,7 @@ public class ProjectMavenBox extends InfoBoxBase implements InfoBox {
             try {
                 MavenResolverService mavenService = Services.getService(MavenResolverService.class);
                 if (mavenService != null) {
-                    mavenService.queue(project, userId);
+                    mavenService.refresh(project, userId);
                 }
             } catch (Exception e) {
                 LOG.error(MessageFormat.format("Failed to perform \''{0}\'' action on project \''{1}\'' for user \''{2}\''",

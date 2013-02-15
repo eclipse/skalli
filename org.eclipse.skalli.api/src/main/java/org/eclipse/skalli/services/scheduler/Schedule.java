@@ -13,6 +13,8 @@ package org.eclipse.skalli.services.scheduler;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -46,10 +48,31 @@ public class Schedule {
     private transient SortedIntSet minutesSet;
 
     /**
-     * Creates a <tt>"* * *"</tt> schedule.
+     * Creates a schedule for the current day of week and time.
+     * {@link #isDue(Calendar)} returns <code>true</code> immediately when
+     * applied to this schedule.
+     */
+    public static final Schedule NOW =
+            new Schedule(new GregorianCalendar(TimeZone.getTimeZone("UTC"), Locale.ENGLISH)); //$NON-NLS-1$
+
+    /**
+     * Creates a <tt>"* * *"</tt> schedule, i.e. a schedule that
+     * is due every minute.
      */
     public Schedule() {
         this(ASTERISK, ASTERISK, ASTERISK);
+    }
+
+    /**
+     * Creates a schedule with the day of week, hour of day and minute
+     * as specified by the given calendar.
+     *
+     * @param date  the date at which the schedule is due.
+     */
+    public Schedule(Calendar date) {
+        this(Integer.toString(date.get(Calendar.DAY_OF_WEEK) - 1),
+                Integer.toString(date.get(Calendar.HOUR_OF_DAY)),
+                Integer.toString(date.get(Calendar.MINUTE)));
     }
 
     /**
@@ -108,31 +131,34 @@ public class Schedule {
 
     /**
      * Returns <code>true</code> if the recurring task that this schedule describes
-     * is due ant now ore any time between lastRun and now is due.
+     * was due somewhen between <code>first</code> and <code>last</code> (including the
+     * interval boundaries).
      *
-     * @param now  the current day of week/hour/minute.
-     * @param lastRun  the lastRun date or null
+     * @param first  the begin of the interval to check, or <code>null</code>. In that case
+     * the method is equivalent to {@link #isDue(Calendar)}.
+     * @param last  the end of the interval to check
+     *
      * @return  <code>true</code>, if the task is due.
      */
-    public boolean isDue(Calendar now, Calendar lastRun) {
-        if (isDue(now)) {
+    public boolean isDue(Calendar first, Calendar last) {
+        if (isDue(last)) {
             return true;
         }
 
-        if (lastRun == null) {
+        if (first == null) {
             return false;
         }
 
-        //is one of the minute due, which is between lastRun and now?
-        Calendar i = new GregorianCalendar(lastRun.getTimeZone());
-        i.setTime(lastRun.getTime());
+        Calendar i = new GregorianCalendar(first.getTimeZone());
+        i.setTime(first.getTime());
         i.add(Calendar.MINUTE, 1);
-        while (i.before(now)) {
+        while (i.before(last)) {
             if (isDue(i)) {
                 return true;
             }
             i.add(Calendar.MINUTE, 1);
         }
+
         return false;
     }
 

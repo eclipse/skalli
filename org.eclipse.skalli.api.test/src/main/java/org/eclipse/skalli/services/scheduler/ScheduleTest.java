@@ -10,8 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.scheduler;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -19,7 +18,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.eclipse.skalli.services.scheduler.Schedule.SortedIntSet;
-import org.junit.Assert;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
@@ -28,37 +26,57 @@ public class ScheduleTest {
     @Test
     public void testBasics() {
         Schedule schedule = new Schedule("*", "*", "*");
-        Assert.assertEquals("*", schedule.getDaysOfWeek());
+        assertEquals("*", schedule.getDaysOfWeek());
         schedule.setDaysOfWeek(Schedule.WEEKDAYS[0]);
-        Assert.assertEquals(Schedule.WEEKDAYS[0], schedule.getDaysOfWeek());
-        Assert.assertEquals("*", schedule.getHours());
+        assertEquals(Schedule.WEEKDAYS[0], schedule.getDaysOfWeek());
+        assertEquals("*", schedule.getHours());
         schedule.setHours("0-23");
-        Assert.assertEquals("0-23", schedule.getHours());
-        Assert.assertEquals("*", schedule.getMinutes());
+        assertEquals("0-23", schedule.getHours());
+        assertEquals("*", schedule.getMinutes());
         schedule.setMinutes("10-20");
-        Assert.assertEquals("10-20", schedule.getMinutes());
+        assertEquals("10-20", schedule.getMinutes());
 
         Schedule newSchedule = new Schedule(schedule);
-        Assert.assertEquals(Schedule.WEEKDAYS[0], newSchedule.getDaysOfWeek());
-        Assert.assertEquals("0-23", newSchedule.getHours());
-        Assert.assertEquals("10-20", newSchedule.getMinutes());
-        Assert.assertEquals(Schedule.WEEKDAYS[0] + " 0-23 10-20", newSchedule.toString());
+        assertEquals(Schedule.WEEKDAYS[0], newSchedule.getDaysOfWeek());
+        assertEquals("0-23", newSchedule.getHours());
+        assertEquals("10-20", newSchedule.getMinutes());
+        assertEquals(Schedule.WEEKDAYS[0] + " 0-23 10-20", newSchedule.toString());
 
-        Assert.assertEquals(schedule, newSchedule);
+        assertEquals(schedule, newSchedule);
 
         schedule = new Schedule();
-        Assert.assertEquals("*", schedule.getDaysOfWeek());
-        Assert.assertEquals("*", schedule.getHours());
-        Assert.assertEquals("*", schedule.getMinutes());
+        assertEquals("*", schedule.getDaysOfWeek());
+        assertEquals("*", schedule.getHours());
+        assertEquals("*", schedule.getMinutes());
 
         //  simulate an uninitialized Schedule -> XStream
         schedule = new Schedule();
         schedule.setDaysOfWeek(null);
         schedule.setHours(null);
         schedule.setMinutes(null);
-        Assert.assertEquals("*", schedule.getDaysOfWeek());
-        Assert.assertEquals("*", schedule.getHours());
-        Assert.assertEquals("*", schedule.getMinutes());
+        assertEquals("*", schedule.getDaysOfWeek());
+        assertEquals("*", schedule.getHours());
+        assertEquals("*", schedule.getMinutes());
+    }
+
+    @Test
+    public void testCreateFromCalendar() throws Exception {
+        Calendar date = new GregorianCalendar(TimeZone.getTimeZone("UTC"), Locale.ENGLISH);
+        date.set(Calendar.HOUR_OF_DAY, 14);
+        date.set(Calendar.MINUTE, 53);
+        for (int i = 1; i <= 7; ++i) {
+            date.set(Calendar.DAY_OF_WEEK, i);
+            Schedule schedule = new Schedule(date);
+            // Calendar uses 1=Sunday,2=Monday,..,7=Saturday, while cron uses 0=Sunday,1=Monday,...6=Saturday.
+            // So day of week in result is always 1 less than in the Calendar setting!
+            assertEquals(Integer.toString(i - 1) + " 14 53", schedule.getSchedule());
+        }
+    }
+
+    @Test
+    public void testScheduleNow() throws Exception {
+        Calendar now = new GregorianCalendar(TimeZone.getTimeZone("UTC"), Locale.ENGLISH);
+        assertTrue(Schedule.NOW.isDue(now));
     }
 
     @Test
@@ -67,132 +85,132 @@ public class ScheduleTest {
         for (int i = 99; i >= 0; --i) {
             set.add(i);
         }
-        Assert.assertEquals(100, set.size());
+        assertEquals(100, set.size());
         for (int i = 0; i <= 99; ++i) {
-            Assert.assertEquals(i, set.get(i));
-            Assert.assertTrue(set.contains(i));
+            assertEquals(i, set.get(i));
+            assertTrue(set.contains(i));
         }
         set.addAll(0, 99, 1);
-        Assert.assertEquals(100, set.size());
+        assertEquals(100, set.size());
         for (int i = 0; i <= 99; ++i) {
-            Assert.assertEquals(i, set.get(i));
+            assertEquals(i, set.get(i));
         }
         set = new SortedIntSet();
         set.addAll(0, 99, 5);
-        Assert.assertEquals(20, set.size());
+        assertEquals(20, set.size());
     }
 
     @Test
     public void testGetTimeSet() {
         SortedIntSet list = RunnableSchedule.getTimeSet("8", 0, 23);
-        Assert.assertEquals(1, list.size());
-        Assert.assertEquals(8, list.get(0));
+        assertEquals(1, list.size());
+        assertEquals(8, list.get(0));
 
         list = RunnableSchedule.getTimeSet("1,2,3", 0, 23);
-        Assert.assertEquals(3, list.size());
-        Assert.assertEquals(1, list.get(0));
-        Assert.assertEquals(2, list.get(1));
-        Assert.assertEquals(3, list.get(2));
+        assertEquals(3, list.size());
+        assertEquals(1, list.get(0));
+        assertEquals(2, list.get(1));
+        assertEquals(3, list.get(2));
 
         list = RunnableSchedule.getTimeSet("3,1,2", 0, 23);
-        Assert.assertEquals(3, list.size());
-        Assert.assertEquals(1, list.get(0));
-        Assert.assertEquals(2, list.get(1));
-        Assert.assertEquals(3, list.get(2));
+        assertEquals(3, list.size());
+        assertEquals(1, list.get(0));
+        assertEquals(2, list.get(1));
+        assertEquals(3, list.get(2));
 
         list = RunnableSchedule.getTimeSet("1-3", 0, 23);
-        Assert.assertEquals(3, list.size());
-        Assert.assertEquals(1, list.get(0));
-        Assert.assertEquals(2, list.get(1));
-        Assert.assertEquals(3, list.get(2));
+        assertEquals(3, list.size());
+        assertEquals(1, list.get(0));
+        assertEquals(2, list.get(1));
+        assertEquals(3, list.get(2));
 
         list = RunnableSchedule.getTimeSet("0-23/2", 0, 23);
-        Assert.assertEquals(12, list.size());
+        assertEquals(12, list.size());
         int n = 0;
         for (int i = 0; i < 12; ++i) {
-            Assert.assertEquals(n, list.get(i));
+            assertEquals(n, list.get(i));
             n += 2;
         }
 
         list = RunnableSchedule.getTimeSet("4,6-10/2,1-3/1,4,5,5-10/2", 0, 23);
-        Assert.assertEquals(10, list.size());
+        assertEquals(10, list.size());
         for (int i = 0; i < 10; ++i) {
-            Assert.assertEquals(i + 1, list.get(i));
+            assertEquals(i + 1, list.get(i));
         }
 
         list = RunnableSchedule.getTimeSet("18-5", 0, 23);
-        Assert.assertEquals(12, list.size());
+        assertEquals(12, list.size());
         n = 0;
         for (int i = 0; i < 23; ++i) {
             if (i <= 5 || i >= 18) {
-                Assert.assertTrue(list.contains(i));
-                Assert.assertEquals(i, list.get(n));
+                assertTrue(list.contains(i));
+                assertEquals(i, list.get(n));
                 ++n;
             } else {
-                Assert.assertFalse(list.contains(i));
+                assertFalse(list.contains(i));
             }
         }
 
         list = RunnableSchedule.getTimeSet("*", 0, 6);
-        Assert.assertEquals(7, list.size());
+        assertEquals(7, list.size());
         for (int i = 0; i <= 6; ++i) {
-            Assert.assertEquals(i, list.get(i));
+            assertEquals(i, list.get(i));
         }
 
         list = RunnableSchedule.getTimeSet("*/2", 0, 6);
-        Assert.assertEquals(4, list.size());
+        assertEquals(4, list.size());
         n = 0;
         for (int i = 0; i < 4; ++i) {
-            Assert.assertEquals(n, list.get(i));
+            assertEquals(n, list.get(i));
             n += 2;
         }
 
         list = RunnableSchedule.getTimeSet("*/10,3,13-14", 0, 23);
-        Assert.assertEquals(6, list.size());
-        Assert.assertEquals(0, list.get(0));
-        Assert.assertEquals(3, list.get(1));
-        Assert.assertEquals(10, list.get(2));
-        Assert.assertEquals(13, list.get(3));
-        Assert.assertEquals(14, list.get(4));
-        Assert.assertEquals(20, list.get(5));
+        assertEquals(6, list.size());
+        assertEquals(0, list.get(0));
+        assertEquals(3, list.get(1));
+        assertEquals(10, list.get(2));
+        assertEquals(13, list.get(3));
+        assertEquals(14, list.get(4));
+        assertEquals(20, list.get(5));
 
         list = RunnableSchedule.getTimeSet("13-14,*/10,3", 0, 23);
-        Assert.assertEquals(6, list.size());
-        Assert.assertEquals(0, list.get(0));
-        Assert.assertEquals(3, list.get(1));
-        Assert.assertEquals(10, list.get(2));
-        Assert.assertEquals(13, list.get(3));
-        Assert.assertEquals(14, list.get(4));
-        Assert.assertEquals(20, list.get(5));
+        assertEquals(6, list.size());
+        assertEquals(0, list.get(0));
+        assertEquals(3, list.get(1));
+        assertEquals(10, list.get(2));
+        assertEquals(13, list.get(3));
+        assertEquals(14, list.get(4));
+        assertEquals(20, list.get(5));
 
         // out of range
         list = RunnableSchedule.getTimeSet("24", 0, 23);
-        Assert.assertEquals(1, list.size());
-        Assert.assertEquals(23, list.get(0));
+        assertEquals(1, list.size());
+        assertEquals(23, list.get(0));
 
         list = RunnableSchedule.getTimeSet("1", 22, 23);
-        Assert.assertEquals(1, list.size());
-        Assert.assertEquals(22, list.get(0));
+        assertEquals(1, list.size());
+        assertEquals(22, list.get(0));
 
         // invalid
         try {
             list = RunnableSchedule.getTimeSet("foobar", 0, 23);
-            Assert.fail("foobar");
+            fail("foobar");
         } catch (NumberFormatException e) {
         }
         try {
             list = RunnableSchedule.getTimeSet("*/foobar", 0, 23);
-            Assert.fail("*/foobar");
+            fail("*/foobar");
         } catch (NumberFormatException e) {
         }
         try {
             list = RunnableSchedule.getTimeSet("1-foobar", 0, 23);
-            Assert.fail("1-foobar");
+            fail("1-foobar");
         } catch (NumberFormatException e) {
         }
         try {
             list = RunnableSchedule.getTimeSet("1,foobar,2", 0, 23);
-            Assert.fail("1,foobar,2");
+            fail("1,foobar,2");
         } catch (NumberFormatException e) {
         }
     }
@@ -201,82 +219,82 @@ public class ScheduleTest {
     public void testGetDaysOfWeekSet() {
         SortedIntSet list = RunnableSchedule.getDaysOfWeekSet("MONDAY-SAT/2,5,SUNDAY,7", 0, 7, Schedule.WEEKDAYS,
                 Schedule.WEEKDAYS_SHORT);
-        Assert.assertEquals(0, list.get(0));
-        Assert.assertEquals(1, list.get(1));
-        Assert.assertEquals(3, list.get(2));
-        Assert.assertEquals(5, list.get(3));
-        Assert.assertEquals(7, list.get(4));
+        assertEquals(0, list.get(0));
+        assertEquals(1, list.get(1));
+        assertEquals(3, list.get(2));
+        assertEquals(5, list.get(3));
+        assertEquals(7, list.get(4));
         list = RunnableSchedule.normalizeDaysOfWeek(list);
-        Assert.assertEquals(1, list.get(0));
-        Assert.assertEquals(2, list.get(1));
-        Assert.assertEquals(4, list.get(2));
-        Assert.assertEquals(6, list.get(3));
+        assertEquals(1, list.get(0));
+        assertEquals(2, list.get(1));
+        assertEquals(4, list.get(2));
+        assertEquals(6, list.get(3));
 
         list = RunnableSchedule.getDaysOfWeekSet("FRI-TUE", 0, 7, Schedule.WEEKDAYS, Schedule.WEEKDAYS_SHORT);
-        Assert.assertEquals(0, list.get(0));
-        Assert.assertEquals(1, list.get(1));
-        Assert.assertEquals(2, list.get(2));
-        Assert.assertEquals(5, list.get(3));
-        Assert.assertEquals(6, list.get(4));
+        assertEquals(0, list.get(0));
+        assertEquals(1, list.get(1));
+        assertEquals(2, list.get(2));
+        assertEquals(5, list.get(3));
+        assertEquals(6, list.get(4));
         list = RunnableSchedule.normalizeDaysOfWeek(list);
-        Assert.assertEquals(1, list.get(0));
-        Assert.assertEquals(2, list.get(1));
-        Assert.assertEquals(3, list.get(2));
-        Assert.assertEquals(6, list.get(3));
-        Assert.assertEquals(7, list.get(4));
+        assertEquals(1, list.get(0));
+        assertEquals(2, list.get(1));
+        assertEquals(3, list.get(2));
+        assertEquals(6, list.get(3));
+        assertEquals(7, list.get(4));
 
         list = RunnableSchedule.getDaysOfWeekSet("0-7", 0, 7, Schedule.WEEKDAYS, Schedule.WEEKDAYS_SHORT);
         for (int i = 0; i <= 7; ++i) {
-            Assert.assertEquals(i, list.get(i));
+            assertEquals(i, list.get(i));
         }
         list = RunnableSchedule.normalizeDaysOfWeek(list);
         for (int i = 0; i <= 6; ++i) {
-            Assert.assertEquals(i + 1, list.get(i));
+            assertEquals(i + 1, list.get(i));
         }
 
         list = RunnableSchedule.getDaysOfWeekSet("*", 0, 7, Schedule.WEEKDAYS, Schedule.WEEKDAYS_SHORT);
         for (int i = 0; i <= 6; ++i) {
-            Assert.assertEquals(i, list.get(i));
+            assertEquals(i, list.get(i));
         }
         list = RunnableSchedule.normalizeDaysOfWeek(list);
         for (int i = 0; i <= 6; ++i) {
-            Assert.assertEquals(i + 1, list.get(i));
+            assertEquals(i + 1, list.get(i));
         }
 
         list = RunnableSchedule.getDaysOfWeekSet("*/2", 0, 7, Schedule.WEEKDAYS, Schedule.WEEKDAYS_SHORT);
-        Assert.assertEquals(0, list.get(0));
-        Assert.assertEquals(2, list.get(1));
-        Assert.assertEquals(4, list.get(2));
-        Assert.assertEquals(6, list.get(3));
+        assertEquals(0, list.get(0));
+        assertEquals(2, list.get(1));
+        assertEquals(4, list.get(2));
+        assertEquals(6, list.get(3));
         list = RunnableSchedule.normalizeDaysOfWeek(list);
-        Assert.assertEquals(1, list.get(0));
-        Assert.assertEquals(3, list.get(1));
-        Assert.assertEquals(5, list.get(2));
-        Assert.assertEquals(7, list.get(3));
+        assertEquals(1, list.get(0));
+        assertEquals(3, list.get(1));
+        assertEquals(5, list.get(2));
+        assertEquals(7, list.get(3));
 
         list = RunnableSchedule.getDaysOfWeekSet("0,7,SUNDAY,*/2,MON,SUN", 0, 7, Schedule.WEEKDAYS,
                 Schedule.WEEKDAYS_SHORT);
-        Assert.assertEquals(0, list.get(0));
-        Assert.assertEquals(1, list.get(1));
-        Assert.assertEquals(2, list.get(2));
-        Assert.assertEquals(4, list.get(3));
-        Assert.assertEquals(6, list.get(4));
-        Assert.assertEquals(7, list.get(5));
+        assertEquals(0, list.get(0));
+        assertEquals(1, list.get(1));
+        assertEquals(2, list.get(2));
+        assertEquals(4, list.get(3));
+        assertEquals(6, list.get(4));
+        assertEquals(7, list.get(5));
         list = RunnableSchedule.normalizeDaysOfWeek(list);
-        Assert.assertEquals(1, list.get(0));
-        Assert.assertEquals(2, list.get(1));
-        Assert.assertEquals(3, list.get(2));
-        Assert.assertEquals(5, list.get(3));
-        Assert.assertEquals(7, list.get(4));
+        assertEquals(1, list.get(0));
+        assertEquals(2, list.get(1));
+        assertEquals(3, list.get(2));
+        assertEquals(5, list.get(3));
+        assertEquals(7, list.get(4));
     }
 
     @Test
     public void testIsDue() {
         Schedule schedule = new Schedule("MONDAY", "2", "0"); // Monday 2:00am
         Calendar calendar = getUTCCalendar(2, 2, 0); // 2=Monday
-        Assert.assertTrue(schedule.isDue(calendar)); // first time we get a runnable
+        assertTrue(schedule.isDue(calendar)); // first time we get a runnable
         calendar.add(Calendar.MINUTE, 1);
-        Assert.assertFalse(schedule.isDue(calendar)); // one minute later, it's gone
+        assertFalse(schedule.isDue(calendar)); // one minute later, it's gone
 
         schedule = new Schedule("*", "2", "0"); // Every day at 2:00am
         calendar = getUTCCalendar(1, 2, 0);
@@ -287,9 +305,9 @@ public class ScheduleTest {
                     calendar.set(Calendar.HOUR_OF_DAY, h);
                     calendar.set(Calendar.MINUTE, m);
                     if (h == 2 && m == 0) {
-                        Assert.assertTrue("d=" + d, schedule.isDue(calendar));
+                        assertTrue("d=" + d, schedule.isDue(calendar));
                     } else {
-                        Assert.assertFalse("d=" + d, schedule.isDue(calendar));
+                        assertFalse("d=" + d, schedule.isDue(calendar));
                     }
                 }
             }
@@ -304,9 +322,9 @@ public class ScheduleTest {
                     calendar.set(Calendar.HOUR_OF_DAY, h);
                     calendar.set(Calendar.MINUTE, m);
                     if ((d == 1 || d == 3 || d == 5 || d == 7) && h == 2 && m == 0) {
-                        Assert.assertTrue("d=" + d, schedule.isDue(calendar));
+                        assertTrue("d=" + d, schedule.isDue(calendar));
                     } else {
-                        Assert.assertFalse("d=" + d, schedule.isDue(calendar));
+                        assertFalse("d=" + d, schedule.isDue(calendar));
                     }
                 }
             }
@@ -320,7 +338,7 @@ public class ScheduleTest {
                     calendar.set(Calendar.DAY_OF_WEEK, d);
                     calendar.set(Calendar.HOUR_OF_DAY, h);
                     calendar.set(Calendar.MINUTE, m);
-                    Assert.assertTrue("m=" + m, schedule.isDue(calendar));
+                    assertTrue("m=" + m, schedule.isDue(calendar));
                 }
             }
         }
@@ -334,9 +352,9 @@ public class ScheduleTest {
                     calendar.set(Calendar.HOUR_OF_DAY, h);
                     calendar.set(Calendar.MINUTE, m);
                     if (m % 5 == 0) {
-                        Assert.assertTrue("m=" + m, schedule.isDue(calendar));
+                        assertTrue("m=" + m, schedule.isDue(calendar));
                     } else {
-                        Assert.assertFalse("m=" + m, schedule.isDue(calendar));
+                        assertFalse("m=" + m, schedule.isDue(calendar));
                     }
                 }
             }
@@ -351,9 +369,9 @@ public class ScheduleTest {
                     calendar.set(Calendar.HOUR_OF_DAY, h);
                     calendar.set(Calendar.MINUTE, m);
                     if ((h % 2 == 0) && (m % 5 == 0)) {
-                        Assert.assertTrue("h=" + h + ",m=" + m, schedule.isDue(calendar));
+                        assertTrue("h=" + h + ",m=" + m, schedule.isDue(calendar));
                     } else {
-                        Assert.assertFalse("h=" + h + ",m=" + m, schedule.isDue(calendar));
+                        assertFalse("h=" + h + ",m=" + m, schedule.isDue(calendar));
                     }
                 }
             }
@@ -368,9 +386,9 @@ public class ScheduleTest {
                     calendar.set(Calendar.HOUR_OF_DAY, h);
                     calendar.set(Calendar.MINUTE, m);
                     if ((h % 2 == 0) && (d == 2 || d == 6)) {
-                        Assert.assertTrue("d=" + d + ",h=" + h + ",m=" + m, schedule.isDue(calendar));
+                        assertTrue("d=" + d + ",h=" + h + ",m=" + m, schedule.isDue(calendar));
                     } else {
-                        Assert.assertFalse("d=" + d + ",h=" + h + ",m=" + m, schedule.isDue(calendar));
+                        assertFalse("d=" + d + ",h=" + h + ",m=" + m, schedule.isDue(calendar));
                     }
                 }
             }
@@ -386,9 +404,9 @@ public class ScheduleTest {
                     calendar.set(Calendar.HOUR_OF_DAY, h);
                     calendar.set(Calendar.MINUTE, m);
                     if ((h % 2d == 0 && h != 6 || h == 15) && (m % 10 == 0 || m == 3 || m == 13 || m == 14) && d <= 6) {
-                        Assert.assertTrue("d=" + d + ",h=" + h + ",m=" + m, schedule.isDue(calendar));
+                        assertTrue("d=" + d + ",h=" + h + ",m=" + m, schedule.isDue(calendar));
                     } else {
-                        Assert.assertFalse("d=" + d + ",h=" + h + ",m=" + m, schedule.isDue(calendar));
+                        assertFalse("d=" + d + ",h=" + h + ",m=" + m, schedule.isDue(calendar));
                     }
                 }
             }
@@ -403,11 +421,11 @@ public class ScheduleTest {
         Calendar lastRun2 = getUTCCalendar(Calendar.MONDAY, 2, 10); // 2:10am -> last run was at schedule time
         Calendar lastRun3 = getUTCCalendar(Calendar.MONDAY, 2, 15); // 2:15am -> last run had same time as now
         Calendar lastRun4 = getUTCCalendar(Calendar.MONDAY, 2, 20); // 2:20am -> value after now ; should never be called
-        assertFalse(schedule.isDue(now, null));
-        assertTrue(schedule.isDue(now, lastRun1));
-        assertFalse(schedule.isDue(now, lastRun2));
-        assertFalse(schedule.isDue(now, lastRun3));
-        assertFalse(schedule.isDue(now, lastRun4));
+        assertFalse(schedule.isDue(null, now));
+        assertTrue(schedule.isDue(lastRun1, now));
+        assertFalse(schedule.isDue(lastRun2, now));
+        assertFalse(schedule.isDue(lastRun3, now));
+        assertFalse(schedule.isDue(lastRun4, now));
     }
 
     private Calendar getUTCCalendar(int dayOfWeek, int hour, int minute) {

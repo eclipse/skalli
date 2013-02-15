@@ -60,11 +60,15 @@ class StatusConverter extends RestConverterBase<Object> {
             for (RunnableSchedule schedule : schedulerService.getSchedules()) {
                 writer.startNode("schedule"); //$NON-NLS-1$
                 writeNode(writer, "name", schedule.getCaption()); //$NON-NLS-1$
-                writeNode(writer, "runnable", schedule.getRunnable().getClass().getName()); //$NON-NLS-1$
+                writeNode(writer, "runnable", schedule.getClass().getName()); //$NON-NLS-1$
                 writeNode(writer, "runAt", schedule.getSchedule()); //$NON-NLS-1$
-                long lastRun = schedule.getLastRun();
-                if (lastRun > 0) {
-                    writeNode(writer, "lastRun", FormatUtils.formatUTCWithMillis(lastRun)); //$NON-NLS-1$
+                long lastStarted = schedule.getLastStarted();
+                if (lastStarted > 0) {
+                    writeNode(writer, "lastStarted", FormatUtils.formatUTCWithMillis(lastStarted)); //$NON-NLS-1$
+                }
+                long lastCompleted = schedule.getLastCompleted();
+                if (lastCompleted > 0) {
+                    writeNode(writer, "lastCompleted", FormatUtils.formatUTCWithMillis(lastCompleted)); //$NON-NLS-1$
                 }
                 writer.endNode();
             }

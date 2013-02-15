@@ -100,16 +100,19 @@ public class FeedUpdaterComponent implements EventListener<EventCustomizingUpdat
                 if (resolverConfig != null) {
                     RunnableSchedule runnableSchedule = new RunnableSchedule(resolverConfig.getSchedule(), "Feed Updater") {
                         @Override
-                        public Runnable getRunnable() {
-                            return new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (feedManager != null) {
-                                        feedManager.updateAllFeeds();
-                                    }
+                        public void run() {
+                            try {
+                                setLastStarted(System.currentTimeMillis());
+                                LOG.info("Updating feeds...");
+                                if (feedManager != null) {
+                                    feedManager.updateAllFeeds();
                                 }
-                            };
-
+                                LOG.info("Updating feeds: Finished");
+                            } catch (Exception e) {
+                                LOG.error("Updating feeds: Failed", e);
+                            } finally {
+                                setLastCompleted(System.currentTimeMillis());
+                            }
                         }
                     };
                     scheduleId = schedulerService.registerSchedule(runnableSchedule);

@@ -26,6 +26,8 @@ import org.eclipse.skalli.model.ext.maven.MavenPomResolver;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
+import org.eclipse.skalli.model.ext.maven.internal.config.MavenResolverConfig;
+import org.eclipse.skalli.nexus.NexusClient;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Before;
@@ -52,7 +54,7 @@ public class MavenResolverRunnableTest {
         private MavenResolverMock resolverMock;
 
         public MavenResolverRunnableMock(MavenResolverMock resolverMock) {
-            super(null, USERID);
+            super(new MavenResolverConfig());
             this.resolverMock = resolverMock;
         }
 
@@ -69,6 +71,11 @@ public class MavenResolverRunnableTest {
         @Override
         protected ProjectService getProjectService() {
             return projectServiceMock;
+        }
+
+        @Override
+        protected NexusClient getNexusClient() {
+            return null;
         }
     }
 

@@ -521,8 +521,22 @@ public class ValidationComponent implements ValidationService, EventListener<Eve
         }
 
         @Override
-        public Runnable getRunnable() {
-            return getRunnableFromConfig(config);
+        public void run() {
+            try {
+                setLastStarted(System.currentTimeMillis());
+                LOG.info("Validating entities...");
+                Runnable runnable = getRunnableFromConfig(config);
+                if (runnable == null) {
+                    LOG.error("No runnable available for schedule " + config);
+                    return;
+                }
+                runnable.run();
+                LOG.info("Validating entities: Finished");
+            } catch (Exception e) {
+                LOG.error("Validating entities: Failed", e);
+            } finally {
+                setLastCompleted(System.currentTimeMillis());
+            }
         }
 
         @Override

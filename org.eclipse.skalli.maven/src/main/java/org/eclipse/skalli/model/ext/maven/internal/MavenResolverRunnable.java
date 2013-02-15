@@ -32,54 +32,73 @@ import org.eclipse.skalli.model.ext.maven.MavenPomResolver;
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
+import org.eclipse.skalli.model.ext.maven.internal.config.MavenResolverConfig;
 import org.eclipse.skalli.nexus.NexusClient;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.scheduler.RunnableSchedule;
+import org.eclipse.skalli.services.scheduler.Schedule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MavenResolverRunnable implements Runnable, Issuer {
+public class MavenResolverRunnable extends RunnableSchedule implements Issuer {
 
     private static final Logger LOG = LoggerFactory.getLogger(MavenResolverRunnable.class);
 
-    private NexusClient nexusClient;
     private String userId;
-    private UUID uuid;
 
     /**
-     * Creates a Maven resolver runable.
+     * Creates a Maven resolver runnable for a single shot execution.
      *
-     * @param nexusClient the Nexus client to use for retrieving artifact versions, or <code>null</code>
-     * @param userId  the unique identifier of the user requesting the resolving of Maven artifacts
+     * @param userId  the user on which behalf the Maven resolution is triggered.
      */
-    public MavenResolverRunnable(NexusClient nexusClient, String userId) {
+    public MavenResolverRunnable(String userId) {
+        super(Schedule.NOW, "Maven Resolver");
+        if (StringUtils.isBlank(userId)) {
+            throw new IllegalArgumentException("Argument 'userId' must not be null or blank");
+        }
         this.userId = userId;
-        this.nexusClient = nexusClient;
-
     }
 
     /**
-     * Creates a Maven resolver runable.
+     * Creates a Maven resolver runnable for scheduled execution.
      *
-     * @param nexusClient the Nexus client to use for retrieving artifact versions, or <code>null</code>
-     * @param userId  the unique identifier of the user requesting the resolving of Maven artifacts
-     * @param uuid  the unique identifier of the project to evaluate, or <code>null</code>.
-     * If no project is specified, the {@link #run()} method will iterate over all existing projects.
+     * @param config  the configuration settings for the Maven resolver.
      */
-    public MavenResolverRunnable(NexusClient nexusClient, String userId, UUID uuid) {
-        this(nexusClient, userId);
-        this.uuid = uuid;
+    public MavenResolverRunnable(MavenResolverConfig config) {
+        super(config.getSchedule(), "Maven Resolver");
+        userId = config.getUserId();
+        if (StringUtils.isBlank(userId)) {
+            userId = MavenResolverRunnable.class.getName();
+        }
     }
 
     @Override
     public void run() {
+        try {
+            setLastStarted(System.currentTimeMillis());
+            ProjectService projectService = getProjectService();
+            List<UUID> uuids = new ArrayList<UUID>(projectService.keySet());
+            run(projectService, uuids);
+        } catch (Exception e) {
+            LOG.error("MavenResolver: Failed", e);
+        } finally {
+            setLastCompleted(System.currentTimeMillis());
+        }
+    }
+
+    public void run(UUID uuid) {
         ProjectService projectService = getProjectService();
-        List<UUID> uuids = uuid != null ?
-                Collections.singletonList(uuid) :
-                new ArrayList<UUID>(projectService.keySet());
+        List<UUID> uuids = Collections.singletonList(uuid);
+        run(projectService, uuids);
+    }
+
+    private void run(ProjectService projectService, List<UUID> uuids) {
         LOG.info(MessageFormat.format("MavenResolver: Started ({0} projects to scan)", uuids.size()));
 
-        NexusVersionsResolver versionsResolver = new NexusVersionsResolver(nexusClient);
+        NexusClient nexusClient = getNexusClient();
+        NexusVersionsResolver versionsResolver = nexusClient != null?
+                new NexusVersionsResolver(nexusClient) : null;
 
         int count = 0;
         int countUpdated = 0;
@@ -135,15 +154,17 @@ public class MavenResolverRunnable implements Runnable, Issuer {
                 continue;
             }
 
-            try {
-                versionsResolver.addVersions(newReactor, oldReactor);
-                versionsResolver.setNexusVersions(newReactor);
-            } catch (RuntimeException e) {
-                ++countUnexpectedException;
-                handleIssue(Severity.FATAL, uuid, MessageFormat.format(
-                        "MavenResolver: Unexpected exception when retrieving artifact versions for project {0}",
-                        project.getProjectId()), e, issues);
-                continue;
+            if (versionsResolver != null) {
+                try {
+                    versionsResolver.addVersions(newReactor, oldReactor);
+                    versionsResolver.setNexusVersions(newReactor);
+                } catch (RuntimeException e) {
+                    ++countUnexpectedException;
+                    handleIssue(Severity.FATAL, uuid, MessageFormat.format(
+                            "MavenResolver: Unexpected exception when retrieving artifact versions for project {0}",
+                            project.getProjectId()), e, issues);
+                    continue;
+                }
             }
 
             if (!ComparatorUtils.equals(newReactor, oldReactor)) {
@@ -341,5 +362,10 @@ public class MavenResolverRunnable implements Runnable, Issuer {
     // package protected for testing purposes
     ProjectService getProjectService() {
         return Services.getRequiredService(ProjectService.class);
+    }
+
+    // package protected for testing purposes
+    NexusClient getNexusClient() {
+        return Services.getService(NexusClient.class);
     }
 }

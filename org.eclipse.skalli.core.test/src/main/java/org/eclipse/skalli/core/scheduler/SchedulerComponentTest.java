@@ -14,7 +14,6 @@ import java.util.Calendar;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.skalli.core.scheduler.SchedulerComponent;
 import org.eclipse.skalli.services.scheduler.RunnableSchedule;
 import org.eclipse.skalli.services.scheduler.Schedule;
 import org.eclipse.skalli.services.scheduler.Task;
@@ -53,8 +52,9 @@ public class SchedulerComponentTest {
     private static class TestRunnableSchedule extends RunnableSchedule {
         TestRunnable runnable = new TestRunnable();
 
-        public TestRunnableSchedule(Schedule schedule) {
+        public TestRunnableSchedule(Schedule schedule, long now) {
             super(schedule, "Test");
+            setLastCompleted(now);
         }
 
         @Override
@@ -63,8 +63,13 @@ public class SchedulerComponentTest {
         }
 
         @Override
-        public Runnable getRunnable() {
-            return runnable;
+        public void run() {
+            try {
+                setLastStarted(getLastCompleted());
+                runnable.run();
+            } finally {
+                setLastCompleted(getLastCompleted() + 1L);
+            }
         }
     }
 
@@ -87,14 +92,14 @@ public class SchedulerComponentTest {
         TestRunnable testRunnable = new TestRunnable();
         Task task = new Task(testRunnable, 0, -1L);
         UUID taskId = instance.registerTask(task);
-        Assert.assertTrue(instance.isRegisteredTask(taskId));
+        Assert.assertTrue(instance.isRegistered(taskId));
 
         waitForExecution(1, testRunnable);
         Assert.assertEquals(1, testRunnable.count); // ensure that the runnable has been called once
         Assert.assertTrue(instance.isDone(taskId));
         Assert.assertFalse(instance.cancel(taskId, true));
         instance.unregisterTask(taskId);
-        Assert.assertFalse(instance.isRegisteredTask(taskId));
+        Assert.assertFalse(instance.isRegistered(taskId));
     }
 
     @Test
@@ -102,27 +107,33 @@ public class SchedulerComponentTest {
         TestRunnable testRunnable = new TestRunnable();
         Task task = new Task(testRunnable, 0, 10L);
         UUID taskId = instance.registerTask(task);
-        Assert.assertTrue(instance.isRegisteredTask(taskId));
+        Assert.assertTrue(instance.isRegistered(taskId));
 
         waitForExecution(2, testRunnable);
         Assert.assertTrue(testRunnable.count > 1); // ensure that the runnable has been called multiple times
         Assert.assertFalse(instance.isDone(taskId));
         Assert.assertTrue(instance.cancel(taskId, true));
         Assert.assertTrue(instance.isDone(taskId));
+
         instance.unregisterTask(taskId);
-        Assert.assertFalse(instance.isRegisteredTask(taskId));
+        Assert.assertFalse(instance.isRegistered(taskId));
     }
 
     @Test
     public void testRegisterUnregisterSchedule() {
         Schedule schedule = new Schedule();
-        TestRunnableSchedule runnableSchedule = new TestRunnableSchedule(schedule);
+        long now = System.currentTimeMillis();
+        TestRunnableSchedule runnableSchedule = new TestRunnableSchedule(schedule, now);
         instance.registerCron(100, TimeUnit.MILLISECONDS); // set the cron period to 10ms
         UUID scheduleId = instance.registerSchedule(runnableSchedule);
 
         waitForExecution(2, runnableSchedule.runnable);
         int count = runnableSchedule.runnable.count;
         Assert.assertTrue(count > 1); // ensure that the runnable has been called multiple times
+        Assert.assertTrue(instance.isDone(scheduleId)); // ensure that it is now done
+        Assert.assertEquals(now + count - 1, instance.getLastStarted(scheduleId));
+        Assert.assertEquals(now + count, instance.getLastCompleted(scheduleId));
+
         instance.unregisterSchedule(scheduleId);
         Assert.assertEquals(count, runnableSchedule.runnable.count); // ensure that the runnable has not been called further
     }

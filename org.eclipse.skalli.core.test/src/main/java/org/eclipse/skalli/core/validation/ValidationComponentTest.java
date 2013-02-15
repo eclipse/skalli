@@ -22,11 +22,6 @@ import java.util.SortedSet;
 import java.util.UUID;
 
 import org.eclipse.skalli.commons.CollectionUtils;
-import org.eclipse.skalli.core.validation.ValidationAction;
-import org.eclipse.skalli.core.validation.ValidationConfig;
-import org.eclipse.skalli.core.validation.ValidationComponent;
-import org.eclipse.skalli.core.validation.ValidationsConfig;
-import org.eclipse.skalli.core.validation.ValidationsResource;
 import org.eclipse.skalli.core.validation.ValidationComponent.QueueAllRunnable;
 import org.eclipse.skalli.core.validation.ValidationComponent.QueueRunnable;
 import org.eclipse.skalli.core.validation.ValidationComponent.ValidateAllRunnable;
@@ -45,10 +40,10 @@ import org.eclipse.skalli.services.scheduler.Task;
 import org.eclipse.skalli.services.validation.Validation;
 import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.BundleManager;
-import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.eclipse.skalli.testutil.TestEntityBase2;
 import org.eclipse.skalli.testutil.TestEntityService;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -103,12 +98,7 @@ public class ValidationComponentTest {
         }
 
         @Override
-        public Runnable getRunnable() {
-            return new Runnable() {
-                @Override
-                public void run() {
-                }
-            };
+        public void run() {
         }
     }
 

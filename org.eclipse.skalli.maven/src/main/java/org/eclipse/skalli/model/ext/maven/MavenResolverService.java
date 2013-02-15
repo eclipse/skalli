@@ -17,6 +17,6 @@ public interface MavenResolverService {
     /**
      * queue the maven resolving for a single project
      */
-    public void queue(Project project, String userId);
+    public void refresh(Project project, String userId);
 
 }

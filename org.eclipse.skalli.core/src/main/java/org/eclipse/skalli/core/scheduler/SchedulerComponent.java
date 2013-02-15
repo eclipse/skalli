@@ -18,6 +18,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -109,7 +110,7 @@ public class SchedulerComponent implements SchedulerService {
     }
 
     @Override
-    public synchronized boolean isRegisteredTask(UUID taskId) {
+    public synchronized boolean isRegistered(UUID taskId) {
         return futures.get(taskId) != null;
     }
 
@@ -156,6 +157,24 @@ public class SchedulerComponent implements SchedulerService {
         return schedules.get(scheduleId) != null;
     }
 
+    @Override
+    public synchronized long getLastStarted(UUID scheduleId) {
+        RunnableSchedule schedule = schedules.get(scheduleId);
+        if (schedule == null) {
+            throw new IllegalArgumentException("No such schedule: " + schedule);
+        }
+        return schedule.getLastStarted();
+    }
+
+    @Override
+    public synchronized long getLastCompleted(UUID scheduleId) {
+        RunnableSchedule schedule = schedules.get(scheduleId);
+        if (schedule == null) {
+            throw new IllegalArgumentException("No such schedule: " + schedule);
+        }
+        return schedule.getLastCompleted();
+    }
+
     /**
      * Registers a cron runner that executes registered schedules.
      */
@@ -181,14 +200,12 @@ public class SchedulerComponent implements SchedulerService {
         @Override
         public void run() {
             Calendar now = new GregorianCalendar(TIMEZONE, Locale.ENGLISH);
-            for (RunnableSchedule schedule : schedules.values()) {
-                Runnable runnable = schedule.getRunnable();
-                if (runnable != null) {
-                    if (schedule.isDue(now, lastCronRun)) {
-                        schedule.setLastRun(now.getTimeInMillis());
-                        singleShotExecutor.submit(runnable);
-                        LOG.info(MessageFormat.format("Schedule ''{0}'': submitted", schedule));
-                    }
+            for (Entry<UUID, RunnableSchedule> entry : schedules.entrySet()) {
+                RunnableSchedule schedule = entry.getValue();
+                if (schedule.isDue(lastCronRun, now)) {
+                    Future<?> future = singleShotExecutor.submit(schedule);
+                    futures.put(entry.getKey(), future);
+                    LOG.info(MessageFormat.format("Schedule ''{0}'': submitted", schedule));
                 }
             }
             lastCronRun = new GregorianCalendar();
