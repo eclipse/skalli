@@ -54,7 +54,7 @@ public class EventComponent implements EventService {
     }
 
     @Override
-    public <T extends Event> void unregisterEventListener(Class<T> event, EventListener<T> listener) {
+    public <T extends Event> void unregisterListener(Class<T> event, EventListener<T> listener) {
         Set<EventListener<T>> set = listeners.get(event.getName());
         if (set != null) {
             set.remove(listener);
