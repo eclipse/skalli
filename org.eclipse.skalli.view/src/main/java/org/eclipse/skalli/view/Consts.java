@@ -41,6 +41,7 @@ public class Consts {
     public static final String ATTRIBUTE_BASE_URL = "baseUrl";
     public static final String ATTRIBUTE_SERVLET_URL = "servletUrl";
     public static final String ATTRIBUTE_WINDOWNAME = "windowName";
+    public static final String ATTRIBUTE_APP_URI = "appUri";
 
     public static final String ATTRIBUTE_USERID = "userId";
     public static final String ATTRIBUTE_USER = "user";
@@ -52,6 +53,7 @@ public class Consts {
     public static final String ATTRIBUTE_PROJECT = "project";
     public static final String ATTRIBUTE_PROJECTID = "projectId";
     public static final String ATTRIBUTE_PROJECTUUID = "projectUUID";
+    public static final String ATTRIBUTE_NATURE = "nature";
     public static final String ATTRIBUTE_PROJECTTEMPLATE = "projectTemplate";
     public static final String ATTRIBUTE_PROJECTCONTEXTLINKS = "projectContextLinks";
 

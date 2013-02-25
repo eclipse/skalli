@@ -49,21 +49,30 @@ import org.slf4j.LoggerFactory;
  * <ul>
  * <li>"{@value Consts#ATTRIBUTE_USERID}" - the identifier of the logged in user; if not defined: anonymous user.</li>
  * <li>"{@value Consts#ATTRIBUTE_PROJECT}" - the project, or <code>null</code> in case the project is to be created.</li>
- * <li>"{@value Consts#ATTRIBUTE_PROJECTADMIN}" - <code>true</code>, if the logged in user is project administrator
+ * <li>"{@value Consts#ATTRIBUTE_PROJECTADMIN}" - <code>true</code>, if the logged in user is project administrator,
  * <code>false</code> otherwise.</li>
  * </ul>
+ * This filter sets the following attributes:
+ * <ul>
+ * <li>"{@value Consts#ATTRIBUTE_WINDOWNAME}" - the name of the Vaadin window, either the project's id, or the
+ * project's uuid for deleted projects. If the project is to be created, the path info from the request is set
+ * as window name.</li>
+ * <li>"{@value Consts#ATTRIBUTE_APP_URI}" - the <tt>appUri</tt> parameter passed to Vaadin,
+ * i.e. <tt>/vprojects/&lt;windowName&gt;</tt>. In edit mode, the suffix <tt>/edit</tt> is appended.</li>
+ * <li>"{@value Consts#ATTRIBUTE_EDITMODE}" - <code>true</code>, if the project is to be edited.</li>
+ * </ul>
  * <p>
- * This filter sets the following attributes if the request attribute "{@value Consts#ATTRIBUTE_PROJECT}" is defined:
+ * This filter sets the following additional attributes if the request attribute "{@value Consts#ATTRIBUTE_PROJECT}"
+ * is defined:
  * <ul>
  * <li>"{@value Consts#ATTRIBUTE_PROJECTTEMPLATE}" - the {@link ProjectTemplate} assigned to the project.</li>
+ * <li>"{@value Consts#ATTRIBUTE_NATURE}" - the nature of the project.</li>
  * </ul>
- * Otherwise the path info of the request is set as attribute "{@value Consts#ATTRIBUTE_WINDOWNAME}".
- * <p>
  * This filter sets the following additional attributes if the request attributes "{@value Consts#ATTRIBUTE_PROJECT}"
  * and "{@value Consts#ATTRIBUTE_USERID}" are defined:
  * <ul>
  * <li>"{@value Consts#ATTRIBUTE_FAVORITES}" - the favorites of the logged in user.</li>
- * <li>"{@value Consts#ATTRIBUTE_SHOW_ISSUES}" - code>true</code>, if the logged in user is allowed to see the issues
+ * <li>"{@value Consts#ATTRIBUTE_SHOW_ISSUES}" - <code>true</code>, if the logged in user is allowed to see the issues
  * of the project, <code>false</code> otherwise. A user must be administrator of the project or administrator of
  * any project in the project's parent hierarchy to see issues.</li>
  * <li>"{@value Consts#ATTRIBUTE_ISSUES}" - the {@link Issues issues} of the project.</li>
@@ -90,11 +99,20 @@ public class ProjectDetailsFilter implements Filter {
         boolean isProjectAdmin = BooleanUtils.toBoolean((Boolean)request.getAttribute(Consts.ATTRIBUTE_PROJECTADMIN));
         boolean isProjectAdminInParentChain =
                 BooleanUtils.toBoolean((Boolean)request.getAttribute(Consts.ATTRIBUTE_PARENTPROJECTADMIN));
+        String action = request.getParameter(Consts.PARAM_ACTION);
 
+        String windowName = httpRequest.getPathInfo();
         if (project != null) {
+            if (!project.isDeleted()) {
+                windowName = project.getProjectId();
+            } else {
+                windowName = project.getUuid().toString();
+            }
+
             ProjectTemplateService templateService = Services.getRequiredService(ProjectTemplateService.class);
             ProjectTemplate projectTemplate = templateService.getProjectTemplateById(project.getProjectTemplateId());
             request.setAttribute(Consts.ATTRIBUTE_PROJECTTEMPLATE, projectTemplate);
+            request.setAttribute(Consts.ATTRIBUTE_NATURE, projectTemplate.getProjectNature().toString());
 
             if (userId != null) {
                 FavoritesService favoritesService = Services.getService(FavoritesService.class);
@@ -112,7 +130,6 @@ public class ProjectDetailsFilter implements Filter {
                 if (showIssues) {
                     IssuesService issuesService = Services.getService(IssuesService.class);
                     if (issuesService != null) {
-                        String action = request.getParameter(Consts.PARAM_ACTION);
                         if (Consts.PARAM_VALUE_VALIDATE.equals(action)) {
                             ValidationService validationService = Services.getService(ValidationService.class);
                             if (validationService != null) {
@@ -136,7 +153,6 @@ public class ProjectDetailsFilter implements Filter {
             if (pathInfo != null) {
                 int infoBoxIndex = pathInfo.indexOf(Consts.URL_INFOBOXES);
                 if (infoBoxIndex > 0) {
-                    final String action = request.getParameter(Consts.PARAM_ACTION);
                     if (StringUtils.isNotBlank(action)) {
                         String infoBoxShortName = pathInfo.substring(infoBoxIndex + Consts.URL_INFOBOXES.length());
                         if (infoBoxShortName.startsWith(FilterUtil.PATH_SEPARATOR)) {
@@ -146,11 +162,18 @@ public class ProjectDetailsFilter implements Filter {
                     }
                 }
             }
-
-        } else {
-            request.setAttribute(Consts.ATTRIBUTE_WINDOWNAME, httpRequest.getPathInfo());
-            // do nothing else as we have to support creation of projects and search urls, too
         }
+        request.setAttribute(Consts.ATTRIBUTE_WINDOWNAME, windowName);
+        request.setAttribute(Consts.ATTRIBUTE_EDITMODE, false);
+
+        String appUri = Consts.URL_VAADIN_PROJECTS + windowName;
+        if (StringUtils.isNotBlank(action)) {
+            if (action.equals(Consts.PARAM_VALUE_EDIT)) {
+                request.setAttribute(Consts.ATTRIBUTE_EDITMODE, true);
+                appUri = appUri + "/edit"; //$NON-NLS-1$
+            }
+        }
+        request.setAttribute(Consts.ATTRIBUTE_APP_URI, appUri);
 
         // proceed along the chain
         chain.doFilter(request, response);

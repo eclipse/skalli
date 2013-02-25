@@ -12,8 +12,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="html" uri="http://www.eclipse.org/skalli/taglib" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
-<%@ page import="org.eclipse.skalli.model.ProjectNature" %>
-<%@ page import="org.eclipse.skalli.model.Project" %>
 <%@ page import="org.eclipse.skalli.view.Consts" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -26,41 +24,6 @@
 </style>
 </head>
 <body>
-
-<%
-    String windowName = null;
-    Project project = (Project) request.getAttribute(Consts.ATTRIBUTE_PROJECT);
-    if (project != null) {
-        if (!project.isDeleted()) {
-            windowName = project.getProjectId();
-        } else {
-            windowName = project.getUuid().toString();
-        }
-    } else if (request.getAttribute(Consts.ATTRIBUTE_WINDOWNAME) != null) {
-        windowName = (String) request.getAttribute(Consts.ATTRIBUTE_WINDOWNAME);
-    } else {
-        Exception e = new RuntimeException("Problem in project servlet filter: Both attributes '"
-                + Consts.ATTRIBUTE_WINDOWNAME + "' and '" + Consts.ATTRIBUTE_PROJECT + "' are both undefined");
-        request.setAttribute("exception", e);
-        request.getRequestDispatcher("/error").forward(request, response);
-        throw new RuntimeException(e);
-    }
-
-    String appUri = Consts.URL_VAADIN_PROJECTS + windowName;
-
-    request.setAttribute(Consts.ATTRIBUTE_EDITMODE, false);
-    String action = request.getParameter(Consts.PARAM_ACTION);
-    if (action != null) {
-        if (action.equals(Consts.PARAM_VALUE_EDIT)) {
-            request.setAttribute(Consts.ATTRIBUTE_EDITMODE, true);
-            appUri = appUri + "/edit";
-        }
-    }
-
-    pageContext.setAttribute("projectNature", ProjectNature.PROJECT);
-    pageContext.setAttribute("componentNature", ProjectNature.COMPONENT);
-%>
-
 <script type="text/javascript">
 //<![CDATA[
 if(!vaadin || !vaadin.vaadinConfigurations) {
@@ -71,7 +34,7 @@ vaadin.debug = true;
 document.write('<iframe tabIndex="-1" id="__gwt_historyFrame" style="position:absolute;width:0;height:0;border:0;overflow:hidden;" src="javascript:false"></iframe>');
 document.write("<script language='javascript' src='/VAADIN/widgetsets/com.vaadin.terminal.gwt.DefaultWidgetSet/com.vaadin.terminal.gwt.DefaultWidgetSet.nocache.js'><\/script>");
 }
-vaadin.vaadinConfigurations["project"] = {appUri:'<%=appUri%>', windowName: '<%=windowName%>', themeUri:'/VAADIN/themes/simple', versionInfo : {vaadinVersion:"6.4.0",applicationVersion:"NONVERSIONED"},"comErrMsg": {"caption":"Communication problem","message" : "Take note of any unsaved data, and <u>click here</u> to continue.","url" : null}};
+vaadin.vaadinConfigurations["project"] = {appUri:'${appUri}', windowName: '${windowName}', themeUri:'/VAADIN/themes/simple', versionInfo : {vaadinVersion:"6.4.0",applicationVersion:"NONVERSIONED"},"comErrMsg": {"caption":"Communication problem","message" : "Take note of any unsaved data, and <u>click here</u> to continue.","url" : null}};
 //]]>
 </script>
 <script type="text/javascript">
@@ -110,10 +73,10 @@ setTimeout('if (typeof com_vaadin_terminal_gwt_DefaultWidgetSet == "undefined") 
     <c:if test="${project!=null && editmode==false}">
         <div class="projectheader">
             <c:choose>
-                <c:when test="${projectTemplate.projectNature == projectNature}">
+                <c:when test="${nature == 'PROJECT'}">
                     <img src="/VAADIN/themes/simple/icons/nature/project32x32.png" alt="projectnature" title="Project" />
                 </c:when>
-                <c:when test="${projectTemplate.projectNature == componentNature}">
+                <c:when test="${nature == 'COMPONENT'}">
                     <img src="/VAADIN/themes/simple/icons/nature/component32x32.png" alt="componentnature"
                         title="Component" />
                 </c:when>
