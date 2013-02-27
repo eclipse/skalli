@@ -23,6 +23,7 @@ public class Projects {
 
     private List<Project> projects;
 
+    // do not remove: required by xstream
     public Projects() {
     }
 

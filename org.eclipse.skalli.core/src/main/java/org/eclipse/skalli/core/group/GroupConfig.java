@@ -31,6 +31,7 @@ public class GroupConfig {
     @XStreamImplicit(itemFieldName = "member")
     private TreeSet<String> groupMembers = new TreeSet<String>();
 
+    // do not remove: required by xstream
     public GroupConfig() {
     }
 

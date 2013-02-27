@@ -38,6 +38,10 @@ public class GerritConfig {
     private boolean useSignedOffBy;
     private boolean subprojectsOnly;
 
+    // do not remove: required by xstream
+    public GerritConfig() {
+    }
+
     public String getProtocol() {
         return protocol;
     }

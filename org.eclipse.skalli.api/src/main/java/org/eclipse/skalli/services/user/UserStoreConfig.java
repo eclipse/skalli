@@ -21,6 +21,10 @@ public class UserStoreConfig {
     private String type;
     private boolean useLocalFallback;
 
+    // do not remove: required by xstream
+    public UserStoreConfig() {
+    }
+
     /**
      * Returns the value of the property <tt>userstore.type</tt> a user service
      * implementation must define to qualify as preferred user store.

@@ -31,6 +31,10 @@ public class PermitConfig {
 
     private transient int pos;
 
+    // do not remove: required by xstream
+    public PermitConfig() {
+    }
+
     public UUID getUuid() {
         return uuid;
     }

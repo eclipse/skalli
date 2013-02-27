@@ -22,6 +22,10 @@ public class DestinationsConfig {
     @XStreamImplicit
     private List<DestinationConfig> destinations;
 
+    // do not remove: required by xstream
+    public DestinationsConfig() {
+    }
+
     public List<DestinationConfig> getDestinations() {
         if (destinations == null) {
             destinations = new ArrayList<DestinationConfig>();

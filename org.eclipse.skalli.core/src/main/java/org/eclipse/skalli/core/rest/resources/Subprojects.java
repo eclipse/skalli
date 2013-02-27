@@ -23,6 +23,7 @@ public class Subprojects {
 
     private LinkedHashSet<Project> subprojects;
 
+    // do not remove: required by xstream
     public Subprojects() {
     }
 

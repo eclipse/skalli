@@ -18,6 +18,9 @@ public class LinkMappingConfig {
     private String template;
     private String name;
 
+    public LinkMappingConfig() {
+    }
+
     public LinkMappingConfig(String id, String purpose, String pattern, String template, String name) {
         this.id = id;
         this.purpose = purpose;

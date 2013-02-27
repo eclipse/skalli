@@ -21,6 +21,7 @@ public class TopLinksConfig {
     @XStreamImplicit
     private ArrayList<TopLinkConfig> topLinks;
 
+    // do not remove: required by xstream
     public TopLinksConfig() {
     }
 

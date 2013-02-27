@@ -29,6 +29,7 @@ public class RoleConfig {
     @XStreamImplicit(itemFieldName = "group")
     private TreeSet<String> groups = new TreeSet<String>();
 
+    // do not remove: required by xstream
     public RoleConfig() {
     }
 

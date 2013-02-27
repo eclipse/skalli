@@ -23,6 +23,10 @@ public class ValidationsConfig {
     @XStreamImplicit
     private ArrayList<ValidationConfig> validationConfigs;
 
+    // do not remove: required by xstream
+    public ValidationsConfig() {
+    }
+
     public ValidationsConfig(Collection<ValidationConfig> validationConfigs) {
         this.validationConfigs = new ArrayList<ValidationConfig>(validationConfigs);
     }

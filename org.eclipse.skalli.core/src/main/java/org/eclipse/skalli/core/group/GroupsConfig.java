@@ -24,10 +24,11 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @XStreamAlias("groups")
 public class GroupsConfig {
 
+    // do not remove: required by xstream
     public GroupsConfig() {
     }
 
-    GroupsConfig(List<GroupConfig> groups) {
+    public GroupsConfig(List<GroupConfig> groups) {
         getGroups().addAll(groups);
     }
 

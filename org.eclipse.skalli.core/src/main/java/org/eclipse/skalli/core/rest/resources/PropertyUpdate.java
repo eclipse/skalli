@@ -12,6 +12,10 @@ public class PropertyUpdate {
 
     private String template = "";//$NON-NLS-1$
 
+    // do not remove: required by xstream
+    public PropertyUpdate() {
+    }
+
     public String getTemplate() {
         return template;
     }

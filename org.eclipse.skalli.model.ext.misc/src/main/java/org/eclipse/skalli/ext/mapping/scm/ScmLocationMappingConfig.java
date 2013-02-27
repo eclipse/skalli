@@ -19,8 +19,13 @@ public class ScmLocationMappingConfig extends LinkMappingConfig {
 
     private String provider;
 
-    public ScmLocationMappingConfig(String id, String provider, String purpose, String pattern, String template,
-            String name) {
+    // do not remove: required by xstream
+    public ScmLocationMappingConfig() {
+        super();
+    }
+
+    public ScmLocationMappingConfig(String id, String provider, String purpose, String pattern,
+            String template, String name) {
         super(id, purpose, pattern, template, name);
         this.provider = provider;
     }

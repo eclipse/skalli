@@ -18,6 +18,7 @@ public class TopLinkConfig {
     private String displayName;
     private String url;
 
+    // do not remove: required by xstream
     public TopLinkConfig() {
     }
 

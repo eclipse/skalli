@@ -38,6 +38,10 @@ public class PermitsConfig {
     @XStreamImplicit(itemFieldName = "permit")
     private List<PermitConfig> permits;
 
+    // do not remove: required by xstream
+    public PermitsConfig() {
+    }
+
     /**
      * Returns the (unmodifiable) set of permits of
      * this configuration, or an empty set.

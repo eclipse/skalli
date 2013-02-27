@@ -22,6 +22,10 @@ public class MailingListMappingsConfig {
     @XStreamImplicit
     private ArrayList<MailingListMappingConfig> mailingListMappings;
 
+    // do not remove: required by xstream
+    public MailingListMappingsConfig() {
+    }
+
     public MailingListMappingsConfig(ArrayList<MailingListMappingConfig> mailingListMappings) {
         this.mailingListMappings = mailingListMappings;
     }

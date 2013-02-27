@@ -22,6 +22,10 @@ public class ScmLocationMappingsConfig {
     @XStreamImplicit
     private ArrayList<ScmLocationMappingConfig> scmMapping;
 
+    // do not remove: required by xstream
+    public ScmLocationMappingsConfig() {
+    }
+
     public ScmLocationMappingsConfig(ArrayList<ScmLocationMappingConfig> scmMappings) {
         this.scmMapping = scmMappings;
     }

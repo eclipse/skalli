@@ -21,6 +21,7 @@ public class NewsConfig {
     private String alert;
     private String info;
 
+    // do not remove: required by xstream
     public NewsConfig() {
     }
 

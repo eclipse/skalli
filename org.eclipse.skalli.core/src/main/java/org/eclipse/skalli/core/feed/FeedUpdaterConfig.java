@@ -19,6 +19,7 @@ public class FeedUpdaterConfig {
 
     private Schedule schedule;
 
+    // do not remove: required by xstream
     public FeedUpdaterConfig() {
     }
 

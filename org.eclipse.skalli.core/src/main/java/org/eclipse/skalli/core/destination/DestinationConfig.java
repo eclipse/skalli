@@ -24,6 +24,7 @@ public class DestinationConfig {
     private String password;
     private String service;
 
+    // do not remove: required by xstream
     public DestinationConfig() {
     }
 

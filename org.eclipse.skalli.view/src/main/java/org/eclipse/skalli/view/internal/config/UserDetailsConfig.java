@@ -17,6 +17,7 @@ public class UserDetailsConfig {
 
     private String url;
 
+    // do not remove: required by xstream
     public UserDetailsConfig() {
     }
 

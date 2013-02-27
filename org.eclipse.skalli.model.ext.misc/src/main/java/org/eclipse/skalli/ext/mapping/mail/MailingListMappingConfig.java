@@ -17,6 +17,11 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("mailingListMapping")
 public class MailingListMappingConfig extends LinkMappingConfig {
 
+    // do not remove: required by xstream
+    public MailingListMappingConfig() {
+        super();
+    }
+
     public MailingListMappingConfig(String id, String purpose, String pattern, String template, String name) {
         super(id, purpose, pattern, template, name);
     }

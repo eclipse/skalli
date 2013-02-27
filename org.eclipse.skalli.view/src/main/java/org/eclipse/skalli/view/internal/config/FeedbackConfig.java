@@ -18,6 +18,7 @@ public class FeedbackConfig {
     private String url;
     private String displayName;
 
+    // do not remove: required by xstream
     public FeedbackConfig() {
     }
 

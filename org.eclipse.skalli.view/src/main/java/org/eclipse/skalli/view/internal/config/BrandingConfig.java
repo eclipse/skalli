@@ -19,6 +19,10 @@ public class BrandingConfig {
     private String searchPluginTitle;
     private String searchPluginDescription;
 
+    // do not remove: required by xstream
+    public BrandingConfig() {
+    }
+
     public String getPageTitle() {
         return pageTitle;
     }

@@ -20,6 +20,7 @@ public class MavenResolverConfig {
     private Schedule schedule;
     private String userId;
 
+    // do not remove: required by xstream
     public MavenResolverConfig() {
     }
 

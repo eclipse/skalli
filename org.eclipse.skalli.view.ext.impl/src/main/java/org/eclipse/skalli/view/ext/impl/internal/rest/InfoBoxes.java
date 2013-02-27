@@ -23,6 +23,7 @@ public class InfoBoxes {
 
     private List<InfoBox> infoboxes;
 
+    // do not remove: required by xstream
     public InfoBoxes() {
     }
 

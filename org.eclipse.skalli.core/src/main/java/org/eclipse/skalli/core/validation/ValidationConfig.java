@@ -25,6 +25,7 @@ public class ValidationConfig {
     private String userId;
     private String entityType;
 
+    // do not remove: required by xstream
     public ValidationConfig() {
     }
 

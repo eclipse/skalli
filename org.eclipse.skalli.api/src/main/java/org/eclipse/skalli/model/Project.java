@@ -72,6 +72,7 @@ public class Project extends ExtensibleEntityBase {
     private String phase = INITIAL_PHASE;
     private long registered = 0;
 
+    // do not remove: required by xstream
     public Project() {
     }
 

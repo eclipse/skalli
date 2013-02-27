@@ -32,6 +32,10 @@ public class LDAPConfig {
 
     private String cacheSize;
 
+    // do not remove: required by xstream
+    public LDAPConfig() {
+    }
+
     public String getPassword() {
         return password;
     }

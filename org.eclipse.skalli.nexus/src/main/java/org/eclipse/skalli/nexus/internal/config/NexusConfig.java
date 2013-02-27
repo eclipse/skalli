@@ -19,6 +19,7 @@ public class NexusConfig {
     private String domain;
     private String target;
 
+    // do not remove: required by xstream
     public NexusConfig() {
     }
 

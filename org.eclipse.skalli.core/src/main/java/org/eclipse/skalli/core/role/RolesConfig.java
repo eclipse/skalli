@@ -22,6 +22,7 @@ public class RolesConfig {
     @XStreamImplicit
     private ArrayList<RoleConfig> roles = new ArrayList<RoleConfig>();
 
+    // do not remove: required by xstream
     public RolesConfig() {
     }
 

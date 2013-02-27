@@ -21,6 +21,10 @@ public class ProxyConfig {
     private String portSSL;
     private String nonProxyHosts;
 
+    // do not remove: required by xstream
+    public ProxyConfig() {
+    }
+
     public String getHost() {
         return host;
     }
