@@ -101,7 +101,7 @@ public class ProjectDetailsFilter implements Filter {
                 BooleanUtils.toBoolean((Boolean)request.getAttribute(Consts.ATTRIBUTE_PARENTPROJECTADMIN));
         String action = request.getParameter(Consts.PARAM_ACTION);
 
-        String windowName = httpRequest.getPathInfo();
+        String windowName = StringUtils.strip(httpRequest.getPathInfo(), "/"); //$NON-NLS-1$
         if (project != null) {
             if (!project.isDeleted()) {
                 windowName = project.getProjectId();
