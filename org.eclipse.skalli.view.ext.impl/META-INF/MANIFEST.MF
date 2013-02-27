@@ -76,7 +76,6 @@ Service-Component: OSGI-INF/BasicForm.xml,
  OSGI-INF/ExtensionServiceAddProjectToJira.xml,
  OSGI-INF/ExtensionServiceCreateGitGerritRepo.xml,
  OSGI-INF/ExtensionServiceRequestP4Project.xml,
- OSGI-INF/ExtensionServiceRefreshInfoBoxes.xml,
  OSGI-INF/FeedInfoBox.xml,
  OSGI-INF/InfoBoxesRestExtension.xml
 Bundle-ActivationPolicy: lazy

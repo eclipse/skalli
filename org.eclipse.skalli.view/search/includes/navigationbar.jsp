@@ -31,8 +31,9 @@
     </c:if>
     <c:if test="${isProjectAdmin == true && editmode == false}">
         <div style="font-weight: bold; padding-bottom: 2px">This Project</div>
-        <a href="<%=request.getRequestURI() + "?" + Consts.PARAM_ACTION + "=" + Consts.PARAM_VALUE_EDIT%>" target="_top">Edit</a><br />
-          <c:forEach var="link" items="${projectContextLinks}" >
+        <a href="<%=request.getRequestURI() + "?action=edit"%>" target="_top">Edit</a><br />
+        <a href="<%=request.getRequestURI() + "/infoboxes?action=refresh"%>" target="_top">Refresh</a><br />
+        <c:forEach var="link" items="${projectContextLinks}" >
             <%-- render the project context links --%>
             <c:set var="linkCaption" value="${link.caption}" />
             <c:set var="linkUri" value="${link.uri}" />
