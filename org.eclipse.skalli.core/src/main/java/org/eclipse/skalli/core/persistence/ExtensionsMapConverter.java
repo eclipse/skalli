@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.persistence;
 
-import java.util.TreeSet;
+import java.util.ArrayList;
 
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.ExtensionsMap;
@@ -21,26 +21,40 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
+/**
+ * Converter for marshaling/unmarshaling {@link ExtensionsMap}s with XStream.
+ */
 public class ExtensionsMapConverter implements Converter {
 
     @Override
-    public boolean canConvert(Class type) {
+    public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
         return ExtensionsMap.class.isAssignableFrom(type);
     }
 
+    /**
+     * Marshals extensions stored in the given {@link ExtensionsMap} with a guaranteed
+     * stable ordering, i.e. by comparing the names of extension classes.
+     */
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         ExtensionsMap map = (ExtensionsMap) source;
-        TreeSet<ExtensionEntityBase> set = new TreeSet<ExtensionEntityBase>(map.getAllExtensions());
-        context.convertAnother(set);
+        ArrayList<ExtensionEntityBase> sortedList = new ArrayList<ExtensionEntityBase>(map.getAllExtensions());
+        context.convertAnother(sortedList);
     }
 
+    /**
+     * Unmarshals extensions and returns an <code>ExtensionsMap</code>.
+     * Extensions that cannot be resolved, e.g. because there is no corresponding
+     * extension class available, are ignored.
+     */
     @Override
     public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         ExtensionsMap map = new ExtensionsMap();
-        TreeSet<?> set = (TreeSet<?>) context.convertAnother(map, TreeSet.class);
-        for (Object o : set) {
-            map.putExtension((ExtensionEntityBase) o);
+        ArrayList<?> sortedList = (ArrayList<?>) context.convertAnother(map, ArrayList.class);
+        for (Object entry : sortedList) {
+            if (entry != null) {
+                map.putExtension((ExtensionEntityBase) entry);
+            }
         }
         return map;
     }

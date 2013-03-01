@@ -10,6 +10,12 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.persistence;
 
+/**
+ * Dummy class representing an unknown tag when unmarshaling entities or configurations with XStream.
+ */
 public class Noop {
+
+    public Noop() {
+    }
 
 }

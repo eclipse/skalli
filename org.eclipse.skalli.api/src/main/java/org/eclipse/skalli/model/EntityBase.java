@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * This class defines one property, <code>uuid</code>, that must be a
  * globally unique identifier. Once set, the <code>uuid</code> is immutable.
  */
-public abstract class EntityBase implements Comparable<Object> {
+public abstract class EntityBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(EntityBase.class);
 
@@ -453,18 +453,5 @@ public abstract class EntityBase implements Comparable<Object> {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        if (o != null) {
-            int ret = 0;
-            if (ret == 0) {
-                ret = this.getClass().getName().compareTo(o.getClass().getName());
-            }
-            return ret;
-        } else {
-            return -1;
-        }
     }
 }

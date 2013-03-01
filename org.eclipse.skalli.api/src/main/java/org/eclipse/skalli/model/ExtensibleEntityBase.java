@@ -89,12 +89,11 @@ public abstract class ExtensibleEntityBase extends ExtensionEntityBase {
     /**
      * Retrieves all assigned model extensions.
      *
-     * @return  an unmodifiable but sorted set of all extensions (see
-     * {@link EntityBase#compareTo(Object)}).
+     * @return  an unmodifiable but sorted set of all extensions (see {@link ExtensionsComparator}).
      */
     public SortedSet<ExtensionEntityBase> getAllExtensions() {
         if (extensions == null) {
-            return new TreeSet<ExtensionEntityBase>();
+            return new TreeSet<ExtensionEntityBase>(new ExtensionsComparator());
         }
         return extensions.getAllExtensions();
     }

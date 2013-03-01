@@ -251,17 +251,4 @@ public class EntityBaseTest {
 
         Assert.assertFalse(entity1.equals(TestUUIDs.TEST_UUIDS[1]));
     }
-
-    @Test
-    public void testCompareTo() {
-        TestEntityBase1 entity1 = new TestEntityBase1();
-        entity1.setUuid(TestUUIDs.TEST_UUIDS[0]);
-        TestEntityBase2 entity2 = new TestEntityBase2();
-        entity2.setUuid(TestUUIDs.TEST_UUIDS[1]);
-
-        Assert.assertEquals(0, entity1.compareTo(entity1));
-        Assert.assertEquals(0, entity2.compareTo(entity2));
-        Assert.assertTrue(entity1.compareTo(entity2) < 0);
-        Assert.assertTrue(entity2.compareTo(entity1) > 0);
-    }
 }

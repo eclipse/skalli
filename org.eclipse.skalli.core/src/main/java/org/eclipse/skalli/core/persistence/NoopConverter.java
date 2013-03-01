@@ -16,22 +16,30 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
+/**
+ * Converter for skipping unknown tags when unmarshaling entities or configurations.
+ * Be careful using this converter to unmarshal entries of collections that cannot
+ * handle <code>null</code> pointers, like for example <code>TreeSet</code>.
+ */
 public class NoopConverter implements Converter {
 
     @Override
-    public void marshal(Object arg0, HierarchicalStreamWriter arg1, MarshallingContext arg2) {
-        // do nothing
+    public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
+        return type.equals(Noop.class);
     }
 
+    /**
+     * This method does nothing.
+     */
     @Override
-    public Object unmarshal(HierarchicalStreamReader arg0, UnmarshallingContext arg1) {
-        // do nothing
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext contex) {
+    }
+
+    /**
+     * This method always returns <code>null</code>.
+     */
+    @Override
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
         return null;
     }
-
-    @Override
-    public boolean canConvert(Class className) {
-        return className.equals(Noop.class);
-    }
-
 }

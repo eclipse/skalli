@@ -45,11 +45,13 @@ public class ExtensionsMap {
 
     /**
      * Returns all currently stored extensions sorted according to
-     * {@link ExtensionEntityBase#compareTo(Object)}. Note, the returned
+     * {@link ExtensionsComparator}, i.e. by class name. Note, the returned
      * set is not backed by the underlying storage.
      */
     public SortedSet<ExtensionEntityBase> getAllExtensions() {
-        return new TreeSet<ExtensionEntityBase>(extensions.values());
+        TreeSet<ExtensionEntityBase> result = new TreeSet<ExtensionEntityBase>(new ExtensionsComparator());
+        result.addAll(extensions.values());
+        return result;
     }
 
     /**

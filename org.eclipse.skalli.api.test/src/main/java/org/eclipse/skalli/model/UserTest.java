@@ -162,10 +162,6 @@ public class UserTest {
         user2 = new User("homer1", "Homer", "Simpson", null);
         assertTrue(user1.compareTo(user2) < 0);
         assertTrue(user2.compareTo(user1) > 0);
-
-        // EntityBase#compare() compares class names:
-        // org.eclipse.skalli.model.User > java.lang.String
-        assertTrue(user1.compareTo("foobar") > 0);
     }
 
 }

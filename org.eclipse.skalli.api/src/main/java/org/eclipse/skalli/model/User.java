@@ -16,7 +16,7 @@ import org.eclipse.skalli.commons.ComparatorUtils;
 /**
  * This class represents a generic user.
  */
-public class User extends EntityBase {
+public class User extends EntityBase implements Comparable<User> {
 
     /** The version of this model entity ({@value}) */
     public static final String MODEL_VERSION = "1.0"; //$NON-NLS-1$
@@ -308,20 +308,13 @@ public class User extends EntityBase {
      * unique identifier (in this order).
      */
     @Override
-    public int compareTo(Object o) {
-        int ret = 0;
-        if (o instanceof User) {
-            User u = (User) o;
-            ret = ComparatorUtils.compare(lastname, u.lastname);
-            if (ret == 0) {
-                ret = ComparatorUtils.compare(firstname, u.firstname);
-                if (ret == 0) {
-                    ret =  ComparatorUtils.compare(userId, u.userId);
-                }
-            }
-        }
+    public int compareTo(User user) {
+        int ret = ComparatorUtils.compare(lastname, user.lastname);
         if (ret == 0) {
-            ret = super.compareTo(o);
+            ret = ComparatorUtils.compare(firstname, user.firstname);
+            if (ret == 0) {
+                ret =  ComparatorUtils.compare(userId, user.userId);
+            }
         }
         return ret;
     }

@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest.resources;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
 
 import org.eclipse.skalli.model.ExtensionEntityBase;
@@ -116,8 +116,7 @@ class ProjectConverter extends CommonProjectConverter {
 
     private Set<ExtensionEntityBase> iterateExtensions(HierarchicalStreamReader reader,
             UnmarshallingContext context) {
-        Set<ExtensionEntityBase> extensions = new TreeSet<ExtensionEntityBase>();
-
+        HashSet<ExtensionEntityBase> extensions = new HashSet<ExtensionEntityBase>();
         while (reader.hasMoreChildren()) {
             reader.moveDown();
             String field = reader.getNodeName();
