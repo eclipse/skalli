@@ -83,6 +83,8 @@ public interface GerritClient {
      *            optional, defaults to <code>false</code>
      * @param useSignedOffBy
      *            optional, defaults to <code>false</code>
+     * @param emptyCommit
+     *            optional, defaults to <code>false</code>
      *
      * @throws ConnectionException      in case of connection / communication problems
      * @throws CommandException         in case of unsuccessful commands
@@ -90,10 +92,10 @@ public interface GerritClient {
      *
      * @see <tt>gerrit create-project</tt>
      */
-    public void createProject(final String name, final String branch, final Set<String> ownerList, final String parent,
-            final boolean permissionsOnly, final String description, final SubmitType submitType,
-            final boolean useContributorAgreements, final boolean useSignedOffBy) throws ConnectionException,
-            CommandException;
+    public void createProject(String name, String branch, Set<String> ownerList, String parent,
+            boolean permissionsOnly, String description, SubmitType submitType,
+            boolean useContributorAgreements, boolean useSignedOffBy, boolean emptyCommit)
+                    throws ConnectionException, CommandException;
 
     /**
      * Returns the list of all globally visible projects.

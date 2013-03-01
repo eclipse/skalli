@@ -66,6 +66,7 @@ public class GitGerritFilter implements Filter {
     public static final String PARAMETER_REPO = "repo"; //$NON-NLS-1$
     public static final String PARAMETER_PARENT = "parent"; //$NON-NLS-1$
     public static final String PARAMETER_PERMITS_ONLY = "permitsOnly"; //$NON-NLS-1$
+    public static final String PARAMETER_EMPTY_COMMIT = "emptyCommit"; //$NON-NLS-1$
     public static final String PARAMETER_PROPOSE_EXISTING_PROJECTS = "proposeExistingProjects"; //$NON-NLS-1$
     public static final String PARAMETER_PROPOSE_EXISTING_GROUPS = "proposeExistingGroups"; //$NON-NLS-1$
 
@@ -80,6 +81,7 @@ public class GitGerritFilter implements Filter {
     public static final String ATTRIBUTE_PROPOSED_REPO = "proposedRepo"; //$NON-NLS-1$
     public static final String ATTRIBUTE_PROPOSED_PARENT = "proposedParent"; //$NON-NLS-1$
     public static final String ATTRIBUTE_PERMITS_ONLY = "permitsOnly"; //$NON-NLS-1$
+    public static final String ATTRIBUTE_EMPTY_COMMIT = "emptyCommit"; //$NON-NLS-1$
     public static final String ATTRIBUTE_PROPOSED_EXISTING_PROJECTS = "proposedExistingProjects"; //$NON-NLS-1$
     public static final String ATTRIBUTE_PROPOSED_EXISTING_GROUPS = "proposedExistingGroups"; //$NON-NLS-1$
     public static final String ATTRIBUTE_INVALID_GROUP = "invalidGroup"; //$NON-NLS-1$
@@ -175,6 +177,9 @@ public class GitGerritFilter implements Filter {
         final String repository = request.getParameter(PARAMETER_REPO);
         final String parent = request.getParameter(PARAMETER_PARENT);
         final boolean permitsOnly = PARAMETER_PERMITS_ONLY.equals(request.getParameter(PARAMETER_PERMITS_ONLY));
+        final boolean emptyCommit = request.getParameter(PARAMETER_EMPTY_COMMIT) != null?
+                PARAMETER_EMPTY_COMMIT.equals(request.getParameter(PARAMETER_EMPTY_COMMIT)) :
+                StringUtils.isBlank(action);
 
         GerritClient client = null;
         try {
@@ -215,6 +220,7 @@ public class GitGerritFilter implements Filter {
                 request.setAttribute(ATTRIBUTE_PROPOSED_PARENT,
                         StringUtils.isNotBlank(parent) ? parent : gerritConfig.getParent());
                 request.setAttribute(ATTRIBUTE_PERMITS_ONLY, permitsOnly);
+                request.setAttribute(ATTRIBUTE_EMPTY_COMMIT, emptyCommit);
                 String groupMode = request.getParameter(PARAMETER_PROPOSE_EXISTING_GROUPS);
                 if ("related".equals(groupMode)) { //$NON-NLS-1$
                     request.setAttribute(ATTRIBUTE_PROPOSED_EXISTING_GROUPS,
@@ -306,7 +312,8 @@ public class GitGerritFilter implements Filter {
                                         projectDescription,
                                         gerritConfig.getSubmitType(),
                                         gerritConfig.isUseContributorAgreement(),
-                                        gerritConfig.isUseSignedOffBy());
+                                        gerritConfig.isUseSignedOffBy(),
+                                        emptyCommit);
                             }
                         }
 

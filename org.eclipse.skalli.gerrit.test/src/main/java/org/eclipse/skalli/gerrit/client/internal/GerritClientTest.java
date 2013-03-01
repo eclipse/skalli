@@ -166,7 +166,7 @@ public class GerritClientTest {
     public void testProjectExists() throws Exception {
         final String name = generateName("p");
         Assert.assertFalse(client.projectExists(name));
-        client.createProject(name, null, null, null, false, DESCRIPTION, null, false, false);
+        client.createProject(name, null, null, null, false, DESCRIPTION, null, false, false, true);
         Assert.assertTrue(client.projectExists(name));
     }
 
@@ -192,7 +192,7 @@ public class GerritClientTest {
         final String name = generateName("p");
 
         Assert.assertFalse(client.projectExists(name));
-        client.createProject(name, null, null, null, false, DESCRIPTION, null, false, false);
+        client.createProject(name, null, null, null, false, DESCRIPTION, null, false, false, true);
         Assert.assertTrue(client.projectExists(name));
     }
 
@@ -200,8 +200,8 @@ public class GerritClientTest {
     public void testCreateProjectTwice() throws Exception {
         final String name = generateName("p");
 
-        client.createProject(name, null, null, null, false, DESCRIPTION, null, false, false);
-        client.createProject(name, null, null, null, false, DESCRIPTION, null, false, false);
+        client.createProject(name, null, null, null, false, DESCRIPTION, null, false, false, true);
+        client.createProject(name, null, null, null, false, DESCRIPTION, null, false, false, true);
     }
 
     @Test
@@ -227,10 +227,10 @@ public class GerritClientTest {
         client.createGroup(g2, null, DESCRIPTION, null);
         client.createGroup(g3, null, DESCRIPTION, null);
 
-        client.createProject(p1, null, new HashSet<String>(Arrays.asList(g1, g2)), null, false, DESCRIPTION, null,
-                false, false);
-        client.createProject(p2, null, new HashSet<String>(Arrays.asList(g2, g3)), null, false, DESCRIPTION, null,
-                false, false);
+        client.createProject(p1, null, new HashSet<String>(Arrays.asList(g1, g2)), null, false,
+                DESCRIPTION, null, false, false, true);
+        client.createProject(p2, null, new HashSet<String>(Arrays.asList(g2, g3)), null, false,
+                DESCRIPTION, null, false, false, true);
 
         List<String> groupsForP1 = client.getGroups(p1);
         Assert.assertTrue(groupsForP1.contains(g1));
@@ -257,9 +257,9 @@ public class GerritClientTest {
         client.createGroup(g3, null, DESCRIPTION, null);
 
         client.createProject(p1, null, new HashSet<String>(Arrays.asList(g1)), null, false, DESCRIPTION,
-                null, false, false);
+                null, false, false, true);
         client.createProject(p2, null, new HashSet<String>(Arrays.asList(g2)), null, false, DESCRIPTION,
-                null, false, false);
+                null, false, false, true);
 
         List<String> groupsForP1 = client.getGroups(p1, p2);
         Assert.assertTrue(groupsForP1.contains(g1));
@@ -276,7 +276,8 @@ public class GerritClientTest {
         for (String invalidProjectName : invalidProjectNames) {
             Assert.assertNotNull(client.checkProjectName(invalidProjectName));
             try {
-                client.createProject(invalidProjectName, null, null, null, false, DESCRIPTION, null, false, false);
+                client.createProject(invalidProjectName, null, null, null, false,
+                        DESCRIPTION, null, false, false, true);
                 Assert.fail(String.format("No error for project name '%s'.", invalidProjectName));
             } catch (GerritClientException e) {
                 LOG.debug(MessageFormat.format("'{0}' is identified as an invalid project name.", invalidProjectName));

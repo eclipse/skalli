@@ -167,10 +167,10 @@ public class GerritClientImpl implements GerritClient {
     }
 
     @Override
-    public void createProject(final String name, final String branch, final Set<String> ownerList, final String parent,
-            final boolean permissionsOnly, final String description, final SubmitType submitType,
-            final boolean useContributorAgreements, final boolean useSignedOffBy) throws ConnectionException,
-            CommandException {
+    public void createProject(String name, String branch, Set<String> ownerList, String parent,
+            boolean permissionsOnly, String description, SubmitType submitType,
+            boolean useContributorAgreements, boolean useSignedOffBy, boolean emptyCommit)
+                    throws ConnectionException, CommandException {
         final StringBuffer sb = new StringBuffer("gerrit create-project");
 
         if (name == null) {
@@ -193,7 +193,7 @@ public class GerritClientImpl implements GerritClient {
         appendArgument(sb, "require-change-id", true);
 
         // available since 2.1.6-rc1 & needed so that Hudson does not struggle with empty projects.
-        appendArgument(sb, "empty-commit", true);
+        appendArgument(sb, "empty-commit", emptyCommit);
 
         sshCommand(sb.toString());
     }

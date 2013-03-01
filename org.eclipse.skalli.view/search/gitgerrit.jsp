@@ -209,6 +209,16 @@ Create Git Repository and Gerrit Project
           <label for="permitsOnly">Permissions-Only Project</label>
         </p>
         <p class="formheader">
+          Create the Git repository with an empty <b>Initial Commit</b> (recommended).<br/>
+          Some tools cannot handle completely empty repositories. However, in some cases, for example when
+          migrating an existing repository, you might want Gerrit to skip the creation of the initial commit.
+        </p>
+        <p>
+          <input type="checkbox" id="emptyCommit" name="<%= GitGerritFilter.PARAMETER_EMPTY_COMMIT %>"
+            value="emptyCommit" <c:if test="${emptyCommit}">checked="checked"</c:if> />
+          <label for="emptyCommit">Create Repository with Initial Commit</label>
+        </p>
+        <p class="formheader">
           <input type="submit" name="submitForCheck" value="Check" class="searchsubmit"/>
           <a href="/projects/${project.projectId}" class="cancel searchsubmit">Cancel</a>
         </p>
@@ -264,6 +274,7 @@ Create Git Repository and Gerrit Project
             value="${param.proposeExistingProjects}" />
           <input type="hidden" name="<%= GitGerritFilter.PARAMETER_PARENT %>" value="${param.parent}" />
           <input type="hidden" name="<%= GitGerritFilter.PARAMETER_PERMITS_ONLY %>" value="${param.permitsOnly}" />
+          <input type="hidden" name="<%= GitGerritFilter.PARAMETER_EMPTY_COMMIT %>" value="${param.emptyCommit}" />
           <input type="hidden" name="<%= GitGerritFilter.PARAMETER_PROPOSE_EXISTING_GROUPS %>"
             value="${param.proposeExistingGroups}" />
           <input type="hidden" name="action" value="<%= GitGerritFilter.ACTION_SAVE %>"/>
@@ -277,6 +288,7 @@ Create Git Repository and Gerrit Project
           <input type="hidden" name="<%= GitGerritFilter.PARAMETER_PROPOSE_EXISTING_PROJECTS %>" value="${param.proposeExistingProjects}" />
           <input type="hidden" name="<%= GitGerritFilter.PARAMETER_PARENT %>" value="${param.parent}" />
           <input type="hidden" name="<%= GitGerritFilter.PARAMETER_PERMITS_ONLY %>" value="${param.permitsOnly}" />
+          <input type="hidden" name="<%= GitGerritFilter.PARAMETER_EMPTY_COMMIT %>" value="${param.emptyCommit}" />
           <input type="hidden" name="<%= GitGerritFilter.PARAMETER_PROPOSE_EXISTING_GROUPS %>" value="${param.proposeExistingGroups}" />
           <input type="submit" name="submit" value="Back" class="searchsubmit" />
         </form>
@@ -344,6 +356,7 @@ Create Git Repository and Gerrit Project
               value="${param.proposeExistingProjects}" />
             <input type="hidden" name="<%= GitGerritFilter.PARAMETER_PARENT %>" value="${param.parent}" />
             <input type="hidden" name="<%= GitGerritFilter.PARAMETER_PERMITS_ONLY %>" value="${param.permitsOnly}" />
+            <input type="hidden" name="<%= GitGerritFilter.PARAMETER_EMPTY_COMMIT %>" value="${param.emptyCommit}" />
             <input type="hidden" name="<%= GitGerritFilter.PARAMETER_PROPOSE_EXISTING_GROUPS %>"
               value="${param.proposeExistingGroups}" />
             <input type="hidden" name="action" value="<%= GitGerritFilter.ACTION_CHECK %>"/>
