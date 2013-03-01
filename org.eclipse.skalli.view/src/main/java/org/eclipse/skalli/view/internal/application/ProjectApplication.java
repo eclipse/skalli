@@ -55,7 +55,7 @@ public class ProjectApplication extends com.vaadin.Application implements HttpSe
         if (project != null) {
             ProjectWindow projectWindow = (ProjectWindow) getWindow(project.getProjectId());
             if (projectWindow != null) {
-                projectWindow.refreshProject(project);
+                projectWindow.setProject(project);
                 projectWindow.requestRepaint();
             }
         }

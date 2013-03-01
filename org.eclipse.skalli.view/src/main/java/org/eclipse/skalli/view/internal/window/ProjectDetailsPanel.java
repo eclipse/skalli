@@ -45,11 +45,11 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Window.Notification;
 
-public class ProjectViewPanel extends CssLayout {
+public class ProjectDetailsPanel extends CssLayout implements ProjectPanel {
 
     private static final long serialVersionUID = -2756706292280384313L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(ProjectViewPanel.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProjectDetailsPanel.class);
 
     private static final String STYLE_EAST_COLUMN = "east-column"; //$NON-NLS-1$
     private static final String STYLE_WEST_COLUMN = "west-column"; //$NON-NLS-1$
@@ -61,7 +61,7 @@ public class ProjectViewPanel extends CssLayout {
     private final CssLayout leftLayout;
     private final CssLayout rightLayout;
 
-    public ProjectViewPanel(ProjectApplication application, Navigator navigator, Project project) {
+    public ProjectDetailsPanel(ProjectApplication application, Navigator navigator, Project project) {
         super();
 
         this.application = application;
@@ -83,6 +83,7 @@ public class ProjectViewPanel extends CssLayout {
         renderContent();
     }
 
+    @Override
     public Project getProject() {
         return project;
     }

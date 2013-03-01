@@ -25,7 +25,6 @@ import java.util.TreeSet;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
-import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.User;
@@ -62,7 +61,7 @@ import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-public class ProjectEditPanel extends Panel implements Issuer {
+public class ProjectEditPanel extends Panel implements ProjectPanel {
 
     private static final long serialVersionUID = 2377962084815410728L;
 
@@ -163,6 +162,7 @@ public class ProjectEditPanel extends Panel implements Issuer {
         renderContent((VerticalLayout) getContent());
     }
 
+    @Override
     public Project getProject() {
         return project;
     }

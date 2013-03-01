@@ -28,13 +28,12 @@ import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 
-public class TemplateSelectPanel extends Panel {
+public class NewProjectPanel extends Panel implements ProjectPanel {
 
     private static final long serialVersionUID = 4432418022051563046L;
 
@@ -53,7 +52,7 @@ public class TemplateSelectPanel extends Panel {
 
     private final Set<ProjectTemplate> projectTemplates;
 
-    public TemplateSelectPanel(ProjectApplication application, ProjectWindow window, Navigator navigator) {
+    public NewProjectPanel(ProjectApplication application, ProjectWindow window, Navigator navigator) {
         this.application = application;
         this.navigator = navigator;
         this.window = window;
@@ -64,6 +63,11 @@ public class TemplateSelectPanel extends Panel {
         setSizeFull();
         setStyleName(STYLE_TEMPLATE_SELECT);
         renderContent((VerticalLayout) getContent());
+    }
+
+    @Override
+    public Project getProject() {
+        return null;
     }
 
     /**
@@ -120,13 +124,13 @@ public class TemplateSelectPanel extends Panel {
         @Override
         public void buttonClick(ClickEvent event) {
             ProjectService projectService = Services.getRequiredService(ProjectService.class);
-            Project project = projectService.createProject(select.getSelected(), application.getLoggedInUser());
+            Project newProject = projectService.createProject(select.getSelected(), application.getLoggedInUser());
 
             PermitService permitService = Services.getRequiredService(PermitService.class);
-            permitService.switchProject(project);
+            permitService.switchProject(newProject);
 
-            Component component = new ProjectEditPanel(application, navigator, project, ProjectEditMode.NEW_PROJECT);
-            window.setMainContent(component);
+            ProjectEditPanel panel = new ProjectEditPanel(application, navigator, newProject, ProjectEditMode.NEW_PROJECT);
+            window.renderPanel(panel);
         }
     }
 

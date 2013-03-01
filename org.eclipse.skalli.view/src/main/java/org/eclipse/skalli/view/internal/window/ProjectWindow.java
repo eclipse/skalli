@@ -18,26 +18,21 @@ import org.eclipse.skalli.view.ext.ProjectEditMode;
 import org.eclipse.skalli.view.internal.application.ProjectApplication;
 import org.eclipse.skalli.view.internal.application.ProjectNavigator;
 
-import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-/**
- * implements the project portal page that renders information about a
- * particular project
- */
 @SuppressWarnings("serial")
 public class ProjectWindow extends Window {
 
+    private static final String STYLE_WINDOW = "projectwindow"; //$NON-NLS-1$
     private static final String STYLE_PROJECT = "projectarea"; //$NON-NLS-1$
-    private static final String STYLE_WINDOW = "projectview"; //$NON-NLS-1$
 
     private final ProjectApplication application;
-    private final HorizontalLayout mainContainer = new HorizontalLayout();
+    private final VerticalLayout layout = new VerticalLayout();
     private final Navigator navigator = new ProjectNavigator(this);
+
+    private ProjectPanel activePanel;
 
     private Project project;
     private boolean repaint;
@@ -46,25 +41,20 @@ public class ProjectWindow extends Window {
         this.addListener(new CloseListener() {
             @Override
             public void windowClose(CloseEvent e) {
-                // set repaint=true to repaint this window when we come
-                // back (if necessary, checked in getContent())
+                // repaint the window when back button was used for navigation
                 repaint = true;
             }
         });
 
         this.application = application;
         this.project = project;
-
-        addStyleName(STYLE_WINDOW);
-        doLayout();
+        renderPanel();
     }
 
     @Override
     public ComponentContainer getContent() {
         if (repaint == true && project != null && isProjectView()) {
-            // project could have been changed in the meantime, refresh project instance
-            project = Services.getRequiredService(ProjectService.class).getByUUID(project.getUuid());
-            doLayout();
+            renderPanel();
             repaint = false;
         }
         return super.getContent();
@@ -74,86 +64,75 @@ public class ProjectWindow extends Window {
         if (project != null) {
             return project;
         }
-        if (isProjectEditView()) {
-            ProjectEditPanel editPanel = (ProjectEditPanel)mainContainer.getComponent(0);
-            return editPanel.getProject();
-        }
-        if (isProjectView()) {
-            ProjectViewPanel viewPanel = (ProjectViewPanel)mainContainer.getComponent(0);
-            return viewPanel.getProject();
-
-        }
-        return null;
+        return activePanel != null? activePanel.getProject() : null;
     }
 
-    public void refreshProject(Project project) {
+    public void setProject(Project project) {
         this.project = project;
         repaint = true;
     }
 
-    void setMainContent(Component component) {
-        mainContainer.removeAllComponents();
-        mainContainer.addComponent(component);
+    private void renderPanel() {
+        ProjectPanel panel = null;
+        if (project != null) {
+            // refresh project since it might have changed in the meantime
+            project = getLastKnownVersion(project);
+            panel = getProjectDetailsView();
+        } else {
+            panel = getNewProjectPanel();
+        }
+        renderPanel(panel);
     }
 
-    @SuppressWarnings("deprecation")
-    private void doLayout() {
-        Panel mainPanel = new Panel();
-        mainPanel.addStyleName(Panel.STYLE_LIGHT);
-
-        VerticalLayout vlayout = new VerticalLayout();
-        vlayout.setSizeFull();
-        vlayout.setMargin(false);
-        vlayout.addStyleName(STYLE_WINDOW);
-
-        mainContainer.setSizeFull();
-        mainContainer.addStyleName(STYLE_PROJECT);
-        mainContainer.setMargin(false);
-
-        if (project != null) {
-            setMainContent(getProjectView());
-        } else {
-            setMainContent(getTemplateSelectView());
+    void renderPanel(ProjectPanel panel) {
+        layout.removeAllComponents();
+        if (panel != null) {
+            activePanel = panel;
+            activePanel.addStyleName(STYLE_PROJECT);
+            layout.addComponent(activePanel);
+            layout.setExpandRatio(activePanel, 1.0f);
         }
+        addStyleName(STYLE_WINDOW);
+        setContent(layout);
+        repaint = false;
+    }
 
-        vlayout.addComponent(mainContainer);
-
-        mainPanel.setContent(vlayout);
-        setContent(mainPanel);
-
-        setSizeFull();
+    private Project getLastKnownVersion(Project project) {
+        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        Project lastKnown = projectService.getByUUID(project.getUuid());
+        return lastKnown != null ? lastKnown : project;
     }
 
     private boolean isProjectView() {
-        return mainContainer.getComponent(0) instanceof ProjectViewPanel;
+        return activePanel instanceof ProjectDetailsPanel;
     }
 
     private boolean isProjectEditView() {
-        return mainContainer.getComponent(0) instanceof ProjectEditPanel;
+        return activePanel instanceof ProjectEditPanel;
     }
 
-    private Component getProjectView() {
-        return new ProjectViewPanel(application, navigator, project);
+    private ProjectPanel getProjectDetailsView() {
+        return new ProjectDetailsPanel(application, navigator, project);
     }
 
-    private Component getProjectEditView() {
+    private ProjectPanel getProjectEditView() {
         return new ProjectEditPanel(application, navigator, project, ProjectEditMode.EDIT_PROJECT);
     }
 
-    private Component getTemplateSelectView() {
-        return new TemplateSelectPanel(application, this, navigator);
+    protected ProjectPanel getNewProjectPanel() {
+        return new NewProjectPanel(application, this, navigator);
     }
 
     public void handleRelativeURI(String relativeUri) {
         if ("edit".equals(relativeUri)) { //$NON-NLS-1$
             if (!isProjectEditView()) {
-                setMainContent(getProjectEditView());
+                renderPanel(getProjectEditView());
             }
         } else {
             if (project == null) {
                 return;
             } else if (isProjectEditView()) {
-                setMainContent(getProjectView());
+                renderPanel(getProjectDetailsView());
             }
         }
     }
