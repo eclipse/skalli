@@ -16,14 +16,14 @@ import org.junit.Assert;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
-public class AddProjectToJiraTest {
+public class CreateJiraProjectLinkTest {
 
     @Test
     public void testGetUri() {
         Project project = new Project();
         project.setUuid(TestUUIDs.TEST_UUIDS[0]);
         project.setProjectId("foobar");
-        AddProjectToJira jira = new AddProjectToJira();
+        CreateJiraProjectLink jira = new CreateJiraProjectLink();
         Assert.assertEquals("/create/jira?id=foobar", jira.getUri(project).toString());
     }
 

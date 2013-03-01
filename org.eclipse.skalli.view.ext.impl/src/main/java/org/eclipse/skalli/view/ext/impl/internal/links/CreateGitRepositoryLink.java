@@ -17,24 +17,24 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.view.ext.ProjectContextLink;
 
-public class CreateGitGerritRepo implements ProjectContextLink {
+public class CreateGitRepositoryLink implements ProjectContextLink {
 
     @Override
     public String getCaption(Project project) {
-        return "Create Git/Gerrit Repo";
+        return "Create Git Repository";
     }
 
     @Override
     public URI getUri(Project project) {
         if (project.isInherited(DevInfProjectExt.class)) {
             try {
-                return new URI("/error/devinfinherited?id=" + project.getProjectId());
+                return new URI("/error/devinfinherited?id=" + project.getProjectId()); //$NON-NLS-1$
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
             }
         } else {
             try {
-                return new URI("/create/gitgerrit?id=" + project.getProjectId());
+                return new URI("/create/gitgerrit?id=" + project.getProjectId()); //$NON-NLS-1$
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
             }
@@ -43,7 +43,7 @@ public class CreateGitGerritRepo implements ProjectContextLink {
 
     @Override
     public float getPositionWeight() {
-        return 2.0f;
+        return 1.0f;
     }
 
     @Override

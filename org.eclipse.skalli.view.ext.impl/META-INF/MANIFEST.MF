@@ -73,9 +73,9 @@ Service-Component: OSGI-INF/BasicForm.xml,
  OSGI-INF/ReviewInfoBox.xml,
  OSGI-INF/ActivityInfoBox.xml,
  OSGI-INF/SubprojectsInfoBox.xml,
- OSGI-INF/ExtensionServiceAddProjectToJira.xml,
- OSGI-INF/ExtensionServiceCreateGitGerritRepo.xml,
- OSGI-INF/ExtensionServiceRequestP4Project.xml,
+ OSGI-INF/CreateJiraProjectLink.xml,
+ OSGI-INF/CreateGitRepositoryLink.xml,
+ OSGI-INF/CreatePerforceProjectLink.xml,
  OSGI-INF/FeedInfoBox.xml,
  OSGI-INF/InfoBoxesRestExtension.xml
 Bundle-ActivationPolicy: lazy

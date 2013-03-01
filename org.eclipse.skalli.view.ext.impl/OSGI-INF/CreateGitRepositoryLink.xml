@@ -9,8 +9,8 @@
         SAP AG - initial API and implementation
  -->
 
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.ui.links.jira">
-   <implementation class="org.eclipse.skalli.view.ext.impl.internal.links.AddProjectToJira"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.ui.links.git">
+   <implementation class="org.eclipse.skalli.view.ext.impl.internal.links.CreateGitRepositoryLink"/>
    <service>
       <provide interface="org.eclipse.skalli.view.ext.ProjectContextLink"/>
    </service>

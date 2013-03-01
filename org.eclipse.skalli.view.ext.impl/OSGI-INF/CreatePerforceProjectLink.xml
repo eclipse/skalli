@@ -10,7 +10,7 @@
  -->
 
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.ui.links.p4">
-   <implementation class="org.eclipse.skalli.view.ext.impl.internal.links.RequestP4Project"/>
+   <implementation class="org.eclipse.skalli.view.ext.impl.internal.links.CreatePerforceProjectLink"/>
    <service>
       <provide interface="org.eclipse.skalli.view.ext.ProjectContextLink"/>
    </service>

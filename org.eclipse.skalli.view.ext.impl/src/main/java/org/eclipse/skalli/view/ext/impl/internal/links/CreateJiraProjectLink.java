@@ -14,37 +14,27 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.view.ext.ProjectContextLink;
 
-public class RequestP4Project implements ProjectContextLink {
+public class CreateJiraProjectLink implements ProjectContextLink {
 
     @Override
     public String getCaption(Project project) {
-        // TODO I18N
-        return "Request Perforce Project";
+        return "Create Jira Project";
     }
 
     @Override
     public URI getUri(Project project) {
-        if (project.isInherited(DevInfProjectExt.class)) {
-            try {
-                return new URI("/error/devinfinherited?id=" + project.getProjectId());
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            try {
-                return new URI("/create/p4?id=" + project.getProjectId());
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
+        try {
+            return new URI("/create/jira?id=" + project.getProjectId()); //$NON-NLS-1$
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public float getPositionWeight() {
-        return 3.0f;
+        return 2.0f;
     }
 
     @Override
