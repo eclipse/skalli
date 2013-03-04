@@ -41,7 +41,9 @@ public class CollectionUtils {
         SortedSet<T> result = new TreeSet<T>();
         if (args != null) {
             for (T arg : args) {
-                result.add(arg);
+                if (arg != null) {
+                    result.add(arg);
+                }
             }
         }
         return result;
