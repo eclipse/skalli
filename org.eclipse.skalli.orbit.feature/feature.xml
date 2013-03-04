@@ -241,13 +241,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.apache.lucene.memory"
-         download-size="0"
-         install-size="0"
-         version="3.5.0.v20120319-2345"
-         unpack="false"/>
-
-   <plugin
          id="org.apache.commons.codec"
          download-size="0"
          install-size="0"
@@ -291,6 +284,13 @@
 
    <plugin
          id="org.slf4j.api"
+         download-size="0"
+         install-size="0"
+         version="1.6.4.v20120130-2120"
+         unpack="false"/>
+
+   <plugin
+         id="org.slf4j.log4j"
          download-size="0"
          install-size="0"
          version="1.6.4.v20120130-2120"
