@@ -62,7 +62,8 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         writeNode(writer, "instance-start", FormatUtils.formatUTCWithMillis(statistics.getStartupTime()));
         writeNode(writer, "instance-uptime",  DurationFormatUtils.formatPeriodISO( //$NON-NLS-1$
                 statistics.getStartupTime(), System.currentTimeMillis()));
-        long from = query.getFrom() > 0? query.getFrom() : statistics.getStartupTime();
+        long from = Math.max(statistics.getStartDate(),
+                query.getFrom() > 0? query.getFrom() : statistics.getStartupTime());
         long to = query.getTo() > 0 ? query.getTo() : System.currentTimeMillis();
         writeNode(writer, "from", FormatUtils.formatUTCWithMillis(from));
         writeNode(writer, "to", FormatUtils.formatUTCWithMillis(to));

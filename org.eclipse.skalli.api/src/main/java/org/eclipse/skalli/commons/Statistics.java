@@ -35,8 +35,12 @@ public class Statistics {
 
         public StatisticsInfo(String userId, long sequenceNumber) {
             this.timestamp = System.currentTimeMillis();
-            this.userHash = hash(userId);
             this.sequenceNumber = sequenceNumber;
+            if (StringUtils.isNotBlank(userId)) {
+                this.userHash = DigestUtils.shaHex(userId);
+            } else {
+                this.userHash = ANONYMOUS;
+            }
         }
         public String getUserHash() {
             return userHash;
@@ -158,6 +162,8 @@ public class Statistics {
     private long startupTime;
     private long startDate;
     private long endDate;
+
+    // sequence number to be assigned to the next tracked info entry
     private long sequenceNumber;
 
     private SortedSet<UserInfo> users = new TreeSet<UserInfo>();
@@ -169,58 +175,187 @@ public class Statistics {
 
     private static Statistics instance = new Statistics();
 
+    /**
+     * Creates an empty statistics resource.
+     * Initializes the {@link #getStartupTime() startup time} to be the current time.
+     */
     public Statistics() {
-        startupTime = System.currentTimeMillis();
-        sequenceNumber = 0;
+        this(System.currentTimeMillis(), 0, 0, 0);
     }
 
+    /**
+     * Creates a statistics resource from a given statistics resource.
+     * Copies the {@link #getStartupTime() startup time} from the given
+     * statistics resource.
+     *
+     * @param statistics  the statistics resource to copy from.
+     * @param startDate  begin of the time interval to copy
+     *                   in milliseconds since January 1, 1970, 00:00:00 GMT.
+     * @param endDate  end of the time interval to copy
+     *                 in milliseconds since January 1, 1970, 00:00:00 GMT.
+     */
     public Statistics(Statistics statistics, long startDate, long endDate) {
-        this.startupTime = statistics.getStartupTime();
+        this(statistics.getStartupTime(), 0, 0, 0);
+        copy(statistics, startDate, endDate);
+        updateAttributes();
+    }
+
+    // package protected for testing purposes
+    Statistics(long startupTime, long startDate, long endDate, long sequenceNumber) {
+        this.startupTime = startupTime;
         this.startDate = startDate;
         this.endDate = endDate;
-        copyAll(statistics);
+        this.sequenceNumber = sequenceNumber;
     }
 
+    /**
+     * Returns the default statistics resource of this Skalli instance.
+     */
     public static Statistics getDefault() {
         return instance;
     }
 
+    /**
+     * Returns the startup time of the current Skalli instance,
+     * i.e. the begin of the statistics recording.
+     *
+     * @return the startup time in milliseconds since January 1, 1970, 00:00:00 GMT.
+     */
     public long getStartupTime() {
         return startupTime;
     }
 
+    /**
+     * Returns the timestamp of the earliest data entry in this statistics resource,
+     * or the instance startup time, if no statistics information has been tracked yet.
+     *
+     * @return the timestamp of the earliest data entry in
+     * milliseconds since January 1, 1970, 00:00:00 GMT
+     */
     public long getStartDate() {
         return startDate > 0? startDate : startupTime;
     }
 
+    /**
+     * Returns the timestamp of the latest data entry in this statistics resource,
+     * or the current time, if no statistics information has been tracked yet.
+     *
+     * @return the timestamp of the latest data entry in
+     * milliseconds since January 1, 1970, 00:00:00 GMT
+     */
     public long getEndDate() {
         return endDate > 0? endDate : System.currentTimeMillis();
     }
 
+    /**
+     * Tracks the path and <code>Referer</code> header of a request.
+     *
+     * @param userId  the user that issued the request, or <code>null</code>,
+     * which is interpreted as the Anonymous user.
+     * @param path  the resource path that has been requested.
+     * @param referer  the <code>Referer</code> header specified in the request,
+     * or <code>null</code>.
+     */
     public synchronized void trackUsage(String userId, String path, String referer) {
-        usages.add(new UsageInfo(userId, path, referer, sequenceNumber++));
+        UsageInfo entry = new UsageInfo(userId, path, referer, sequenceNumber++);
+        usages.add(entry);
+        endDate = entry.getTimestamp();
+        if (startDate == 0) {
+            startDate = endDate;
+        }
     }
 
+    /**
+     * Tracks the user of a request.
+     *
+     * @param userId  the user that issued the request, or <code>null</code>,
+     * which is interpreted as the Anonymous user.
+     * @param department  the department the user belongs to, or <code>null</code>.
+     * @param location  the location of the user, or <code>null</code>.
+     */
     public synchronized void trackUser(String userId, String department, String location) {
-        users.add(new UserInfo(userId, department, location, sequenceNumber++));
+        UserInfo entry = new UserInfo(userId, department, location, sequenceNumber++);
+        users.add(entry);
+        endDate = entry.getTimestamp();
+        if (startDate == 0) {
+            startDate = endDate;
+        }
     }
 
+    /**
+     * Tracks the <code>User-Agent</code> header of a request.
+     *
+     * @param userId  the user that issued the request, or <code>null</code>,
+     * which is interpreted as the Anonymous user.
+     * @param userAgent  the <code>User-Agent</code> header specified in the request.
+     */
     public synchronized void trackBrowser(String userId, String userAgent) {
-        browsers.add(new BrowserInfo(userId, userAgent, sequenceNumber++));
+        BrowserInfo entry = new BrowserInfo(userId, userAgent, sequenceNumber++);
+        browsers.add(entry);
+        endDate = entry.getTimestamp();
+        if (startDate == 0) {
+            startDate = endDate;
+        }
     }
 
+    /**
+     * Tracks a search request.
+     *
+     * @param userId  the user that performed the search, or <code>null</code>,
+     * which is interpreted as the Anonymous user.
+     * @param queryString  the query string entered by the user.
+     * @param resultCount  the number of search results.
+     * @param duration  the amount of time it took to calculate the search
+     * result in milliseconds.
+     */
     public synchronized void trackSearch(String userId, String queryString, int resultCount, long duration) {
-        searches.add(new SearchInfo(userId, queryString, resultCount, duration, sequenceNumber++));
+        SearchInfo entry = new SearchInfo(userId, queryString, resultCount, duration, sequenceNumber++);
+        searches.add(entry);
+        endDate = entry.getTimestamp();
+        if (startDate == 0) {
+            startDate = endDate;
+        }
     }
 
+    /**
+     * Tracks the <code>Referer</code> header of a request.
+     *
+     * @param userId  the user that issued the request, or <code>null</code>,
+     * which is interpreted as the Anonymous user.
+     * @param referer  the <code>Referer</code> header specified in the request.
+     */
     public synchronized void trackReferer(String userId, String referer) {
-        referers.add(new RefererInfo(userId, referer, sequenceNumber++));
+        RefererInfo entry = new RefererInfo(userId, referer, sequenceNumber++);
+        referers.add(entry);
+        endDate = entry.getTimestamp();
+        if (startDate == 0) {
+            startDate = endDate;
+        }
     }
 
+    /**
+     * Tracks the response time of a request.
+     *
+     * @param userId  the user that issued the request, or <code>null</code>,
+     * which is interpreted as the Anonymous user.
+     * @param path
+     * @param responseTime
+     */
     public synchronized void trackResponseTime(String userId, String path, long responseTime) {
-        responseTimes.add(new ResponseTimeInfo(userId, path, responseTime, sequenceNumber++));
+        ResponseTimeInfo entry = new ResponseTimeInfo(userId, path, responseTime, sequenceNumber++);
+        responseTimes.add(entry);
+        endDate = entry.getTimestamp();
+        if (startDate == 0) {
+            startDate = endDate;
+        }
     }
 
+    /**
+     * Removes all data entries from this statistics resource and resets the
+     * {@link #getStartDate() start} and {@link #getEndDate() end} date
+     * parameters. The {@link #getStartupTime() startup} timestamp
+     * is not touched.
+     */
     public synchronized void clear() {
         users.clear();
         usages.clear();
@@ -228,24 +363,45 @@ public class Statistics {
         browsers.clear();
         searches.clear();
         responseTimes.clear();
+        startDate = 0;
+        endDate = 0;
         sequenceNumber = 0;
     }
 
+    /**
+     * Removes all data entries from this statistics resource with a timestamp
+     * within the given range.
+     *
+     * @param startDate  begin of the time intervall to remove
+     *                   in milliseconds since January 1, 1970, 00:00:00 GMT.
+     * @param endDate    end of the time intervall to remove
+     *                   in milliseconds since January 1, 1970, 00:00:00 GMT.
+     */
     public synchronized void clear(long startDate, long endDate) {
-        remove(usages, startDate, endDate);
-        remove(users, startDate, endDate);
-        remove(browsers, startDate, endDate);
-        remove(searches, startDate, endDate);
-        remove(referers, startDate, endDate);
-        remove(responseTimes, startDate, endDate);
+        clear(usages, startDate, endDate);
+        clear(users, startDate, endDate);
+        clear(browsers, startDate, endDate);
+        clear(searches, startDate, endDate);
+        clear(referers, startDate, endDate);
+        clear(responseTimes, startDate, endDate);
+        updateAttributes();
     }
 
+    /**
+     * Restores the content of this statistics resource from a given statistics resource, e.g. a backup,
+     * but retains the {@link #getStartupTime() startup time} of this statistics resource.
+     * Removes all previously stored data entries from this statistics resource and copies all data
+     * entries from the backup resource.
+     *
+     * @param statistics  the statistics backup from which to restore this
+     * statistics resource. If the argument is <code>null</code> the method
+     * does nothing.
+     */
     public synchronized void restore(Statistics statistics) {
         if (statistics != null) {
             clear();
-            this.startDate = 0;
-            this.endDate = 0;
-            copyAll(statistics);
+            copy(statistics, statistics.getStartDate(), statistics.getEndDate());
+            updateAttributes();
         }
     }
 
@@ -417,7 +573,11 @@ public class Statistics {
         return tracks;
     }
 
-    private void addAll(Map<String, SortedSet<StatisticsInfo>> tracks, SortedSet<? extends StatisticsInfo> entries,
+    long getSequenceNumber() {
+        return sequenceNumber;
+    }
+
+    void addAll(Map<String, SortedSet<StatisticsInfo>> tracks, SortedSet<? extends StatisticsInfo> entries,
             long startDate, long endDate) {
         for (StatisticsInfo info: entries) {
             if (info.inRange(startDate, endDate)) {
@@ -433,7 +593,7 @@ public class Statistics {
 
     }
 
-    private void remove(SortedSet<? extends StatisticsInfo> entries, long startDate, long endDate) {
+    void clear(SortedSet<? extends StatisticsInfo> entries, long startDate, long endDate) {
         Iterator<? extends StatisticsInfo> it = entries.iterator();
         while (it.hasNext()) {
             StatisticsInfo next = it.next();
@@ -443,7 +603,10 @@ public class Statistics {
         }
     }
 
-    private void copyAll(Statistics statistics) {
+    /**
+     * Copies all statistics entries from the given <code>Statistics</code>.
+     */
+    void copy(Statistics statistics, long startDate, long endDate) {
         copy(statistics.getUserInfo(), users, startDate, endDate);
         copy(statistics.getUsageInfo(), usages, startDate, endDate);
         copy(statistics.getRefererInfo(), referers, startDate, endDate);
@@ -452,17 +615,40 @@ public class Statistics {
         copy(statistics.getResponseTimeInfo(), responseTimes, startDate, endDate);
     }
 
-    private <T extends StatisticsInfo> void copy(SortedSet<T> source, SortedSet<T> target,
+    <T extends StatisticsInfo> void copy(SortedSet<T> source, SortedSet<T> target,
             long startDate, long endDate) {
         for (T next: source) {
             if (next.inRange(startDate, endDate)) {
                 target.add(next);
-                sequenceNumber = Math.max(sequenceNumber, next.getSequenceNumber());
             }
         }
     }
 
-    private Map<String,Long> sortedByFrequencyDescending(Map<String,Long> map) {
+    /**
+     * Recalculates <code>sequenceNumber</code>, <code>startDate</code>
+     * and <code>endDate</code> from the entries in this dataset.
+     */
+    void updateAttributes() {
+        sequenceNumber = 0;
+        startDate = 0;
+        endDate = 0;
+        updateAttributes(users);
+        updateAttributes(usages);
+        updateAttributes(referers);
+        updateAttributes(browsers);
+        updateAttributes(searches);
+        updateAttributes(responseTimes);
+    }
+
+    <T extends StatisticsInfo> void updateAttributes(SortedSet<T> source) {
+        for (T next: source) {
+            sequenceNumber = Math.max(sequenceNumber, next.getSequenceNumber() + 1);
+            startDate = startDate > 0 ? Math.min(startDate, next.getTimestamp()) : next.getTimestamp();
+            endDate = endDate > 0? Math.max(endDate, next.getTimestamp()) : next.getTimestamp();
+        }
+    }
+
+    Map<String,Long> sortedByFrequencyDescending(Map<String,Long> map) {
         if (map == null || map.size() <= 1) {
             return map;
         }
@@ -482,13 +668,5 @@ public class Statistics {
             sortedMap.put(entry.getKey(), entry.getValue());
         }
         return sortedMap;
-    }
-
-    private static String hash(String userId) {
-        if (StringUtils.isNotBlank(userId)) {
-            return DigestUtils.shaHex(userId);
-        } else {
-            return ANONYMOUS;
-        }
     }
 }
