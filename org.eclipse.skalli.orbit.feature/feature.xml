@@ -83,28 +83,28 @@
          id="org.apache.lucene.core"
          download-size="0"
          install-size="0"
-         version="3.0.3.v201111231628"
+         version="3.5.0.v20120725-1805"
          unpack="false"/>
 
    <plugin
          id="org.apache.lucene.highlighter"
          download-size="0"
          install-size="0"
-         version="3.0.3.v201111141847"
+         version="3.5.0.v20121015-1317"
          unpack="false"/>
 
    <plugin
          id="org.apache.lucene.queries"
          download-size="0"
          install-size="0"
-         version="3.0.3.v201111141847"
+         version="3.5.0.v20120725-1805"
          unpack="false"/>
 
    <plugin
          id="org.apache.lucene.memory"
          download-size="0"
          install-size="0"
-         version="3.0.3.v201111151751"
+         version="3.5.0.v20120725-1805"
          unpack="false"/>
 
    <plugin

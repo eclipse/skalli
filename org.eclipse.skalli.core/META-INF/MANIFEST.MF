@@ -89,10 +89,10 @@ Import-Package: com.thoughtworks.xstream,
  org.slf4j,
  org.w3c.dom,
  org.xml.sax
-Require-Bundle: org.apache.lucene.core;bundle-version="3.0.3",
- org.apache.lucene.highlighter;bundle-version="3.0.3",
- org.apache.lucene.queries;bundle-version="3.0.3",
- org.apache.lucene.memory;bundle-version="3.0.3"
+Require-Bundle: org.apache.lucene.core;bundle-version="3.5.0",
+ org.apache.lucene.highlighter;bundle-version="3.5.0",
+ org.apache.lucene.queries;bundle-version="3.5.0",
+ org.apache.lucene.memory;bundle-version="3.5.0"
 Service-Component: OSGI-INF/PermitComponent.xml,
  OSGI-INF/PermitsConfigSection.xml,
  OSGI-INF/EventComponent.xml,
