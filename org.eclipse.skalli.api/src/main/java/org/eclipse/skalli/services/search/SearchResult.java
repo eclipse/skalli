@@ -63,6 +63,10 @@ public class SearchResult<T extends EntityBase> {
         this.pagingInfo = pagingInfo;
     }
 
+    public void setPagingInfo(int start, int count) {
+        this.pagingInfo = new PagingInfo(start, count);
+    }
+
     public List<T> getEntities() {
         List<T> ret = new ArrayList<T>(result.size());
         for (SearchHit<T> hit : getResult()) {

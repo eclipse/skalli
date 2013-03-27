@@ -11,6 +11,7 @@
 package org.eclipse.skalli.view.internal.filter;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -36,14 +37,16 @@ public class FavoritesFilter extends AbstractSearchFilter {
 
     @Override
     protected SearchResult<Project> getSearchHits(User user, ServletRequest request, ServletResponse response,
-            int start, int viewSize)
+            int start, int count)
             throws IOException, ServletException {
+        int resultCount = 0;
         List<Project> projects = new ArrayList<Project>();
         if (user != null) {
             ProjectService projectService = Services.getRequiredService(ProjectService.class);
             List<UUID> uuids = getFavorites(user).getProjects();
+            resultCount = uuids.size();
             if (start < uuids.size()) {
-                int end = Math.min(start + viewSize, uuids.size());
+                int end = Math.min(start + count, uuids.size());
                 for (int i = start; i < end; ++i) {
                     Project project = projectService.getByUUID(uuids.get(i));
                     if (project != null) {
@@ -56,14 +59,15 @@ public class FavoritesFilter extends AbstractSearchFilter {
         List<SearchHit<Project>> searchHits = searchService.asSearchHits(projects);
         SearchResult<Project> searchResult = new SearchResult<Project>();
         searchResult.setResult(searchHits);
-        searchResult.setResultCount(searchHits.size());
+        searchResult.setResultCount(resultCount);
+        searchResult.setPagingInfo(start, count);
         searchResult.setDuration(0);
         return searchResult;
     }
 
     @Override
     protected String getTitle(User user) {
-        return user != null ? "Favorites for " + user.getDisplayName() : "Favorites";
+        return user != null ? MessageFormat.format("Favorites for {0}", user.getDisplayName()) : "Favorites";
     }
 
 }
