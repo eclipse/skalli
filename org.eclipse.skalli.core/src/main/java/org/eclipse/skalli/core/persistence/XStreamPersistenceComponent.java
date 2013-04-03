@@ -138,7 +138,7 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
     }
 
     @Override
-    public synchronized void persist(EntityBase entity, String userId) {
+    public synchronized <T extends EntityBase> void persist(Class<T> entityClass, EntityBase entity, String userId) {
         if (entity == null) {
             throw new IllegalArgumentException("argument 'entity' must not be null");
         }
@@ -146,7 +146,6 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
             throw new IllegalArgumentException("argument 'userId' must not be null or an empty string");
         }
 
-        Class<? extends EntityBase> entityClass = entity.getClass();
         if (xstreamPersistence == null) {
             LOG.warn(MessageFormat.format("Cannot persist entity {0}: StorageService not available", entity));
             return;
@@ -188,7 +187,7 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
 
         // reload the entity to proof that is has been persisted successfully;
         // if so, update the caches
-        EntityBase savedEntity = loadEntity(entity.getClass(), entity.getUuid());
+        T savedEntity = loadEntity(entityClass, entity.getUuid());
         if (savedEntity != null) {
             updateCache(savedEntity);
             if (entity.isDeleted()) {

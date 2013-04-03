@@ -165,7 +165,7 @@ public abstract class EntityServiceBase<T extends EntityBase> implements EntityS
             entity.setUuid(UUID.randomUUID());
         }
         validateEntity(entity);
-        getPersistenceService().persist(entity, userId);
+        getPersistenceService().persist(entity.getClass(), entity, userId);
         updateSearchIndex(entity);
 
         ValidationService validationService = getService(ValidationService.class, "ValidationService"); //$NON-NLS-1$

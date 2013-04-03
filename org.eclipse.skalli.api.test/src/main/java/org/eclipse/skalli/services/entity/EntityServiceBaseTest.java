@@ -25,8 +25,8 @@ import org.eclipse.skalli.services.validation.Validation;
 import org.eclipse.skalli.services.validation.ValidationService;
 import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.BundleManager;
-import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestEntityBase1;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -141,9 +141,9 @@ public class EntityServiceBaseTest {
     @Test
     public void testPersist() throws Exception {
         reset(mocks);
-        mockIPS.persist(eq(validEntity), eq(USERID));
+        mockIPS.persist(eq(TestEntityBase1.class), eq(validEntity), eq(USERID));
         expectLastCall();
-        mockIPS.persist(eq(noUuidEntity), eq(USERID));
+        mockIPS.persist(eq(TestEntityBase1.class), eq(noUuidEntity), eq(USERID));
         expectLastCall();
         mockVS.queue(eq(new Validation<TestEntityBase1>(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[0],
                 Severity.INFO, USERID)));
@@ -163,9 +163,9 @@ public class EntityServiceBaseTest {
     @Test(expected = ValidationException.class)
     public void testPersist_invalidEntity() throws Exception {
         reset(mocks);
-        mockIPS.persist(eq(validEntity), eq(USERID));
+        mockIPS.persist(eq(TestEntityBase1.class), eq(validEntity), eq(USERID));
         expectLastCall();
-        mockIPS.persist(eq(noUuidEntity), eq(USERID));
+        mockIPS.persist(eq(TestEntityBase1.class), eq(noUuidEntity), eq(USERID));
         expectLastCall();
         mockVS.queue(eq(new Validation<TestEntityBase1>(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[0],
                 Severity.INFO, USERID)));

@@ -26,11 +26,12 @@ public interface PersistenceService {
     /**
      * Persists the given model entity.
      *
+     * @param entityClass  the class the entity belongs to.
      * @param entity  the model entity to persist.
      * @param userId  unique identifier of the user performing the modification
      *                (relevant for the audit trail).
      */
-    public void persist(EntityBase entity, String userId);
+    public <T extends EntityBase> void persist(Class<T> entityClass, EntityBase entity, String userId);
 
     /**
      * Loads the entity with the given UUID and its parent hierarchy, if available,

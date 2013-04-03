@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.skalli.commons.XMLUtils;
-import org.eclipse.skalli.core.persistence.XStreamPersistenceComponent;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
@@ -72,7 +71,7 @@ public class XStreamPersistenceServiceTest {
         // create and persist test entities
         List<TestExtensibleEntityBase> expectedEntities = createTestEntityHierarchy();
         for (ExtensibleEntityBase entity : expectedEntities) {
-            persistenceService.persist(entity, "anyonomous");
+            persistenceService.persist(entity.getClass(), entity, "anyonomous");
         }
 
         // read the persisted files as DOM and do some asserts
@@ -119,7 +118,8 @@ public class XStreamPersistenceServiceTest {
     @Test(expected = RuntimeException.class)
     public void testPersist_withUnknownParent() throws Exception {
         List<TestExtensibleEntityBase> expectedEntities = createTestEntityHierarchy();
-        persistenceService.persist(expectedEntities.get(1), "anonymous");
+        TestExtensibleEntityBase entity = expectedEntities.get(1);
+        persistenceService.persist(entity.getClass(), entity, "anonymous");
     }
 
     @Test
