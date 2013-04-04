@@ -23,11 +23,11 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.PropertyTestUtil;
-import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.eclipse.skalli.testutil.TestEntityBase2;
 import org.eclipse.skalli.testutil.TestExtensibleEntityBase;
 import org.eclipse.skalli.testutil.TestExtension;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -227,9 +227,8 @@ public class EntityBaseTest {
     @Test
     public void testHashCode() {
         TestEntityBase1 entity = new TestEntityBase1();
-        Assert.assertEquals(31, entity.hashCode());
         entity.setUuid(TestUUIDs.TEST_UUIDS[0]);
-        Assert.assertEquals(31 + TestUUIDs.TEST_UUIDS[0].hashCode(), entity.hashCode());
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0].hashCode(), entity.hashCode());
     }
 
     @Test

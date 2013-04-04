@@ -427,10 +427,7 @@ public abstract class EntityBase {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
-        return result;
+        return (uuid == null) ? super.hashCode() : uuid.hashCode();
     }
 
     @Override
