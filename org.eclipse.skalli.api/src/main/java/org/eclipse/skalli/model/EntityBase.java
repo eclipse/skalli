@@ -44,11 +44,11 @@ public abstract class EntityBase {
     public static final String PROPERTY_DELETED = "deleted"; //$NON-NLS-1$
 
     @PropertyName
-    public static final String PROPERTY_PARENT_ENTITY = "parentEntity"; //$NON-NLS-1$
+    public static final String PROPERTY_PARENT_ENTITY_ID = "parentEntityId"; //$NON-NLS-1$
 
     @Derived
     @PropertyName
-    public static final String PROPERTY_PARENT_ENTITY_ID = "parentEntityId"; //$NON-NLS-1$
+    public static final String PROPERTY_PARENT_ENTITY = "parentEntity"; //$NON-NLS-1$
 
     @Derived
     @PropertyName
@@ -179,7 +179,7 @@ public abstract class EntityBase {
      * testing purposes. The parent entity is determined when
      * the entity is loaded.
      */
-    protected void setParentEntityId(UUID parentEntityId) {
+    public void setParentEntityId(UUID parentEntityId) {
         this.parentEntityId = parentEntityId;
     }
 
