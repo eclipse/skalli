@@ -26,9 +26,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Abstract base class for all uniquely indentifiable model entities.
- * This class defines one property, <code>uuid</code>, that must be a
- * globally unique identifier. Once set, the <code>uuid</code> is immutable.
+ * Abstract base class for all uniquely identifiable model entities.
+ * The identifier of an entity is a {@link UUID universally unique identifier (UUID)}.
+ * Once set, the <code>uuid</code> of an entity  is immutable. An entity can be assigned
+ * to one (and only one) parent entity, so that hierarchies of entities can be built.
+ * Furthermore, entities can be marked as {@link #isDeleted() deleted} to hide them
+ * from common operations.
  */
 public abstract class EntityBase {
 
@@ -69,13 +72,12 @@ public abstract class EntityBase {
                 .toMap();
 
     /**
-     * The unique identifier of a project - created once, never changed!
-     * @see org.eclipse.skalli.core.internal.persistence.xstream.PersistenceServiceXStream#persist(EntityBase,String)
+     * The unique identifier of a project - set once, never changed.
      */
     private UUID uuid;
 
     /**
-     * Deleted entities are ignored during loading of the model.
+     * Deleted entities are loaded and cached separately.
      */
     private boolean deleted = false;
 
@@ -92,7 +94,8 @@ public abstract class EntityBase {
     private transient EntityBase parentEntity;
 
     /**
-     * Date of last modification.
+     * Date of last modification in ISO 8601 format
+     * and in milliseconds since midnight, January 1, 1970 UTC.
      */
     private transient String lastModified;
     private transient long lastModifiedMillis;
@@ -111,8 +114,8 @@ public abstract class EntityBase {
 
     /**
      * Sets the unique identifier of the entity. Note, this
-     * method does not change the unique identifier, if it already
-     * has been set.
+     * method does not change the unique identifier, if it has
+     * been set before.
      */
     public void setUuid(UUID uuid) {
         if (this.uuid == null) {
@@ -169,7 +172,13 @@ public abstract class EntityBase {
         return parentEntityId;
     }
 
-    // for testing purposes, see PropertyHelperUtils#TestEntityBase...
+    /**
+     * Sets the unique identifier of the parent entity.
+     *
+     * Note, this method should not be called directly except for
+     * testing purposes. The parent entity is determined when
+     * the entity is loaded.
+     */
     protected void setParentEntityId(UUID parentEntityId) {
         this.parentEntityId = parentEntityId;
     }
@@ -199,9 +208,11 @@ public abstract class EntityBase {
     }
 
     /**
-     * Sets the date/time of the last modification. Note, this method
-     * should not be called directly. The date/time of the last modification
-     * is set/overwritten when the entity is persisted.
+     * Sets the date/time of the last modification.
+     *
+     * Note, this method should not be called directly except for
+     * testing purposes. The date/time of the last modification
+     * is determined when the entity is persisted.
      *
      * @param lastModified  an ISO8061-compliant date/time string following the
      * pattern <tt>[-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm]</tt> as defined for
@@ -231,8 +242,10 @@ public abstract class EntityBase {
     }
 
     /**
-     * Sets the unique identifier of the last modifier. Note, this method
-     * should not be called directly. The last modifier is set automatically
+     * Sets the unique identifier of the last modifier.
+     *
+     * Note, this method should not be called directly except for
+     * testing purposes. The last modifier is determined
      * when the entity is persisted.
      *
      * @param lastModifiedBy  the unique identifier of the last modifier, or
@@ -266,7 +279,7 @@ public abstract class EntityBase {
      * with {@link PropertyName}.
      *
      * @return  a set of property identifiers, or an empty set, if the entity
-     * provides no properties, or <code>entityClass</code> was <code>null</code>.
+     * provides no properties or <code>entityClass</code> was <code>null</code>.
      */
     public static Set<String> getPropertyNames(Class<? extends EntityBase> entityClass) {
         Set<String> propertyNames = new HashSet<String>();
@@ -289,14 +302,14 @@ public abstract class EntityBase {
     }
 
     /**
-    * Returns <code>true</code> if this entity has a property
+     * Returns <code>true</code> if this entity has a property
      * with the given name.
      *
      * @param propertyName  the identifier of the property.
      * @return <code>true</code> if this entity has the requested property,
      * <code>false</code> otherwise.
-    *
-    * @see org.eclipse.skalli.services.projects.PropertyName
+     *
+     * @see org.eclipse.skalli.services.projects.PropertyName
      */
     public boolean hasProperty(String propertyName) {
         return getMethod(propertyName) != null;
