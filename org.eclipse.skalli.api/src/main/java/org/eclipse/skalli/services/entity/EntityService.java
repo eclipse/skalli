@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.entity;
 
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +28,11 @@ import org.eclipse.skalli.services.extension.DataMigration;
 /**
  * Interface for a service that manages and provides {@link EntityBase entities},
  * e.g. {@link Project projects}.
+ * <p>
+ * Note that entities provided by an entity service in general are shared objects and
+ * should be treated in a read-only fashion. Changing properties of such entities may have
+ * undesirable side effects. In order to change an entity, an exlusive
+ * instance must be obtained with {@link #loadEntity(Class, UUID)}.
  */
 public interface EntityService<T extends EntityBase> {
 
@@ -62,6 +68,12 @@ public interface EntityService<T extends EntityBase> {
 
     /**
      * Returns all existing entities.
+     * <p>
+     * Note that the list of entities returned by this method can change without notice,
+     * e.g. when properties of an entry are changed or whole entities are deleted.
+     * This may lead to surprising effects especially when iterating through the list
+     * (see {@link ConcurrentModificationException}).
+     *
      * @returns a list of entities, or an empty list.
      */
     public List<T> getAll();
@@ -79,8 +91,7 @@ public interface EntityService<T extends EntityBase> {
     public Set<UUID> keySet();
 
     /**
-     * Persists the given entity and {@link #scheduleForValidation(UUID, Severity, String) schedules}
-     * a re-validation of the entity.
+     * Persists the given entity.
      *
      * @param entity
      *          the entity to persist.
@@ -94,8 +105,16 @@ public interface EntityService<T extends EntityBase> {
     public void persist(T entity, String userId) throws ValidationException;
 
     /**
-     * Loads the entity with the given UUID and its parent hierarchy, if available,
-     * directly from the underyling persistence service without caching it.
+     * Loads the entity with the given unique identifier from storage.
+     * The chain of {@link EntityBase#getParentEntity() parent entities} of the given entity is
+     * resolved recursively.
+     * <p>
+     * This method returns a fresh instance of the entity, which excusively belongs to the caller.
+     * It can safely be changed and persisted afterwards.
+     * <p>
+     * Note that the entities in the parent hierarchy are in general shared objects and should be
+     * treated in a read-only fashion. Changing properties of parent entities may have undesirable
+     * side effects.
      *
      * @param entityClass  the class the entity belongs to.
      * @param uuid  the unique identifier of the entity.
@@ -131,7 +150,6 @@ public interface EntityService<T extends EntityBase> {
      * @return a set of migrations, or an empty set.
      */
     public Set<DataMigration> getMigrations();
-
 
     /**
      * Validates the given entity.
