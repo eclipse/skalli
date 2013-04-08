@@ -216,7 +216,7 @@ public class LDAPClient {
         List<User> ret = new ArrayList<User>(0);
         try {
             boolean somethingAdded = false;
-            SearchControls sc = new SearchControls();
+            SearchControls sc = getSearchControls();
             String[] parts = StringUtils.split(NormalizeUtil.normalize(name), " ,"); //$NON-NLS-1$
             if (parts.length == 1) {
                 somethingAdded = search(parts[0], ret, ldap, sc);
