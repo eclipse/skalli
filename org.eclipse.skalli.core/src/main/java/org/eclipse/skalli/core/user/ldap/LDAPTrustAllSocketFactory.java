@@ -27,7 +27,7 @@ import javax.net.ssl.TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class LDAPTrustAllSocketFactory extends SocketFactory implements Comparator<Object> {
+public class LDAPTrustAllSocketFactory extends SocketFactory implements Comparator<Object> {
 
     private static final Logger LOG = LoggerFactory.getLogger(LDAPTrustAllSocketFactory.class);
 
