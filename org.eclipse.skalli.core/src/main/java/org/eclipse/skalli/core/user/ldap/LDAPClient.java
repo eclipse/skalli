@@ -49,10 +49,18 @@ public class LDAPClient {
     private static final String DEFAULT_CONTEXT_FACTORY = "com.sun.jndi.ldap.LdapCtxFactory"; //$NON-NLS-1$
     private static final String USE_CONNECTION_POOLING = "com.sun.jndi.ldap.connect.pool"; //$NON-NLS-1$
     private static final String CONNECT_POOL_PROTOCOLS = "com.sun.jndi.ldap.connect.pool.protocol"; //$NON-NLS-1$
+    private static final String CONNECT_POOL_DEBUG = "com.sun.jndi.ldap.connect.pool.debug"; //$NON-NLS-1$
+    private static final String CONNECT_POOL_MAXSIZE = "com.sun.jndi.ldap.connect.pool.maxsize"; //$NON-NLS-1$
+    private static final String CONNECT_POOL_TIMEOUT = "com.sun.jndi.ldap.connect.pool.timeout"; //$NON-NLS-1$
 
     static {
-        // heaven knows why this is a system property while all other params can be set per context...
+        // heaven knows why the following params are system properties while all other params can be set per context...
         System.setProperty(CONNECT_POOL_PROTOCOLS, "plain ssl"); //$NON-NLS-1$
+        System.setProperty(CONNECT_POOL_MAXSIZE, "5"); //$NON-NLS-1$
+        System.setProperty(CONNECT_POOL_TIMEOUT, "10000"); //$NON-NLS-1$
+        if (LOG.isDebugEnabled()) {
+            System.setProperty(CONNECT_POOL_DEBUG, "fine"); //$NON-NLS-1$
+        }
     }
 
     private LDAPConfig config;
@@ -127,6 +135,16 @@ public class LDAPClient {
         }
     }
 
+    private void closeQuietly(NamingEnumeration<?> result) {
+        if (result != null) {
+            try {
+                result.close();
+            } catch (NamingException e) {
+                LOG.error("Failed to close LDAP result set", e);
+            }
+        }
+    }
+
     public User searchUserById(String userId) {
         LdapContext ldap = null;
         try {
@@ -173,18 +191,23 @@ public class LDAPClient {
 
     private User searchUserById(LdapContext ldap, String userId) throws NamingException {
         SearchControls sc = getSearchControls();
-        NamingEnumeration<SearchResult> results = ldap.search(config.getBaseDN(),
+        NamingEnumeration<SearchResult> results = null;
+        try {
+            results = ldap.search(config.getBaseDN(),
                 MessageFormat.format("(&(objectClass=user)(sAMAccountName={0}))", userId), sc); //$NON-NLS-1$
-        while (results != null && results.hasMore()) {
-            SearchResult entry = results.next();
-            User user = processEntry(entry);
-            if (user != null) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(MessageFormat.format("Success reading from LDAP: {0}, {1} <{2}>", //$NON-NLS-1$
-                            user.getUserId(), user.getDisplayName(), user.getEmail()));
+            while (results != null && results.hasMore()) {
+                SearchResult entry = results.next();
+                User user = processEntry(entry);
+                if (user != null) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug(MessageFormat.format("Success reading from LDAP: {0}, {1} <{2}>", //$NON-NLS-1$
+                                user.getUserId(), user.getDisplayName(), user.getEmail()));
+                    }
+                    return user;
                 }
-                return user;
             }
+        } finally {
+            closeQuietly(results);
         }
         return new User(userId);
     }
@@ -200,28 +223,45 @@ public class LDAPClient {
             }
             else if (parts.length > 1) {
                 // givenname surname ('Michael Ochmann'), or surname givenname('Ochmann, Michael')
-                NamingEnumeration<SearchResult> results = ldap.search(
+                NamingEnumeration<SearchResult> results = null;
+                try {
+                    results = ldap.search(
                         config.getBaseDN(),
                         MessageFormat.format("(&(objectClass=user)(givenName={0}*)(sn={1}*))", //$NON-NLS-1$
                                 parts[0], parts[1]), sc);
-                somethingAdded |= addLDAPSearchResult(ret, results);
-                results = ldap.search(
-                        config.getBaseDN(),
-                        MessageFormat.format("(&(objectClass=user)(sn={0}*)(givenName={1}*))", //$NON-NLS-1$
-                                parts[0], parts[1]), sc);
-                somethingAdded |= addLDAPSearchResult(ret, results);
-                // givenname initial surname, e.g. 'Michael R. Ochmann'
-                if (parts.length > 2) {
-                    results = ldap.search(
-                            config.getBaseDN(),
-                            MessageFormat.format("(&(objectClass=user)(givenName={0}*)(sn={1}*))", //$NON-NLS-1$
-                                    parts[0], parts[2]), sc);
                     somethingAdded |= addLDAPSearchResult(ret, results);
+                } finally {
+                    closeQuietly(results);
+                }
+                try {
                     results = ldap.search(
                             config.getBaseDN(),
                             MessageFormat.format("(&(objectClass=user)(sn={0}*)(givenName={1}*))", //$NON-NLS-1$
-                                    parts[0], parts[2]), sc);
+                                    parts[0], parts[1]), sc);
                     somethingAdded |= addLDAPSearchResult(ret, results);
+                } finally {
+                    closeQuietly(results);
+                }
+                // givenname initial surname, e.g. 'Michael R. Ochmann'
+                if (parts.length > 2) {
+                    try {
+                        results = ldap.search(
+                                config.getBaseDN(),
+                                MessageFormat.format("(&(objectClass=user)(givenName={0}*)(sn={1}*))", //$NON-NLS-1$
+                                        parts[0], parts[2]), sc);
+                        somethingAdded |= addLDAPSearchResult(ret, results);
+                    } finally {
+                        closeQuietly(results);
+                    }
+                    try {
+                        results = ldap.search(
+                                config.getBaseDN(),
+                                MessageFormat.format("(&(objectClass=user)(sn={0}*)(givenName={1}*))", //$NON-NLS-1$
+                                        parts[0], parts[2]), sc);
+                        somethingAdded |= addLDAPSearchResult(ret, results);
+                    } finally {
+                        closeQuietly(results);
+                    }
                 }
                 if (!somethingAdded) {
                     // try to match each part individually
@@ -239,25 +279,43 @@ public class LDAPClient {
 
     private boolean search(String s, List<User> ret, LdapContext ldap, SearchControls sc) throws NamingException {
         // try a match with surname*
-        NamingEnumeration<SearchResult> results = ldap.search(
-                config.getBaseDN(),
-                MessageFormat.format("(&(objectClass=user)(|(sn={0}*)(givenName={1}*)))", s, s), sc); //$NON-NLS-1$
-        boolean somethingAdded = addLDAPSearchResult(ret, results);
-        if (!somethingAdded) {
-            // try a match with the account name and mail address
+        boolean somethingAdded = false;
+        NamingEnumeration<SearchResult> results = null;
+        try {
             results = ldap.search(
                     config.getBaseDN(),
-                    MessageFormat.format("(&(objectClass=user)(sAMAccountName={0}*))", s), sc); //$NON-NLS-1$
-            somethingAdded |= addLDAPSearchResult(ret, results);
-            if (!somethingAdded) {
-                // try to match surname~= or givenname~=
-                results = ldap.search(config.getBaseDN(),
-                        MessageFormat.format("(&(objectClass=user)(|(sn~={0})(givenName~={1})))", s, s), sc); //$NON-NLS-1$
+                    MessageFormat.format("(&(objectClass=user)(|(sn={0}*)(givenName={1}*)))", s, s), sc); //$NON-NLS-1$
+            somethingAdded = addLDAPSearchResult(ret, results);
+        } finally {
+            closeQuietly(results);
+        }
+        if (!somethingAdded) {
+            try {
+                // try a match with the account name and mail address
+                results = ldap.search(
+                        config.getBaseDN(),
+                        MessageFormat.format("(&(objectClass=user)(sAMAccountName={0}*))", s), sc); //$NON-NLS-1$
                 somethingAdded |= addLDAPSearchResult(ret, results);
-                if (!somethingAdded) {
+            } finally {
+                closeQuietly(results);
+            }
+            if (!somethingAdded) {
+                try {
+                    // try to match surname~= or givenname~=
                     results = ldap.search(config.getBaseDN(),
-                            MessageFormat.format("(&(objectClass=user)(mail={0}*))", s), sc); //$NON-NLS-1$
+                            MessageFormat.format("(&(objectClass=user)(|(sn~={0})(givenName~={1})))", s, s), sc); //$NON-NLS-1$
                     somethingAdded |= addLDAPSearchResult(ret, results);
+                } finally {
+                    closeQuietly(results);
+                }
+                if (!somethingAdded) {
+                    try {
+                        results = ldap.search(config.getBaseDN(),
+                                MessageFormat.format("(&(objectClass=user)(mail={0}*))", s), sc); //$NON-NLS-1$
+                        somethingAdded |= addLDAPSearchResult(ret, results);
+                    } finally {
+                        closeQuietly(results);
+                    }
                 }
             }
         }
@@ -335,5 +393,4 @@ public class LDAPClient {
         sc.setReturningAttributes(LDAPAttributeNames.getAll());
         return sc;
     }
-
 }
