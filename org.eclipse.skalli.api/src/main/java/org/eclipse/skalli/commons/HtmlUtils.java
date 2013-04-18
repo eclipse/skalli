@@ -15,6 +15,8 @@ import java.text.MessageFormat;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Entities.EscapeMode;
 import org.jsoup.safety.Whitelist;
 
 /**
@@ -80,15 +82,14 @@ public class HtmlUtils {
     /**
      * Filters untrusted tags and attributes from the given HTML fragment by using
      * the {@link #getWhiteList() whitelist} of allowed tags and attributes.
+     * Escapes the XML entities <tt>&amp;quot</tt>, <tt>&amp;amp</tt>, <tt>&amp;apos</tt>,
+     * <tt>&amp;lt</tt>, and <tt>&amp;gt</tt> in the output.
      *
      * @param html  the HTML fragment to clean.
      * @return the cleaned input string.
      */
     public static String clean(String html) {
-        if (StringUtils.isBlank(html)) {
-            return html;
-        }
-        return Jsoup.clean(html, getWhiteList());
+        return clean(html, null, null);
     }
 
     /**
@@ -96,14 +97,22 @@ public class HtmlUtils {
      * the {@link #getWhiteList() whitelist} of allowed tags and attributes.
      *
      * @param html  the HTML fragment to clean.
-     * @param baseUri  base URL to resolve relative URLs against.
+     * @param baseUri  base URL to resolve relative URLs against, or <code>null</code>.
+     * @param escapeMode  determines how XML/HTML entities are to be escaped,
+     * or <code>null</code>. The default escape mode is {@link EscapeMode.xhtml},
+     * i.e. only the XML entities <tt>&amp;quot</tt>, <tt>&amp;amp</tt>, <tt>&amp;apos</tt>,
+     * <tt>&amp;lt</tt>, and <tt>&amp;gt</tt> are recognized.
+     *
      * @return the cleaned input string.
      */
-    public static String clean(String html, String baseUri) {
+    public static String clean(String html, String baseUri, EscapeMode escapeMode) {
         if (StringUtils.isBlank(html)) {
             return html;
         }
-        return Jsoup.clean(html, baseUri, getWhiteList());
+        String cleaned = Jsoup.clean(html, baseUri != null? baseUri : "", getWhiteList()); //$NON-NLS-1$
+        Document cleanedDocument = Jsoup.parse(cleaned);
+        cleanedDocument.outputSettings().escapeMode(escapeMode != null? escapeMode : EscapeMode.xhtml);
+        return cleanedDocument.body().html();
     }
 
    /**
