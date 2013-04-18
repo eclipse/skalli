@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
     Copyright (c) 2010, 2011 SAP AG and others.
     All rights reserved. This program and the accompanying materials
@@ -19,7 +20,7 @@
         <relativePath>../org.eclipse.skalli.parent</relativePath>
     </parent>
 
-    <artifactId>org.eclipse.skalli.product.jetty.win32</artifactId>
+    <artifactId>org.eclipse.skalli.p2</artifactId>
     <packaging>eclipse-repository</packaging>
 
     <build>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (c) 2010, 2011 SAP AG and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+
+    Contributors:
+        SAP AG - initial API and implementation
+ -->
+<site>
+   <feature url="features/org.eclipse.skalli.feature_0.2.0.qualifier.jar" id="org.eclipse.skalli.feature" version="0.2.0.qualifier">
+      <category name="skalli"/>
+   </feature>
+   <feature url="features/org.eclipse.skalli.source.feature_0.2.0.qualifier.jar" id="org.eclipse.skalli.source.feature" version="0.2.0.qualifier">
+      <category name="skalli"/>
+   </feature>
+   <feature url="features/org.eclipse.skalli.testing.feature_0.2.0.qualifier.jar" id="org.eclipse.skalli.testing.feature" version="0.2.0.qualifier">
+      <category name="skalli"/>
+   </feature>
+   <feature url="features/org.eclipse.skalli.orbit.feature_0.2.0.qualifier.jar" id="org.eclipse.skalli.orbit.feature" version="0.2.0.qualifier">
+      <category name="skalli"/>
+   </feature>
+   <category-def name="skalli" label="Skalli"/>
+</site>
