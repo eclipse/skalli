@@ -13,21 +13,21 @@ package org.eclipse.skalli.model.ext.devinf.internal.config;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
-import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingsConfig;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapping;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappings;
 import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class ScmLocationMappingResource extends ConfigResourceBase<ScmLocationMappingsConfig> {
+public class ScmLocationMappingResource extends ConfigResourceBase<ScmLocationMappings> {
 
     @Override
-    protected Class<ScmLocationMappingsConfig> getConfigClass() {
-        return ScmLocationMappingsConfig.class;
+    protected Class<ScmLocationMappings> getConfigClass() {
+        return ScmLocationMappings.class;
     };
 
     @Override
     protected List<Class<?>> getAdditionalConfigClasses() {
         List<Class<?>> ret = new LinkedList<Class<?>>();
-        ret.add(ScmLocationMappingConfig.class);
+        ret.add(ScmLocationMapping.class);
         return ret;
     }
 

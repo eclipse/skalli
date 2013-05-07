@@ -17,7 +17,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
-import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapping;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenCoordinate;
@@ -193,14 +193,13 @@ public class ProjectMavenBox extends InfoBoxBase implements InfoBox {
         if (!isValidNormalizedPath(relativePath)) {
             return null;
         }
-        ScmLocationMapper mapper = new ScmLocationMapper();
-        List<ScmLocationMappingConfig> mappings = mapper.getMappings(configService,
-                "git", ScmLocationMapper.PURPOSE_BROWSE); //$NON-NLS-1$
+        ScmLocationMapper mapper = new ScmLocationMapper("git", ScmLocationMapper.PURPOSE_BROWSE); //$NON-NLS-1$
+        List<ScmLocationMapping> mappings = mapper.getMappings(configService);
         if (mappings.isEmpty()) {
             return null;
         }
         String repositoryRoot = null;
-        for (ScmLocationMappingConfig mapping : mappings) {
+        for (ScmLocationMapping mapping : mappings) {
             repositoryRoot = PropertyMapper.convert(scmLocation, mapping.getPattern(),
                     mapping.getTemplate(), project.getProjectId());
             if (StringUtils.isNotBlank(repositoryRoot)) {

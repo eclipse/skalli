@@ -13,7 +13,7 @@ package org.eclipse.skalli.model.ext.maven.internal;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapping;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
@@ -26,8 +26,8 @@ public class GitWebMavenPomResolverTest {
     private static final GitWebMavenPomResolver getGitWebPomResolver(final String pattern, final String template) {
         GitWebMavenPomResolver resolver = new GitWebMavenPomResolver() {
             @Override
-            protected ScmLocationMappingConfig getScmLocationMapping(String scmLocation) {
-                return new ScmLocationMappingConfig("browse.maven", "git", "maven-resolver", pattern,
+            protected ScmLocationMapping getScmLocationMapping(String scmLocation) {
+                return new ScmLocationMapping("browse.maven", "git", "maven-resolver", pattern,
                       template, "Dowload POMs");
             }
         };

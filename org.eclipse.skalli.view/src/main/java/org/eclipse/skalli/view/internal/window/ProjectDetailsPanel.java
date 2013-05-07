@@ -210,6 +210,11 @@ public class ProjectDetailsPanel extends CssLayout implements ProjectPanel {
         }
 
         @Override
+        public String getLoggedInUserId() {
+            return application.getLoggedInUser();
+        }
+
+        @Override
         public Resource getBundleResource(String path) {
             return new StreamResource(new ExtensionStreamSource(iconProvider, path),
                     FilenameUtils.getName(path), application);

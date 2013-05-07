@@ -12,6 +12,7 @@ package org.eclipse.skalli.view.ext.impl.internal.infobox;
 
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.Link;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
@@ -68,18 +69,19 @@ public class ProjectActivityBox extends InfoBoxBase implements InfoBox {
 
     @Override
     public boolean isVisible(Project project, String loggedInUserId) {
-        return (getActivityGraphicUrl(project) != null || getActivityDetailsUrl(project) != null);
+        return getActivityGraphicUrl(project, loggedInUserId) != null
+                || getActivityDetailsUrl(project, loggedInUserId) != null;
     }
 
-    private Link getActivityGraphicUrl(Project project) {
-        return getMappedLink(project, ScmLocationMapper.PURPOSE_ACTIVITY);
+    private Link getActivityGraphicUrl(Project project, String userId) {
+        return getMappedLink(ScmLocationMapper.PURPOSE_ACTIVITY, project, userId);
     }
 
-    private Link getActivityDetailsUrl(Project project) {
-        return getMappedLink(project, ScmLocationMapper.PURPOSE_ACTIVITY_DETAILS);
+    private Link getActivityDetailsUrl(Project project, String userId) {
+        return getMappedLink(ScmLocationMapper.PURPOSE_ACTIVITY_DETAILS, project, userId);
     }
 
-    private Link getMappedLink(Project project, String purpose) {
+    private Link getMappedLink(String purpose, Project project, String userId) {
         if (configService == null) {
             return null;
         }
@@ -91,15 +93,9 @@ public class ProjectActivityBox extends InfoBoxBase implements InfoBox {
         if (StringUtils.isBlank(scmLocation)) {
             return null;
         }
-        ScmLocationMapper mapper = new ScmLocationMapper();
-        List<Link> links = mapper.getMappedLinks(configService, project.getProjectId(), scmLocation,
-                purpose);
-
-        if (links != null && links.size() > 0) {
-            return links.get(0);
-        } else {
-            return null;
-        }
+        ScmLocationMapper mapper = new ScmLocationMapper(ScmLocationMapper.ALL_PROVIDERS, purpose);
+        List<Link> links = mapper.getMappedLinks(scmLocation, userId, project, configService);
+        return CollectionUtils.isNotEmpty(links)? links.get(0) : null;
     }
 
     @Override
@@ -113,8 +109,8 @@ public class ProjectActivityBox extends InfoBoxBase implements InfoBox {
         layout.addComponent(label);
         layout.addComponent(new Label("&nbsp;", Label.CONTENT_XHTML));
 
-        Link imgLink = getActivityGraphicUrl(project);
-        Link detailsLink = getActivityDetailsUrl(project);
+        Link imgLink = getActivityGraphicUrl(project, util.getLoggedInUserId());
+        Link detailsLink = getActivityDetailsUrl(project, util.getLoggedInUserId());
 
         Label activityArea = new Label();
         activityArea.setContentMode(Label.CONTENT_XHTML);

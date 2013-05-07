@@ -10,19 +10,28 @@
  *******************************************************************************/
 package org.eclipse.skalli.ext.mapping.mail;
 
-import org.eclipse.skalli.ext.mapping.LinkMappingConfig;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-@XStreamAlias("mailingListMapping")
-public class MailingListMappingConfig extends LinkMappingConfig {
+@XStreamAlias("mailingListMappings")
+public class MailingListMappings {
+
+    @XStreamImplicit
+    private ArrayList<MailingListMapping> mailingListMappings;
 
     // do not remove: required by xstream
-    public MailingListMappingConfig() {
-        super();
+    public MailingListMappings() {
     }
 
-    public MailingListMappingConfig(String id, String purpose, String pattern, String template, String name) {
-        super(id, purpose, pattern, template, name);
+    public MailingListMappings(ArrayList<MailingListMapping> mailingListMappings) {
+        this.mailingListMappings = mailingListMappings;
     }
+
+    public List<MailingListMapping> getMailingListMappings() {
+        return mailingListMappings;
+    }
+
 }

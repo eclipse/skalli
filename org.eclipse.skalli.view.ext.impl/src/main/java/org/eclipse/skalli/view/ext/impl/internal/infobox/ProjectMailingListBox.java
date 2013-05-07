@@ -15,11 +15,11 @@ import java.util.Set;
 
 import org.eclipse.skalli.commons.HtmlBuilder;
 import org.eclipse.skalli.commons.Link;
-import org.eclipse.skalli.ext.mapping.LinkMapper;
 import org.eclipse.skalli.ext.mapping.mail.MailingListMapper;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.commons.InfoExtension;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.extension.LinkMapper;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;
 import org.eclipse.skalli.view.ext.InfoBoxBase;
@@ -69,13 +69,13 @@ public class ProjectMailingListBox extends InfoBoxBase implements InfoBox {
         if (ext != null) {
             Set<String> mailingLists = ext.getMailingLists();
             if (mailingLists.size() > 0) {
-                MailingListMapper mapper = new MailingListMapper();
+                MailingListMapper mapper = new MailingListMapper(LinkMapper.ALL_PURPOSES);
                 html.append("<ul>"); //$NON-NLS-1$
                 for (String mailingList : ext.getMailingLists()) {
                     html.append("<li>");
                     html.appendMailToLink(mailingList);
-                    List<Link> mappedLinks = mapper.getMappedLinks(configService, project.getProjectId(),
-                            mailingList, LinkMapper.ALL_PURPOSES);
+                    List<Link> mappedLinks = mapper.getMappedLinks(mailingList,
+                            util.getLoggedInUserId(), project, configService);
                     if (!mappedLinks.isEmpty()) {
                         html.appendLineBreak();
                         html.appendLinks(mappedLinks);

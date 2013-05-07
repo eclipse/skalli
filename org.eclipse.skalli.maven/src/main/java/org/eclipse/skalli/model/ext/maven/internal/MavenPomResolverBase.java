@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
-import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapping;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.maven.MavenPomResolver;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
@@ -37,7 +37,7 @@ public abstract class MavenPomResolverBase implements MavenPomResolver {
 
     @Override
     public boolean canResolve(String scmLocation) {
-         ScmLocationMappingConfig mapping = getScmLocationMapping(scmLocation);
+         ScmLocationMapping mapping = getScmLocationMapping(scmLocation);
          return (mapping != null)? getProvider().equals(mapping.getProvider()) : false;
     }
 
@@ -47,7 +47,7 @@ public abstract class MavenPomResolverBase implements MavenPomResolver {
         return parser.parse(pomInputStream);
     }
 
-    protected ScmLocationMappingConfig getScmLocationMapping(String scmLocation) {
+    protected ScmLocationMapping getScmLocationMapping(String scmLocation) {
         if (configService == null) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("no configuration service available");
@@ -55,9 +55,9 @@ public abstract class MavenPomResolverBase implements MavenPomResolver {
             return null;
         }
 
-        ScmLocationMapper mapper = new ScmLocationMapper();
-        List<ScmLocationMappingConfig> mappings = mapper.getMappings(configService, ScmLocationMapper.ALL_PROVIDERS
-                , ScmLocationMapper.MAVEN_RESOLVER);
+        ScmLocationMapper mapper = new ScmLocationMapper(ScmLocationMapper.ALL_PROVIDERS,
+                ScmLocationMapper.MAVEN_RESOLVER);
+        List<ScmLocationMapping> mappings = mapper.getMappings(configService);
         if (mappings.isEmpty()) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(MessageFormat.format(
@@ -67,7 +67,7 @@ public abstract class MavenPomResolverBase implements MavenPomResolver {
             return null;
         }
 
-        for (ScmLocationMappingConfig mapping : mappings) {
+        for (ScmLocationMapping mapping : mappings) {
             if (PropertyMapper.matches(scmLocation, mapping.getPattern())) {
                 return mapping;
             }
@@ -82,7 +82,7 @@ public abstract class MavenPomResolverBase implements MavenPomResolver {
     }
 
     protected String getRepositoryRoot(String scmLocation) {
-        ScmLocationMappingConfig scmMappingConfig = getScmLocationMapping(scmLocation);
+        ScmLocationMapping scmMappingConfig = getScmLocationMapping(scmLocation);
         if (scmMappingConfig == null) {
             throw new IllegalArgumentException(MessageFormat.format(
                     "no scm location mapping available for location {0}", scmLocation));

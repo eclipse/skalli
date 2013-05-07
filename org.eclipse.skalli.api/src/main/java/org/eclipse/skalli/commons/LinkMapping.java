@@ -8,9 +8,9 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.ext.mapping;
+package org.eclipse.skalli.commons;
 
-public class LinkMappingConfig {
+public class LinkMapping {
 
     private String id;
     private String purpose;
@@ -18,10 +18,10 @@ public class LinkMappingConfig {
     private String template;
     private String name;
 
-    public LinkMappingConfig() {
+    public LinkMapping() {
     }
 
-    public LinkMappingConfig(String id, String purpose, String pattern, String template, String name) {
+    public LinkMapping(String id, String purpose, String pattern, String template, String name) {
         this.id = id;
         this.purpose = purpose;
         this.pattern = pattern;

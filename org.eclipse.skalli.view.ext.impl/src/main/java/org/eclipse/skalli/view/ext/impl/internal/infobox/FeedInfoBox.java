@@ -154,14 +154,15 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
             sourceFilter.put(source, new SourceDetails(true, captions.get(source)));
         }
 
-        renderContentPanel(contentLayout, project, sourceFilter);
+        renderContentPanel(contentLayout, project, util.getLoggedInUserId(), sourceFilter);
         return contentLayout;
     }
 
-    private void renderContentPanel(Layout layout, Project project, HashMap<String, SourceDetails> sourceFilter) {
+    private void renderContentPanel(Layout layout, Project project, String userId,
+            HashMap<String, SourceDetails> sourceFilter) {
         layout.removeAllComponents();
-        renderSourceFilters(layout, project, sourceFilter);
-        renderTimelineContent(layout, project, sourceFilter);
+        renderSourceFilters(layout, project, userId, sourceFilter);
+        renderTimelineContent(layout, project, userId, sourceFilter);
     }
 
     private List<String> getSources(Project project) {
@@ -174,11 +175,12 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
         return Collections.emptyList();
     }
 
-    private void renderSourceFilters(Layout parentLayout, Project project, HashMap<String, SourceDetails> sourceFilter) {
+    private void renderSourceFilters(Layout parentLayout, Project project, String userId,
+            HashMap<String, SourceDetails> sourceFilter) {
         FloatLayout grid = new FloatLayout();
         Set<String> keys = sourceFilter.keySet();
         for (String source : keys) {
-            addSourceFilter(parentLayout, grid, source, sourceFilter, project);
+            addSourceFilter(parentLayout, grid, source, sourceFilter, project, userId);
         }
         parentLayout.addComponent(grid);
     }
@@ -196,20 +198,18 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
         return captions;
     }
 
-    private void renderTimelineContent(final Layout layout, final Project project,
-            final HashMap<String, SourceDetails> sourceFilter) {
+    private void renderTimelineContent(Layout layout, Project project, String userId,
+            HashMap<String, SourceDetails> sourceFilter) {
         try {
 
             List<String> selectedSources = getSelecedSources(sourceFilter);
             if (!CollectionUtils.isEmpty(selectedSources)) {
-
                 List<Entry> entries = feedService.findEntries(project.getUuid(), selectedSources,
                         maxFeedEntries + 1);
-                createLabel(layout, getEntriesAsHtml(project, entries, Math.min(entries.size(), maxFeedEntries))
-                        .toString());
-
+                createLabel(layout, getEntriesAsHtml(project, userId, entries,
+                        Math.min(entries.size(), maxFeedEntries)).toString());
                 if (entries.size() > maxFeedEntries) {
-                    addMoreButton(layout, project, sourceFilter);
+                    addMoreButton(layout, project, userId, sourceFilter);
                 }
             }
         } catch (StorageException e) {
@@ -219,7 +219,7 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
     }
 
     @SuppressWarnings({ "deprecation", "serial" })
-    private void addMoreButton(final Layout layout, final Project project,
+    private void addMoreButton(final Layout layout, final Project project, final String userId,
             final HashMap<String, SourceDetails> sourceFilter) {
         final Button moreButton = new Button("more ...");
         moreButton.setStyle(Button.STYLE_LINK);
@@ -227,16 +227,16 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
             @Override
             public void buttonClick(ClickEvent event) {
                 maxFeedEntries = maxFeedEntries + 30;
-                renderContentPanel(layout, project, sourceFilter);
+                renderContentPanel(layout, project, userId, sourceFilter);
             }
         });
         layout.addComponent(moreButton);
     }
 
-    private HtmlBuilder getEntriesAsHtml(Project project,List<Entry> entries, int maxCount) {
+    private HtmlBuilder getEntriesAsHtml(Project project, String userId, List<Entry> entries, int maxCount) {
         HtmlBuilder html = new HtmlBuilder();
         for (int i = 0; i < maxCount; i++) {
-            addEntry(project, html, entries.get(i));
+            addEntry(project, userId, html, entries.get(i));
         }
         return html;
     }
@@ -253,7 +253,7 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
     }
 
     private void addSourceFilter(final Layout parentLayout, FloatLayout layout, final String source,
-            final HashMap<String, SourceDetails> sourceFilter, final Project project) {
+            final HashMap<String, SourceDetails> sourceFilter, final Project project, final String userId) {
         final SourceDetails value = sourceFilter.get(source);
         CheckBox cb = new CheckBox(value.caption, value.selected);
         cb.setImmediate(true);
@@ -264,14 +264,14 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
             public void buttonClick(ClickEvent event) {
                 boolean checked = event.getButton().booleanValue();
                 value.selected = checked;
-                renderContentPanel(parentLayout, project, sourceFilter);
+                renderContentPanel(parentLayout, project, userId, sourceFilter);
             }
         });
         layout.addComponent(cb, "margin-right:10px;"); //$NON-NLS-1$
     }
 
     @SuppressWarnings("nls")
-    private void addEntry(Project project, HtmlBuilder html, Entry entry) {
+    private void addEntry(Project project, String userId, HtmlBuilder html, Entry entry) {
         html.append("<p class=\"").append(STYLE_TIMELINE_ENTRY).append("\">");
 
         String title = StringUtils.abbreviate(entry.getTitle(), MAX_DISPLAY_LENGTH_TITLE);
@@ -281,7 +281,7 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
             link = entry.getLink().getHref();
         }
 
-        link = mapLink(project, link);
+        link = mapLink(project, userId, link);
 
         html.appendLink(HtmlUtils.clean(title), link);
 
@@ -304,13 +304,13 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
         html.append("</p>");
     }
 
-    private String mapLink(Project project, String link) {
+    private String mapLink(Project project, String userId, String link) {
         if (configService == null) {
             return link;
         }
-        ScmLocationMapper mapper = new ScmLocationMapper();
-        List<Link> mappedScmLinks = mapper.getMappedLinks(configService, project.getUuid().toString(), link,
+        ScmLocationMapper mapper = new ScmLocationMapper(ScmLocationMapper.ALL_PROVIDERS,
                 ScmLocationMapper.PURPOSE_FEED_LINK);
+        List<Link> mappedScmLinks = mapper.getMappedLinks(link, userId, project, configService);
         if (mappedScmLinks.size() == 0) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(MessageFormat.format("no mapping for feed link =''{0}'' with purpose = ''{1}'' defined.",

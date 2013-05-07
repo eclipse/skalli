@@ -239,6 +239,9 @@ public class PropertyMapper {
      * given regular expression.
      */
     public static String convert(String s, String pattern, String template, EntityBase entity, Map<String,Object> properties) {
+        if (pattern == null) {
+            return null;
+        }
         Pattern regex = Pattern.compile(pattern);
         return convert(s, regex, template, entity, properties);
     }
@@ -264,6 +267,9 @@ public class PropertyMapper {
      * given regular expression.
      */
     public static String convert(String s, Pattern pattern, String template, EntityBase entity, Map<String,Object> properties) {
+        if (s == null || pattern == null) {
+            return null;
+        }
         Matcher matcher = pattern.matcher(s);
         if (!matcher.matches()) {
             return null;

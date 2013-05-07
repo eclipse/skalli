@@ -10,21 +10,21 @@
  *******************************************************************************/
 package org.eclipse.skalli.ext.mapping.scm;
 
-import org.eclipse.skalli.ext.mapping.LinkMappingConfig;
+import org.eclipse.skalli.commons.LinkMapping;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("scmMapping")
-public class ScmLocationMappingConfig extends LinkMappingConfig {
+public class ScmLocationMapping extends LinkMapping {
 
     private String provider;
 
     // do not remove: required by xstream
-    public ScmLocationMappingConfig() {
+    public ScmLocationMapping() {
         super();
     }
 
-    public ScmLocationMappingConfig(String id, String provider, String purpose, String pattern,
+    public ScmLocationMapping(String id, String provider, String purpose, String pattern,
             String template, String name) {
         super(id, purpose, pattern, template, name);
         this.provider = provider;

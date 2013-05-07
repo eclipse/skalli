@@ -13,21 +13,21 @@ package org.eclipse.skalli.ext.mapping.mail.internal;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.skalli.ext.mapping.mail.MailingListMappingConfig;
-import org.eclipse.skalli.ext.mapping.mail.MailingListMappingsConfig;
+import org.eclipse.skalli.ext.mapping.mail.MailingListMapping;
+import org.eclipse.skalli.ext.mapping.mail.MailingListMappings;
 import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class MailingListMappingResource extends ConfigResourceBase<MailingListMappingsConfig> {
+public class MailingListMappingResource extends ConfigResourceBase<MailingListMappings> {
 
     @Override
-    protected Class<MailingListMappingsConfig> getConfigClass() {
-        return MailingListMappingsConfig.class;
+    protected Class<MailingListMappings> getConfigClass() {
+        return MailingListMappings.class;
     };
 
     @Override
     protected List<Class<?>> getAdditionalConfigClasses() {
         List<Class<?>> ret = new LinkedList<Class<?>>();
-        ret.add(MailingListMappingConfig.class);
+        ret.add(MailingListMapping.class);
         return ret;
     }
 

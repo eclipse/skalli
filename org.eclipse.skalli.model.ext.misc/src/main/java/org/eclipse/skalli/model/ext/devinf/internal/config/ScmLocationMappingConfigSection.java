@@ -10,11 +10,11 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.devinf.internal.config;
 
-import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingsConfig;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappings;
 import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.restlet.resource.ServerResource;
 
-public class ScmLocationMappingConfigSection implements ConfigSection<ScmLocationMappingsConfig> {
+public class ScmLocationMappingConfigSection implements ConfigSection<ScmLocationMappings> {
 
     private static final String STORAGE_KEY = "devInf.scmLocationMappings"; //$NON-NLS-1$
     private static final String[] RESOURCE_PATHS = new String[] { "/devInf/scmMappings" }; //$NON-NLS-1$
@@ -25,8 +25,8 @@ public class ScmLocationMappingConfigSection implements ConfigSection<ScmLocatio
     }
 
     @Override
-    public Class<ScmLocationMappingsConfig> getConfigClass() {
-        return ScmLocationMappingsConfig.class;
+    public Class<ScmLocationMappings> getConfigClass() {
+        return ScmLocationMappings.class;
     }
 
     @Override

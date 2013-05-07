@@ -26,6 +26,8 @@ public interface ExtensionUtil {
 
     public User getLoggedInUser();
 
+    public String getLoggedInUserId();
+
     public Navigator getNavigator();
 
     public ProjectTemplate getProjectTemplate();

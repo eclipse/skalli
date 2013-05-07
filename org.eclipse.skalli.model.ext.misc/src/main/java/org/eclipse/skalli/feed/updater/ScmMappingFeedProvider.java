@@ -18,7 +18,8 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
-import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapping;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappings;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
@@ -49,14 +50,11 @@ public class ScmMappingFeedProvider implements FeedProvider {
         DevInfProjectExt ext = project.getExtension(DevInfProjectExt.class);
         if (ext != null) {
             Set<String> scmLocations = ext.getScmLocations();
-            ScmLocationMapper mapper = new ScmLocationMapper();
+            ScmLocationMapper mapper = new ScmLocationMapper(ScmLocationMapper.ALL_PROVIDERS,
+                    ScmLocationMapper.PURPOSE_FEED);
             for (String scmLocation : scmLocations) {
-
-                //we want to have all providers
-                List<ScmLocationMappingConfig> feedMappings = mapper.getMappings(configService, null,
-                        ScmLocationMapper.PURPOSE_FEED);
-
-                for (ScmLocationMappingConfig mappingConfig : feedMappings) {
+                List<ScmLocationMapping> feedMappings = mapper.filter(getScmLocationMappings());
+                for (ScmLocationMapping mappingConfig : feedMappings) {
                     String urlStr = PropertyMapper.convert(scmLocation, mappingConfig.getPattern(),
                             mappingConfig.getTemplate(), project, "");
                     if (StringUtils.isNotBlank(urlStr)) {
@@ -79,5 +77,10 @@ public class ScmMappingFeedProvider implements FeedProvider {
             }
         }
         return result;
+    }
+
+    private List<ScmLocationMapping> getScmLocationMappings() {
+        ScmLocationMappings mappingsConfig = configService.readConfiguration(ScmLocationMappings.class);
+        return mappingsConfig != null? mappingsConfig.getScmMappings() : null;
     }
 }

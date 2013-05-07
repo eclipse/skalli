@@ -15,11 +15,12 @@ import java.util.List;
 
 import org.easymock.EasyMock;
 import org.eclipse.skalli.commons.Link;
-import org.eclipse.skalli.ext.mapping.LinkMapper;
 import org.eclipse.skalli.ext.mapping.mail.MailingListMapper;
-import org.eclipse.skalli.ext.mapping.mail.MailingListMappingConfig;
-import org.eclipse.skalli.ext.mapping.mail.MailingListMappingsConfig;
+import org.eclipse.skalli.ext.mapping.mail.MailingListMapping;
+import org.eclipse.skalli.ext.mapping.mail.MailingListMappings;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.extension.LinkMapper;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,31 +29,31 @@ public class MailingListMapperTest {
 
     @Test
     public void testGetMappedLinks() {
-        MailingListMappingConfig m1 = new MailingListMappingConfig("1", "purpose1", "^(hello) (world)$", "{1}_1_{2}",
+        MailingListMapping m1 = new MailingListMapping("1", "purpose1", "^(hello) (world)$", "{1}_1_{2}",
                 "Mapping 1");
-        MailingListMappingConfig m2 = new MailingListMappingConfig("2", "purpose1", "^(hello) (world)$", "{1}_2_{2}",
+        MailingListMapping m2 = new MailingListMapping("2", "purpose1", "^(hello) (world)$", "{1}_2_{2}",
                 "Mapping 2");
-        MailingListMappingConfig m3 = new MailingListMappingConfig("3", "purpose1", "^(hello)no(world)$", "{1}_1_{2}",
+        MailingListMapping m3 = new MailingListMapping("3", "purpose1", "^(hello)no(world)$", "{1}_1_{2}",
                 "Mapping 3");
-        ArrayList<MailingListMappingConfig> ms = new ArrayList<MailingListMappingConfig>(3);
+        ArrayList<MailingListMapping> ms = new ArrayList<MailingListMapping>(3);
         ms.add(m1);
         ms.add(m2);
         ms.add(m3);
-        MailingListMappingsConfig mappings = new MailingListMappingsConfig(ms);
+        MailingListMappings mappings = new MailingListMappings(ms);
 
         final ConfigurationService mockConfigService = EasyMock.createMock(ConfigurationService.class);
         Object[] mocks = new Object[] { mockConfigService };
 
         EasyMock.reset(mocks);
 
-        mockConfigService.readConfiguration(EasyMock.isA(Class.class));
+        mockConfigService.readConfiguration(MailingListMappings.class);
         EasyMock.expectLastCall().andReturn(mappings);
 
         EasyMock.replay(mocks);
 
-        MailingListMapper mapper = new MailingListMapper();
-        List<Link> res = mapper.getMappedLinks(mockConfigService, "some.project", "hello world",
-                LinkMapper.ALL_PURPOSES);
+        MailingListMapper mapper = new MailingListMapper(LinkMapper.ALL_PURPOSES);
+        Project project = new Project("some.project", "Some Project", "Some Project");
+        List<Link> res = mapper.getMappedLinks("hello world", "homer", project, mockConfigService);
         EasyMock.verify(mocks);
 
         Assert.assertNotNull(res);
@@ -66,14 +67,14 @@ public class MailingListMapperTest {
 
         EasyMock.reset(mocks);
 
-        mockConfigService.readConfiguration(EasyMock.isA(Class.class));
+        mockConfigService.readConfiguration(MailingListMappings.class);
         EasyMock.expectLastCall().andReturn(null);
 
         EasyMock.replay(mocks);
 
-        MailingListMapper mapper = new MailingListMapper();
-        List<Link> res = mapper.getMappedLinks(mockConfigService, "some.project", "hello world",
-                LinkMapper.ALL_PURPOSES);
+        MailingListMapper mapper = new MailingListMapper(LinkMapper.ALL_PURPOSES);
+        Project project = new Project("some.project", "Some Project", "Some Project");
+        List<Link> res = mapper.getMappedLinks("hello world" ,"homer", project, mockConfigService);
         EasyMock.verify(mocks);
 
         Assert.assertNotNull(res);

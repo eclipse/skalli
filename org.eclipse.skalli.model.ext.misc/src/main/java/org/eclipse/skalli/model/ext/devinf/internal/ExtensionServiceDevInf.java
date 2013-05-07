@@ -21,8 +21,8 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.commons.ComparatorUtils;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
-import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
-import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingsConfig;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapping;
+import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappings;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
@@ -217,11 +217,11 @@ public class ExtensionServiceDevInf
     private List<Pattern> getIndexPatterns(ConfigurationService configService) {
         List<Pattern> patterns = new ArrayList<Pattern>();
         if (configService != null) {
-            ScmLocationMappingsConfig mappingsConfig = configService.readConfiguration(ScmLocationMappingsConfig.class);
+            ScmLocationMappings mappingsConfig = configService.readConfiguration(ScmLocationMappings.class);
             if (mappingsConfig != null) {
-                List<ScmLocationMappingConfig> mappings = mappingsConfig.getScmMappings();
+                List<ScmLocationMapping> mappings = mappingsConfig.getScmMappings();
                 if (mappings != null) {
-                    for (ScmLocationMappingConfig mapping : mappings) {
+                    for (ScmLocationMapping mapping : mappings) {
                         if (ComparatorUtils.equals(ScmLocationMapper.PURPOSE_INDEXING, mapping.getPurpose())
                                 && StringUtils.isNotBlank(mapping.getPattern())) {
                             try {
@@ -240,7 +240,7 @@ public class ExtensionServiceDevInf
 
     @Override
     public void onEvent(EventConfigUpdate event) {
-        if (ScmLocationMappingsConfig.class.equals(event.getConfigClass())) {
+        if (ScmLocationMappings.class.equals(event.getConfigClass())) {
             indexPatterns = getIndexPatterns(configService);
         }
     }

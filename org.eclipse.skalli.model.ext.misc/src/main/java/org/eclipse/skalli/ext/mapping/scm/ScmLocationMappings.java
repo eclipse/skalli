@@ -17,20 +17,20 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 @XStreamAlias("scmMappings")
-public class ScmLocationMappingsConfig {
+public class ScmLocationMappings {
 
     @XStreamImplicit
-    private ArrayList<ScmLocationMappingConfig> scmMapping;
+    private ArrayList<ScmLocationMapping> scmMapping;
 
     // do not remove: required by xstream
-    public ScmLocationMappingsConfig() {
+    public ScmLocationMappings() {
     }
 
-    public ScmLocationMappingsConfig(ArrayList<ScmLocationMappingConfig> scmMappings) {
+    public ScmLocationMappings(ArrayList<ScmLocationMapping> scmMappings) {
         this.scmMapping = scmMappings;
     }
 
-    public List<ScmLocationMappingConfig> getScmMappings() {
+    public List<ScmLocationMapping> getScmMappings() {
         return scmMapping;
     }
 
