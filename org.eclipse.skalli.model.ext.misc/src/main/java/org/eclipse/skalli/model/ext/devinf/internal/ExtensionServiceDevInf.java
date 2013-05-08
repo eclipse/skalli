@@ -25,9 +25,8 @@ import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingsConfig;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
-import org.eclipse.skalli.model.ext.devinf.internal.config.ScmLocationMappingResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.event.EventCustomizingUpdate;
+import org.eclipse.skalli.services.configuration.EventConfigUpdate;
 import org.eclipse.skalli.services.event.EventListener;
 import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.extension.ExtensionService;
@@ -43,7 +42,7 @@ import org.slf4j.LoggerFactory;
 
 public class ExtensionServiceDevInf
         extends ExtensionServiceBase<DevInfProjectExt>
-        implements ExtensionService<DevInfProjectExt>, EventListener<EventCustomizingUpdate>
+        implements ExtensionService<DevInfProjectExt>, EventListener<EventConfigUpdate>
 {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExtensionServiceDevInf.class);
@@ -120,7 +119,7 @@ public class ExtensionServiceDevInf
 
     protected void bindEventService(EventService eventService) {
         LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
-        eventService.registerListener(EventCustomizingUpdate.class, this);
+        eventService.registerListener(EventConfigUpdate.class, this);
     }
 
     protected void unbindEventService(EventService eventService) {
@@ -218,8 +217,7 @@ public class ExtensionServiceDevInf
     private List<Pattern> getIndexPatterns(ConfigurationService configService) {
         List<Pattern> patterns = new ArrayList<Pattern>();
         if (configService != null) {
-            ScmLocationMappingsConfig mappingsConfig = configService.readCustomization(
-                    ScmLocationMappingResource.MAPPINGS_KEY, ScmLocationMappingsConfig.class);
+            ScmLocationMappingsConfig mappingsConfig = configService.readConfiguration(ScmLocationMappingsConfig.class);
             if (mappingsConfig != null) {
                 List<ScmLocationMappingConfig> mappings = mappingsConfig.getScmMappings();
                 if (mappings != null) {
@@ -241,8 +239,8 @@ public class ExtensionServiceDevInf
     }
 
     @Override
-    public void onEvent(EventCustomizingUpdate event) {
-        if (ScmLocationMappingResource.MAPPINGS_KEY.equals(event.getCustomizationName())) {
+    public void onEvent(EventConfigUpdate event) {
+        if (ScmLocationMappingsConfig.class.equals(event.getConfigClass())) {
             indexPatterns = getIndexPatterns(configService);
         }
     }

@@ -10,31 +10,34 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.group;
 
-import org.eclipse.skalli.services.configuration.rest.ConfigSection;
-import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
+import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.restlet.resource.ServerResource;
 
 /**
  * Configuration API for user groups located at <tt>/api/config/groups</tt>
  * and <tt>/api/config/groups/&lt;groupName&gt;</tt>.
  */
-public class GroupsConfigSection extends ConfigSectionBase implements ConfigSection {
+public class GroupsConfigSection implements ConfigSection<GroupsConfig> {
 
-    private static final String NAME = "groups"; //$NON-NLS-1$
+    private static final String STORAGE_KEY =  "groups"; //$NON-NLS-1$
 
     private static final String GROUPS_PATH = "/groups"; //$NON-NLS-1$
     private static final String GROUPS_GROUP_NAME_PATH = "/groups/{groupName}"; //$NON-NLS-1$
+    private static final String[] RESOURCE_PATHS = new String[] { GROUPS_PATH, GROUPS_GROUP_NAME_PATH };
 
     @Override
-    public String getName() {
-        return NAME;
+    public String getStorageKey() {
+        return STORAGE_KEY;
+    }
+
+    @Override
+    public Class<GroupsConfig> getConfigClass() {
+        return GroupsConfig.class;
     }
 
     @Override
     public String[] getResourcePaths() {
-        return new String[] {
-                GROUPS_PATH, GROUPS_GROUP_NAME_PATH
-        };
+        return RESOURCE_PATHS;
     }
 
     @Override

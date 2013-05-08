@@ -10,19 +10,28 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.internal.config;
 
-import org.eclipse.skalli.services.configuration.rest.ConfigSection;
-import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
+import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.restlet.resource.ServerResource;
 
-public class UserDetailsConfigSection extends ConfigSectionBase implements ConfigSection {
+public class UserDetailsConfigSection implements ConfigSection<UserDetailsConfig> {
 
-    private static final String NAME = "view/userdetails"; //$NON-NLS-1$
+    private static final String STORAGE_KEY = "view.userdetails"; //$NON-NLS-1$
+    private static final String[] RESOURCE_PATHS = new String[] { "/view/userdetails" }; //$NON-NLS-1$
 
     @Override
-    public String getName() {
-        return NAME;
+    public String getStorageKey() {
+        return STORAGE_KEY;
     }
 
+    @Override
+    public Class<UserDetailsConfig> getConfigClass() {
+        return UserDetailsConfig.class;
+    }
+
+    @Override
+    public String[] getResourcePaths() {
+        return RESOURCE_PATHS;
+    }
     @Override
     public Class<? extends ServerResource> getServerResource(String resourePath) {
         return UserDetailsResource.class;

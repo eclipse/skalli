@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.destination;
 
-import org.eclipse.skalli.services.configuration.rest.Protect;
+import org.eclipse.skalli.services.configuration.Protect;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 

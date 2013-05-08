@@ -10,16 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal.config;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class MavenResolverResource extends CustomizingResource<MavenResolverConfig> {
-
-    public static final String MAPPINGS_KEY = "ext.maven.resolver"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return MAPPINGS_KEY;
-    }
+public class MavenResolverResource extends ConfigResourceBase<MavenResolverConfig> {
 
     @Override
     protected Class<MavenResolverConfig> getConfigClass() {

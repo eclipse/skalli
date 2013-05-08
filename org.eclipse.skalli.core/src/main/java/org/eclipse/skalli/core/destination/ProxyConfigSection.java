@@ -10,22 +10,31 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.destination;
 
-import org.eclipse.skalli.services.configuration.rest.ConfigSection;
-import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
+import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.restlet.resource.ServerResource;
 
-public class ProxyConfigSection extends ConfigSectionBase implements ConfigSection {
+public class ProxyConfigSection implements ConfigSection<ProxyConfig> {
 
-    private static final String NAME = "proxy"; //$NON-NLS-1$
+    private static final String STORAGE_KEY = "proxy"; //$NON-NLS-1$
+    private static final String[] RESOURCE_PATHS = new String[] { "/proxy" }; //$NON-NLS-1$
 
     @Override
-    public String getName() {
-        return NAME;
+    public String getStorageKey() {
+        return STORAGE_KEY;
+    }
+
+    @Override
+    public Class<ProxyConfig> getConfigClass() {
+        return ProxyConfig.class;
+    }
+
+    @Override
+    public String[] getResourcePaths() {
+        return RESOURCE_PATHS;
     }
 
     @Override
     public Class<? extends ServerResource> getServerResource(String resourePath) {
         return ProxyResource.class;
     }
-
 }

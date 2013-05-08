@@ -74,7 +74,7 @@ public class UserServices {
 
         // if there is a configuration via REST API available, override the properties
         if (configService != null) {
-            UserStoreConfig config = configService.readCustomization(CONFIG_KEY_USERSTORE, UserStoreConfig.class);
+            UserStoreConfig config = configService.readConfiguration(UserStoreConfig.class);
             if (config != null) {
                 type = config.getType();
                 isUseLocalFallback = config.isUseLocalFallback();

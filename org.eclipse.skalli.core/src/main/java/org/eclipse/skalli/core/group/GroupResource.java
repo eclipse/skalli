@@ -2,8 +2,8 @@ package org.eclipse.skalli.core.group;
 
 import java.util.Map;
 
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.configuration.rest.ConfigResourceBase;
 
 public class GroupResource extends ConfigResourceBase<GroupConfig> {
 
@@ -51,10 +51,10 @@ public class GroupResource extends ConfigResourceBase<GroupConfig> {
     }
 
     private GroupsConfig readGroupsConfig(ConfigurationService configService) {
-        return configService.readCustomization(GroupsResource.MAPPINGS_KEY, GroupsConfig.class);
+        return configService.readConfiguration(GroupsConfig.class);
     }
 
     private void storeGroupsConfig(ConfigurationService configService, GroupsConfig configObject) {
-        configService.writeCustomization(GroupsResource.MAPPINGS_KEY, configObject);
+        configService.writeConfiguration(configObject);
     }
 }

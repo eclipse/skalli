@@ -10,17 +10,27 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.internal.config;
 
-import org.eclipse.skalli.services.configuration.rest.ConfigSection;
-import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
+import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.restlet.resource.ServerResource;
 
-public class BrandingConfigSection extends ConfigSectionBase implements ConfigSection{
+public class BrandingConfigSection implements ConfigSection<BrandingConfig> {
 
-  private static final String NAME = "view/branding"; //$NON-NLS-1$
+  private static final String STORAGE_KEY = "view.branding"; //$NON-NLS-1$
+  private static final String[] RESOURCE_PATHS = new String[] { "/view/branding" }; //$NON-NLS-1$
 
   @Override
-  public String getName() {
-    return NAME;
+  public String getStorageKey() {
+      return STORAGE_KEY;
+  }
+
+  @Override
+  public Class<BrandingConfig> getConfigClass() {
+      return BrandingConfig.class;
+  }
+
+  @Override
+  public String[] getResourcePaths() {
+      return RESOURCE_PATHS;
   }
 
   @Override

@@ -10,16 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.internal.config;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class BrandingResource extends CustomizingResource<BrandingConfig> {
-
-  public static final String KEY = "view.branding"; //$NON-NLS-1$
-
-  @Override
-  protected String getKey() {
-    return KEY;
-  }
+public class BrandingResource extends ConfigResourceBase<BrandingConfig> {
 
   @Override
   protected Class<BrandingConfig> getConfigClass() {

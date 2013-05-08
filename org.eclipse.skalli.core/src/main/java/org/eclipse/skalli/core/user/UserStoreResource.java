@@ -10,17 +10,10 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.user;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 import org.eclipse.skalli.services.user.UserStoreConfig;
 
-public class UserStoreResource extends CustomizingResource<UserStoreConfig> {
-
-    public static final String KEY = "userStore"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return KEY;
-    }
+public class UserStoreResource extends ConfigResourceBase<UserStoreConfig> {
 
     @Override
     protected Class<UserStoreConfig> getConfigClass() {

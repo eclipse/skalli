@@ -10,17 +10,28 @@
  *******************************************************************************/
 package org.eclipse.skalli.ext.mapping.mail.internal;
 
-import org.eclipse.skalli.services.configuration.rest.ConfigSection;
-import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
+import org.eclipse.skalli.ext.mapping.mail.MailingListMappingsConfig;
+import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.restlet.resource.ServerResource;
 
-public class MailingListMappingConfigSection extends ConfigSectionBase implements ConfigSection {
+public class MailingListMappingConfigSection implements ConfigSection<MailingListMappingsConfig> {
 
-    private static final String NAME = "info/mailingList"; //$NON-NLS-1$
+    private static final String STORAGE_KEY = "info.mailingListMappings"; //$NON-NLS-1$
+    private static final String[] RESOURCE_PATHS = new String[] { "/info/mailingList" }; //$NON-NLS-1$
 
     @Override
-    public String getName() {
-        return NAME;
+    public String getStorageKey() {
+        return STORAGE_KEY;
+    }
+
+    @Override
+    public Class<MailingListMappingsConfig> getConfigClass() {
+        return MailingListMappingsConfig.class;
+    }
+
+    @Override
+    public String[] getResourcePaths() {
+        return RESOURCE_PATHS;
     }
 
     @Override

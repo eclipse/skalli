@@ -23,7 +23,7 @@ import org.eclipse.skalli.core.cache.Cache;
 import org.eclipse.skalli.core.cache.GroundhogCache;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.event.EventConfigUpdate;
+import org.eclipse.skalli.services.configuration.EventConfigUpdate;
 import org.eclipse.skalli.services.event.EventListener;
 import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.user.UserService;
@@ -80,7 +80,7 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
     private synchronized void initializeCache() {
         int cacheSize = DEFAULT_CACHE_SIZE;
         if (configurationService != null) {
-            LDAPConfig config = configurationService.readCustomization(LDAPResource.KEY, LDAPConfig.class);
+            LDAPConfig config = configurationService.readConfiguration(LDAPConfig.class);
             if (config != null) {
                 cacheSize = NumberUtils.toInt(config.getCacheSize(), DEFAULT_CACHE_SIZE);
             }
@@ -90,7 +90,7 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
 
     private LDAPClient getLDAPClient() {
         if (configurationService != null) {
-            LDAPConfig config = configurationService.readCustomization(LDAPResource.KEY, LDAPConfig.class);
+            LDAPConfig config = configurationService.readConfiguration(LDAPConfig.class);
             if (config != null) {
                 return new LDAPClient(config);
             }
@@ -170,7 +170,9 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
 
     @Override
     public synchronized void onEvent(EventConfigUpdate event) {
-        initializeCache();
+        if (LDAPConfig.class.equals(event.getConfigClass())) {
+            initializeCache();
+        }
     }
 
 }

@@ -33,7 +33,6 @@ import org.eclipse.skalli.services.search.SearchService;
 import org.eclipse.skalli.services.user.LoginUtils;
 import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.internal.config.NewsConfig;
-import org.eclipse.skalli.view.internal.config.NewsResource;
 
 /**
  * Servlet implementation class Servlet.
@@ -73,7 +72,7 @@ public class Servlet extends HttpServlet {
         if (requestURI.endsWith(Consts.URL_NEWS)) {
             ConfigurationService confService = Services.getRequiredService(ConfigurationService.class);
             if (confService != null) {
-                NewsConfig newsConfig = confService.readCustomization(NewsResource.KEY, NewsConfig.class);
+                NewsConfig newsConfig = confService.readConfiguration(NewsConfig.class);
                 if (newsConfig != null) {
                     redirect(newsConfig.getUrl(), response);
                     return;

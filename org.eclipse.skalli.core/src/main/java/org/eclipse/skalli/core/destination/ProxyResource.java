@@ -10,16 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.destination;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class ProxyResource extends CustomizingResource<ProxyConfig> {
-
-    public static final String KEY = "proxy"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return KEY;
-    }
+public class ProxyResource extends ConfigResourceBase<ProxyConfig> {
 
     @Override
     protected Class<ProxyConfig> getConfigClass() {

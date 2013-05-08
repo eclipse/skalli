@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
 import org.eclipse.skalli.services.permit.Permits;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -28,14 +28,7 @@ import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.converters.Converter;
 
 
-public class PermitsResource extends CustomizingResource<PermitsConfig> {
-
-    public static final String MAPPINGS_KEY = "permissions"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return MAPPINGS_KEY;
-    }
+public class PermitsResource extends ConfigResourceBase<PermitsConfig> {
 
     @Override
     protected Class<PermitsConfig> getConfigClass() {

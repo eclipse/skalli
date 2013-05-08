@@ -38,7 +38,6 @@ import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritService;
 import org.eclipse.skalli.gerrit.client.config.GerritConfig;
-import org.eclipse.skalli.gerrit.client.config.GerritResource;
 import org.eclipse.skalli.gerrit.client.exception.CommandException;
 import org.eclipse.skalli.gerrit.client.exception.ConnectionException;
 import org.eclipse.skalli.gerrit.client.exception.GerritClientException;
@@ -155,7 +154,7 @@ public class GitGerritFilter implements Filter {
 
         // no Gerrit configuration: cancel further processing since we will not
         // be able to create a Gerrit client
-        GerritConfig gerritConfig = configService.readCustomization(GerritResource.KEY, GerritConfig.class);
+        GerritConfig gerritConfig = configService.readConfiguration(GerritConfig.class);
         if (gerritConfig == null) {
             request.setAttribute(ATTRIBUTE_ERROR_MESSAGE, ERROR_NO_CONFIGURATION);
             FilterUtil.forward(request, response, URL_GITGERRITERROR);

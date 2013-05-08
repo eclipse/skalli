@@ -10,17 +10,10 @@
  *******************************************************************************/
 package org.eclipse.skalli.nexus.internal.config;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
 
-public class NexusResource extends CustomizingResource<NexusConfig> {
-
-    public static final String KEY = "ext.nexus"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return KEY;
-    }
+public class NexusResource extends ConfigResourceBase<NexusConfig> {
 
     @Override
     protected Class<NexusConfig> getConfigClass() {

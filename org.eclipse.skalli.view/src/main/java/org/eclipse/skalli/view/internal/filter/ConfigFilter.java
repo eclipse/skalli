@@ -24,15 +24,10 @@ import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.internal.config.BrandingConfig;
-import org.eclipse.skalli.view.internal.config.BrandingResource;
 import org.eclipse.skalli.view.internal.config.FeedbackConfig;
-import org.eclipse.skalli.view.internal.config.FeedbackResource;
 import org.eclipse.skalli.view.internal.config.NewsConfig;
-import org.eclipse.skalli.view.internal.config.NewsResource;
 import org.eclipse.skalli.view.internal.config.TopLinksConfig;
-import org.eclipse.skalli.view.internal.config.TopLinksResource;
 import org.eclipse.skalli.view.internal.config.UserDetailsConfig;
-import org.eclipse.skalli.view.internal.config.UserDetailsResource;
 
 public class ConfigFilter implements Filter {
 
@@ -50,21 +45,19 @@ public class ConfigFilter implements Filter {
 
         ConfigurationService confService = Services.getService(ConfigurationService.class);
         if (confService != null) {
-            FeedbackConfig feedbackConfig = confService.readCustomization(FeedbackResource.FEEDBACK_KEY,
-                    FeedbackConfig.class);
+            FeedbackConfig feedbackConfig = confService.readConfiguration(FeedbackConfig.class);
             if (feedbackConfig != null) {
                 request.setAttribute(Consts.ATTRIBUTE_FEEDBACKCONFIG, feedbackConfig);
             }
-            TopLinksConfig toplinksConfig = confService.readCustomization(TopLinksResource.TOPLINKS_KEY,
-                    TopLinksConfig.class);
+            TopLinksConfig toplinksConfig = confService.readConfiguration(TopLinksConfig.class);
             if (toplinksConfig != null) {
                 request.setAttribute(Consts.ATTRIBUTE_TOPLINKSCONFIG, toplinksConfig);
             }
-            NewsConfig newsConfig = confService.readCustomization(NewsResource.KEY, NewsConfig.class);
+            NewsConfig newsConfig = confService.readConfiguration(NewsConfig.class);
             if (newsConfig != null) {
                 request.setAttribute(Consts.ATTRIBUTE_NEWSCONFIG, newsConfig);
             }
-            BrandingConfig brandingConfig = confService.readCustomization(BrandingResource.KEY, BrandingConfig.class);
+            BrandingConfig brandingConfig = confService.readConfiguration(BrandingConfig.class);
             if (brandingConfig != null) {
                 request.setAttribute(Consts.ATTRIBUTE_BRANDINGCONFIG, brandingConfig);
                 if (StringUtils.isNotBlank(brandingConfig.getPageTitle())) {
@@ -77,7 +70,7 @@ public class ConfigFilter implements Filter {
                     request.setAttribute(Consts.ATTRIBUTE_SEARCH_PLUGIN_DESCRIPTION, brandingConfig.getSearchPluginDescription());
                 }
             }
-            UserDetailsConfig userDetailsConfig = confService.readCustomization(UserDetailsResource.KEY, UserDetailsConfig.class);
+            UserDetailsConfig userDetailsConfig = confService.readConfiguration(UserDetailsConfig.class);
             if (userDetailsConfig != null) {
                 request.setAttribute(Consts.ATTRIBUTE_USERDETAILSCONFIG, userDetailsConfig);
             }

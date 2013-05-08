@@ -11,7 +11,7 @@
 package org.eclipse.skalli.gerrit.client.config;
 
 import org.eclipse.skalli.gerrit.client.SubmitType;
-import org.eclipse.skalli.services.configuration.rest.Protect;
+import org.eclipse.skalli.services.configuration.Protect;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 

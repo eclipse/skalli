@@ -10,16 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.internal.config;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class FeedbackResource extends CustomizingResource<FeedbackConfig> {
-
-    public static final String FEEDBACK_KEY = "view.feedback"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return FEEDBACK_KEY;
-    }
+public class FeedbackResource extends ConfigResourceBase<FeedbackConfig> {
 
     @Override
     protected Class<FeedbackConfig> getConfigClass() {

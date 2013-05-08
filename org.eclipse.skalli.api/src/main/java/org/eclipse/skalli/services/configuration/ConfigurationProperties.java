@@ -24,35 +24,73 @@ import org.eclipse.skalli.services.Services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Utility class to access system properties and properties defined in
+ * <tt>"skalli.properties"</tt> files in installed bundles.
+ */
 public class ConfigurationProperties {
 
+    /** Name of the property files to search for: <tt>{@value}</tt> */
     public static final String PROPERTIES_RESOURCE = "skalli.properties";//$NON-NLS-1$
 
+    /** Name of the property specifying the active storage service: <tt>{@value}</tt> */
     public static final String PROPERTY_STORAGE_SERVICE = "skalli.storageService"; //$NON-NLS-1$
+
+    /** Name of the property specifying the workig directory for file storage: <tt>{@value}</tt> */
     public static final String PROPERTY_WORKDIR = "workdir"; //$NON-NLS-1$
 
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationProperties.class);
 
     private static Properties propertyCache = getBundleProperties();
 
+    /**
+     * Returns the value of the specified property. This method is a shortcut for
+     * {@link #getProperty(String, String) getProperty(propertyName, null)}.
+     *
+     * @param propertyName the name of the property.
+     * @return  the value of ths property, or <code>null</code> if the specified property does not exist.
+     */
     public static String getProperty(String propertyName) {
         return getProperty(propertyName, null);
     }
 
+    /**
+     * Returns the value of the specified property or a default value if the property does not exist.
+     * <br>
+     * This method returns the value of a system property with the given name, if it exists.
+     * Otherwise, the property is searched in all installed bundles, i.e. in property files with
+     * name <tt>"skalli.properties"</tt>, which must reside in the root directories of their
+     * respective bundles. The first encounter of the property wins in case the property is
+     * defined in several property files. Since the search order is in general unpredictable this
+     * situation should be avoided.
+     * <br>
+     * Note: Properties from installed bundles are cached during startup, since scanning all installed
+     * bundles for certain files is a time consuming operation. Installing additional bundles at
+     * a later time or uninstalling bundles will not update the property cache.
+     *
+     * @param propertyName  the name of the property.
+     * @param defaultValue  the value to return in case the property does not exist.
+     * @return  the value of the property, or the given default value if the property does not exist.
+     */
     public static String getProperty(String propertyName, String defaultValue) {
         String propertyValue = System.getProperty(propertyName);
         if (propertyValue == null) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug(MessageFormat.format("System property ''{0}'' is undefined", propertyName)); //$NON-NLS-1$
+                LOG.debug(MessageFormat.format("system property ''{0}'' is undefined", propertyName)); //$NON-NLS-1$
             }
             propertyValue = propertyCache.getProperty(propertyName);
-        }
-        if (propertyValue == null && StringUtils.isNotBlank(defaultValue)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(MessageFormat.format("Using default value ''{0}'' for property ''{0}''", //$NON-NLS-1$
-                        defaultValue, propertyName));
+            if (propertyValue == null && StringUtils.isNotBlank(defaultValue)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(MessageFormat.format(
+                            "using default value ''{0}'' for property ''{1}''", //$NON-NLS-1$
+                            defaultValue, propertyName));
+                }
+                propertyValue = defaultValue;
             }
-            propertyValue = defaultValue;
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(MessageFormat.format("found property ''{0}'' with value ''{1}''", //$NON-NLS-1$
+                    propertyName, propertyValue));
         }
         return propertyValue;
     }
@@ -77,7 +115,7 @@ public class ConfigurationProperties {
                 bundleProperties.putAll(properties);
             }
         } catch (Exception e) {
-            LOG.info(MessageFormat.format("Failed to retrieve properties from resource ''{1}''", //$NON-NLS-1$
+            LOG.info(MessageFormat.format("Failed to retrieve properties from resource ''{0}''", //$NON-NLS-1$
                     resource));
         } finally {
             IOUtils.closeQuietly(in);

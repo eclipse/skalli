@@ -15,16 +15,9 @@ import java.util.List;
 
 import org.eclipse.skalli.ext.mapping.mail.MailingListMappingConfig;
 import org.eclipse.skalli.ext.mapping.mail.MailingListMappingsConfig;
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class MailingListMappingResource extends CustomizingResource<MailingListMappingsConfig> {
-
-    public static final String MAPPINGS_KEY = "info.mailingListMappings"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return MAPPINGS_KEY;
-    };
+public class MailingListMappingResource extends ConfigResourceBase<MailingListMappingsConfig> {
 
     @Override
     protected Class<MailingListMappingsConfig> getConfigClass() {

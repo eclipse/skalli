@@ -19,7 +19,6 @@ import org.eclipse.skalli.ext.mapping.LinkMapper;
 import org.eclipse.skalli.ext.mapping.mail.MailingListMapper;
 import org.eclipse.skalli.ext.mapping.mail.MailingListMappingConfig;
 import org.eclipse.skalli.ext.mapping.mail.MailingListMappingsConfig;
-import org.eclipse.skalli.ext.mapping.mail.internal.MailingListMappingResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,8 +45,7 @@ public class MailingListMapperTest {
 
         EasyMock.reset(mocks);
 
-        mockConfigService.readCustomization(EasyMock.eq(MailingListMappingResource.MAPPINGS_KEY),
-                EasyMock.isA(Class.class));
+        mockConfigService.readConfiguration(EasyMock.isA(Class.class));
         EasyMock.expectLastCall().andReturn(mappings);
 
         EasyMock.replay(mocks);
@@ -68,8 +66,7 @@ public class MailingListMapperTest {
 
         EasyMock.reset(mocks);
 
-        mockConfigService.readCustomization(EasyMock.eq(MailingListMappingResource.MAPPINGS_KEY),
-                EasyMock.isA(Class.class));
+        mockConfigService.readConfiguration(EasyMock.isA(Class.class));
         EasyMock.expectLastCall().andReturn(null);
 
         EasyMock.replay(mocks);

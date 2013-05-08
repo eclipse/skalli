@@ -10,12 +10,18 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.configuration;
 
-public interface ConfigKey {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    public String getKey();
-
-    public String getDefaultValue();
-
-    public boolean isEncrypted();
-
+/**
+ * Annotation for fields of configurations that contain secret or confidential
+ * information and must be protected. Such fields for example should not
+ * appear in the response of a REST API call and should be encrypted
+ * when persisted.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface Protect {
 }

@@ -10,17 +10,27 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.validation;
 
-import org.eclipse.skalli.services.configuration.rest.ConfigSection;
-import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
+import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.restlet.resource.ServerResource;
 
-public class ValidationsConfigSection extends ConfigSectionBase implements ConfigSection {
+public class ValidationsConfigSection implements ConfigSection<ValidationsConfig> {
 
-    private static final String NAME = "validation"; //$NON-NLS-1$
+    private static final String STORAGE_KEY = "validation"; //$NON-NLS-1$
+    private static final String[] RESOURCE_PATHS = new String[] { "/validation" }; //$NON-NLS-1$
 
     @Override
-    public String getName() {
-        return NAME;
+    public String getStorageKey() {
+        return STORAGE_KEY;
+    }
+
+    @Override
+    public Class<ValidationsConfig> getConfigClass() {
+        return ValidationsConfig.class;
+    }
+
+    @Override
+    public String[] getResourcePaths() {
+        return RESOURCE_PATHS;
     }
 
     @Override

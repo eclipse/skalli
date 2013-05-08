@@ -17,8 +17,8 @@ import java.util.Map;
 
 import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.model.Issuer;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.configuration.rest.ConfigResourceBase;
 import org.eclipse.skalli.services.permit.Permits;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -101,11 +101,11 @@ public class PermitResource extends ConfigResourceBase<PermitConfig> implements 
     }
 
     private PermitsConfig readPermitsConfig(ConfigurationService configService) {
-        return configService.readCustomization(PermitsResource.MAPPINGS_KEY, PermitsConfig.class);
+        return configService.readConfiguration(PermitsConfig.class);
     }
 
     private void storePermitsConfig(ConfigurationService configService, PermitsConfig configObject) {
-        configService.writeCustomization(PermitsResource.MAPPINGS_KEY, configObject);
+        configService.writeConfiguration(configObject);
     }
 
     @Override

@@ -10,16 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.feed;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class FeedUpdaterResource extends CustomizingResource<FeedUpdaterConfig> {
-
-    public static final String MAPPINGS_KEY = "feedupdater"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return MAPPINGS_KEY;
-    }
+public class FeedUpdaterResource extends ConfigResourceBase<FeedUpdaterConfig> {
 
     @Override
     protected Class<FeedUpdaterConfig> getConfigClass() {

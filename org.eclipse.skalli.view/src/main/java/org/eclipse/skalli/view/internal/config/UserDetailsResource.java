@@ -10,16 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.internal.config;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class UserDetailsResource extends CustomizingResource<UserDetailsConfig> {
-
-    public static final String KEY = "view.userdetails"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return KEY;
-    }
+public class UserDetailsResource extends ConfigResourceBase<UserDetailsConfig> {
 
     @Override
     protected Class<UserDetailsConfig> getConfigClass() {

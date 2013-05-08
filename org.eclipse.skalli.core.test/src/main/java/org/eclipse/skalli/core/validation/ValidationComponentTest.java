@@ -204,7 +204,7 @@ public class ValidationComponentTest {
     }
 
     private void initConfigurationServiceMock() {
-        mockCS.readCustomization(eq(ValidationsResource.MAPPINGS_KEY), eq(ValidationsConfig.class));
+        mockCS.readConfiguration(eq(ValidationsConfig.class));
         expectLastCall().andReturn(config).anyTimes();
     }
 

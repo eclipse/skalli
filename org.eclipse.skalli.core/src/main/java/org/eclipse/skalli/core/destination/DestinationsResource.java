@@ -13,16 +13,9 @@ package org.eclipse.skalli.core.destination;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class DestinationsResource extends CustomizingResource<DestinationsConfig> {
-
-    public static final String KEY = "destinations"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return KEY;
-    }
+public class DestinationsResource extends ConfigResourceBase<DestinationsConfig> {
 
     @Override
     protected Class<DestinationsConfig> getConfigClass() {

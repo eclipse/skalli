@@ -10,16 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.internal.config;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class NewsResource extends CustomizingResource<NewsConfig> {
-
-    public static final String KEY = "view.news"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return KEY;
-    }
+public class NewsResource extends ConfigResourceBase<NewsConfig> {
 
     @Override
     protected Class<NewsConfig> getConfigClass() {

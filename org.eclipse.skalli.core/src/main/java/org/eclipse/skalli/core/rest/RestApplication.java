@@ -14,6 +14,7 @@ import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.core.rest.admin.ProjectBackupResource;
 import org.eclipse.skalli.core.rest.admin.StatisticsBackupResource;
 import org.eclipse.skalli.core.rest.admin.StatisticsResource;
@@ -25,8 +26,7 @@ import org.eclipse.skalli.core.rest.resources.ProjectsResource;
 import org.eclipse.skalli.core.rest.resources.SubprojectsResource;
 import org.eclipse.skalli.core.rest.resources.UserPermitsResource;
 import org.eclipse.skalli.core.rest.resources.UserResource;
-import org.eclipse.skalli.services.configuration.rest.ConfigResource;
-import org.eclipse.skalli.services.configuration.rest.ConfigSection;
+import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.eclipse.skalli.services.extension.rest.ErrorRepresentation;
 import org.eclipse.skalli.services.extension.rest.RestExtension;
 import org.restlet.Application;
@@ -45,7 +45,7 @@ public class RestApplication extends Application {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestApplication.class);
 
-    private final static Set<ConfigSection> configSections = new HashSet<ConfigSection>();
+    private final static Set<ConfigSection<?>> configSections = new HashSet<ConfigSection<?>>();
     private final static Set<Monitorable> serviceMonitors = new HashSet<Monitorable>();
     private final static Set<RestExtension> extensions = new HashSet<RestExtension>();
 
@@ -78,11 +78,11 @@ public class RestApplication extends Application {
         return router;
     }
 
-    protected void bindConfigSection(ConfigSection configSection) {
+    protected void bindConfigSection(ConfigSection<?> configSection) {
         configSections.add(configSection);
     }
 
-    protected void unbindConfigSection(ConfigSection configSection) {
+    protected void unbindConfigSection(ConfigSection<?> configSection) {
         configSections.remove(configSection);
     }
 
@@ -134,27 +134,38 @@ public class RestApplication extends Application {
     }
 
     private void attachConfigurationResources(Router router) {
-        for (ConfigSection configSection : configSections) {
+        for (ConfigSection<?> configSection : configSections) {
             String[] resourcePaths = configSection.getResourcePaths();
             if (resourcePaths == null || resourcePaths.length == 0) {
-                resourcePaths = new String[] { getName() };
+                LOG.warn(MessageFormat.format(
+                        "Configuration extension ''{0}'' does not register any resource paths",
+                        configSection.getStorageKey()));
+                return;
             }
             for (String resourcePath: resourcePaths) {
+                resourcePath = StringUtils.trim(resourcePath);
+                if (StringUtils.isBlank(resourcePath) || "/".equals(resourcePath)) { //$NON-NLS-1$
+                    LOG.warn(MessageFormat.format(
+                            "Configuration extension ''{0}'': resource path '/' is not allowed",
+                            configSection.getStorageKey()));
+                    continue;
+                }
                 if (!resourcePath.startsWith("/")) { //$NON-NLS-1$
                     resourcePath = "/" + resourcePath; //$NON-NLS-1$
                 }
                 Class<? extends ServerResource> resource = configSection.getServerResource(resourcePath);
                 if (resource != null) {
-                    router.attach(ConfigResource.CONFIG_PATH_PREFIX + resourcePath, resource); //$NON-NLS-1$
+                    router.attach("/config" + resourcePath, resource); //$NON-NLS-1$
                     LOG.info(MessageFormat.format(
-                            "Attached REST resource {0} to path {1} for configuration section ''{2}''",
-                            resource.getName(), resourcePath, configSection.getName()));
+                            "Attached REST resource ''{0}'' to path ''{1}'' for configuration extension ''{2}''",
+                            resource.getName(), resourcePath, configSection.getStorageKey()));
                 } else {
-                    LOG.warn(MessageFormat.format("No REST resource provided for path {0}", resourcePath));
+                    LOG.warn(MessageFormat.format(
+                            "Configuration extension ''{0}'': No REST resource provided for path ''{1}''",
+                            configSection.getStorageKey(), resourcePath));
                 }
             }
         }
-
     }
 
     private void attachServiceMonitors(String basePath, Router router) {
@@ -177,19 +188,32 @@ public class RestApplication extends Application {
         for (RestExtension ext : extensions) {
             String[] resourcePaths = ext.getResourcePaths();
             if (resourcePaths == null  || resourcePaths.length == 0) {
-                LOG.warn(MessageFormat.format("REST extension {0} registers no resource paths at all", ext.getClass().getName()));
+                LOG.warn(MessageFormat.format(
+                        "REST extension ''{0}'' does not register any resource paths",
+                        ext.getClass().getName()));
                 continue;
             }
             for (String resourcePath: resourcePaths) {
+                resourcePath = StringUtils.trim(resourcePath);
+                if (StringUtils.isBlank(resourcePath) || "/".equals(resourcePath)) { //$NON-NLS-1$
+                    LOG.warn(MessageFormat.format(
+                            "REST extension ''{0}'': resource path '/' is not allowed",
+                            ext.getClass().getName()));
+                    continue;
+                }
                 if (!resourcePath.startsWith("/")) { //$NON-NLS-1$
                     resourcePath = "/" + resourcePath; //$NON-NLS-1$
                 }
                 Class<? extends ServerResource> resource = ext.getServerResource(resourcePath);
                 if (resource != null) {
                     router.attach(resourcePath, resource);
-                    LOG.info(MessageFormat.format("Attached REST resource {0} to path {1}", resource.getName(), resourcePath));
+                    LOG.info(MessageFormat.format(
+                            "Attached REST resource ''{0}'' to path ''{1}''",
+                            resource.getName(), resourcePath));
                 } else {
-                    LOG.warn(MessageFormat.format("No REST resource provided for path {0}", resourcePath));
+                    LOG.warn(MessageFormat.format(
+                            "REST extension ''{0}'': No REST resource provided for path ''{1}''",
+                            ext.getClass().getName(), resourcePath));
                 }
             }
         }

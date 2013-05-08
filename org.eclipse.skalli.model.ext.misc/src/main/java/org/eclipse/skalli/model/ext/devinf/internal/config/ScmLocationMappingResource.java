@@ -15,16 +15,9 @@ import java.util.List;
 
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingsConfig;
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class ScmLocationMappingResource extends CustomizingResource<ScmLocationMappingsConfig> {
-
-    public static final String MAPPINGS_KEY = "devInf.scmLocationMappings"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return MAPPINGS_KEY;
-    };
+public class ScmLocationMappingResource extends ConfigResourceBase<ScmLocationMappingsConfig> {
 
     @Override
     protected Class<ScmLocationMappingsConfig> getConfigClass() {

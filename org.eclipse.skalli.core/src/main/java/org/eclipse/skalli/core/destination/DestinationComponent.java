@@ -137,7 +137,7 @@ public class DestinationComponent implements DestinationService {
             return;
         }
 
-        DestinationsConfig config = configService.readCustomization(DestinationsResource.KEY, DestinationsConfig.class);
+        DestinationsConfig config = configService.readConfiguration(DestinationsConfig.class);
         if (config == null) {
             return;
         }
@@ -188,7 +188,7 @@ public class DestinationComponent implements DestinationService {
 
         // allow to overwrite the system properties with configuration /api/config/proxy
         if (configService != null) {
-            ProxyConfig proxyConfig = configService.readCustomization(ProxyResource.KEY, ProxyConfig.class);
+            ProxyConfig proxyConfig = configService.readConfiguration(ProxyConfig.class);
             String defaultConfigProxyHost = proxyConfig.getHost();
             String defaultConfigProxyPort = proxyConfig.getPort();
             String configProxyHost = HTTPS.equals(protocol) ? proxyConfig.getHostSSL() : defaultConfigProxyHost;

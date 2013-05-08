@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.eclipse.skalli.model.Group;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.event.EventCustomizingUpdate;
+import org.eclipse.skalli.services.configuration.EventConfigUpdate;
 import org.eclipse.skalli.services.event.EventListener;
 import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.group.GroupService;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * <tt>&lt;groupId&gt.xml</tt> in the <tt>$workdir/storage/Group</tt>
  * directory.
  */
-public class LocalGroupComponent implements GroupService, EventListener<EventCustomizingUpdate> {
+public class LocalGroupComponent implements GroupService, EventListener<EventConfigUpdate> {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalGroupComponent.class);
 
@@ -68,7 +68,7 @@ public class LocalGroupComponent implements GroupService, EventListener<EventCus
 
     protected void bindEventService(EventService eventService) {
         LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
-        eventService.registerListener(EventCustomizingUpdate.class, this);
+        eventService.registerListener(EventConfigUpdate.class, this);
     }
 
     protected void unbindEventService(EventService eventService) {
@@ -105,7 +105,7 @@ public class LocalGroupComponent implements GroupService, EventListener<EventCus
         if (configService == null) {
             return Collections.emptyList();
         }
-        GroupsConfig groupsConfig = configService.readCustomization(GroupsResource.MAPPINGS_KEY, GroupsConfig.class);
+        GroupsConfig groupsConfig = configService.readConfiguration(GroupsConfig.class);
         if (groupsConfig == null) {
             return Collections.emptyList();
         }
@@ -135,8 +135,10 @@ public class LocalGroupComponent implements GroupService, EventListener<EventCus
     }
 
     @Override
-    public void onEvent(EventCustomizingUpdate event) {
-        invalidatePermits();
+    public void onEvent(EventConfigUpdate event) {
+        if (GroupsConfig.class.equals(event.getConfigClass())) {
+            invalidatePermits();
+        }
     }
 
     private void invalidatePermits() {

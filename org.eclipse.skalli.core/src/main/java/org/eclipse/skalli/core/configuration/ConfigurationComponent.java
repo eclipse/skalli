@@ -18,20 +18,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.ThreadPool;
 import org.eclipse.skalli.core.persistence.CompositeEntityClassLoader;
 import org.eclipse.skalli.core.persistence.FileStorageComponent;
-import org.eclipse.skalli.services.configuration.ConfigKey;
-import org.eclipse.skalli.services.configuration.ConfigTransaction;
+import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.eclipse.skalli.services.configuration.ConfigurationProperties;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.event.EventConfigUpdate;
-import org.eclipse.skalli.services.event.EventCustomizingUpdate;
+import org.eclipse.skalli.services.configuration.EventConfigUpdate;
 import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.persistence.StorageException;
@@ -45,41 +40,41 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 
 public class ConfigurationComponent implements ConfigurationService {
+
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationComponent.class);
     private static final Logger AUDIT_LOG = LoggerFactory.getLogger("audit"); //$NON-NLS-1$
 
     private static final String CATEGORY_CUSTOMIZATION = "customization"; //$NON-NLS-1$
-    private static final String KEY_PROPERTYSTORE = "PROPERTYSTORE"; //$NON-NLS-1$
 
     private EventService eventService;
     private StorageService storageService;
     private String storageServiceClassName;
 
+    private Map<String, ConfigSection<?>> byStorageKey =
+            Collections.synchronizedMap(new HashMap<String, ConfigSection<?>>());
+    private Map<Class<?>, ConfigSection<?>> byConfigClass =
+            Collections.synchronizedMap(new HashMap<Class<?>, ConfigSection<?>>());
+
     private Map<String, Object> configCache = new HashMap<String, Object>();
 
-    private final Map<ConfigTransaction, Map<ConfigKey, String>> transactions =
-            new HashMap<ConfigTransaction, Map<ConfigKey, String>>(0);
-
     public ConfigurationComponent() {
-        storageServiceClassName = ConfigurationProperties.getProperty(ConfigurationProperties.PROPERTY_STORAGE_SERVICE,
-                FileStorageComponent.class.getName());
+        storageServiceClassName = ConfigurationProperties.getProperty(
+                ConfigurationProperties.PROPERTY_STORAGE_SERVICE, FileStorageComponent.class.getName());
     }
 
-    /**
-     * Constructor for testing purposes: set the class name of the StorageService implementation
-     * you want to bind with bindStorageService!
-     */
+     // Constructor for testing purposes.
+     // Set the storage services to use with bindStorageService().
     ConfigurationComponent(String storageServiceClassName) {
         this.storageServiceClassName = storageServiceClassName;
     }
 
     protected void activate(ComponentContext context) {
-        LOG.info(MessageFormat.format("[ConfigurationService] {0} : activated",
+        LOG.info(MessageFormat.format("[ConfigurationService] {0} : activated", //$NON-NLS-1$
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
     protected void deactivate(ComponentContext context) {
-        LOG.info(MessageFormat.format("[ConfigurationService] {0} : deactivated",
+        LOG.info(MessageFormat.format("[ConfigurationService] {0} : deactivated", //$NON-NLS-1$
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
@@ -111,121 +106,116 @@ public class ConfigurationComponent implements ConfigurationService {
         }
     }
 
-    private void notifyCustomizationChanged(final StorageService storageService) {
-        ThreadPool.submit(new Runnable() {
-            @Override
-            public void run() {
-                if (eventService != null) {
-                    List<String> customizationKeys = Collections.emptyList();
-                    try {
-                        customizationKeys = storageService.keys(CATEGORY_CUSTOMIZATION);
-                    } catch (StorageException e) {
-                        LOG.error("Failed to retrieve configuration keys", e);
-                        return;
-                    }
-                    for (String customizationKey: customizationKeys) {
-                        eventService.fireEvent(new EventCustomizingUpdate(customizationKey));
-                    }
+    protected void bindConfigSection(ConfigSection<?> configSection) {
+        byConfigClass.put(configSection.getConfigClass(), configSection);
+        byStorageKey.put(configSection.getStorageKey(), configSection);
+        notifyCustomizationChanged(configSection);
+        LOG.info(MessageFormat.format("bindConfigSection({0})", configSection)); //$NON-NLS-1$
+    }
+
+    protected void unbindConfigSection(ConfigSection<?> configSection) {
+        LOG.info(MessageFormat.format("unbindConfigSection({0})", configSection)); //$NON-NLS-1$
+        byConfigClass.remove(configSection.getConfigClass());
+        byStorageKey.remove(configSection.getStorageKey());
+        notifyCustomizationChanged(configSection);
+    }
+
+    ConfigSection<?> getConfigSection(Class<?> configClass) {
+        return byConfigClass.get(configClass);
+    }
+
+    ConfigSection<?> getConfigSection(String storageKey) {
+        return byStorageKey.get(storageKey);
+    }
+
+    @Override
+    public synchronized <T> void writeConfiguration(T configuration) {
+        if (storageService == null) {
+            LOG.error("Cannot store configurations: StorageService not available");
+            return;
+        }
+
+        if (configuration == null) {
+            // delete configuration?
+            return;
+        }
+
+        ConfigSection<?> configSection = byConfigClass.get(configuration.getClass());
+        if (configSection == null) {
+            LOG.error(MessageFormat.format(
+                    "Cannot store configuration: No suitable configuration extension " + //$NON-NLS-1$
+                    "for configurations of type ''{0}'' available", //$NON-NLS-1$
+                    configuration.getClass()));
+            return;
+        }
+
+        String storageKey = configSection.getStorageKey();
+        configCache.put(storageKey, configuration);
+        String xml = getXStream(configuration.getClass()).toXML(configuration);
+        InputStream is = null;
+        try {
+            is = new ByteArrayInputStream(xml.getBytes("UTF-8")); //$NON-NLS-1$
+            storageService.write(CATEGORY_CUSTOMIZATION, storageKey, is);
+            if (eventService != null) {
+                fireEvent(configSection);
+            }
+            AUDIT_LOG.info(MessageFormat.format("Configuration ''{0}'' changed by user ''{1}''",
+                    storageKey, Permits.getLoggedInUser()));
+        } catch (UnsupportedEncodingException e) {
+            // should never happen for UTF-8
+            throw new IllegalStateException(e);
+        } catch (StorageException e) {
+            LOG.error(MessageFormat.format("Failed to store configuration ''{0}''", storageKey), e);
+        } finally {
+            IOUtils.closeQuietly(is);
+        }
+    };
+
+    @Override
+    public synchronized <T> T readConfiguration(Class<T> configurationClass) {
+        if (storageService == null) {
+            LOG.warn("Cannot load configurations: StorageService not available");
+            return null;
+        }
+
+        if (configurationClass == null) {
+            return null;
+        }
+
+        ConfigSection<?> configSection = byConfigClass.get(configurationClass);
+        if (configSection == null) {
+            LOG.error(MessageFormat.format(
+                    "Cannot retrieve configuration: No suitable configuration extension " + //$NON-NLS-1$
+                    "for configurations of type ''{0}'' available", //$NON-NLS-1$
+                    configurationClass));
+            return null;
+        }
+
+        String storageKey = configSection.getStorageKey();
+        Object config = configCache.get(storageKey);
+        if (config == null) {
+            InputStream is = null;
+            try {
+                is = storageService.read(CATEGORY_CUSTOMIZATION, storageKey);
+                if (is == null) {
+                    return null;
                 }
-            }
-        });
-    }
-
-    @Override
-    public String readString(ConfigKey key) {
-        @SuppressWarnings("unchecked")
-        TreeMap<String,String> changes = readCustomization(KEY_PROPERTYSTORE, TreeMap.class);
-        String value = null;
-        if (changes != null) {
-            value = changes.get(key.getKey());
-        }
-        return value != null? value : key.getDefaultValue();
-    }
-
-    @Override
-    public void writeString(ConfigTransaction configTransaction, ConfigKey key, String value) {
-        Map<ConfigKey, String> tx = getChanges(configTransaction);
-        tx.put(key, value);
-    }
-
-    private void writeObject(ConfigTransaction configTransaction, ConfigKey key, Object value) {
-        if (value == null) {
-            writeString(configTransaction, key, null);
-        } else {
-            writeString(configTransaction, key, value.toString());
-        }
-    }
-
-    @Override
-    public Integer readInteger(ConfigKey key) {
-        String value = readString(key);
-        if (StringUtils.isEmpty(value)) {
-            return null;
-        } else {
-            return Integer.parseInt(value);
-        }
-    }
-
-    @Override
-    public void writeInteger(ConfigTransaction configTransaction, ConfigKey key, Integer value) {
-        writeObject(configTransaction, key, value);
-    }
-
-    @Override
-    public Boolean readBoolean(ConfigKey key) {
-        String value = readString(key);
-        if (StringUtils.isEmpty(value)) {
-            return null;
-        } else {
-            return BooleanUtils.toBooleanObject(value);
-        }
-    }
-
-    @Override
-    public void writeBoolean(ConfigTransaction configTransaction, ConfigKey key, Boolean value) {
-        writeObject(configTransaction, key, value);
-    }
-
-    private Map<ConfigKey, String> getChanges(ConfigTransaction tx) {
-        Map<ConfigKey, String> ret = transactions.get(tx);
-        if (ret == null) {
-            ret = new HashMap<ConfigKey, String>(0);
-            transactions.put(tx, ret);
-        }
-        return ret;
-    }
-
-    @Override
-    public ConfigTransaction startTransaction() {
-        return new ConfigTransaction() {
-        };
-    }
-
-    @Override
-    public void commit(ConfigTransaction configTransaction) {
-        Map<ConfigKey, String> tx = getChanges(configTransaction);
-        @SuppressWarnings("unchecked")
-        TreeMap<String,String> changes = readCustomization(KEY_PROPERTYSTORE, TreeMap.class);
-        if (changes == null) {
-            changes = new TreeMap<String,String>();
-        }
-        for (ConfigKey key: tx.keySet()) {
-            String value = tx.get(key);
-            if (value != null) {
-                changes.put(key.getKey(), value);
-            } else {
-                changes.remove(key.getKey());
+                config = getXStream(configurationClass).fromXML(is);
+            } catch (XStreamException e) {
+                LOG.error(MessageFormat.format(
+                        "Failed to unmarshal configuration ''{0}'' ",
+                        storageKey), e);
+                return null;
+            } catch (StorageException e) {
+                LOG.error(MessageFormat.format(
+                        "Failed to retrieve configuration ''{0}''",
+                        storageKey), e);
+                return null;
+            } finally {
+                IOUtils.closeQuietly(is);
             }
         }
-        writeCustomization(KEY_PROPERTYSTORE, changes);
-        if (eventService != null) {
-            eventService.fireEvent(new EventConfigUpdate(tx.keySet().toArray(new ConfigKey[tx.size()])));
-        }
-    }
-
-    @Override
-    public void rollback(ConfigTransaction tx) {
-        transactions.remove(tx);
+        return configurationClass.cast(config);
     }
 
     private XStream getXStream(Class<?> customizationClass) {
@@ -237,67 +227,43 @@ public class ConfigurationComponent implements ConfigurationService {
         return xstream;
     }
 
-    @Override
-    public synchronized <T> void writeCustomization(String customizationKey, T customization) {
-        if (storageService == null) {
-            LOG.error(MessageFormat.format(
-                    "Cannot store configuration for key {0}: StorageService not available",
-                    customizationKey));
-            return;
-        }
-        configCache.put(customizationKey, customization);
-        String xml = getXStream(customization.getClass()).toXML(customization);
-        InputStream is = null;
-        try {
-            is = new ByteArrayInputStream(xml.getBytes("UTF-8")); //$NON-NLS-1$
-            storageService.write(CATEGORY_CUSTOMIZATION, customizationKey, is);
-            if (eventService != null) {
-                eventService.fireEvent(new EventCustomizingUpdate(customizationKey));
-            }
-            AUDIT_LOG.info(MessageFormat.format("Configuration ''{0}'' changed by user ''{1}''",
-                    customizationKey, Permits.getLoggedInUser()));
-        } catch (UnsupportedEncodingException e) {
-            // should never happen for UTF-8
-            throw new IllegalStateException(e);
-        } catch (StorageException e) {
-            LOG.error(MessageFormat.format("Failed to store configuration for key ''{0}''",
-                    customizationKey, storageService), e);
-        } finally {
-            IOUtils.closeQuietly(is);
-        }
-    };
-
-    @Override
-    public synchronized <T> T readCustomization(String customizationKey, Class<T> customizationClass) {
-        if (storageService == null) {
-            LOG.warn(MessageFormat.format(
-                    "Cannot load configuration for key {0}: StorageService not available",
-                    customizationKey));
-            return null;
-        }
-        Object config = configCache.get(customizationKey);
-        if (config == null) {
-            InputStream is = null;
-            try {
-                is = storageService.read(CATEGORY_CUSTOMIZATION, customizationKey);
-                if (is == null) {
-                    return null;
+    private void notifyCustomizationChanged(final StorageService storageService) {
+        ThreadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                if (eventService != null) {
+                    List<String> storageKeys = Collections.emptyList();
+                    try {
+                        storageKeys = storageService.keys(CATEGORY_CUSTOMIZATION);
+                    } catch (StorageException e) {
+                        LOG.error("Failed to retrieve configuration keys", e);
+                        return;
+                    }
+                    for (String storageKey: storageKeys) {
+                        ConfigSection<?> configSection = byStorageKey.get(storageKey);
+                        if (configSection != null) {
+                            fireEvent(configSection);
+                        }
+                    }
                 }
-                config = getXStream(customizationClass).fromXML(is);
-            } catch (XStreamException e) {
-                LOG.error(MessageFormat.format(
-                        "Failed to unmarshal configuration for key ''{0}'' ",
-                        customizationKey), e);
-                return null;
-            } catch (StorageException e) {
-                LOG.error(MessageFormat.format(
-                        "Failed to retrieve configuration for key ''{0}''",
-                        customizationKey), e);
-                return null;
-            } finally {
-                IOUtils.closeQuietly(is);
             }
-        }
-        return customizationClass.cast(config);
+        });
+    }
+
+    private void notifyCustomizationChanged(final ConfigSection<?> configSection) {
+        ThreadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                if (eventService != null && storageService != null) {
+                    fireEvent(configSection);
+                }
+            }
+        });
+    }
+
+    private void fireEvent(ConfigSection<?> configSection) {
+        eventService.fireEvent(new EventConfigUpdate(configSection.getConfigClass()));
+        LOG.info(MessageFormat.format("Event sent: Configuration ''{0}'' has changed",
+                configSection.getStorageKey()));
     }
 }

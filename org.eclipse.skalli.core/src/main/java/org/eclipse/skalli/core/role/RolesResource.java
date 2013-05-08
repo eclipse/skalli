@@ -19,16 +19,9 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Severity;
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class RolesResource extends CustomizingResource<RolesConfig> implements Issuer {
-
-    public static final String MAPPINGS_KEY = "roles"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return MAPPINGS_KEY;
-    }
+public class RolesResource extends ConfigResourceBase<RolesConfig> implements Issuer {
 
     @Override
     protected Class<RolesConfig> getConfigClass() {

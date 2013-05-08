@@ -10,16 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.gerrit.client.config;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class GerritResource extends CustomizingResource<GerritConfig> {
-
-    public static final String KEY = "gerrit"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return KEY;
-    }
+public class GerritResource extends ConfigResourceBase<GerritConfig> {
 
     @Override
     protected Class<GerritConfig> getConfigClass() {

@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.eclipse.skalli.ext.mapping.LinkMapperBase;
 import org.eclipse.skalli.ext.mapping.LinkMappingConfig;
-import org.eclipse.skalli.ext.mapping.mail.internal.MailingListMappingResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 
 public class MailingListMapper extends LinkMapperBase {
@@ -34,8 +33,7 @@ public class MailingListMapper extends LinkMapperBase {
     @Override
     protected List<? extends LinkMappingConfig> getAllMappings(ConfigurationService configService) {
         MailingListMappingsConfig mappingsConfig =
-                configService.readCustomization(MailingListMappingResource.MAPPINGS_KEY,
-                        MailingListMappingsConfig.class);
+                configService.readConfiguration(MailingListMappingsConfig.class);
         if (mappingsConfig == null) {
             return null;
         }

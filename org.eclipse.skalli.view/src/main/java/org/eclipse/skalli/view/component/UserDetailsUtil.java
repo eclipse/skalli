@@ -15,7 +15,6 @@ import java.util.IllegalFormatConversionException;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.view.internal.config.UserDetailsConfig;
-import org.eclipse.skalli.view.internal.config.UserDetailsResource;
 
 public class UserDetailsUtil {
 
@@ -26,8 +25,7 @@ public class UserDetailsUtil {
     public static String getUserDetailsLink(String userId) {
         ConfigurationService confService = Services.getService(ConfigurationService.class);
         if (confService != null) {
-            UserDetailsConfig userDetailsConfig = confService.readCustomization(UserDetailsResource.KEY,
-                    UserDetailsConfig.class);
+            UserDetailsConfig userDetailsConfig = confService.readConfiguration(UserDetailsConfig.class);
             if (userDetailsConfig != null) {
                 try {
                     // the configured base url can have a placeholder for

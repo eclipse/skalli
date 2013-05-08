@@ -10,16 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.user.ldap;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class LDAPResource extends CustomizingResource<LDAPConfig> {
-
-    public static final String KEY = "ldap"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return KEY;
-    }
+public class LDAPResource extends ConfigResourceBase<LDAPConfig> {
 
     @Override
     protected Class<LDAPConfig> getConfigClass() {

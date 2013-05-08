@@ -11,45 +11,24 @@
 package org.eclipse.skalli.services.configuration;
 
 /**
- * Service providing configuration settings.
+ * Interface of a service that provides configuration settings.
  */
 public interface ConfigurationService {
 
-    public String readString(ConfigKey key);
-
-    public void writeString(ConfigTransaction tx, ConfigKey key, String value);
-
-    public Integer readInteger(ConfigKey key);
-
-    public void writeInteger(ConfigTransaction tx, ConfigKey key, Integer value);
-
-    public Boolean readBoolean(ConfigKey key);
-
-    public void writeBoolean(ConfigTransaction tx, ConfigKey key, Boolean value);
-
-    public ConfigTransaction startTransaction();
-
-    public void commit(ConfigTransaction tx);
-
-    public void rollback(ConfigTransaction tx);
-
-    public <T> T readCustomization(String customizationKey, Class<T> customizationClass);
+    /**
+     * Retrieves the configuration for the given configuration class.
+     *
+     * @param configurationClass  the class of the configuration to retrieve.
+     *
+     * @return the configuration instance, or <code>null</code> if no
+     * such configuration exists.
+     */
+    public <T> T readConfiguration(Class<T> configurationClass);
 
     /**
-     * Stores a customization object with the given key.
+     * Stores the given configuration.
      *
-     * <p>
-     * In contrast to configurations that are typically technical oriented parameters (passwords, systems),
-     * customizations are more related to controlling the behavior of the system.
-     * </p>
-     * <p>
-     * Please note that customizations will not be encrypted,
-     * so storing passwords and other secrets should be done as configurations.
-     * </p>
-     *
-     * @param <T>
-     * @param customizationKey
-     * @param customization
+     * @param configuration  the configuration to store.
      */
-    public <T> void writeCustomization(String customizationKey, T customization);
+    public <T> void writeConfiguration(T configuration);
 }

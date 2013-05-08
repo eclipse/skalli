@@ -16,9 +16,8 @@ import java.util.UUID;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.maven.MavenResolverService;
 import org.eclipse.skalli.model.ext.maven.internal.config.MavenResolverConfig;
-import org.eclipse.skalli.model.ext.maven.internal.config.MavenResolverResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.event.EventCustomizingUpdate;
+import org.eclipse.skalli.services.configuration.EventConfigUpdate;
 import org.eclipse.skalli.services.event.EventListener;
 import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.scheduler.RunnableSchedule;
@@ -28,7 +27,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MavenResolverServiceImpl implements MavenResolverService, EventListener<EventCustomizingUpdate> {
+public class MavenResolverServiceImpl implements MavenResolverService, EventListener<EventConfigUpdate> {
 
     private static final Logger LOG = LoggerFactory.getLogger(MavenResolverServiceImpl.class);
 
@@ -73,7 +72,7 @@ public class MavenResolverServiceImpl implements MavenResolverService, EventList
 
     protected void bindEventService(EventService eventService) {
         LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
-        eventService.registerListener(EventCustomizingUpdate.class, this);
+        eventService.registerListener(EventConfigUpdate.class, this);
     }
 
     protected void unbindEventService(EventService eventService) {
@@ -91,8 +90,7 @@ public class MavenResolverServiceImpl implements MavenResolverService, EventList
                 stopAllTasks();
             }
             if (configService != null) {
-                MavenResolverConfig resolverConfig = configService.readCustomization(
-                        MavenResolverResource.MAPPINGS_KEY, MavenResolverConfig.class);
+                MavenResolverConfig resolverConfig = configService.readConfiguration(MavenResolverConfig.class);
                 if (resolverConfig != null) {
                     RunnableSchedule runnableSchedule = new MavenResolverRunnable(resolverConfig);
                     scheduleId = schedulerService.registerSchedule(runnableSchedule);
@@ -114,8 +112,8 @@ public class MavenResolverServiceImpl implements MavenResolverService, EventList
     }
 
     @Override
-    public void onEvent(EventCustomizingUpdate event) {
-        if (MavenResolverResource.MAPPINGS_KEY.equals(event.getCustomizationName())) {
+    public void onEvent(EventConfigUpdate event) {
+        if (MavenResolverConfig.class.equals(event.getConfigClass())) {
             synchronizeAllTasks();
         }
     }

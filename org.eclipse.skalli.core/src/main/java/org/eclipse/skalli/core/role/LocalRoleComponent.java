@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.event.EventCustomizingUpdate;
+import org.eclipse.skalli.services.configuration.EventConfigUpdate;
 import org.eclipse.skalli.services.event.EventListener;
 import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.permit.PermitService;
@@ -27,7 +27,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LocalRoleComponent implements RoleService, EventListener<EventCustomizingUpdate> {
+public class LocalRoleComponent implements RoleService, EventListener<EventConfigUpdate> {
 
     private static final Logger LOG = LoggerFactory.getLogger(LocalRoleComponent.class);
 
@@ -62,7 +62,7 @@ public class LocalRoleComponent implements RoleService, EventListener<EventCusto
 
     protected void bindEventService(EventService eventService) {
         LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
-        eventService.registerListener(EventCustomizingUpdate.class, this);
+        eventService.registerListener(EventConfigUpdate.class, this);
     }
 
     protected void unbindEventService(EventService eventService) {
@@ -81,7 +81,7 @@ public class LocalRoleComponent implements RoleService, EventListener<EventCusto
         if (configService == null || StringUtils.isBlank(userId)) {
             return Collections.emptyList();
         }
-        RolesConfig rolesConfig = configService.readCustomization(RolesResource.MAPPINGS_KEY, RolesConfig.class);
+        RolesConfig rolesConfig = configService.readConfiguration(RolesConfig.class);
         if (rolesConfig == null) {
             return Collections.emptyList();
         }
@@ -99,7 +99,7 @@ public class LocalRoleComponent implements RoleService, EventListener<EventCusto
         if (configService == null || groups == null || groups.length == 0) {
             return Collections.emptyList();
         }
-        RolesConfig rolesConfig = configService.readCustomization(RolesResource.MAPPINGS_KEY, RolesConfig.class);
+        RolesConfig rolesConfig = configService.readConfiguration(RolesConfig.class);
         if (rolesConfig == null) {
             return Collections.emptyList();
         }
@@ -119,8 +119,10 @@ public class LocalRoleComponent implements RoleService, EventListener<EventCusto
     }
 
     @Override
-    public void onEvent(EventCustomizingUpdate event) {
-        invalidatePermits();
+    public void onEvent(EventConfigUpdate event) {
+        if (RolesConfig.class.equals(event.getConfigClass())) {
+            invalidatePermits();
+        }
     }
 
     private void invalidatePermits() {

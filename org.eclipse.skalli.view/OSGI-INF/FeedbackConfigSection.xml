@@ -12,7 +12,7 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.view.internal.config.FeedbackConfigSection">
    <implementation class="org.eclipse.skalli.view.internal.config.FeedbackConfigSection"/>
    <service>
-      <provide interface="org.eclipse.skalli.services.configuration.rest.ConfigSection"/>
+      <provide interface="org.eclipse.skalli.services.configuration.ConfigSection"/>
    </service>
 </scr:component>
 

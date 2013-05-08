@@ -10,22 +10,31 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.feed;
 
-import org.eclipse.skalli.services.configuration.rest.ConfigSection;
-import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
+import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.restlet.resource.ServerResource;
 
-public class FeedUpdaterConfigSection extends ConfigSectionBase implements ConfigSection {
+public class FeedUpdaterConfigSection implements ConfigSection<FeedUpdaterConfig> {
 
-    private static final String NAME = "feeds/updater"; //$NON-NLS-1$
+    private static final String STORAGE_KEY = "feedupdater"; //$NON-NLS-1$
+    private static final String[] RESOURCE_PATHS = new String[] { "/feeds/updater" }; //$NON-NLS-1$
 
     @Override
-    public String getName() {
-        return NAME;
+    public String getStorageKey() {
+        return STORAGE_KEY;
+    }
+
+    @Override
+    public Class<FeedUpdaterConfig> getConfigClass() {
+        return FeedUpdaterConfig.class;
+    }
+
+    @Override
+    public String[] getResourcePaths() {
+        return RESOURCE_PATHS;
     }
 
     @Override
     public Class<? extends ServerResource> getServerResource(String resourePath) {
         return FeedUpdaterResource.class;
     }
-
 }

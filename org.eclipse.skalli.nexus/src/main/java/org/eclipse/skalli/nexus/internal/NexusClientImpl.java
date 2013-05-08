@@ -30,7 +30,6 @@ import org.eclipse.skalli.nexus.NexusClient;
 import org.eclipse.skalli.nexus.NexusClientException;
 import org.eclipse.skalli.nexus.NexusSearchResult;
 import org.eclipse.skalli.nexus.internal.config.NexusConfig;
-import org.eclipse.skalli.nexus.internal.config.NexusResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.destination.Destinations;
 import org.slf4j.Logger;
@@ -55,14 +54,14 @@ public class NexusClientImpl implements NexusClient {
         if (configService == null) {
             throw new NexusClientException("No configuration service available");
         }
-        NexusConfig nexusConfig = configService.readCustomization(NexusResource.KEY, NexusConfig.class);
+        NexusConfig nexusConfig = configService.readConfiguration(NexusConfig.class);
         if (nexusConfig == null) {
-            throw new NexusClientException(MessageFormat.format("Nexus configuration not found (key={0})",
-                    NexusResource.KEY));
+            throw new NexusClientException("Nexus configuration not available");
         }
 
-        //hint, count=Integer.MAX_VALUE, does not work. the http request comes back without an error and from the result you cannot find out
-        // that something got wrong. Take a big value under the assumption that you will never have so many versions.
+        // count=Integer.MAX_VALUE, does not work. the http request comes back without an error and from the
+        // result you cannot find out that something got wrong. Take a big value under the assumption that you will
+        // never have so many versions.
         return searchArtifactVersions(nexusConfig, groupId, artifactId, 10000000);
     }
 

@@ -13,16 +13,9 @@ package org.eclipse.skalli.core.validation;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class ValidationsResource extends CustomizingResource<ValidationsConfig> {
-
-    public static final String MAPPINGS_KEY = "validation"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return MAPPINGS_KEY;
-    }
+public class ValidationsResource extends ConfigResourceBase<ValidationsConfig> {
 
     @Override
     protected Class<ValidationsConfig> getConfigClass() {

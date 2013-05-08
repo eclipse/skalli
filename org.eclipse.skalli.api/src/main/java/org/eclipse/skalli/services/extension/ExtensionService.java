@@ -23,13 +23,25 @@ import org.eclipse.skalli.services.extension.rest.RestConverter;
  * Interface of a service that defines a model extension.
  *
  * An implementation of this interface should be derived from the
- * base class {@link ExtensionServiceBase} and  must be registered as
- * an OSGI component.
+ * base class {@link ExtensionServiceBase} and must be registered as
+ * an OSGI service component.
+ * <br>
+ * For example:
+ * <pre>
+ * &lt;component immediate="true" name="org.eclipse.skalli.ext.info"&gt;
+ *   &lt;implementation class="org.eclipse.skalli.core.extension.info.ExtensionServiceInfo"/&gt;
+ *   &lt;service&gt;
+ *     &lt;provide interface="org.eclipse.skalli.services.extension.ExtensionService"/&gt;
+ *   &lt;/service&gt;
+ * &lt;/component&gt;
+ * </pre>
+ * Note, extension services should be started as early as possible, hence
+ * the declaration as <i>immediate</i>.
  */
 public interface ExtensionService<T extends ExtensionEntityBase> {
 
     /**
-     * Returns the class of the model extension provided by this extension service.
+     * Returns the class of the model extension associated with this extension service.
      */
     public Class<T> getExtensionClass();
 

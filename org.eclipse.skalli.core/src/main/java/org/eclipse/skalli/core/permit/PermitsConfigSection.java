@@ -10,28 +10,31 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.permit;
 
-import org.eclipse.skalli.services.configuration.rest.ConfigSection;
-import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
+import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.restlet.resource.ServerResource;
 
-public class PermitsConfigSection extends ConfigSectionBase implements ConfigSection {
+public class PermitsConfigSection implements ConfigSection<PermitsConfig> {
 
-    private static final String NAME = "permissions"; //$NON-NLS-1$
+    private static final String STORAGE_KEY = "permissions"; //$NON-NLS-1$
 
     private static final String PERMISSIONS_PATH = "/permissions"; //$NON-NLS-1$
     private static final String PERMITS_PATH = "/permits"; //$NON-NLS-1$
     private static final String PERMIT_PATH = "/permits/{id}"; //$NON-NLS-1$
+    private static final String[] RESOURCE_PATHS = new String[] { PERMISSIONS_PATH, PERMITS_PATH, PERMIT_PATH };
 
     @Override
-    public String getName() {
-        return NAME;
+    public String getStorageKey() {
+        return STORAGE_KEY;
+    }
+
+    @Override
+    public Class<PermitsConfig> getConfigClass() {
+        return PermitsConfig.class;
     }
 
     @Override
     public String[] getResourcePaths() {
-        return new String[] {
-                PERMISSIONS_PATH, PERMITS_PATH, PERMIT_PATH
-        };
+        return RESOURCE_PATHS;
     }
 
     @Override

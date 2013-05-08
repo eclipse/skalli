@@ -14,7 +14,7 @@ import java.text.MessageFormat;
 import java.util.UUID;
 
 import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.event.EventCustomizingUpdate;
+import org.eclipse.skalli.services.configuration.EventConfigUpdate;
 import org.eclipse.skalli.services.event.EventListener;
 import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.feed.FeedManager;
@@ -25,7 +25,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FeedUpdaterComponent implements EventListener<EventCustomizingUpdate> {
+public class FeedUpdaterComponent implements EventListener<EventConfigUpdate> {
 
     private static final Logger LOG = LoggerFactory.getLogger(FeedUpdaterComponent.class);
 
@@ -71,7 +71,7 @@ public class FeedUpdaterComponent implements EventListener<EventCustomizingUpdat
 
     protected void bindEventService(EventService eventService) {
         LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
-        eventService.registerListener(EventCustomizingUpdate.class, this);
+        eventService.registerListener(EventConfigUpdate.class, this);
     }
 
     protected void unbindEventService(EventService eventService) {
@@ -95,8 +95,7 @@ public class FeedUpdaterComponent implements EventListener<EventCustomizingUpdat
                 stopAllTasks();
             }
             if (configService != null) {
-                final FeedUpdaterConfig resolverConfig = configService.readCustomization(
-                        FeedUpdaterResource.MAPPINGS_KEY, FeedUpdaterConfig.class);
+                FeedUpdaterConfig resolverConfig = configService.readConfiguration(FeedUpdaterConfig.class);
                 if (resolverConfig != null) {
                     RunnableSchedule runnableSchedule = new RunnableSchedule(resolverConfig.getSchedule(), "Feed Updater") {
                         @Override
@@ -134,8 +133,8 @@ public class FeedUpdaterComponent implements EventListener<EventCustomizingUpdat
     }
 
     @Override
-    public void onEvent(EventCustomizingUpdate event) {
-        if (FeedUpdaterResource.MAPPINGS_KEY.equals(event.getCustomizationName())) {
+    public void onEvent(EventConfigUpdate event) {
+        if (FeedUpdaterConfig.class.equals(event.getConfigClass())) {
             synchronizeAllTasks();
         }
     }

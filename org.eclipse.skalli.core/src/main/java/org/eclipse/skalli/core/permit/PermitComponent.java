@@ -29,7 +29,7 @@ import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.eclipse.skalli.services.event.EventCustomizingUpdate;
+import org.eclipse.skalli.services.configuration.EventConfigUpdate;
 import org.eclipse.skalli.services.event.EventListener;
 import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.group.GroupService;
@@ -44,7 +44,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PermitComponent implements PermitService, EventListener<EventCustomizingUpdate> {
+public class PermitComponent implements PermitService, EventListener<EventConfigUpdate> {
 
     private static final Logger LOG = LoggerFactory.getLogger(PermitComponent.class);
 
@@ -100,7 +100,7 @@ public class PermitComponent implements PermitService, EventListener<EventCustom
 
     protected void bindEventService(EventService eventService) {
         LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
-        eventService.registerListener(EventCustomizingUpdate.class, this);
+        eventService.registerListener(EventConfigUpdate.class, this);
     }
 
     protected void unbindEventService(EventService eventService) {
@@ -217,10 +217,10 @@ public class PermitComponent implements PermitService, EventListener<EventCustom
     }
 
     @Override
-    public void onEvent(EventCustomizingUpdate event) {
-        if (PermitsResource.MAPPINGS_KEY.equals(event.getCustomizationName())) {
-            logoutAll();
-        }
+    public void onEvent(EventConfigUpdate event) {
+        // we do not know which configurations affect permissions,
+        // so throw away all login sessions just to be sure
+        logoutAll();
     }
 
     private PermitSet getSessionPermits(HttpSession session, String userId, Project project) {
@@ -280,7 +280,7 @@ public class PermitComponent implements PermitService, EventListener<EventCustom
             List<String> roles = getRoles(userId);
             List<String> projectRoles = getProjectRoles(userId, project);
 
-            PermitsConfig permitsConfig = configService.readCustomization(PermitsResource.MAPPINGS_KEY, PermitsConfig.class);
+            PermitsConfig permitsConfig = configService.readConfiguration(PermitsConfig.class);
             if (permitsConfig != null) {
                 Map<String,String> properties = new HashMap<String,String>();
                 properties.put(USER_WILDCARD, userId);

@@ -14,7 +14,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritService;
 import org.eclipse.skalli.gerrit.client.config.GerritConfig;
-import org.eclipse.skalli.gerrit.client.config.GerritResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +44,7 @@ public class GerritServiceImpl implements GerritService {
             return null;
         }
 
-        GerritConfig gerritConfig = configService.readCustomization(GerritResource.KEY, GerritConfig.class);
+        GerritConfig gerritConfig = configService.readConfiguration(GerritConfig.class);
         if (gerritConfig == null) {
             LOG.warn("Failed to create a Gerrit client:  No Gerrit configuration available");
             return null;

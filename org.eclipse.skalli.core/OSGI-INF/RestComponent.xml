@@ -13,7 +13,7 @@
     <implementation class="org.eclipse.skalli.core.rest.RestApplication"/>
     <reference
         name="ConfigSection"
-        interface="org.eclipse.skalli.services.configuration.rest.ConfigSection"
+        interface="org.eclipse.skalli.services.configuration.ConfigSection"
         bind="bindConfigSection"
         unbind="unbindConfigSection"
         cardinality="0..n"

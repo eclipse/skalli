@@ -52,7 +52,7 @@ public class UserServicesTest {
 
         EasyMock.reset(mocks);
 
-        mockConfig.readCustomization("userStore", UserStoreConfig.class);
+        mockConfig.readConfiguration(UserStoreConfig.class);
         EasyMock.expectLastCall().andReturn(createUserStoreConfig("local", true));
 
         EasyMock.replay(mocks);
@@ -70,7 +70,7 @@ public class UserServicesTest {
 
         EasyMock.reset(mocks);
 
-        mockConfig.readCustomization("userStore", UserStoreConfig.class);
+        mockConfig.readConfiguration(UserStoreConfig.class);
         EasyMock.expectLastCall().andReturn(createUserStoreConfig("foobar", true));
 
         EasyMock.replay(mocks);

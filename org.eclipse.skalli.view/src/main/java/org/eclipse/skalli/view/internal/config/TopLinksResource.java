@@ -10,16 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.internal.config;
 
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class TopLinksResource extends CustomizingResource<TopLinksConfig> {
-
-    public static final String TOPLINKS_KEY = "view.toplinks"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return TOPLINKS_KEY;
-    }
+public class TopLinksResource extends ConfigResourceBase<TopLinksConfig> {
 
     @Override
     protected Class<TopLinksConfig> getConfigClass() {

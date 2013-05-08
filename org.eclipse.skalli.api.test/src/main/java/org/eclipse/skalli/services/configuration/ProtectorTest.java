@@ -8,7 +8,7 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.services.configuration.rest;
+package org.eclipse.skalli.services.configuration;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;

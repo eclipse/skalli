@@ -10,17 +10,27 @@
  *******************************************************************************/
 package org.eclipse.skalli.nexus.internal.config;
 
-import org.eclipse.skalli.services.configuration.rest.ConfigSection;
-import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
+import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.restlet.resource.ServerResource;
 
-public class NexusConfigSection extends ConfigSectionBase implements ConfigSection {
+public class NexusConfigSection implements ConfigSection<NexusConfig> {
 
-    private static final String NAME = "ext/nexus"; //$NON-NLS-1$
+    private static final String STORAGE_KEY = "ext.nexus"; //$NON-NLS-1$
+    private static final String[] RESOURCE_PATHS = new String[] { "/ext/nexus" }; //$NON-NLS-1$
 
     @Override
-    public String getName() {
-        return NAME;
+    public String getStorageKey() {
+        return STORAGE_KEY;
+    }
+
+    @Override
+    public Class<NexusConfig> getConfigClass() {
+        return NexusConfig.class;
+    }
+
+    @Override
+    public String[] getResourcePaths() {
+        return RESOURCE_PATHS;
     }
 
     @Override

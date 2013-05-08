@@ -10,17 +10,27 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.role;
 
-import org.eclipse.skalli.services.configuration.rest.ConfigSection;
-import org.eclipse.skalli.services.configuration.rest.ConfigSectionBase;
+import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.restlet.resource.ServerResource;
 
-public class RolesConfigSection extends ConfigSectionBase implements ConfigSection {
+public class RolesConfigSection implements ConfigSection<RolesConfig> {
 
-    private static final String NAME = "roles"; //$NON-NLS-1$
+    private static final String STORAGE_KEY = "roles"; //$NON-NLS-1$
+    private static final String[] RESOURCE_PATHS = new String[] { "/roles" }; //$NON-NLS-1$
 
     @Override
-    public String getName() {
-        return NAME;
+    public String getStorageKey() {
+        return STORAGE_KEY;
+    }
+
+    @Override
+    public Class<RolesConfig> getConfigClass() {
+        return RolesConfig.class;
+    }
+
+    @Override
+    public String[] getResourcePaths() {
+        return RESOURCE_PATHS;
     }
 
     @Override

@@ -24,10 +24,7 @@ import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.nexus.NexusClientException;
 import org.eclipse.skalli.nexus.NexusSearchResult;
 import org.eclipse.skalli.nexus.internal.config.NexusConfig;
-import org.eclipse.skalli.nexus.internal.config.NexusResource;
 import org.eclipse.skalli.services.Services;
-import org.eclipse.skalli.services.configuration.ConfigKey;
-import org.eclipse.skalli.services.configuration.ConfigTransaction;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.destination.DestinationService;
 import org.eclipse.skalli.testutil.BundleManager;
@@ -110,55 +107,12 @@ public class NexusClientImplTest {
             }
         };
         ConfigurationService configService = new ConfigurationService() {
-
             @Override
-            public void writeString(ConfigTransaction tx, ConfigKey key, String value) {
+            public <T> T readConfiguration(Class<T> configurationClass) {
+                return configurationClass.cast(nexusConfig);
             }
-
             @Override
-            public void writeInteger(ConfigTransaction tx, ConfigKey key, Integer value) {
-            }
-
-            @Override
-            public <T> void writeCustomization(String customizationKey, T customization) {
-            }
-
-            @Override
-            public void writeBoolean(ConfigTransaction tx, ConfigKey key, Boolean value) {
-            }
-
-            @Override
-            public ConfigTransaction startTransaction() {
-                return null;
-            }
-
-            @Override
-            public void rollback(ConfigTransaction tx) {
-            }
-
-            @Override
-            public String readString(ConfigKey key) {
-                return null;
-            }
-
-            @Override
-            public Integer readInteger(ConfigKey key) {
-                return null;
-            }
-
-            @SuppressWarnings("unchecked")
-            @Override
-            public <T> T readCustomization(String customizationKey, Class<T> customizationClass) {
-                return (T) nexusConfig;
-            }
-
-            @Override
-            public Boolean readBoolean(ConfigKey key) {
-                return null;
-            }
-
-            @Override
-            public void commit(ConfigTransaction tx) {
+            public <T> void writeConfiguration(T configuration) {
             }
         };
 
@@ -184,54 +138,12 @@ public class NexusClientImplTest {
     public void testSearchArtifactVersions_StringString_noConfig() throws IOException {
         NexusClientImpl nexusClientImpl = new NexusClientImpl();
         ConfigurationService configService = new ConfigurationService() {
-
             @Override
-            public void writeString(ConfigTransaction tx, ConfigKey key, String value) {
-            }
-
-            @Override
-            public void writeInteger(ConfigTransaction tx, ConfigKey key, Integer value) {
-            }
-
-            @Override
-            public <T> void writeCustomization(String customizationKey, T customization) {
-            }
-
-            @Override
-            public void writeBoolean(ConfigTransaction tx, ConfigKey key, Boolean value) {
-            }
-
-            @Override
-            public ConfigTransaction startTransaction() {
-                return null;
-            }
-
-            @Override
-            public void rollback(ConfigTransaction tx) {
-            }
-
-            @Override
-            public String readString(ConfigKey key) {
-                return null;
-            }
-
-            @Override
-            public Integer readInteger(ConfigKey key) {
-                return null;
-            }
-
-            @Override
-            public <T> T readCustomization(String customizationKey, Class<T> customizationClass) {
+            public <T> T readConfiguration(Class<T> configurationClass) {
                 return (T) null;
             }
-
             @Override
-            public Boolean readBoolean(ConfigKey key) {
-                return null;
-            }
-
-            @Override
-            public void commit(ConfigTransaction tx) {
+            public <T> void writeConfiguration(T configuration) {
             }
         };
 
@@ -241,7 +153,7 @@ public class NexusClientImplTest {
             nexusClientImpl.searchArtifactVersions(groupId, artifactId);
             fail();
         } catch (NexusClientException e) {
-            assertThat(e.getMessage(), containsString(NexusResource.KEY));
+            assertThat(e.getMessage(), containsString("Nexus configuration not available"));
         }
     }
 

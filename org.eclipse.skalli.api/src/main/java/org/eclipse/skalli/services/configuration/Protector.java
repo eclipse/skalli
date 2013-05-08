@@ -8,7 +8,7 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.services.configuration.rest;
+package org.eclipse.skalli.services.configuration;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

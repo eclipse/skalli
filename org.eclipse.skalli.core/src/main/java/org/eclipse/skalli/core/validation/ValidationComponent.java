@@ -32,9 +32,9 @@ import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.configuration.EventConfigUpdate;
 import org.eclipse.skalli.services.entity.EntityService;
 import org.eclipse.skalli.services.entity.EntityServices;
-import org.eclipse.skalli.services.event.EventCustomizingUpdate;
 import org.eclipse.skalli.services.event.EventListener;
 import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.issues.Issues;
@@ -50,7 +50,7 @@ import org.restlet.resource.ServerResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ValidationComponent implements ValidationService, EventListener<EventCustomizingUpdate>, Monitorable {
+public class ValidationComponent implements ValidationService, EventListener<EventConfigUpdate>, Monitorable {
 
     private static final Logger LOG = LoggerFactory.getLogger(ValidationComponent.class);
 
@@ -121,7 +121,7 @@ public class ValidationComponent implements ValidationService, EventListener<Eve
 
     protected void bindEventService(EventService eventService) {
         LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
-        eventService.registerListener(EventCustomizingUpdate.class, this);
+        eventService.registerListener(EventConfigUpdate.class, this);
     }
 
     protected void unbindEventService(EventService eventService) {
@@ -587,8 +587,7 @@ public class ValidationComponent implements ValidationService, EventListener<Eve
                 stopAllTasks();
             }
             if (configService != null) {
-                ValidationsConfig validationConfigs = configService.readCustomization(ValidationsResource.MAPPINGS_KEY,
-                        ValidationsConfig.class);
+                ValidationsConfig validationConfigs = configService.readConfiguration(ValidationsConfig.class);
                 if (validationConfigs != null) {
                     for (ValidationConfig validationConfig : validationConfigs.getValidationConfigs()) {
                         ValidationSchedule schedule = new ValidationSchedule(validationConfig);
@@ -630,8 +629,8 @@ public class ValidationComponent implements ValidationService, EventListener<Eve
     }
 
     @Override
-    public void onEvent(EventCustomizingUpdate event) {
-        if (ValidationsResource.MAPPINGS_KEY.equals(event.getCustomizationName())) {
+    public void onEvent(EventConfigUpdate event) {
+        if (ValidationsConfig.class.equals(event.getConfigClass())) {
             synchronizeAllTasks();
         }
     }

@@ -21,7 +21,6 @@ import org.eclipse.skalli.ext.mapping.LinkMapper;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingConfig;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMappingsConfig;
-import org.eclipse.skalli.model.ext.devinf.internal.config.ScmLocationMappingResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,8 +52,7 @@ public class ScmLocationMapperTest {
     @Test
     public void testGetMappedLinks_noConfig() {
         final ConfigurationService mockConfigService = EasyMock.createMock(ConfigurationService.class);
-        mockConfigService.readCustomization(EasyMock.eq(ScmLocationMappingResource.MAPPINGS_KEY),
-                EasyMock.isA(Class.class));
+        mockConfigService.readConfiguration(EasyMock.isA(Class.class));
         EasyMock.expectLastCall().andReturn(null);
         EasyMock.replay(mockConfigService);
         ScmLocationMapper mapper = new ScmLocationMapper();
@@ -134,8 +132,7 @@ public class ScmLocationMapperTest {
         ScmLocationMappingsConfig mappings = new ScmLocationMappingsConfig(ms);
 
         final ConfigurationService mockConfigService = EasyMock.createMock(ConfigurationService.class);
-        mockConfigService.readCustomization(EasyMock.eq(ScmLocationMappingResource.MAPPINGS_KEY),
-                EasyMock.isA(Class.class));
+        mockConfigService.readConfiguration(EasyMock.isA(Class.class));
         EasyMock.expectLastCall().andReturn(mappings).anyTimes();
         EasyMock.replay(mockConfigService);
         return mockConfigService;

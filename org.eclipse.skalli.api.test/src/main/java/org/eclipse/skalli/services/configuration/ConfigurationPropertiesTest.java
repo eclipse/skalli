@@ -8,9 +8,8 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.core.configuration;
+package org.eclipse.skalli.services.configuration;
 
-import org.eclipse.skalli.services.configuration.ConfigurationProperties;
 import org.junit.Assert;
 import org.junit.Test;
 

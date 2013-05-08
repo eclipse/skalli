@@ -20,17 +20,10 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Severity;
-import org.eclipse.skalli.services.configuration.rest.CustomizingResource;
+import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 import org.eclipse.skalli.services.group.GroupService;
 
-public class GroupsResource extends CustomizingResource<GroupsConfig> implements Issuer {
-
-    public static final String MAPPINGS_KEY = "groups"; //$NON-NLS-1$
-
-    @Override
-    protected String getKey() {
-        return MAPPINGS_KEY;
-    }
+public class GroupsResource extends ConfigResourceBase<GroupsConfig> implements Issuer {
 
     @Override
     protected Class<GroupsConfig> getConfigClass() {

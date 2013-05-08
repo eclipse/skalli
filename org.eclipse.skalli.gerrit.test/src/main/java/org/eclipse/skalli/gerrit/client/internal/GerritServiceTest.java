@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.eclipse.skalli.gerrit.client.config.GerritConfig;
-import org.eclipse.skalli.gerrit.client.config.GerritResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.junit.Test;
 
@@ -127,7 +126,7 @@ public class GerritServiceTest {
     gerritConfig.setPassphrase(passphrase);
     ConfigurationService mockedConfigService = createMock(ConfigurationService.class);
 
-    expect(mockedConfigService.readCustomization(GerritResource.KEY, GerritConfig.class)).andReturn(gerritConfig);
+    expect(mockedConfigService.readConfiguration(GerritConfig.class)).andReturn(gerritConfig);
 
     replay(mockedConfigService);
     return mockedConfigService;

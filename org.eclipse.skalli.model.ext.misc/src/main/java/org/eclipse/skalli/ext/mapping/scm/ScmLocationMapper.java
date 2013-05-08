@@ -16,7 +16,6 @@ import java.util.List;
 import org.eclipse.skalli.commons.ComparatorUtils;
 import org.eclipse.skalli.ext.mapping.LinkMapperBase;
 import org.eclipse.skalli.ext.mapping.LinkMappingConfig;
-import org.eclipse.skalli.model.ext.devinf.internal.config.ScmLocationMappingResource;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 
 public class ScmLocationMapper extends LinkMapperBase {
@@ -88,8 +87,7 @@ public class ScmLocationMapper extends LinkMapperBase {
     @Override
     protected List<? extends LinkMappingConfig> getAllMappings(ConfigurationService configService) {
         ScmLocationMappingsConfig mappingsConfig =
-                configService.readCustomization(ScmLocationMappingResource.MAPPINGS_KEY,
-                        ScmLocationMappingsConfig.class);
+                configService.readConfiguration(ScmLocationMappingsConfig.class);
         return mappingsConfig != null ? mappingsConfig.getScmMappings() : null;
     }
 }
