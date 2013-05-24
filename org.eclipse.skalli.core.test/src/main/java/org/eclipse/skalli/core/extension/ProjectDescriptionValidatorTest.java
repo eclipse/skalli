@@ -12,7 +12,6 @@ package org.eclipse.skalli.core.extension;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.HtmlUtils;
-import org.eclipse.skalli.core.extension.ProjectDescriptionValidator;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.testutil.TestUUIDs;

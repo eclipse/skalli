@@ -8,7 +8,7 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.services.configuration;
+package org.eclipse.skalli.services;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -18,9 +18,6 @@ import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.services.BundleFilter;
-import org.eclipse.skalli.services.FilterMode;
-import org.eclipse.skalli.services.Services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * Utility class to access system properties and properties defined in
  * <tt>"skalli.properties"</tt> files in installed bundles.
  */
-public class ConfigurationProperties {
+public class BundleProperties {
 
     /** Name of the property files to search for: <tt>{@value}</tt> */
     public static final String PROPERTIES_RESOURCE = "skalli.properties";//$NON-NLS-1$
@@ -39,7 +36,7 @@ public class ConfigurationProperties {
     /** Name of the property specifying the workig directory for file storage: <tt>{@value}</tt> */
     public static final String PROPERTY_WORKDIR = "workdir"; //$NON-NLS-1$
 
-    private static final Logger LOG = LoggerFactory.getLogger(ConfigurationProperties.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BundleProperties.class);
 
     private static Properties propertyCache = getBundleProperties();
 

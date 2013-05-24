@@ -70,6 +70,6 @@ class IssuesConverter extends RestConverterBase<Issues> {
 
     @Override
     public String getXsdFileName() {
-        return "issues.xsd";
+        return "issues.xsd"; //$NON-NLS-1$
     }
 }

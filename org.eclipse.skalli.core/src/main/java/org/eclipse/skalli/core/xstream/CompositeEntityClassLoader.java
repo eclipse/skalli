@@ -8,7 +8,7 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.core.persistence;
+package org.eclipse.skalli.core.xstream;
 
 import java.io.InputStream;
 import java.text.MessageFormat;
@@ -17,8 +17,6 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
 
 public class CompositeEntityClassLoader extends ClassLoader {
 

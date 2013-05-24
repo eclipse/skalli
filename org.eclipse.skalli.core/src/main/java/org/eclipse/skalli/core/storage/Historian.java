@@ -8,7 +8,7 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.core.persistence;
+package org.eclipse.skalli.core.storage;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

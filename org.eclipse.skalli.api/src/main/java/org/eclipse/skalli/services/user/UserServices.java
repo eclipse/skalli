@@ -14,8 +14,8 @@ import java.text.MessageFormat;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.services.BundleProperties;
 import org.eclipse.skalli.services.Services;
-import org.eclipse.skalli.services.configuration.ConfigurationProperties;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.osgi.framework.Constants;
 import org.slf4j.Logger;
@@ -68,9 +68,9 @@ public class UserServices {
 
         // retrieve params from configuration properties;
         // use "local" userstore as fallback in case no explicit property/configuration is available
-        String type = ConfigurationProperties.getProperty(USERSTORE_TYPE_PROPERTY, LOCAL_USERSTORE);
+        String type = BundleProperties.getProperty(USERSTORE_TYPE_PROPERTY, LOCAL_USERSTORE);
         boolean isUseLocalFallback = BooleanUtils.toBoolean(
-                ConfigurationProperties.getProperty(USERSTORE_USE_LOCAL_FALLBACK_PROPERTY));
+                BundleProperties.getProperty(USERSTORE_USE_LOCAL_FALLBACK_PROPERTY));
 
         // if there is a configuration via REST API available, override the properties
         if (configService != null) {

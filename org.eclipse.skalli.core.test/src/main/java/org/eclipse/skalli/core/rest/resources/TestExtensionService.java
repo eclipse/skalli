@@ -19,6 +19,7 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
+@SuppressWarnings("nls")
 class TestExtensionService extends ExtensionServiceBase<TestExtension> {
     @Override
     public Class<TestExtension> getExtensionClass() {
@@ -45,7 +46,7 @@ class TestExtensionService extends ExtensionServiceBase<TestExtension> {
             }
 
             @Override
-            public boolean canConvert(Class class1) {
+            public boolean canConvert(@SuppressWarnings("rawtypes") Class class1) {
                 return class1.equals(TestExtension.class);
             }
 

@@ -13,8 +13,6 @@ package org.eclipse.skalli.core.permit;
 import static org.junit.Assert.*;
 
 import org.eclipse.skalli.commons.CollectionUtils;
-import org.eclipse.skalli.core.permit.PermitConfig;
-import org.eclipse.skalli.core.permit.PermitsConfig;
 import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;

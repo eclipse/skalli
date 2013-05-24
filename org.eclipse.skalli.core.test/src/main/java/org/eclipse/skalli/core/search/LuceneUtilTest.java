@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.search;
 
-import org.eclipse.skalli.core.search.LuceneUtil;
 import org.junit.Assert;
 import org.junit.Test;
 

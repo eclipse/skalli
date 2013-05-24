@@ -19,7 +19,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.eclipse.skalli.core.destination.DestinationComponent;
 import org.eclipse.skalli.services.destination.DestinationService;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.HttpServerMock;

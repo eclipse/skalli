@@ -11,7 +11,6 @@
 package org.eclipse.skalli.core.rest;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.core.rest.RestApplication;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.eclipse.skalli.core.feed.FeedManagerComponent;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.feed.Entry;
 import org.eclipse.skalli.services.feed.FeedEntry;
@@ -36,6 +35,7 @@ import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.feeds.HashMapFeedService;
 import org.junit.Test;
 
+@SuppressWarnings("nls")
 public class FeedManagerComponentTest {
 
     private static final UUID PROJECT1_UUID = TestUUIDs.TEST_UUIDS[0];

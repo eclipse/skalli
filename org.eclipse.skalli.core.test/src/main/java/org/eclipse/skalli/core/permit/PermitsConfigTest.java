@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.eclipse.skalli.core.permit.PermitConfig;
-import org.eclipse.skalli.core.permit.PermitsConfig;
 import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;

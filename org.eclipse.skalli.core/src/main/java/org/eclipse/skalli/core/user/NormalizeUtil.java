@@ -14,6 +14,7 @@ import java.text.Normalizer;
 
 public class NormalizeUtil {
 
+    @SuppressWarnings("nls")
     public static String normalize(String s) {
         if (s == null) {
             return null;

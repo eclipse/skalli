@@ -114,10 +114,10 @@ public class LocalUserComponent extends EntityServiceBase<User> implements UserS
     public List<User> findUser(String search) {
         List<User> result = new ArrayList<User>();
         if (StringUtils.isNotBlank(search)) {
-            String[] parts = StringUtils.split(NormalizeUtil.normalize(search), " ,");
+            String[] parts = StringUtils.split(NormalizeUtil.normalize(search), " ,"); //$NON-NLS-1$
             Pattern[] patterns = new Pattern[parts.length];
             for (int i = 0; i < parts.length; ++i) {
-                patterns[i] = Pattern.compile(parts[i] + ".*", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+                patterns[i] = Pattern.compile(parts[i] + ".*", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) ;//$NON-NLS-1$
             }
 
             for (User user : getAll()) {

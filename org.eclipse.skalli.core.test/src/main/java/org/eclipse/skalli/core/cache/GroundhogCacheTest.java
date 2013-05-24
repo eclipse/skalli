@@ -13,7 +13,6 @@ package org.eclipse.skalli.core.cache;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.eclipse.skalli.core.cache.GroundhogCache;
 import org.junit.Assert;
 import org.junit.Test;
 

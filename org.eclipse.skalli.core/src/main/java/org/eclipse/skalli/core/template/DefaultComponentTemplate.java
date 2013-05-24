@@ -15,7 +15,7 @@ import org.eclipse.skalli.model.ProjectNature;
 public class DefaultComponentTemplate extends DefaultProjectTemplate {
 
     /** Identifier of this template, see {@link #getId()} */
-    public static final String ID = "component";
+    public static final String ID = "component"; //$NON-NLS-1$
 
     private static final String TEMPLATE_DISPLAYNAME = "Free-Style Component";
     private static final String TEMPLATE_DESCRIPTION =

@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.extension;
 
-import org.eclipse.skalli.core.extension.DataMigration16;
 import org.eclipse.skalli.testutil.MigrationTestUtil;
 import org.junit.Test;
 
+@SuppressWarnings("nls")
 public class DataMigration16Test {
 
     @Test

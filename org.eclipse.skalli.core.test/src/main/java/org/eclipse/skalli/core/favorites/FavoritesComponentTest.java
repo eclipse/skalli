@@ -13,7 +13,6 @@ package org.eclipse.skalli.core.favorites;
 import static org.easymock.EasyMock.*;
 
 import org.easymock.IAnswer;
-import org.eclipse.skalli.core.favorites.FavoritesComponent;
 import org.eclipse.skalli.core.project.ProjectComponentTest;
 import org.eclipse.skalli.services.favorites.Favorites;
 import org.eclipse.skalli.services.favorites.FavoritesService;
@@ -23,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleException;
 
+@SuppressWarnings("nls")
 public class FavoritesComponentTest extends ProjectComponentTest {
 
     private static class TestFavoritesServiceImpl extends FavoritesComponent {

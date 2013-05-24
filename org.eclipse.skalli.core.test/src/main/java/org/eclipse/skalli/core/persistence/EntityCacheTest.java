@@ -13,7 +13,6 @@ package org.eclipse.skalli.core.persistence;
 import java.util.List;
 import java.util.UUID;
 
-import org.eclipse.skalli.core.persistence.EntityCache;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.junit.Assert;

@@ -16,8 +16,8 @@ import java.util.SortedSet;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.services.extension.PropertyValidatorTestUtils;
-import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestExtension;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Assert;
 import org.junit.Test;
 

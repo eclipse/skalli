@@ -8,10 +8,9 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.core.persistence;
+package org.eclipse.skalli.core.xstream;
 
 import org.easymock.EasyMock;
-import org.eclipse.skalli.core.persistence.NoopConverter;
 import org.junit.Assert;
 import org.junit.Test;
 

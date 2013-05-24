@@ -8,7 +8,7 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.core.persistence;
+package org.eclipse.skalli.core.xstream;
 
 import java.text.MessageFormat;
 
@@ -22,9 +22,6 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
  * Special mapper that ignored unknown XML fields and collection entries, as XStream does not
  * support that yet. Collection entries that cannot be mapped to a suitable class are ignored.
  * Instead a {@link Noop} instance is put into the collection.
- *
- * @see http://pvoss.wordpress.com/2009/01/08/xstream and JIRA
- * entry http://jira.codehaus.org/browse/XSTR-30
  */
 public class IgnoreUnknownElementsMapperWrapper extends IgnoreUnknownFieldsMapperWrapper {
     private static final Logger LOG = LoggerFactory.getLogger(IgnoreUnknownElementsMapperWrapper.class);
@@ -34,7 +31,7 @@ public class IgnoreUnknownElementsMapperWrapper extends IgnoreUnknownFieldsMappe
     }
 
     @Override
-    public Class realClass(String elementName) {
+    public @SuppressWarnings("rawtypes") Class realClass(String elementName) {
         try {
             return super.realClass(elementName);
         } catch (CannotResolveClassException e) {

@@ -21,10 +21,10 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.skalli.commons.ThreadPool;
-import org.eclipse.skalli.core.persistence.CompositeEntityClassLoader;
-import org.eclipse.skalli.core.persistence.FileStorageComponent;
+import org.eclipse.skalli.core.storage.FileStorageComponent;
+import org.eclipse.skalli.core.xstream.CompositeEntityClassLoader;
+import org.eclipse.skalli.services.BundleProperties;
 import org.eclipse.skalli.services.configuration.ConfigSection;
-import org.eclipse.skalli.services.configuration.ConfigurationProperties;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.configuration.EventConfigUpdate;
 import org.eclipse.skalli.services.event.EventService;
@@ -58,8 +58,8 @@ public class ConfigurationComponent implements ConfigurationService {
     private Map<String, Object> configCache = new HashMap<String, Object>();
 
     public ConfigurationComponent() {
-        storageServiceClassName = ConfigurationProperties.getProperty(
-                ConfigurationProperties.PROPERTY_STORAGE_SERVICE, FileStorageComponent.class.getName());
+        storageServiceClassName = BundleProperties.getProperty(
+                BundleProperties.PROPERTY_STORAGE_SERVICE, FileStorageComponent.class.getName());
     }
 
      // Constructor for testing purposes.

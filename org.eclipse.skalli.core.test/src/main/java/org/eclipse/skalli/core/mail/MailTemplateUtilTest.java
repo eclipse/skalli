@@ -15,8 +15,6 @@ import static org.easymock.EasyMock.*;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.skalli.core.mail.MailTemplate;
-import org.eclipse.skalli.core.mail.MailTemplateUtil;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.junit.Assert;

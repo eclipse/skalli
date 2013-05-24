@@ -18,11 +18,11 @@ import java.util.Map;
 
 import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.PropertyTestUtil;
-import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestExtensibleEntityBase;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.eclipse.skalli.testutil.TestExtensionEntityBase1;
 import org.eclipse.skalli.testutil.TestExtensionEntityBase2;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Assert;
 import org.junit.Test;
 

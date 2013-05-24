@@ -8,7 +8,7 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.core.persistence;
+package org.eclipse.skalli.core.xstream;
 
 /**
  * Dummy class representing an unknown tag when unmarshaling entities or configurations with XStream.

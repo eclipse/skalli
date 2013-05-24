@@ -566,6 +566,8 @@ public class ValidationComponent implements ValidationService, EventListener<Eve
                         "Ignoring invalid schedule entry ''{0}'': entity type required for action {1}",
                         toString(), action));
                 return null;
+            default:
+                break;
             }
         }
         switch (action) {

@@ -18,8 +18,6 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
 import org.easymock.EasyMock;
-import org.eclipse.skalli.core.user.ldap.LDAPClient;
-import org.eclipse.skalli.core.user.ldap.LDAPConfig;
 import org.eclipse.skalli.model.User;
 import org.junit.Assert;
 import org.junit.Before;

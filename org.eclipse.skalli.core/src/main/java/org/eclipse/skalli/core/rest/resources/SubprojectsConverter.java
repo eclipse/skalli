@@ -44,7 +44,7 @@ public class SubprojectsConverter extends RestConverterBase<Subprojects> {
 
     @Override
     public String getXsdFileName() {
-        return "subprojects.xsd";
+        return "subprojects.xsd"; //$NON-NLS-1$
     }
 
     @Override

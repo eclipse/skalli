@@ -25,19 +25,19 @@ public class MailTemplateUtil {
      * email when the project parent has changed.
      */
     public final static MailTemplate PARENT_CHANGED = new MailTemplateImpl(
-            "org/eclipse/skalli/core/internal/mail/ParentChangedSubject.vm",
-            "org/eclipse/skalli/core/internal/mail/ParentChangedBody.vm");
+            "org/eclipse/skalli/core/internal/mail/ParentChangedSubject.vm", //$NON-NLS-1$
+            "org/eclipse/skalli/core/internal/mail/ParentChangedBody.vm"); //$NON-NLS-1$
 
     // parameters that are passed to all velocity templates
-    private final static String PARAMETER_PROJECT = "project";
+    private final static String PARAMETER_PROJECT = "project"; //$NON-NLS-1$
 
     // set up the velocity engine once for this class
     private static VelocityEngine velocityEngine = new VelocityEngine();
     static {
         Properties properties = new Properties();
-        properties.setProperty("resource.loader", "class");
-        properties.setProperty("class.resource.loader.class",
-                "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        properties.setProperty("resource.loader", "class"); //$NON-NLS-1$ //$NON-NLS-2$
+        properties.setProperty("class.resource.loader.class", //$NON-NLS-1$
+                "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader"); //$NON-NLS-1$
         try {
             velocityEngine.init(properties);
         } catch (Exception e) {

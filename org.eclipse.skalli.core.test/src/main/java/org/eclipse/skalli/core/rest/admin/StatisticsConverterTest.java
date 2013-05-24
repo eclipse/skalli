@@ -22,15 +22,13 @@ import org.eclipse.skalli.commons.FormatUtils;
 import org.eclipse.skalli.commons.Statistics.SearchInfo;
 import org.eclipse.skalli.commons.Statistics.UsageInfo;
 import org.eclipse.skalli.commons.Statistics.UserInfo;
-import org.eclipse.skalli.core.rest.admin.StatisticsConverter;
-import org.eclipse.skalli.core.rest.admin.StatisticsQuery;
 import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.StringBufferHierarchicalStreamWriter;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Before;
 import org.junit.Test;
 
-//@SuppressWarnings("nls")
+@SuppressWarnings("nls")
 public class StatisticsConverterTest {
 
     private StringBufferHierarchicalStreamWriter writer;

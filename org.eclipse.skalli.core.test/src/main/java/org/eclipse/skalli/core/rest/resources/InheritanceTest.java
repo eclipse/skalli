@@ -13,7 +13,6 @@ package org.eclipse.skalli.core.rest.resources;
 import java.io.IOException;
 import java.util.UUID;
 
-import org.eclipse.skalli.core.rest.resources.ProjectConverter;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.extension.ExtensionService;

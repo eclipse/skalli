@@ -14,9 +14,9 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.eclipse.skalli.testutil.PropertyTestUtil;
-import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestExtensibleEntityBase;
 import org.eclipse.skalli.testutil.TestExtension;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Assert;
 import org.junit.Test;
 

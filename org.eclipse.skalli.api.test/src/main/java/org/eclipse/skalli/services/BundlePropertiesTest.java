@@ -8,34 +8,34 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.services.configuration;
+package org.eclipse.skalli.services;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ConfigurationPropertiesTest {
+public class BundlePropertiesTest {
 
     @Test
     @SuppressWarnings("nls")
     public void testGetProperty() throws Exception {
         // workdir is defined in o.e.g.skalli.parent/pom.xml -> that should overule skalli.properties
-        String workdir = ConfigurationProperties.getProperty("workdir");
+        String workdir = BundleProperties.getProperty("workdir");
         Assert.assertTrue(workdir.endsWith("org.eclipse.skalli.testutil"));
 
         // anotherProperty is defined in skalli.properties
-        String anotherProperty = ConfigurationProperties.getProperty("anotherProperty");
+        String anotherProperty = BundleProperties.getProperty("anotherProperty");
         Assert.assertEquals("value", anotherProperty);
 
         // unknow property should return null
-        String unknownProperty = ConfigurationProperties.getProperty("unknownProperty");
+        String unknownProperty = BundleProperties.getProperty("unknownProperty");
         Assert.assertNull(unknownProperty);
 
         // unknown property with explicit default
-        unknownProperty = ConfigurationProperties.getProperty("unknownProperty", "default");
+        unknownProperty = BundleProperties.getProperty("unknownProperty", "default");
         Assert.assertEquals("default", unknownProperty);
 
         // known property with explicit default
-        anotherProperty = ConfigurationProperties.getProperty("anotherProperty", "default");
+        anotherProperty = BundleProperties.getProperty("anotherProperty", "default");
         Assert.assertEquals("value", anotherProperty);
     }
 

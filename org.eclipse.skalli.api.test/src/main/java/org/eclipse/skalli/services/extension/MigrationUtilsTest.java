@@ -13,10 +13,10 @@ package org.eclipse.skalli.services.extension;
 import static org.junit.Assert.*;
 
 import org.eclipse.skalli.commons.XMLUtils;
-import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestEntityBase1;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.eclipse.skalli.testutil.TestExtension1;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

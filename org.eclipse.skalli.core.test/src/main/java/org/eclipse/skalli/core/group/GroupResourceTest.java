@@ -17,9 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.SortedSet;
 
-import org.eclipse.skalli.core.group.GroupConfig;
-import org.eclipse.skalli.core.group.GroupsConfig;
-import org.eclipse.skalli.core.group.GroupsResource;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.services.group.GroupService;
 import org.junit.Test;

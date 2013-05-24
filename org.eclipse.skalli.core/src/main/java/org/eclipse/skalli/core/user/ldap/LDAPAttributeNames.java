@@ -10,7 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.user.ldap;
 
+@SuppressWarnings("nls")
 public enum LDAPAttributeNames {
+
     BITS("userAccountControl"),
     EMAIL("mail"),
     USERID("sAMAccountName"),

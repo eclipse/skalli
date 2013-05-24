@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.user;
 
-import org.eclipse.skalli.core.user.NormalizeUtil;
 import org.junit.Assert;
 import org.junit.Test;
 

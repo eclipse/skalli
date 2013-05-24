@@ -16,9 +16,9 @@ import java.text.MessageFormat;
 import java.util.TreeSet;
 
 import org.eclipse.skalli.testutil.AssertUtils;
-import org.eclipse.skalli.testutil.TestUUIDs;
 import org.eclipse.skalli.testutil.TestExtension;
 import org.eclipse.skalli.testutil.TestExtension1;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Assert;
 import org.junit.Test;
 

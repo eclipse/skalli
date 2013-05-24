@@ -8,20 +8,18 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.core.persistence;
+package org.eclipse.skalli.core.storage;
 
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.skalli.core.storage.Historian.HistoryEntry;
+import org.eclipse.skalli.core.storage.Historian.HistoryIterator;
+import org.eclipse.skalli.testutil.TestUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import org.eclipse.skalli.core.persistence.Historian;
-import org.eclipse.skalli.core.persistence.Historian.HistoryEntry;
-import org.eclipse.skalli.core.persistence.Historian.HistoryIterator;
-import org.eclipse.skalli.testutil.TestUtils;
 
 @SuppressWarnings("nls")
 public class HistorianTest {

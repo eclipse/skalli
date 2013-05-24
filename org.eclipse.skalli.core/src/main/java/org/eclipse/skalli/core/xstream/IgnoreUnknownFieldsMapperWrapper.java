@@ -8,7 +8,7 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.core.persistence;
+package org.eclipse.skalli.core.xstream;
 
 import com.thoughtworks.xstream.mapper.MapperWrapper;
 
@@ -24,7 +24,7 @@ public class IgnoreUnknownFieldsMapperWrapper extends MapperWrapper {
     }
 
     @Override
-    public boolean shouldSerializeMember(Class definedIn, String fieldName) {
+    public boolean shouldSerializeMember(@SuppressWarnings("rawtypes")  Class definedIn, String fieldName) {
         if (definedIn == Object.class) {
             return false;
         }

@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.extension;
 
-import org.eclipse.skalli.core.extension.DataMigration13;
 import org.eclipse.skalli.testutil.MigrationTestUtil;
 import org.junit.Test;
 

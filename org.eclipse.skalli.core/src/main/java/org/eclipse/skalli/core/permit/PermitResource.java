@@ -25,7 +25,6 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.Delete;
 
 import com.thoughtworks.xstream.converters.Converter;
-;
 
 public class PermitResource extends ConfigResourceBase<PermitConfig> implements Issuer {
 

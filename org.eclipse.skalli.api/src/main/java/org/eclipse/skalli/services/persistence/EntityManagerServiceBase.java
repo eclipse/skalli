@@ -17,7 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.eclipse.skalli.commons.CollectionUtils;
-import org.eclipse.skalli.services.configuration.ConfigurationProperties;
+import org.eclipse.skalli.services.BundleProperties;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jpa.EntityManagerFactoryBuilder;
 import org.slf4j.Logger;
@@ -164,7 +164,7 @@ public class EntityManagerServiceBase implements EntityManagerService {
 
     private EntityManagerFactory getEntityManagerFactory() {
         EntityManagerFactory entityManagerFactory = null;
-        long timeout = NumberUtils.toLong(ConfigurationProperties.getProperty(SKALLI_EMF_TIMEOUT),
+        long timeout = NumberUtils.toLong(BundleProperties.getProperty(SKALLI_EMF_TIMEOUT),
                 SKALLI_EMF_DEFAULT_TIMEOUT);
         try {
             entityManagerFactory = waitEntityManagerFactory(timeout);
@@ -268,9 +268,9 @@ public class EntityManagerServiceBase implements EntityManagerService {
     }
 
     private String getPropertyValue(String jpaUnitName, String propertyKey) {
-        String result = ConfigurationProperties.getProperty(SKALLI_PERSISTENCE + jpaUnitName + "." + propertyKey); //$NON-NLS-1$
+        String result = BundleProperties.getProperty(SKALLI_PERSISTENCE + jpaUnitName + "." + propertyKey); //$NON-NLS-1$
         if (result == null) {
-            result = ConfigurationProperties.getProperty(SKALLI_PERSISTENCE + propertyKey);
+            result = BundleProperties.getProperty(SKALLI_PERSISTENCE + propertyKey);
         }
         return result;
     }

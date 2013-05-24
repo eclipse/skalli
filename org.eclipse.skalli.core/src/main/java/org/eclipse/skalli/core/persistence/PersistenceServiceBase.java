@@ -18,6 +18,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.core.xstream.ExtensionsMapConverter;
+import org.eclipse.skalli.core.xstream.NoopConverter;
+import org.eclipse.skalli.core.xstream.UUIDListConverter;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.services.entity.EntityService;
 import org.eclipse.skalli.services.entity.EntityServices;
@@ -25,14 +28,10 @@ import org.eclipse.skalli.services.extension.DataMigration;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.persistence.PersistenceService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.converters.Converter;
 
 public abstract class PersistenceServiceBase implements PersistenceService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(PersistenceServiceBase.class);
 
     private static final String ENTITY_PREFIX = "entity-"; //$NON-NLS-1$
 

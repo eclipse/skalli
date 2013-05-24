@@ -10,7 +10,7 @@
         SAP AG - initial API and implementation
  -->
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.storage.file">
-    <implementation class="org.eclipse.skalli.core.persistence.FileStorageComponent"/>
+    <implementation class="org.eclipse.skalli.core.storage.FileStorageComponent"/>
     <service>
         <provide interface="org.eclipse.skalli.services.persistence.StorageService"/>
     </service>

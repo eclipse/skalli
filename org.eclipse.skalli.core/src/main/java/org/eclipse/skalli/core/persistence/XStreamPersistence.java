@@ -29,6 +29,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.XMLUtils;
+import org.eclipse.skalli.core.xstream.IgnoreUnknownElementsXStream;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;

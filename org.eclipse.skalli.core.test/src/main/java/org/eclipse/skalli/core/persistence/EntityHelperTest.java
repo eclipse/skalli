@@ -25,7 +25,6 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.eclipse.skalli.core.persistence.EntityHelper;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.testutil.AssertUtils;

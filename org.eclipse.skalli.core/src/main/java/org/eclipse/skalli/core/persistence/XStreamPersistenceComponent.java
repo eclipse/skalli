@@ -17,8 +17,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.core.storage.FileStorageComponent;
 import org.eclipse.skalli.model.EntityBase;
-import org.eclipse.skalli.services.configuration.ConfigurationProperties;
+import org.eclipse.skalli.services.BundleProperties;
 import org.eclipse.skalli.services.entity.EntityService;
 import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.MigrationException;
@@ -49,7 +50,7 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
      * Creates a new, uninitialized <code>PersistenceServiceXStream</code>.
      */
     public XStreamPersistenceComponent() {
-        storageServiceClassName = ConfigurationProperties.getProperty(ConfigurationProperties.PROPERTY_STORAGE_SERVICE,
+        storageServiceClassName = BundleProperties.getProperty(BundleProperties.PROPERTY_STORAGE_SERVICE,
                 FileStorageComponent.class.getName());
     }
 

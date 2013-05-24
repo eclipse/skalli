@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
-import org.eclipse.skalli.core.rest.resources.ProjectsResource;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.search.SearchQuery;
 import org.eclipse.skalli.testutil.TestExtension;

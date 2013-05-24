@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.persistence;
 
-import org.eclipse.skalli.core.persistence.XStreamPersistence;
-import org.eclipse.skalli.core.persistence.XStreamPersistenceComponent;
 import org.eclipse.skalli.services.persistence.StorageService;
 
 public class XStreamPersistenceServiceMock extends XStreamPersistenceComponent {

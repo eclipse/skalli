@@ -75,7 +75,8 @@ public class ProjectTemplateComponent implements ProjectTemplateService {
 
         @Override
         public int compare(ProjectTemplate o1, ProjectTemplate o2) {
-            int result = compareBoolean("default".equals(o1.getId()), "default".equals(o2.getId()));
+            int result = compareBoolean(ProjectTemplate.DEFAULT_ID.equals(o1.getId()),
+                    ProjectTemplate.DEFAULT_ID.equals(o2.getId()));
             if (result == 0) {
                 result = o1.getDisplayName().compareTo(o2.getDisplayName());
                 if (result == 0) {

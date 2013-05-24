@@ -25,10 +25,10 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
-import org.eclipse.skalli.core.persistence.FileStorageComponent;
+import org.eclipse.skalli.core.storage.FileStorageComponent;
+import org.eclipse.skalli.services.BundleProperties;
 import org.eclipse.skalli.services.ServiceFilter;
 import org.eclipse.skalli.services.Services;
-import org.eclipse.skalli.services.configuration.ConfigurationProperties;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.persistence.PersistenceService;
@@ -206,8 +206,8 @@ public class ProjectBackupResource extends ResourceBase {
     }
 
     private StorageService getStorageService() {
-        final String storageServiceClassName = ConfigurationProperties.getProperty(
-                ConfigurationProperties.PROPERTY_STORAGE_SERVICE, FileStorageComponent.class.getName());
+        final String storageServiceClassName = BundleProperties.getProperty(
+                BundleProperties.PROPERTY_STORAGE_SERVICE, FileStorageComponent.class.getName());
         Set<StorageService> storageServices = Services.getServices(StorageService.class, new ServiceFilter<StorageService>() {
             @Override
             public boolean accept(StorageService instance) {

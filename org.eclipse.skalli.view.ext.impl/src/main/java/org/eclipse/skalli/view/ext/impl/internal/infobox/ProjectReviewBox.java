@@ -13,8 +13,8 @@ package org.eclipse.skalli.view.ext.impl.internal.infobox;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.misc.ReviewProjectExt;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
-import org.eclipse.skalli.view.ext.InfoBoxBase;
 import org.eclipse.skalli.view.ext.InfoBox;
+import org.eclipse.skalli.view.ext.InfoBoxBase;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;

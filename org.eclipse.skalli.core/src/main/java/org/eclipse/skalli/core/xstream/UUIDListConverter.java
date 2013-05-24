@@ -8,7 +8,7 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.core.persistence;
+package org.eclipse.skalli.core.xstream;
 
 import java.util.UUID;
 
@@ -23,7 +23,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 public class UUIDListConverter implements Converter {
 
     @Override
-    public boolean canConvert(Class type) {
+    public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
         return UUIDList.class.isAssignableFrom(type);
     }
 
@@ -31,7 +31,7 @@ public class UUIDListConverter implements Converter {
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         UUIDList uuids = (UUIDList) source;
         for (UUID uuid : uuids) {
-            writer.startNode("uuid");
+            writer.startNode("uuid"); //$NON-NLS-1$
             writer.setValue(uuid.toString());
             writer.endNode();
         }
@@ -44,7 +44,7 @@ public class UUIDListConverter implements Converter {
             reader.moveDown();
             String name = reader.getNodeName();
             String value = reader.getValue();
-            if ("uuid".equals(name)) {
+            if ("uuid".equals(name)) { //$NON-NLS-1$
                 uuids.add(UUID.fromString(value));
             }
             reader.moveUp();

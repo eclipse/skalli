@@ -20,7 +20,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.easymock.EasyMock;
 import org.eclipse.skalli.commons.XMLUtils;
-import org.eclipse.skalli.core.persistence.DataMigrator;
 import org.eclipse.skalli.services.extension.DataMigration;
 import org.eclipse.skalli.services.extension.DataMigrationBase;
 import org.eclipse.skalli.services.extension.MigrationException;

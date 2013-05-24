@@ -28,15 +28,12 @@ public class PermitConfigConverter implements Converter {
 
     private String host;
 
-//    public PermitConfigConverter() {
-//    }
-
     public PermitConfigConverter(String host) {
         this.host = host;
     }
 
     @Override
-    public boolean canConvert(Class type) {
+    public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
         return type.equals(PermitConfig.class);
     }
 

@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.skalli.core.search.LuceneIndex;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.search.FacetedSearchResult;
 import org.eclipse.skalli.services.search.PagingInfo;

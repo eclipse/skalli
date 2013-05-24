@@ -22,7 +22,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 public class PermitsConfigConverter implements Converter {
 
     @Override
-    public boolean canConvert(Class type) {
+    public boolean canConvert(@SuppressWarnings("rawtypes") Class type) {
         return type.equals(PermitsConfig.class);
     }
 

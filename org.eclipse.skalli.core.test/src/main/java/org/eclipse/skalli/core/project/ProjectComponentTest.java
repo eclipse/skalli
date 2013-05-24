@@ -23,7 +23,6 @@ import java.util.SortedSet;
 import java.util.UUID;
 
 import org.eclipse.skalli.core.extension.people.CoreRoleProvider;
-import org.eclipse.skalli.core.project.ProjectComponent;
 import org.eclipse.skalli.core.template.DefaultProjectTemplate;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;

@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.eclipse.skalli.core.tagging.TaggingComponent;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.commons.TagsExtension;
 import org.eclipse.skalli.services.persistence.PersistenceService;

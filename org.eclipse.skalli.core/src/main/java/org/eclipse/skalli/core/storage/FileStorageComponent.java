@@ -8,7 +8,7 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.core.persistence;
+package org.eclipse.skalli.core.storage;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.eclipse.skalli.services.configuration.ConfigurationProperties;
+import org.eclipse.skalli.services.BundleProperties;
 import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.osgi.service.component.ComponentConstants;
@@ -120,7 +120,7 @@ public class FileStorageComponent implements StorageService {
 
     private final File getDefaultStorageDirectory() {
         File storageDirectory = null;
-        String workdir = ConfigurationProperties.getProperty(ConfigurationProperties.PROPERTY_WORKDIR);
+        String workdir = BundleProperties.getProperty(BundleProperties.PROPERTY_WORKDIR);
         if (workdir != null) {
             File workingDirectory = new File(workdir);
             if (workingDirectory.exists() && workingDirectory.isDirectory()) {
