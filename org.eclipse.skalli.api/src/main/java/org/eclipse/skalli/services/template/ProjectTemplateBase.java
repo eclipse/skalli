@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.ExtensionEntityBase;
@@ -148,6 +149,16 @@ public abstract class ProjectTemplateBase implements ProjectTemplate {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public Set<UUID> getAllowedParents() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public UUID getDirectParent() {
+        return null;
     }
 
     protected void addIncludedSubprojectTemplate(String templateId) {

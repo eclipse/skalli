@@ -13,6 +13,7 @@ package org.eclipse.skalli.services.template;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.ProjectNature;
@@ -78,6 +79,25 @@ public interface ProjectTemplate extends Issuer {
      *          that are assigned to the given template.
      */
     public boolean isAllowedSubprojectTemplate(ProjectTemplate projectTemplate);
+
+    /**
+     * Returns the unique identifiers of projects, which a project assigned to
+     * this template can have as direct or indirect parent project. Indirect means
+     * that the project is somewhere in the parent chain of a subproject, e.g.
+     * a top-level project.
+     *
+     * @return a set of unique identifiers, or an empty set if this template
+     * has no special requirements concerning parent projects.
+     */
+    public Set<UUID> getAllowedParents();
+
+    /**
+     * Returns the unique identifier of a project that must be the direct parent
+     * of a project assigned to this template.
+     *
+     * @return a unique identifier of a project, or <code>null</code>.
+     */
+    public UUID getDirectParent();
 
     /**
      * Returns a collection of model extensions that should be included in the edit dialog.

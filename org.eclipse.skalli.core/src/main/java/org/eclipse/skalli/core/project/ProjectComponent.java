@@ -25,6 +25,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
@@ -223,15 +224,18 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
 
     @Override
     public List<Project> getParentChain(UUID uuid) {
+        return getParentChain(getByUUID(uuid));
+    }
+
+    private List<Project> getParentChain(Project project) {
         List<Project> result = new LinkedList<Project>();
-        Project project = getByUUID(uuid);
         if (project != null) {
             result.add(project);
             UUID parentUUID = project.getParentProject();
             while (parentUUID != null) {
                 Project parent = getByUUID(parentUUID);
                 if (parent == null) {
-                    throw new InvalidParentChainException(uuid, parentUUID);
+                    throw new InvalidParentChainException(project.getUuid(), parentUUID);
                 }
                 result.add(parent);
                 parentUUID = parent.getParentProject();
@@ -401,12 +405,45 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
         ProjectTemplate projectTemplate = projectTemplateService.getProjectTemplateById(project.getProjectTemplateId());
         if (projectTemplate == null) {
             issues.add(new Issue(Severity.FATAL, ProjectService.class, project.getUuid(),
+                    Project.class, Project.PROPERTY_TEMPLATEID,
                     MessageFormat.format(
                             "Project references project template ''{0}'' but such a template is not registered",
-                            Project.class, Project.PROPERTY_TEMPLATEID,
                             project.getProjectTemplateId())));
         }
+        validateDirectParent(projectTemplate, project, issues);
+        validateAllowedParents(projectTemplate, project, issues);
         return projectTemplate;
+    }
+
+    private void validateDirectParent(ProjectTemplate projectTemplate, Project project, Set<Issue> issues) {
+        UUID directParent = projectTemplate.getDirectParent();
+        if (directParent != null && !directParent.equals(project.getParentEntityId())) {
+            issues.add(new Issue(Severity.FATAL, ProjectService.class, project.getUuid(),
+                    Project.class, Project.PROPERTY_PARENT_ENTITY_ID,
+                    MessageFormat.format(
+                            "Project assigned to project template ''{0}'' must be direct subproject of project ''{1}''",
+                            project.getProjectTemplateId(), directParent)));
+        }
+    }
+
+    private void validateAllowedParents(ProjectTemplate projectTemplate, Project project, Set<Issue> issues) {
+        Set<UUID> allowedParents = projectTemplate.getAllowedParents();
+        if (CollectionUtils.isNotBlank(allowedParents)) {
+            boolean hasAllowedParent = false;
+            for (Project parent: getParentChain(project.getUuid())) {
+                if (allowedParents.contains(parent.getUuid())) {
+                    hasAllowedParent = true;
+                    break;
+                }
+            }
+            if (!hasAllowedParent) {
+                issues.add(new Issue(Severity.FATAL, ProjectService.class, project.getUuid(),
+                        Project.class, Project.PROPERTY_PARENT_ENTITY_ID,
+                        MessageFormat.format(
+                                "Project assigned to project template ''{0}'' must be subproject of any of ''{1}''",
+                                projectTemplate.getId(), CollectionUtils.toString(allowedParents, ','))));
+            }
+        }
     }
 
     private ExtensionService<?> validateExtensionService(UUID projectUUID, ExtensionEntityBase ext, Set<Issue> issues) {
