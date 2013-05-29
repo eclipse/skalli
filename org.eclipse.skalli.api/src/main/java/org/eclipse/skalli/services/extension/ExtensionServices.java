@@ -14,11 +14,9 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.services.BundleFilter;
@@ -43,12 +41,10 @@ public class ExtensionServices {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExtensionServices.class);
 
-    private static Set<ExtensionService<?>> all =
-            Collections.synchronizedSet(new HashSet<ExtensionService<?>>());
     private static Map<String, ExtensionService<?>> byShortName =
-            Collections.synchronizedMap(new HashMap<String, ExtensionService<?>>());
+            new ConcurrentHashMap<String, ExtensionService<?>>();
     private static Map<String, ExtensionService<?>> byExtensionClassName =
-            Collections.synchronizedMap(new HashMap<String, ExtensionService<?>>());
+            new ConcurrentHashMap<String, ExtensionService<?>>();
 
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[ExtensionServices] {0} : activated",
@@ -66,7 +62,6 @@ public class ExtensionServices {
             throw new RuntimeException(MessageFormat.format(
                     "There is already an extension registered with the short name ''{0}''", shortName));
         }
-        all.add(extensionService);
         byShortName.put(extensionService.getShortName(), extensionService);
         String extensionClassName = extensionService.getExtensionClass().getName();
         byExtensionClassName.put(extensionClassName, extensionService);
@@ -78,7 +73,6 @@ public class ExtensionServices {
         String extensionClassName = extensionService.getExtensionClass().getName();
         byExtensionClassName.remove(extensionClassName);
         byShortName.remove(extensionService.getShortName());
-        all.remove(extensionService);
         LOG.info(MessageFormat.format("[ExtensionServices][unregistered {0}]", extensionClassName));
     }
 
@@ -88,7 +82,7 @@ public class ExtensionServices {
      * @return a collection of extension services, or an empty collection.
      */
     public static Collection<ExtensionService<?>> getAll() {
-        return Collections.unmodifiableSet(all);
+        return Collections.unmodifiableCollection(byShortName.values());
     }
 
     /**
