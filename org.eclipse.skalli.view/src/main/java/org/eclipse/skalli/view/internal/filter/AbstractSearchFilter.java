@@ -238,7 +238,8 @@ public abstract class AbstractSearchFilter implements Filter {
                 String uuid = project.getUuid().toString();
                 DevInfProjectExt devInf = project.getExtension(DevInfProjectExt.class);
                 if (devInf != null && CollectionUtils.isNotBlank(devInf.getScmLocations())) {
-                    ScmLocationMapper mapper = new ScmLocationMapper(ScmLocationMapper.PURPOSE_BROWSE);
+                    ScmLocationMapper mapper = new ScmLocationMapper(ScmLocationMapper.ALL_PROVIDERS,
+                            ScmLocationMapper.PURPOSE_BROWSE);
                     for (String scmLocation : devInf.getScmLocations()) {
                         List<String> scmUrls = new ArrayList<String>();
                         List<Link> mappedLinks = mapper.getMappedLinks(scmLocation, userId, project, configService);
@@ -246,7 +247,7 @@ public abstract class AbstractSearchFilter implements Filter {
                             scmUrls.add(link.getUrl());
                         }
                         if (scmUrls.isEmpty()) {
-                            String scmUrl = searchHit.getSingleValues().get("scmUrl");
+                            String scmUrl = searchHit.getSingleValues().get("scmUrl"); //$NON-NLS-1$
                             if (scmUrl != null) {
                                 scmUrls.add(scmUrl);
                             }
