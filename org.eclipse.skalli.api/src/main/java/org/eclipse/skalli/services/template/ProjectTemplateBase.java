@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.template;
 
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,12 +20,11 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.skalli.commons.CollectionUtils;
-import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ProjectNature;
 import org.eclipse.skalli.model.ext.commons.InfoExtension;
 import org.eclipse.skalli.model.ext.commons.PeopleExtension;
-import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.ExtensionValidator;
 import org.eclipse.skalli.services.extension.PropertyValidator;
 
@@ -67,8 +65,6 @@ public abstract class ProjectTemplateBase implements ProjectTemplate {
     private Map<String, Map<Object, String>> inputPrompts = new HashMap<String, Map<Object, String>>();
     private Map<String, Map<Object, Integer>> maxSizes = new HashMap<String, Map<Object, Integer>>();
 
-    private Map<String, ExtensionService<?>> extensions = new HashMap<String, ExtensionService<?>>();
-
     protected ProjectTemplateBase() {
         setEnabled(PEOPLE_EXTENSION_CLASSNAME, true);
         setEnabled(INFO_EXTENSION_CLASSNAME, true);
@@ -80,25 +76,6 @@ public abstract class ProjectTemplateBase implements ProjectTemplate {
                     "Deprecated", "Abandoned", "Closed"));
     }
 
-    protected void bindExtensionService(ExtensionService<?> extensionService) {
-        String extensionClassName = extensionService.getExtensionClass().getName();
-        if (extensions.containsKey(extensionClassName)) {
-            throw new RuntimeException(MessageFormat.format(
-                    "Extension {0} already has a registered extension service",
-                    extensionClassName));
-        }
-        extensions.put(extensionClassName, extensionService);
-    }
-
-    protected void unbindExtensionService(ExtensionService<?> extensionService) {
-        extensions.remove(extensionService.getExtensionClass().getName());
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <T extends ExtensionEntityBase> ExtensionService<T> getExtensionService(Class<T> extension) {
-        return (ExtensionService<T>)extensions.get(extension.getClass().getName());
-    }
-
     @Override
     public Set<String> getIncludedExtensions() {
         if (includedExtensions.isEmpty()) {
@@ -106,7 +83,7 @@ public abstract class ProjectTemplateBase implements ProjectTemplate {
         }
         Set<String> result = new HashSet<String>();
         for (String extensionClassName: includedExtensions) {
-            if (extensions.containsKey(extensionClassName)) {
+            if (ExtensionServices.getByExtensionClassName(extensionClassName) != null) {
                 result.add(extensionClassName);
             }
         }
@@ -124,7 +101,7 @@ public abstract class ProjectTemplateBase implements ProjectTemplate {
         }
         Set<String> result = new HashSet<String>();
         for (String extensionClassName: excludedExtensions) {
-            if (extensions.containsKey(extensionClassName)) {
+            if (ExtensionServices.getByExtensionClassName(extensionClassName) != null) {
                 result.add(extensionClassName);
             }
         }
@@ -138,7 +115,8 @@ public abstract class ProjectTemplateBase implements ProjectTemplate {
     @Override
     public boolean isAllowedSubprojectTemplate(ProjectTemplate projectTemplate) {
         // projects are not allowed as subprojects of components!
-        if (getProjectNature() == ProjectNature.COMPONENT && projectTemplate.getProjectNature() == ProjectNature.PROJECT) {
+        if (getProjectNature() == ProjectNature.COMPONENT
+                && projectTemplate.getProjectNature() == ProjectNature.PROJECT) {
             return false;
         }
         String templateId = projectTemplate.getId();
