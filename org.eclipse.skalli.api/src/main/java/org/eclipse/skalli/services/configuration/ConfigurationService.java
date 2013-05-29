@@ -16,7 +16,8 @@ package org.eclipse.skalli.services.configuration;
 public interface ConfigurationService {
 
     /**
-     * Retrieves the configuration for the given configuration class.
+     * Retrieves the configuration for the given configuration class
+     * from the underlying storage.
      *
      * @param configurationClass  the class of the configuration to retrieve.
      *

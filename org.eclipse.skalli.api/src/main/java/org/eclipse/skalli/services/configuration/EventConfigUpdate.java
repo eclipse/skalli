@@ -23,14 +23,16 @@ import org.eclipse.skalli.services.event.Event;
 public class EventConfigUpdate extends Event {
 
     private final Class<?> configClass;
+    private final Object config;
 
     /**
      * Creates a configuration update event.
      *
      * @param configClass  the configuration that has been updated.
      */
-    public EventConfigUpdate(Class<?> configClass) {
+    public EventConfigUpdate(Class<?> configClass, Object config) {
         this.configClass = configClass;
+        this.config = config;
     }
 
     /**
@@ -38,6 +40,13 @@ public class EventConfigUpdate extends Event {
      */
     public Class<?> getConfigClass() {
         return configClass;
+    }
+
+    /**
+     * Returns the updated configuration value.
+     */
+    public Object getConfig() {
+        return config;
     }
 
 }

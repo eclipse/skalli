@@ -15,9 +15,9 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.skalli.commons.ThreadPool;
@@ -51,11 +51,9 @@ public class ConfigurationComponent implements ConfigurationService {
     private String storageServiceClassName;
 
     private Map<String, ConfigSection<?>> byStorageKey =
-            Collections.synchronizedMap(new HashMap<String, ConfigSection<?>>());
+            new ConcurrentHashMap<String, ConfigSection<?>>();
     private Map<Class<?>, ConfigSection<?>> byConfigClass =
-            Collections.synchronizedMap(new HashMap<Class<?>, ConfigSection<?>>());
-
-    private Map<String, Object> configCache = new HashMap<String, Object>();
+            new ConcurrentHashMap<Class<?>, ConfigSection<?>>();
 
     public ConfigurationComponent() {
         storageServiceClassName = BundleProperties.getProperty(
@@ -91,7 +89,6 @@ public class ConfigurationComponent implements ConfigurationService {
     protected void bindStorageService(StorageService storageService) {
         if (storageServiceClassName.equals(storageService.getClass().getName())) {
             this.storageService = storageService;
-            configCache.clear();
             notifyCustomizationChanged(storageService);
             LOG.info(MessageFormat.format("bindStorageService({0})", storageService)); //$NON-NLS-1$
         }
@@ -101,7 +98,6 @@ public class ConfigurationComponent implements ConfigurationService {
         if (storageServiceClassName.equals(storageService.getClass().getName())) {
             LOG.info(MessageFormat.format("unbindStorageService({0})", storageService)); //$NON-NLS-1$
             this.storageService = null;
-            configCache.clear();
             notifyCustomizationChanged(storageService);
         }
     }
@@ -150,14 +146,13 @@ public class ConfigurationComponent implements ConfigurationService {
         }
 
         String storageKey = configSection.getStorageKey();
-        configCache.put(storageKey, configuration);
         String xml = getXStream(configuration.getClass()).toXML(configuration);
         InputStream is = null;
         try {
             is = new ByteArrayInputStream(xml.getBytes("UTF-8")); //$NON-NLS-1$
             storageService.write(CATEGORY_CUSTOMIZATION, storageKey, is);
             if (eventService != null) {
-                fireEvent(configSection);
+                fireEvent(configSection, configuration);
             }
             AUDIT_LOG.info(MessageFormat.format("Configuration ''{0}'' changed by user ''{1}''",
                     storageKey, Permits.getLoggedInUser()));
@@ -190,30 +185,30 @@ public class ConfigurationComponent implements ConfigurationService {
                     configurationClass));
             return null;
         }
+        return readConfiguration(configSection.getStorageKey(), configurationClass);
+    }
 
-        String storageKey = configSection.getStorageKey();
-        Object config = configCache.get(storageKey);
-        if (config == null) {
-            InputStream is = null;
-            try {
-                is = storageService.read(CATEGORY_CUSTOMIZATION, storageKey);
-                if (is == null) {
-                    return null;
-                }
-                config = getXStream(configurationClass).fromXML(is);
-            } catch (XStreamException e) {
-                LOG.error(MessageFormat.format(
-                        "Failed to unmarshal configuration ''{0}'' ",
-                        storageKey), e);
+    private <T> T readConfiguration(String storageKey, Class<T> configurationClass) {
+        Object config = null;
+        InputStream is = null;
+        try {
+            is = storageService.read(CATEGORY_CUSTOMIZATION, storageKey);
+            if (is == null) {
                 return null;
-            } catch (StorageException e) {
-                LOG.error(MessageFormat.format(
-                        "Failed to retrieve configuration ''{0}''",
-                        storageKey), e);
-                return null;
-            } finally {
-                IOUtils.closeQuietly(is);
             }
+            config = getXStream(configurationClass).fromXML(is);
+        } catch (XStreamException e) {
+            LOG.error(MessageFormat.format(
+                    "Failed to unmarshal configuration ''{0}'' ",
+                    storageKey), e);
+            return null;
+        } catch (StorageException e) {
+            LOG.error(MessageFormat.format(
+                    "Failed to retrieve configuration ''{0}''",
+                    storageKey), e);
+            return null;
+        } finally {
+            IOUtils.closeQuietly(is);
         }
         return configurationClass.cast(config);
     }
@@ -262,8 +257,13 @@ public class ConfigurationComponent implements ConfigurationService {
     }
 
     private void fireEvent(ConfigSection<?> configSection) {
-        eventService.fireEvent(new EventConfigUpdate(configSection.getConfigClass()));
+        Object config = readConfiguration(configSection.getStorageKey(), configSection.getConfigClass());
+        fireEvent(configSection, config);
+    }
+
+    private void fireEvent(ConfigSection<?> configSection, Object config) {
+        eventService.fireEvent(new EventConfigUpdate(configSection.getConfigClass(), config));
         LOG.info(MessageFormat.format("Event sent: Configuration ''{0}'' has changed",
-                configSection.getStorageKey()));
+                configSection.getConfigClass().getSimpleName()));
     }
 }
