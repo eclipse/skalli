@@ -174,6 +174,18 @@
      -->
 
     <filter>
+        <filter-name>CacheFilter</filter-name>
+        <filter-class>org.eclipse.skalli.view.internal.filter.CacheFilter</filter-class>
+        <init-param>
+            <param-name>maxAge</param-name>
+            <param-value>86400</param-value>
+        </init-param>
+        <init-param>
+            <param-name>cachedResources</param-name>
+            <param-value>css,js,png,gif,jpg,jpeg,ico,swf,xsd,tif,bmp</param-value>
+        </init-param>
+    </filter>
+    <filter>
        <filter-name>LoginFilter</filter-name>
        <filter-class>org.eclipse.skalli.view.internal.filter.LoginFilter</filter-class>
     </filter>
@@ -340,6 +352,14 @@
      ***************
      -->
 
+    <filter-mapping>
+        <filter-name>CacheFilter</filter-name>
+        <url-pattern>/VAADIN/themes/*</url-pattern>
+        <url-pattern>/schemas/*</url-pattern>
+        <url-pattern>/js/*</url-pattern>
+        <url-pattern>/favicon.ico</url-pattern>
+        <url-pattern>/search-plugin.xml</url-pattern>
+    </filter-mapping>
     <filter-mapping>
        <filter-name>LoginFilter</filter-name>
        <url-pattern>/</url-pattern>
