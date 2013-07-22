@@ -18,9 +18,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.commons.UUIDListConverter;
 import org.eclipse.skalli.core.xstream.ExtensionsMapConverter;
 import org.eclipse.skalli.core.xstream.NoopConverter;
-import org.eclipse.skalli.core.xstream.UUIDListConverter;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.services.entity.EntityService;
 import org.eclipse.skalli.services.entity.EntityServices;

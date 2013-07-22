@@ -8,11 +8,10 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.core.xstream;
+package org.eclipse.skalli.commons;
 
 import java.util.UUID;
 
-import org.eclipse.skalli.commons.UUIDList;
 
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
