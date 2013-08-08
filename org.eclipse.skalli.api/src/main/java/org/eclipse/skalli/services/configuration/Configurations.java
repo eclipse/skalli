@@ -11,11 +11,7 @@
 package org.eclipse.skalli.services.configuration;
 
 import java.text.MessageFormat;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.skalli.services.event.EventListener;
-import org.eclipse.skalli.services.event.EventService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -23,19 +19,27 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Convenience class for accessing configuration settings. For performance
- * reasons configurations should always be retrieved with the help of this class,
- * since {@link ConfigurationService} is supposed to read configurations
- * directly from storage.
- * <br>
- * This class tracks all configuration changes, i.e. events of the type
- * {@link EventConfigUpdate} and caches the current configuration settings.
+ * Convenience class for accessing configuration settings.
+ *
+ * This helper class should be used in code that is not an OSGI service, or where a direct binding
+ * to the configuration service may not be possible (e.g. because of cyclic dependencies) or not
+ * desirable. For example, infoboxes, validators and REST converters should prefer
+ * <pre>
+ *   ConfigClass config = Configurations.getConfiguration(ConfigClass.class);
+ * </pre>
+ * rather than the sequence
+ * <pre>
+ *   ConfigurationService configService = Services.getService(ConfigurationService.class);
+ *   if (configService != null) {
+ *       ConfigClass config = configService.readConfiguration(ConfigClass.class);
+ *       ...
+ *   }
+ * </pre>
+ * because the service lookup in the OSGI service registry might be quite expensive.
  */
-public class Configurations implements EventListener<EventConfigUpdate> {
+public class Configurations {
 
     private static final Logger LOG = LoggerFactory.getLogger(Configurations.class);
-
-    private static Map<Class<?>, Object> configCache = new ConcurrentHashMap<Class<?>, Object>();
 
     private static volatile ConfigurationService configService;
 
@@ -49,20 +53,8 @@ public class Configurations implements EventListener<EventConfigUpdate> {
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
-    protected void bindEventService(EventService eventService) {
-        LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
-        configCache.clear();
-        eventService.registerListener(EventConfigUpdate.class, this);
-    }
-
-    protected void unbindEventService(EventService eventService) {
-        LOG.info(MessageFormat.format("unbindEventService({0})", eventService)); //$NON-NLS-1$
-        configCache.clear();
-    }
-
     protected void bindConfigurationService(ConfigurationService configService) {
         LOG.info(MessageFormat.format("bindConfigurationService({0})", configService)); //$NON-NLS-1$
-        configCache.clear();
         Configurations.configService = configService;
     }
 
@@ -76,27 +68,10 @@ public class Configurations implements EventListener<EventConfigUpdate> {
      *
      * @param configurationClass  the class of the configuration to retrieve.
      * @return  the configuration instance, or <code>null</code> if no
-     * such configuration exists.
+     * such configuration exists, or no configuration service is currently active.
      */
     public static <T> T getConfiguration(Class<T> configurationClass) {
-        Object config = configCache.get(configurationClass);
-        if (config == null && configService != null) {
-            config = configService.readConfiguration(configurationClass);
-        }
-        return configurationClass.cast(config);
+        return configurationClass != null & configService != null?
+                configService.readConfiguration(configurationClass) : null;
     }
-
-    @Override
-    public void onEvent(EventConfigUpdate event) {
-        Class<?> configClass = event.getConfigClass();
-        Object config = event.getConfig();
-        if (config == null) {
-            configCache.remove(configClass);
-        } else {
-            configCache.put(configClass, config);
-        }
-        LOG.info(MessageFormat.format("[Configurations] Event received: Configuration ''{0}'' has changed",
-                configClass.getSimpleName()));
-    }
-
 }

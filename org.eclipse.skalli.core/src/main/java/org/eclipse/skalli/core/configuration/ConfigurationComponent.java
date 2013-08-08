@@ -54,6 +54,8 @@ public class ConfigurationComponent implements ConfigurationService {
             new ConcurrentHashMap<String, ConfigSection<?>>();
     private Map<Class<?>, ConfigSection<?>> byConfigClass =
             new ConcurrentHashMap<Class<?>, ConfigSection<?>>();
+    private static Map<Class<?>, Object> configCache =
+            new ConcurrentHashMap<Class<?>, Object>();
 
     public ConfigurationComponent() {
         storageServiceClassName = BundleProperties.getProperty(
@@ -89,6 +91,7 @@ public class ConfigurationComponent implements ConfigurationService {
     protected void bindStorageService(StorageService storageService) {
         if (storageServiceClassName.equals(storageService.getClass().getName())) {
             this.storageService = storageService;
+            configCache.clear();
             notifyCustomizationChanged(storageService);
             LOG.info(MessageFormat.format("bindStorageService({0})", storageService)); //$NON-NLS-1$
         }
@@ -98,6 +101,7 @@ public class ConfigurationComponent implements ConfigurationService {
         if (storageServiceClassName.equals(storageService.getClass().getName())) {
             LOG.info(MessageFormat.format("unbindStorageService({0})", storageService)); //$NON-NLS-1$
             this.storageService = null;
+            configCache.clear();
             notifyCustomizationChanged(storageService);
         }
     }
@@ -105,6 +109,7 @@ public class ConfigurationComponent implements ConfigurationService {
     protected void bindConfigSection(ConfigSection<?> configSection) {
         byConfigClass.put(configSection.getConfigClass(), configSection);
         byStorageKey.put(configSection.getStorageKey(), configSection);
+        configCache.remove(configSection.getConfigClass());
         notifyCustomizationChanged(configSection);
         LOG.info(MessageFormat.format("bindConfigSection({0})", configSection)); //$NON-NLS-1$
     }
@@ -113,6 +118,7 @@ public class ConfigurationComponent implements ConfigurationService {
         LOG.info(MessageFormat.format("unbindConfigSection({0})", configSection)); //$NON-NLS-1$
         byConfigClass.remove(configSection.getConfigClass());
         byStorageKey.remove(configSection.getStorageKey());
+        configCache.remove(configSection.getConfigClass());
         notifyCustomizationChanged(configSection);
     }
 
@@ -146,11 +152,13 @@ public class ConfigurationComponent implements ConfigurationService {
         }
 
         String storageKey = configSection.getStorageKey();
-        String xml = getXStream(configuration.getClass()).toXML(configuration);
+        Class<?> configurationClass = configuration.getClass();
+        String xml = getXStream(configurationClass).toXML(configuration);
         InputStream is = null;
         try {
             is = new ByteArrayInputStream(xml.getBytes("UTF-8")); //$NON-NLS-1$
             storageService.write(CATEGORY_CUSTOMIZATION, storageKey, is);
+            configCache.put(configurationClass, configuration);
             if (eventService != null) {
                 fireEvent(configSection, configuration);
             }
@@ -177,18 +185,22 @@ public class ConfigurationComponent implements ConfigurationService {
             return null;
         }
 
-        ConfigSection<?> configSection = byConfigClass.get(configurationClass);
-        if (configSection == null) {
-            LOG.error(MessageFormat.format(
-                    "Cannot retrieve configuration: No suitable configuration extension " + //$NON-NLS-1$
-                    "for configurations of type ''{0}'' available", //$NON-NLS-1$
-                    configurationClass));
-            return null;
+        Object config = configCache.get(configurationClass);
+        if (config == null) {
+            ConfigSection<?> configSection = byConfigClass.get(configurationClass);
+            if (configSection == null) {
+                LOG.error(MessageFormat.format(
+                        "Cannot retrieve configuration: No suitable configuration extension " + //$NON-NLS-1$
+                        "for configurations of type ''{0}'' available", //$NON-NLS-1$
+                        configurationClass));
+                return null;
+            }
+            config = readConfiguration(configSection.getStorageKey(), configurationClass);
         }
-        return readConfiguration(configSection.getStorageKey(), configurationClass);
+        return configurationClass.cast(config);
     }
 
-    private <T> T readConfiguration(String storageKey, Class<T> configurationClass) {
+    private Object readConfiguration(String storageKey, Class<?> configurationClass) {
         Object config = null;
         InputStream is = null;
         try {
@@ -201,16 +213,14 @@ public class ConfigurationComponent implements ConfigurationService {
             LOG.error(MessageFormat.format(
                     "Failed to unmarshal configuration ''{0}'' ",
                     storageKey), e);
-            return null;
         } catch (StorageException e) {
             LOG.error(MessageFormat.format(
                     "Failed to retrieve configuration ''{0}''",
                     storageKey), e);
-            return null;
         } finally {
             IOUtils.closeQuietly(is);
         }
-        return configurationClass.cast(config);
+        return config;
     }
 
     private XStream getXStream(Class<?> customizationClass) {
