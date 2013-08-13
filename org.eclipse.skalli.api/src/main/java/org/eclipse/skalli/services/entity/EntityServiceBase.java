@@ -25,11 +25,9 @@ import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.extension.DataMigration;
 import org.eclipse.skalli.services.persistence.PersistenceService;
-import org.eclipse.skalli.services.validation.Validation;
-import org.eclipse.skalli.services.validation.ValidationService;
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * {@link #validateEntity(EntityBase, Severity)}.
  * <p>
  * <b>IMPORTANT NOTE:</b><br>
- * Derived classes must declare the following &lt;reference&gts; in their service component descriptors:
+ * Derived classes must declare the following references in their service component descriptors:
  * <pre>
  *    &lt;reference
  *        name="PersistenceService"
@@ -50,66 +48,49 @@ import org.slf4j.LoggerFactory;
  *        policy="dynamic"
  *        bind="bindPersistenceService"
  *        unbind="unbindPersistenceService" /&gt
- *    &lt;<reference
- *        name="ValidationService"
- *        interface="org.eclipse.skalli.services.validation.ValidationService"
+ *    &lt;reference
+ *        name="EventService"
+ *        interface="org.eclipse.skalli.services.event.EventService"
  *        cardinality="0..1"
- *        policy="dynamic" /&gt;
+ *        policy="dynamic"
+ *        bind="bindEventService"
+ *        unbind="unbindEventService" /&gt;
  * </pre>
+ * The second reference is optional if the entity service does not want to send {@link EventEntityUpdate update
+ * events} when an entity is {@link #persist(EntityBase, String) persisted}.
  */
 public abstract class EntityServiceBase<T extends EntityBase> implements EntityService<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(EntityServiceBase.class);
 
-    private ComponentContext context;
     private PersistenceService persistenceService;
+    private EventService eventService;
 
-    protected void activate(ComponentContext context) {
-        this.context = context;
-    }
-
-    protected void deactivate(ComponentContext context) {
-        this.context = null;
-    }
-
-    /**
-     * Locates and binds the given service to the entity service.
-     *
-     * @param service  the service class to locate and bind.
-     * @param name  the name of the service as defined in the component descriptor.
-     *
-     * @return  an instance of the rquested service, or <code>null</code>.
-     */
-    protected <S> S getService(Class<S> service, String name) {
-        return context != null? service.cast(context.locateService(name)) : null;
-    }
-
-    /**
-     * Updates the search index.
-     *
-     * @param entity  the entity to pass to the search service.
-     */
-    protected void updateSearchIndex(T entity) {
-    };
-
-    /**
-     * Binds the required persistence service.
-     */
-    public void bindPersistenceService(PersistenceService persistenceService) {
+    protected void bindPersistenceService(PersistenceService persistenceService) {
         this.persistenceService = persistenceService;
+        LOG.info(MessageFormat.format("bindPersistenceService({0})", persistenceService)); //$NON-NLS-1$
     }
 
-    /** Unbinds the required persistence service */
-    public void unbindPersistenceService(PersistenceService persistenceService) {
+    protected void unbindPersistenceService(PersistenceService persistenceService) {
+        LOG.info(MessageFormat.format("unbindPersistenceService({0})", persistenceService)); //$NON-NLS-1$
         this.persistenceService = null;
+    }
+
+    protected void bindEventService(EventService eventService) {
+        this.eventService = eventService;
+        LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
+    }
+
+    protected void unbindEventService(EventService eventService) {
+        LOG.info(MessageFormat.format("unbindEventService({0})", eventService)); //$NON-NLS-1$
+        this.eventService = null;
     }
 
     /**
      * Returns the (required) persistence service the entity service should use
      * to retrieve or store entities.
      *
-     * @throws {@link java.lang.IllegalStateException} if no persistence
-     * service is registered.
+     * @throws IllegalStateException  if no persistence service is registered.
      */
     protected PersistenceService getPersistenceService() {
         if (persistenceService == null) {
@@ -121,7 +102,7 @@ public abstract class EntityServiceBase<T extends EntityBase> implements EntityS
 
     /**
      * Ensures that an entity can be persisted. Throws <code>ValidationException</code>
-     * if the entity has {@link Severity#FATAL} issues.
+     * if the entity has {@link Severity#FATAL fatal} issues.
      *
      * @param entity  the entity to validate.
      *
@@ -165,13 +146,9 @@ public abstract class EntityServiceBase<T extends EntityBase> implements EntityS
             entity.setUuid(UUID.randomUUID());
         }
         validateEntity(entity);
-        getPersistenceService().persist(entity.getClass(), entity, userId);
-        updateSearchIndex(entity);
-
-        ValidationService validationService = getService(ValidationService.class, "ValidationService"); //$NON-NLS-1$
-        if (validationService != null) {
-            validationService.queue(new Validation<T>(getEntityClass(), entity.getUuid(),
-                    Severity.INFO, userId, Validation.IMMEDIATE));
+        getPersistenceService().persist(getEntityClass(), entity, userId);
+        if (eventService != null) {
+            eventService.fireEvent(new EventEntityUpdate(getEntityClass(), entity, userId));
         }
     }
 

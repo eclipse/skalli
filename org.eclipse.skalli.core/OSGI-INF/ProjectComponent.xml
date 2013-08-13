@@ -30,15 +30,12 @@
         bind="bindProjectTemplateService"
         unbind="unbindProjectTemplateService"/>
     <reference
-        name="ValidationService"
-        interface="org.eclipse.skalli.services.validation.ValidationService"
+        name="EventService"
+        interface="org.eclipse.skalli.services.event.EventService"
         cardinality="0..1"
-        policy="dynamic" />
-    <reference
-        name="SearchService"
-        interface="org.eclipse.skalli.services.search.SearchService"
-        cardinality="0..1"
-        policy="dynamic" />
+        policy="dynamic"
+        bind="bindEventService"
+        unbind="unbindEventService"/>
     <reference
         name="RoleProvider"
         interface="org.eclipse.skalli.services.role.RoleProvider"

@@ -36,13 +36,11 @@ public class FavoritesComponent extends EntityServiceBase<Favorites> implements 
 
     private static final int CURRENT_MODEL_VERISON = 20;
 
-    @Override
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[FavoritesService] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
-    @Override
     protected void deactivate(ComponentContext context) {
         LOG.info(MessageFormat.format("[FavoritesService] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));

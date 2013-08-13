@@ -23,5 +23,12 @@
         bind="bindPersistenceService"
         unbind="unbindPersistenceService"/>
     <property name="userService.type" type="String" value="local"/>
+    <reference
+        name="EventService"
+        interface="org.eclipse.skalli.services.event.EventService"
+        cardinality="0..1"
+        policy="dynamic"
+        bind="bindEventService"
+        unbind="unbindEventService"/>
 </scr:component>
 

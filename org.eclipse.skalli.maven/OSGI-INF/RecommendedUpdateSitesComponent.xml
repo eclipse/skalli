@@ -29,5 +29,12 @@
         policy="dynamic"
         bind="bindProjectService"
         unbind="unbindProjectService"/>
+    <reference
+        name="EventService"
+        interface="org.eclipse.skalli.services.event.EventService"
+        cardinality="0..1"
+        policy="dynamic"
+        bind="bindEventService"
+        unbind="unbindEventService"/>
 </scr:component>
 

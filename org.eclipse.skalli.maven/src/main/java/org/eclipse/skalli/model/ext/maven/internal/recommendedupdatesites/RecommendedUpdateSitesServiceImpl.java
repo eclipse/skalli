@@ -44,13 +44,11 @@ public class RecommendedUpdateSitesServiceImpl extends EntityServiceBase<Recomme
 
     private ProjectService projectService;
 
-    @Override
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[RecommendedUpdateSitesService] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
-    @Override
     protected void deactivate(ComponentContext context) {
         LOG.info(MessageFormat.format("[RecommendedUpdateSitesService] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
@@ -66,9 +64,6 @@ public class RecommendedUpdateSitesServiceImpl extends EntityServiceBase<Recomme
         this.projectService = null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.skalli.api.java.EntityService#getEntityClass()
-     */
     @Override
     public Class<RecommendedUpdateSites> getEntityClass() {
         return RecommendedUpdateSites.class;

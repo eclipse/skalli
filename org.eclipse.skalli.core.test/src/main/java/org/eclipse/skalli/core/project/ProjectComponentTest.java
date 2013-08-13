@@ -29,6 +29,8 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ProjectNature;
 import org.eclipse.skalli.model.ext.commons.PeopleExtension;
 import org.eclipse.skalli.model.ext.commons.TagsExtension;
+import org.eclipse.skalli.services.entity.EventEntityUpdate;
+import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.persistence.PersistenceService;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
 import org.eclipse.skalli.testutil.BundleManager;
@@ -78,12 +80,22 @@ public class ProjectComponentTest {
         }
     }
 
+    private static class TestProjectService extends ProjectComponent {
+        public TestProjectService(PersistenceService mockIPS, ProjectTemplateService mockTS, EventService mockES) {
+            bindPersistenceService(mockIPS);
+            bindProjectTemplateService(mockTS);
+            bindEventService(mockES);
+            bindRoleProvider(new CoreRoleProvider());
+        }
+    }
+
     private List<Project> projects;
     private List<Project> deletedprojects;
     protected UUID[] uuids = new UUID[9];
     protected Object[] mocks;
     protected PersistenceService mockIPS;
     protected ProjectTemplateService mockTS;
+    protected EventService mockES;
     private ProjectComponent ps;
     private Member m1;
     private Member m2;
@@ -156,11 +168,9 @@ public class ProjectComponentTest {
 
         mockIPS = createNiceMock(PersistenceService.class);
         mockTS = createNiceMock(ProjectTemplateService.class);
-        mocks = new Object[] { mockIPS, mockTS };
-        ps = new ProjectComponent();
-        ps.bindPersistenceService(mockIPS);
-        ps.bindProjectTemplateService(mockTS);
-        ps.bindRoleProvider(new CoreRoleProvider());
+        mockES = createNiceMock(EventService.class);
+        mocks = new Object[] { mockIPS, mockTS, mockES };
+        ps = new TestProjectService(mockIPS, mockTS, mockES);
 
         reset(mocks);
         recordMocks();
@@ -212,6 +222,9 @@ public class ProjectComponentTest {
 
         mockTS.getProjectTemplateById(eq("comptemplate2"));
         expectLastCall().andReturn(new TestComponentTemplate2()).anyTimes();
+
+        mockES.fireEvent(isA(EventEntityUpdate.class));
+        expectLastCall().anyTimes();
     }
 
     @Test

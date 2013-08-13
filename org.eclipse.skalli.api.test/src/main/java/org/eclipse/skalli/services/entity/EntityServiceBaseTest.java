@@ -20,9 +20,8 @@ import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.persistence.PersistenceService;
-import org.eclipse.skalli.services.validation.Validation;
-import org.eclipse.skalli.services.validation.ValidationService;
 import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.TestEntityBase1;
@@ -40,7 +39,7 @@ public class EntityServiceBaseTest {
     private TestEntityServiceImpl entityService;
     private Object[] mocks;
     private PersistenceService mockIPS;
-    private ValidationService mockVS;
+    private EventService mockES;
 
     private TestEntityBase1 validEntity;
     private TestEntityBase1 noUuidEntity;
@@ -49,19 +48,9 @@ public class EntityServiceBaseTest {
 
     private class TestEntityServiceImpl extends EntityServiceBase<TestEntityBase1> implements Issuer {
 
-        private ValidationService validationService;
-
-        public TestEntityServiceImpl(PersistenceService persistenceService, ValidationService validationService) {
+        public TestEntityServiceImpl(PersistenceService persistenceService, EventService eventService) {
             bindPersistenceService(persistenceService);
-            this.validationService = validationService;
-        }
-
-        @Override
-        protected <S> S getService(Class<S> service, String name) {
-            if ("ValidationService".equals(name)) {
-                return (S)validationService;
-            }
-            return null;
+            bindEventService(eventService);
         }
 
         @Override
@@ -109,12 +98,11 @@ public class EntityServiceBaseTest {
         }
 
         mockIPS = createNiceMock(PersistenceService.class);
-        mockVS = createNiceMock(ValidationService.class);
-        mocks = new Object[] { mockIPS, mockVS };
+        mockES = createNiceMock(EventService.class);
+        mocks = new Object[] { mockIPS, mockES };
 
-        entityService = new TestEntityServiceImpl(mockIPS, mockVS);
+        entityService = new TestEntityServiceImpl(mockIPS, mockES);
         Assert.assertNotNull(entityService.getPersistenceService());
-        Assert.assertNotNull(entityService.getService(ValidationService.class, "ValidationService"));
     }
 
     @Test
@@ -145,11 +133,7 @@ public class EntityServiceBaseTest {
         expectLastCall();
         mockIPS.persist(eq(TestEntityBase1.class), eq(noUuidEntity), eq(USERID));
         expectLastCall();
-        mockVS.queue(eq(new Validation<TestEntityBase1>(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[0],
-                Severity.INFO, USERID)));
-        expectLastCall();
-        mockVS.queue(isA(Validation.class)); // test for concrete Validation not possible,
-                                             // because UUID for noUuidEntity is set in persist()!
+        mockES.fireEvent(isA(EventEntityUpdate.class));
         expectLastCall();
         replay(mocks);
 
@@ -167,13 +151,8 @@ public class EntityServiceBaseTest {
         expectLastCall();
         mockIPS.persist(eq(TestEntityBase1.class), eq(noUuidEntity), eq(USERID));
         expectLastCall();
-        mockVS.queue(eq(new Validation<TestEntityBase1>(TestEntityBase1.class, TestUUIDs.TEST_UUIDS[0],
-                Severity.INFO, USERID)));
+        mockES.fireEvent(isA(EventEntityUpdate.class));
         expectLastCall();
-        mockVS.queue(isA(Validation.class)); // test for concrete Validation not possible,
-        // because UUID for noUuidEntity is set in persist()!
-        expectLastCall();
-
         replay(mocks);
 
         entityService.persist(invalidEntity, USERID);
@@ -231,7 +210,7 @@ public class EntityServiceBaseTest {
 
     @Test
     public void testValidateIssues() {
-        TestEntityServiceImpl service = new TestEntityServiceImpl(mockIPS, mockVS);
+        TestEntityServiceImpl service = new TestEntityServiceImpl(mockIPS, mockES);
 
         TreeSet<Issue> issues = getIssues();
         assertTimestamps(issues, true);

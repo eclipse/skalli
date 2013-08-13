@@ -29,12 +29,14 @@ import org.eclipse.skalli.commons.FormatUtils;
 import org.eclipse.skalli.core.rest.monitor.Monitorable;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.configuration.EventConfigUpdate;
 import org.eclipse.skalli.services.entity.EntityService;
 import org.eclipse.skalli.services.entity.EntityServices;
+import org.eclipse.skalli.services.entity.EventEntityUpdate;
 import org.eclipse.skalli.services.event.EventListener;
 import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.issues.Issues;
@@ -50,7 +52,7 @@ import org.restlet.resource.ServerResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ValidationComponent implements ValidationService, EventListener<EventConfigUpdate>, Monitorable {
+public class ValidationComponent implements ValidationService, Monitorable {
 
     private static final Logger LOG = LoggerFactory.getLogger(ValidationComponent.class);
 
@@ -121,7 +123,8 @@ public class ValidationComponent implements ValidationService, EventListener<Eve
 
     protected void bindEventService(EventService eventService) {
         LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
-        eventService.registerListener(EventConfigUpdate.class, this);
+        eventService.registerListener(EventConfigUpdate.class, new ConfigUpdateListener());
+        eventService.registerListener(EventEntityUpdate.class, new EntityUpdateListener());
     }
 
     protected void unbindEventService(EventService eventService) {
@@ -550,6 +553,25 @@ public class ValidationComponent implements ValidationService, EventListener<Eve
         }
     }
 
+    final class ConfigUpdateListener implements EventListener<EventConfigUpdate> {
+        @Override
+        public void onEvent(EventConfigUpdate event) {
+            if (event.getConfigClass().equals(ValidationsConfig.class)) {
+                synchronizeAllTasks();
+            }
+        }
+    }
+
+    final class EntityUpdateListener implements EventListener<EventEntityUpdate> {
+        @Override
+        public void onEvent(EventEntityUpdate event) {
+            if (event.getEntityClass().equals(Project.class)) {
+                queue(new Validation<Project>(Project.class, event.getEntityId(),
+                      Severity.INFO, event.getUserId(), Validation.IMMEDIATE));
+            }
+        }
+    }
+
     Runnable getRunnableFromConfig(ValidationConfig config) {
         ValidationAction action = config.getAction();
         Severity minSeverity = config.getMinSeverity();
@@ -628,13 +650,6 @@ public class ValidationComponent implements ValidationService, EventListener<Eve
     void synchronizeAllTasks() {
         stopAllTasks();
         startAllTasks();
-    }
-
-    @Override
-    public void onEvent(EventConfigUpdate event) {
-        if (ValidationsConfig.class.equals(event.getConfigClass())) {
-            synchronizeAllTasks();
-        }
     }
 
     // interface Monitorable

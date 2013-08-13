@@ -12,7 +12,6 @@ package org.eclipse.skalli.model.ext.maven.internal.recommendedupdatesites;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import java.util.UUID;
@@ -20,13 +19,12 @@ import java.util.UUID;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpdateSites;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.UpdateSite;
-import org.eclipse.skalli.services.persistence.PersistenceService;
-import org.eclipse.skalli.testutil.HashMapStorageService;
+import org.eclipse.skalli.testutil.HashMapPersistenceService;
 import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
+@SuppressWarnings("nls")
 public class RecommendedUpdateSitesServiceImplTest {
 
     private static final String TEST_USER_ID = "User12345";
@@ -35,7 +33,16 @@ public class RecommendedUpdateSitesServiceImplTest {
 
     private RecommendedUpdateSitesServiceImpl recommendedUpdateSitesService;
 
-    HashMapStorageService hashMapStorageService = new HashMapStorageService();
+    private static class TestRecommendedUpdateSitesService extends RecommendedUpdateSitesServiceImpl {
+        public TestRecommendedUpdateSitesService() {
+            bindPersistenceService(new HashMapPersistenceService(RecommendedUpdateSites.class));
+        }
+    }
+
+    @Before
+    public void setup() {
+        recommendedUpdateSitesService = new TestRecommendedUpdateSitesService();
+    }
 
     private UpdateSite createUpdatesite(String identifier) {
         UpdateSite us = new UpdateSite();
@@ -47,17 +54,6 @@ public class RecommendedUpdateSitesServiceImplTest {
         return us;
     }
 
-    @Before
-    public void setup() {
-        recommendedUpdateSitesService = new RecommendedUpdateSitesServiceImpl();
-        recommendedUpdateSitesService.bindPersistenceService(getPersistenceServiceMock());
-    }
-
-    private PersistenceService getPersistenceServiceMock() {
-        return null;
-    }
-
-    @Ignore("we cant initialize a getPersistenceServiceMock")
     @Test
     public void testPersistAndLoad() throws ValidationException {
 
@@ -66,6 +62,7 @@ public class RecommendedUpdateSitesServiceImplTest {
         testUpdateSites.setDescription("My Test recommendedUpdatesites");
         testUpdateSites.setUuid(TestUUIDs.TEST_UUIDS[0]);
         testUpdateSites.setId("updateSiteId1234");
+        testUpdateSites.setName("name");
 
         UpdateSite updateSite1 = createUpdatesite("1");
         UpdateSite updateSite2 = createUpdatesite("2");
@@ -77,10 +74,7 @@ public class RecommendedUpdateSitesServiceImplTest {
 
         RecommendedUpdateSites loadedUpdateSites = recommendedUpdateSitesService.loadEntity(
                 RecommendedUpdateSites.class, testUpdateSites.getUuid());
-        assertThat(loadedUpdateSites.getLastModifiedBy(), is(TEST_USER_ID));
-        assertNotNull(loadedUpdateSites.getLastModified());
         assertSame(loadedUpdateSites, testUpdateSites);
-
     }
 
     private void assertSame(RecommendedUpdateSites actual, RecommendedUpdateSites expected) {
@@ -96,7 +90,6 @@ public class RecommendedUpdateSitesServiceImplTest {
         }
     }
 
-    @Ignore("we cant initialize a getPersistenceServiceMock")
     @Test
     public void testGetRecommendedUpdateSites() throws ValidationException
     {
@@ -108,6 +101,7 @@ public class RecommendedUpdateSitesServiceImplTest {
         testUpdateSites.setDescription("My Test recommendedUpdatesites");
         testUpdateSites.setUuid(TestUUIDs.TEST_UUIDS[0]);
         testUpdateSites.setId(updateSiteId);
+        testUpdateSites.setName("name");
 
         UpdateSite updateSite1 = createUpdatesite("testGetRecommended");
         UpdateSite updateSite2 = createUpdatesite("2");

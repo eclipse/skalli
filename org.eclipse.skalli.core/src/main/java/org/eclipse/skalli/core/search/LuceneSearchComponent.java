@@ -20,6 +20,9 @@ import java.util.Set;
 import org.eclipse.skalli.commons.ThreadPool;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Taggable;
+import org.eclipse.skalli.services.entity.EventEntityUpdate;
+import org.eclipse.skalli.services.event.EventListener;
+import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.Indexer;
@@ -34,10 +37,12 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LuceneSearchComponent implements SearchService {
+public class LuceneSearchComponent implements SearchService, EventListener<EventEntityUpdate> {
 
     private static final Logger LOG = LoggerFactory.getLogger(LuceneSearchComponent.class);
+
     private LuceneIndex<Project> luceneIndex;
+    private EventService eventService;
 
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[SearchService][Lucene] {0} : activated",
@@ -60,6 +65,17 @@ public class LuceneSearchComponent implements SearchService {
                 reindexAll();
             }
         });
+    }
+
+    protected void bindEventService(EventService eventService) {
+        LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
+        this.eventService = eventService;
+        eventService.registerListener(EventEntityUpdate.class, this);
+    }
+
+    protected void unbindEventService(EventService eventService) {
+        LOG.info(MessageFormat.format("unbindEventService({0})", eventService)); //$NON-NLS-1$
+        this.eventService = null;
     }
 
     protected void unbindProjectService(ProjectService projectService) {
@@ -145,6 +161,13 @@ public class LuceneSearchComponent implements SearchService {
     @Override
     public List<SearchHit<Project>> asSearchHits(List<Project> projects) {
         return luceneIndex.entitiesToHit(projects);
+    }
+
+    @Override
+    public void onEvent(EventEntityUpdate event) {
+        if (event.getEntityClass().equals(Project.class)) {
+            update((Project)event.getEntity());
+        }
     }
 
 }

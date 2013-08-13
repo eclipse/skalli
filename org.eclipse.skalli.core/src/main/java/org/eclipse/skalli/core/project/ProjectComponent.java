@@ -45,7 +45,6 @@ import org.eclipse.skalli.services.project.InvalidParentChainException;
 import org.eclipse.skalli.services.project.ProjectNode;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.role.RoleProvider;
-import org.eclipse.skalli.services.search.SearchService;
 import org.eclipse.skalli.services.template.NoSuchTemplateException;
 import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
@@ -76,16 +75,12 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
     private ProjectTemplateService projectTemplateService;
     private Set<RoleProvider> roleProviders = new HashSet<RoleProvider>();
 
-    @Override
     protected void activate(ComponentContext context) {
-        super.activate(context);
         LOG.info(MessageFormat.format("[ProjectService] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
-    @Override
     protected void deactivate(ComponentContext context) {
-        super.deactivate(context);
         LOG.info(MessageFormat.format("[ProjectService] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
@@ -593,18 +588,6 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
             }
         }
         return issues;
-    }
-
-    @Override
-    protected void updateSearchIndex(Project project) {
-        SearchService searchService = getService(SearchService.class, "SearchService"); //$NON-NLS-1$
-        if (searchService != null) {
-            searchService.update(project);
-            LOG.debug(MessageFormat.format("project {0} updated in search index", project.getProjectId()));
-        } else {
-            LOG.warn(MessageFormat.format("Failed to update search index - no instance of {0} available",
-                    SearchService.class.getName()));
-        }
     }
 
     @Override

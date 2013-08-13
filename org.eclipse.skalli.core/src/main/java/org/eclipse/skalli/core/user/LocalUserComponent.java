@@ -53,13 +53,11 @@ public class LocalUserComponent extends EntityServiceBase<User> implements UserS
 
     private Map<String, User> cache;
 
-    @Override
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[UserService][local] {0} : activated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
-    @Override
     protected void deactivate(ComponentContext context) {
         LOG.info(MessageFormat.format("[UserService][local] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
