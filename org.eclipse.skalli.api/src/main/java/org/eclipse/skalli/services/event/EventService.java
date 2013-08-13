@@ -11,9 +11,10 @@
 package org.eclipse.skalli.services.event;
 
 public interface EventService {
-    public <T extends Event> void registerListener(Class<T> event, EventListener<T> listener);
 
-    public <T extends Event> void unregisterListener(Class<T> event, EventListener<T> listener);
+    public <T extends Event> void registerListener(Class<T> eventClass, EventListener<T> listener);
+
+    public <T extends Event> void unregisterListener(Class<T> eventClass, EventListener<T> listener);
 
     public <T extends Event> void fireEvent(T event);
 }

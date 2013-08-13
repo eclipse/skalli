@@ -11,11 +11,8 @@
 package org.eclipse.skalli.core.event;
 
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.skalli.services.event.Event;
 import org.eclipse.skalli.services.event.EventListener;
@@ -26,12 +23,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Beware: This eventing implementation is just a POC!!!
+ * Default implementation of the eventing service.
  */
+@SuppressWarnings("rawtypes")
 public class EventComponent implements EventService {
+
     private static final Logger LOG = LoggerFactory.getLogger(EventComponent.class);
 
-    private final Map<String, Set> listeners = Collections.synchronizedMap(new HashMap<String, Set>());
+    private final ConcurrentHashMap<Class<?>, Map<EventListener,Boolean>> byEventClass =
+            new ConcurrentHashMap<Class<?>, Map<EventListener,Boolean>>();
 
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[EventService] {0} : activated",
@@ -44,31 +44,31 @@ public class EventComponent implements EventService {
     }
 
     @Override
-    public <T extends Event> void registerListener(Class<T> event, EventListener<T> listener) {
-        Set<EventListener<T>> set = listeners.get(event.getName());
-        if (set == null) {
-            set = new HashSet<EventListener<T>>(1);
-            listeners.put(event.getName(), set);
+    public <T extends Event> void registerListener(Class<T> eventClass, EventListener<T> listener) {
+        Map<EventListener,Boolean> map = new ConcurrentHashMap<EventListener,Boolean>(1);
+        Map<EventListener,Boolean> listeners = byEventClass.putIfAbsent(eventClass, map);
+        if (listeners == null) {
+            listeners = map;
         }
-        set.add(listener);
+        listeners.put(listener, Boolean.TRUE);
     }
 
     @Override
-    public <T extends Event> void unregisterListener(Class<T> event, EventListener<T> listener) {
-        Set<EventListener<T>> set = listeners.get(event.getName());
-        if (set != null) {
-            set.remove(listener);
+    public <T extends Event> void unregisterListener(Class<T> eventClass, EventListener<T> listener){
+        Map<EventListener,Boolean> listeners = byEventClass.get(eventClass);
+        if (listeners != null) {
+            listeners.remove(listener);
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends Event> void fireEvent(T event) {
-        Set<EventListener<T>> set = listeners.get(event.getClass().getName());
-        if (set != null) {
-            for (EventListener<T> listener : set) {
+        Map<EventListener,Boolean> listeners = byEventClass.get(event.getClass());
+        if (listeners != null) {
+            for (EventListener listener : listeners.keySet()) {
                 listener.onEvent(event);
             }
         }
     }
-
 }
