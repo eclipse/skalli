@@ -11,9 +11,11 @@
 package org.eclipse.skalli.commons;
 
 import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -190,6 +193,53 @@ public class CollectionUtils {
         @Override
         public T last() {
             throw new NoSuchElementException();
+        }
+    }
+
+    public static final  SortedMap<Object,Object> EMPTY_SORTED_MAP = new EmptySortedMap<Object,Object>();
+
+    @SuppressWarnings("unchecked")
+    public static <K,V> SortedMap<K,V> emptySortedMap() {
+        return (SortedMap<K,V>)EMPTY_SORTED_MAP;
+    }
+
+    private static class EmptySortedMap<K,V> extends AbstractMap<K,V> implements SortedMap<K,V>, Serializable {
+
+        private static final long serialVersionUID = 6175770364668730931L;
+
+        @Override
+        public Comparator<? super K> comparator() {
+            return null;
+        }
+
+        @Override
+        public SortedMap<K, V> subMap(K fromKey, K toKey) {
+            return this;
+        }
+
+        @Override
+        public SortedMap<K, V> headMap(K toKey) {
+            return this;
+        }
+
+        @Override
+        public SortedMap<K, V> tailMap(K fromKey) {
+            return this;
+        }
+
+        @Override
+        public K firstKey() {
+            throw new NoSuchElementException();
+        }
+
+        @Override
+        public K lastKey() {
+            throw new NoSuchElementException();
+        }
+
+        @Override
+        public Set<Map.Entry<K, V>> entrySet() {
+            return Collections.emptySet();
         }
     }
 }

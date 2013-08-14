@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.tagging;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
@@ -19,38 +19,45 @@ import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Taggable;
 
 /**
- * Service for managing of tags and taggable entities.
- *
+ * Service for managing tags and taggable entities.
+ * <p>
  * Note, all methods of this service expect that either the given entity class implements the
- * interface {@link Taggable}, or that it is an {@link ExtensibleEntityBase} and at least one of
- * its assigned {@link ExtensionEntityBase extensions} implementsc<code>Taggable</code>.
- * If neither of these conditions is met, an empty result will be returned.
+ * interface {@link Taggable}, or that it is an {@link ExtensibleEntityBase extensible entity}
+ * and at least one of its associated {@link ExtensionEntityBase extensions} implements
+ * <code>Taggable</code>.
  */
 public interface TaggingService {
 
     /**
-     * Returns the overall set of tags assigned to entities of the given class.
+     * Returns all known tags assigned to entities of the given class sorted alphanumerically
+     * by tag name and mapped to their respective number <sof occurence.
      *
      * @param entityClass the class of entities to examine.
-     * @return a set of tags, or an empty set.
+     * @return all known tags assigned to entities of the given class, or an empty map.
      */
-    public <T extends EntityBase> Set<String> getAllTags(Class<T> entityClass);
+    public <T extends EntityBase> SortedMap<String, Integer> getTags(Class<T> entityClass);
 
     /**
-     * Returns all entities of a given class that are tagged with a certain tag.
-     * The order of the result is not specified.
+     * Returns all known tags assigned to entities of the given class sorted by
+     * decreasing number of occurence. The most popular tag is returned first in the result.
      *
      * @param entityClass the class of entities to examine.
-     * @param tag the tag to search for.
-     * @return  entities tagged with the given tag, or an empty list.
+     * @return all known tags assigned to entities of the given class, or an empty set.
      */
-    public <T extends EntityBase> Set<T> getTaggables(Class<T> entityClass, String tag);
+    public <T extends EntityBase> SortedSet<TagCount> getMostPopular(Class<T> entityClass);
+
 
     /**
-     * Returns a map of entities of the given class sorted by their respective tags.
+     * Returns the <code>count</code> most popular tags assigned to entities of the
+     * given class sorted by decreasing number of occurence. The most popular tag is
+     * returned first in the result.
      *
-     * @param entityClass  the class of entities to examine.
-     * @return a map of entities with tags as keys, or an empty map.
+     * @param entityClass the class of entities to examine.
+     * @param count  the number of entries to return. If <code>count</code> is negative,
+     * the result is the same as for {@link #getMostPopular()}. If <code>count</code> is
+     * zero, an empty list is returned.
+     *
+     * @return the most popular tags, or an empty set.
      */
-    public <T extends EntityBase> Map<String, Set<T>> getTaggables(Class<T> entityClass);
+    public <T extends EntityBase> SortedSet<TagCount> getMostPopular(Class<T> entityClass, int count);
 }

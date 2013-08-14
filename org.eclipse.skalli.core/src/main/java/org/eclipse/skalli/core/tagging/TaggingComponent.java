@@ -11,36 +11,29 @@
 package org.eclipse.skalli.core.tagging;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.commons.ThreadPool;
 import org.eclipse.skalli.model.EntityBase;
-import org.eclipse.skalli.model.ExtensibleEntityBase;
-import org.eclipse.skalli.model.ExtensionEntityBase;
-import org.eclipse.skalli.model.Taggable;
-import org.eclipse.skalli.services.persistence.PersistenceService;
+import org.eclipse.skalli.services.entity.EntityService;
+import org.eclipse.skalli.services.entity.EventEntityUpdate;
+import org.eclipse.skalli.services.event.EventListener;
+import org.eclipse.skalli.services.event.EventService;
+import org.eclipse.skalli.services.tagging.TagCount;
 import org.eclipse.skalli.services.tagging.TaggingService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TaggingComponent implements TaggingService {
+public class TaggingComponent implements TaggingService, EventListener<EventEntityUpdate> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TaggingComponent.class);
 
-    private PersistenceService persistenceService;
-
-    protected void bindPersistenceService(PersistenceService srvc) {
-        this.persistenceService = srvc;
-    }
-
-    protected void unbindPersistenceService(PersistenceService srvc) {
-        this.persistenceService = null;
-    }
+    private ConcurrentHashMap<Class<?>, TagCache> caches = new ConcurrentHashMap<Class<?>, TagCache>();
 
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[TaggingService] {0} : activated",
@@ -52,68 +45,76 @@ public class TaggingComponent implements TaggingService {
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
     }
 
-    @Override
-    public <T extends EntityBase> Set<String> getAllTags(Class<T> entityClass) {
-        Set<String> result = new HashSet<String>();
-        List<T> entities = persistenceService.getEntities(entityClass);
-        for (T entity : entities) {
-            if (entity instanceof Taggable) {
-                appendTags((Taggable)entity, result);
-            } else if (entity instanceof ExtensibleEntityBase) {
-                appendTagsFromExtensions((ExtensibleEntityBase)entity, result);
+    protected void bindEntityService(final EntityService<?> entityService) {
+        LOG.info(MessageFormat.format("bindEntityService({0})", entityService.getEntityClass().getSimpleName())); //$NON-NLS-1$
+        // initialize tags asynchronously to not block the binding
+        ThreadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                initialize(entityService);
             }
-        }
-        return result;
+        });
     }
 
-    private void appendTags(Taggable taggable, Set<String> result) {
-        Set<String> tags = taggable.getTags();
-        if (tags != null) {
-            for (String tag : tags) {
-                if (!result.contains(tag)) {
-                    result.add(tag);
-                }
-            }
-        }
+    protected void unbindEntityService(EntityService<?> entityService) {
+        LOG.info(MessageFormat.format("unbindEntityService({0})", entityService.getEntityClass().getSimpleName())); //$NON-NLS-1$
+        caches.remove(entityService.getEntityClass());
     }
 
-    private void appendTagsFromExtensions(ExtensibleEntityBase entity, Set<String> result) {
-        for (ExtensionEntityBase ext: entity.getAllExtensions()) {
-            if (ext instanceof Taggable) {
-                appendTags((Taggable)ext, result);
-            }
-        }
+    protected void bindEventService(EventService eventService) {
+        LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
+        eventService.registerListener(EventEntityUpdate.class, this);
+    }
+
+    protected void unbindEventService(EventService eventService) {
+        LOG.info(MessageFormat.format("unbindEventService({0})", eventService)); //$NON-NLS-1$
     }
 
     @Override
-    public <T extends EntityBase> Set<T> getTaggables(Class<T> entityClass, String tag) {
-        Set<T> result = new HashSet<T>();
-        List<T> entities = persistenceService.getEntities(entityClass);
-        for (T entity : entities) {
-            if (entity instanceof Taggable) {
-                if (((Taggable)entity).hasTag(tag)) {
-                    result.add(entity);
-                }
-            } else if (entity instanceof ExtensibleEntityBase) {
-                for (ExtensionEntityBase ext: ((ExtensibleEntityBase)entity).getAllExtensions()) {
-                    if (ext instanceof Taggable) {
-                        if (((Taggable)ext).hasTag(tag)) {
-                            result.add(entity);
-                        }
-                    }
-                }
-            }
+    public <T extends EntityBase> SortedMap<String, Integer> getTags(Class<T> entityClass) {
+        TagCache tagCache = caches.get(entityClass);
+        if (tagCache == null) {
+            return CollectionUtils.emptySortedMap();
         }
-        return result;
+        return tagCache.getByName();
     }
 
     @Override
-    public <T extends EntityBase> Map<String, Set<T>> getTaggables(Class<T> entityClass) {
-        Map<String, Set<T>> result = new HashMap<String, Set<T>>();
-        for (String tag : getAllTags(entityClass)) {
-            Set<T> taggables = getTaggables(entityClass, tag);
-            result.put(tag, taggables);
+    public <T extends EntityBase> SortedSet<TagCount> getMostPopular(Class<T> entityClass) {
+        TagCache tagCache = caches.get(entityClass);
+        if (tagCache == null) {
+            return CollectionUtils.emptySortedSet();
         }
-        return result;
+        return tagCache.getByCount();
+    }
+
+    @Override
+    public <T extends EntityBase> SortedSet<TagCount> getMostPopular(Class<T> entityClass, int count) {
+        TagCache tagCache = caches.get(entityClass);
+        if (tagCache == null) {
+            return CollectionUtils.emptySortedSet();
+        }
+        return tagCache.getByCount(count);
+    }
+
+    @Override
+    public void onEvent(EventEntityUpdate event) {
+        Class<?> entityClass = event.getEntityClass();
+        TagCache tagCache = caches.get(entityClass);
+        if (tagCache == null) {
+            caches.putIfAbsent(entityClass, new TagCache());
+            tagCache = caches.get(entityClass);
+        }
+        tagCache.update(event.getEntity());
+    }
+
+    void initialize(EntityService<?> entityService) {
+        Class<?> entityClass = entityService.getEntityClass();
+        TagCache tagCache = caches.get(entityClass);
+        if (tagCache == null) {
+            caches.putIfAbsent(entityClass, new TagCache());
+            tagCache = caches.get(entityClass);
+        }
+        tagCache.initialize(entityService);
     }
 }

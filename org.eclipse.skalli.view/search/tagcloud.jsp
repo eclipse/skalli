@@ -25,7 +25,7 @@
 </head>
 <body>
 <%
-    TagCloud tagCloud = TagCloud.getInstance();
+    TagCloud tagCloud = new TagCloud();
 %>
 
 <%-- header area --%>

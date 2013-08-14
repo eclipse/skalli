@@ -13,6 +13,7 @@ package org.eclipse.skalli.view.ext.impl.internal.infobox;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.SortedSet;
 
 import org.eclipse.skalli.model.Project;
@@ -209,8 +210,8 @@ public class TagComponent extends CustomComponent {
         tagComboBoxLayout.removeAllComponents();
         // add tag input field
         final ComboBox tagComboBox = new ComboBox();
-        Set<String> availableTags = taggingService.getAllTags(Project.class);
-        for (String tag : availableTags) {
+        SortedMap<String,Integer> availableTags = taggingService.getTags(Project.class);
+        for (String tag : availableTags.keySet()) {
             tagComboBox.addItem(tag);
         }
         tagComboBox.setNewItemsAllowed(true);

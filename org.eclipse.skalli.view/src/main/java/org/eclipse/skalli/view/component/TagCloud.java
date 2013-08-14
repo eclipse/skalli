@@ -10,17 +10,14 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.component;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
+import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.tagging.TagCount;
 import org.eclipse.skalli.services.tagging.TaggingService;
 import org.eclipse.skalli.view.Consts;
 
@@ -30,107 +27,59 @@ public class TagCloud {
     private static final int FONT_SIZE_NORMAL = 3;
     private static final double FONT_SIZE_DELTA_MAX = 5.0;
 
-    private final int viewMax;
+    private SortedSet<TagCount> mostPopular = CollectionUtils.emptySortedSet();
+    private SortedMap<String,Integer> sortedByName= CollectionUtils.emptySortedMap();
 
-    private int thresholdMin = 1;
-    private int thresholdMax = 1;
-
-    private final Map<String, Set<Project>> tags;
-
-    /**
-     * Set of most popular tags sorted alphanumerically.
-     * This set contains only the <code>viewMax</code>
-     * most popluar tags.
-     */
-    private SortedSet<String> mostPopular;
-
-    public static TagCloud getInstance() {
-        return getInstance(Integer.MAX_VALUE);
+    public TagCloud() {
+        this(-1);
     }
 
-    public static TagCloud getInstance(int maxTags) {
-        TagCloud tagCloud = null;
-        TaggingService service = Services.getService(TaggingService.class);
-        if (service != null) {
-            tagCloud = new TagCloud(service.getTaggables(Project.class), maxTags);
-        }
-        return tagCloud;
-    }
-
-    TagCloud(Map<String, Set<Project>> tags, int viewMax) {
-        if (tags == null) {
-            tags = new HashMap<String, Set<Project>>(0);
-        }
-        this.tags = tags;
-        this.viewMax = Math.min(tags.size(), viewMax);
-        determineMostPopular(tags);
-    }
-
-    /**
-     * Sorts tags by their frequency (most frequent tags at the beginning).
-     * Determines the thresholds for the font size calculation.
-     */
-    private void determineMostPopular(final Map<String, Set<Project>> tags) {
-        // sort all tags by frequency
-        LinkedList<String> sortedByFrequency = new LinkedList<String>(tags.keySet());
-        Collections.sort(sortedByFrequency, new Comparator<String>() {
-            @Override
-            public int compare(String tag1, String tag2) {
-                int result = tags.get(tag2).size() - tags.get(tag1).size();
-                if (result == 0) {
-                    result = tag1.compareTo(tag2);
-                }
-                return result;
+    public TagCloud(int count) {
+        TaggingService tagService = getTaggingService();
+        if (tagService != null) {
+            if (count >= 0) {
+                mostPopular = tagService.getMostPopular(Project.class, count);
+                sortedByName = TagCount.asMap(mostPopular);
+            } else {
+                mostPopular = tagService.getMostPopular(Project.class);
+                sortedByName = tagService.getTags(Project.class);
             }
-        });
-
-        // determine the largest and smallest frequency of tags
-        if (sortedByFrequency.size() > 0) {
-            thresholdMax = tags.get(sortedByFrequency.getFirst()).size();
-            thresholdMin = tags.get(sortedByFrequency.get(Math.max(viewMax - 1, 0))).size();
         }
+    }
 
-        // sort the first viewMax tags of sortedByFrequency alphanumerically
-        mostPopular = new TreeSet<String>();
-        for (int i = 0; i < viewMax; ++i) {
-            String next = sortedByFrequency.get(i);
-            mostPopular.add(next);
-        }
+    protected TaggingService getTaggingService() {
+        return Services.getService(TaggingService.class);
     }
 
     public String doLayout() {
-        StringBuilder xhtmlCloud = new StringBuilder();
-
-        xhtmlCloud.append("<center>"); //$NON-NLS-1$
+        StringBuilder html = new StringBuilder();
+        html.append("<center>"); //$NON-NLS-1$
+        int thresholdMin = 1;
+        int thresholdMax = 1;
         if (mostPopular.size() > 0) {
-            for (String tag : mostPopular) {
-                int fontSize = calculateFontSize(tag);
-                String tagUrl = Consts.URL_PROJECTS_TAG + tag;
-                xhtmlCloud.append("<a href='"); //$NON-NLS-1$
-                xhtmlCloud.append(tagUrl);
-                xhtmlCloud.append("'><font class='tag"); //$NON-NLS-1$
-                xhtmlCloud.append(fontSize);
-                xhtmlCloud.append("'>"); //$NON-NLS-1$
-                xhtmlCloud.append(tag);
-                xhtmlCloud.append("</font></a> "); //$NON-NLS-1$
+            TagCount first = mostPopular.first();
+            TagCount last = mostPopular.last();
+            thresholdMax = first.getCount();
+            thresholdMin = last.getCount();
+            for (Entry<String,Integer> entry : sortedByName.entrySet()) {
+                int fontSize = FONT_SIZE_NORMAL;
+                if (thresholdMin != thresholdMax) {
+                    int value = (int) Math.ceil((FONT_SIZE_DELTA_MAX * (entry.getValue() - thresholdMin)) / (thresholdMax - thresholdMin));
+                    fontSize = value + FONT_SIZE_MIN;
+                }
+                String tagUrl = Consts.URL_PROJECTS_TAG + entry.getKey();
+                html.append("<a href='"); //$NON-NLS-1$
+                html.append(tagUrl);
+                html.append("'><font class='tag"); //$NON-NLS-1$
+                html.append(fontSize);
+                html.append("'>"); //$NON-NLS-1$
+                html.append(entry.getKey());
+                html.append("</font></a> "); //$NON-NLS-1$
             }
         } else {
-            xhtmlCloud.append("no tags at the moment");
+            html.append("(no tags defined yet)");
         }
-        xhtmlCloud.append("</center>"); //$NON-NLS-1$
-
-        return xhtmlCloud.toString();
-    }
-
-    /**
-     * Calculates the font size for the given tag (min=1, max=6).
-     */
-    private int calculateFontSize(String tag) {
-        if (thresholdMin == thresholdMax) {
-            return FONT_SIZE_NORMAL;
-        }
-        int count = tags.get(tag).size();
-        int value = (int) Math.ceil((FONT_SIZE_DELTA_MAX * (count - thresholdMin)) / (thresholdMax - thresholdMin));
-        return value + FONT_SIZE_MIN;
+        html.append("</center>"); //$NON-NLS-1$
+        return html.toString();
     }
 }

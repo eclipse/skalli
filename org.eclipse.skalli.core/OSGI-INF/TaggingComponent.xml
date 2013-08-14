@@ -15,11 +15,18 @@
         <provide interface="org.eclipse.skalli.services.tagging.TaggingService"/>
     </service>
     <reference
-        name="PersistenceService"
-        interface="org.eclipse.skalli.services.persistence.PersistenceService"
-        cardinality="1..1"
+        name="EventService"
+        interface="org.eclipse.skalli.services.event.EventService"
+        cardinality="0..1"
         policy="dynamic"
-        bind="bindPersistenceService"
-        unbind="unbindPersistenceService"/>
+        bind="bindEventService"
+        unbind="unbindEventService"/>
+    <reference
+        name="EntityService"
+        interface="org.eclipse.skalli.services.entity.EntityService"
+        cardinality="0..n"
+        policy="dynamic"
+        bind="bindEntityService"
+        unbind="unbindEntityService" />
 </scr:component>
 

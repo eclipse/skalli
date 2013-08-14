@@ -11,82 +11,122 @@
 package org.eclipse.skalli.view.component;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.UUID;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.eclipse.skalli.commons.CollectionUtils;
-import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.model.Taggable;
-import org.eclipse.skalli.model.ext.commons.TaggingUtils;
+import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.services.tagging.TagCount;
+import org.eclipse.skalli.services.tagging.TaggingService;
 import org.junit.Assert;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
 public class TagCloudTest {
 
-    private static class TestTaggable implements Taggable {
+    private static class TestTaggingService implements TaggingService {
+
+        private TreeMap<String,Integer> byName =  new TreeMap<String,Integer>();
+        private TreeSet<TagCount> byCount =  new TreeSet<TagCount>();
+
+        public TestTaggingService() {
+            byName.put("a", 4);
+            byName.put("b", 14);
+            byName.put("c", 1);
+            byName.put("d", 4);
+            byName.put("e", 7);
+            byName.put("f", 1);
+            byName.put("g", 4);
+            byName.put("h", 25);
+            byName.put("i", 1);
+            byName.put("j", 1);
+            byName.put("k", 2);
+            byName.put("l", 12);
+            byName.put("m", 14);
+            byName.put("n", 1);
+            byName.put("o", 6);
+            byName.put("p", 4);
+            for (Entry<String,Integer> entry: byName.entrySet()) {
+                byCount.add(new TagCount(entry.getKey(), entry.getValue()));
+            }
+        }
+
         @Override
-        public SortedSet<String> getTags() {
+        public <T extends EntityBase> SortedMap<String, Integer> getTags(Class<T> entityClass) {
+            return byName;
+        }
+
+        @Override
+        public <T extends EntityBase> SortedSet<TagCount> getMostPopular(Class<T> entityClass, int count) {
+            if (count < 0) {
+                return byCount;
+            }
+            TreeSet<TagCount> result = new TreeSet<TagCount>();
+            int i = 0;
+            Iterator<TagCount> it = byCount.iterator();
+            while (i < count && it.hasNext()) {
+                result.add(it.next());
+                ++i;
+            }
+            return result;
+        }
+
+        @Override
+        public <T extends EntityBase> SortedSet<TagCount> getMostPopular(Class<T> entityClass) {
+            return byCount;
+        }
+    }
+
+    private static class EmptyTaggingService implements TaggingService {
+
+        @Override
+        public <T extends EntityBase> SortedMap<String, Integer> getTags(Class<T> entityClass) {
+            return CollectionUtils.emptySortedMap();
+        }
+
+        @Override
+        public <T extends EntityBase> SortedSet<TagCount> getMostPopular(Class<T> entityClass, int count) {
             return CollectionUtils.emptySortedSet();
         }
 
         @Override
-        public void addTag(String tag) {
+        public <T extends EntityBase> SortedSet<TagCount> getMostPopular(Class<T> entityClass) {
+            return CollectionUtils.emptySortedSet();
+        }
+
+    }
+
+    private static class TestTagCloud extends TagCloud {
+
+        public TestTagCloud(int count, boolean initialize) {
+            super(count);
         }
 
         @Override
-        public void addTags(String... tags) {
-        }
-
-        @Override
-        public void removeTag(String tag) {
-        }
-
-        @Override
-        public boolean hasTag(String tag) {
-            return false;
+        protected TaggingService getTaggingService() {
+            return new TestTaggingService();
         }
     }
 
-    private Map<String, Set<Project>> getTestProjects() {
-        Map<String, Set<Project>> tags = new HashMap<String, Set<Project>>();
-        addTestTaggables("a", 4, tags);
-        addTestTaggables("b", 14, tags);
-        addTestTaggables("c", 1, tags);
-        addTestTaggables("d", 4, tags);
-        addTestTaggables("e", 7, tags);
-        addTestTaggables("f", 1, tags);
-        addTestTaggables("g", 4, tags);
-        addTestTaggables("h", 25, tags);
-        addTestTaggables("i", 1, tags);
-        addTestTaggables("j", 1, tags);
-        addTestTaggables("k", 2, tags);
-        addTestTaggables("l", 12, tags);
-        addTestTaggables("m", 14, tags);
-        addTestTaggables("n", 1, tags);
-        addTestTaggables("o", 6, tags);
-        addTestTaggables("p", 4, tags);
-        return tags;
-    }
+    private static class EmptyTagCloud extends TagCloud {
 
-    private void addTestTaggables(String tag, int n, Map<String, Set<Project>> taggables) {
-        HashSet<Project> set = new HashSet<Project>(n);
-        for (int i = 0; i < n; ++i) {
-            Project p = new Project();
-            p.setUuid(UUID.randomUUID());
-            TaggingUtils.addTags(p, tag);
-            set.add(p);
+        public EmptyTagCloud() {
+            super();
         }
-        taggables.put(tag, set);
+
+        @Override
+        protected TaggingService getTaggingService() {
+            return new EmptyTaggingService();
+        }
     }
 
     @Test
     public void testShow3MostPopular() throws IOException {
-        TagCloud tagCloud = new TagCloud(getTestProjects(), 3);
+        TagCloud tagCloud = new TestTagCloud(3, true);
         String xhtml = tagCloud.doLayout();
 
         Assert.assertEquals("xhtml",
@@ -99,7 +139,7 @@ public class TagCloudTest {
 
     @Test
     public void testShow25MostPopular() throws IOException {
-        TagCloud tagCloud = new TagCloud(getTestProjects(), 25);
+        TagCloud tagCloud = new TestTagCloud(25, true);
         String xhtml = tagCloud.doLayout();
 
         Assert.assertEquals("xhtml",
@@ -125,9 +165,17 @@ public class TagCloudTest {
 
     @Test
     public void testShowAllTags() throws IOException {
-        TagCloud tagCloud = new TagCloud(getTestProjects(), Integer.MAX_VALUE);
-        String xhtml = tagCloud.doLayout();
+        TagCloud tagCloud = new TestTagCloud(Integer.MAX_VALUE, true);
+        assertAllTags(tagCloud.doLayout());
+    }
 
+    @Test
+    public void testShowAllTagsNegativeCount() throws IOException {
+        TagCloud tagCloud = new TestTagCloud(-1, true);
+        assertAllTags(tagCloud.doLayout());
+    }
+
+    private void assertAllTags(String xhtml) {
         Assert.assertEquals("xhtml",
                 "<center>" +
                         "<a href='/projects?tag=a'><font class='tag2'>a</font></a> " +
@@ -151,20 +199,21 @@ public class TagCloudTest {
 
     @Test
     public void testNoTags() throws IOException {
-        TagCloud tagCloud = new TagCloud(null, 3);
+        TagCloud tagCloud = new EmptyTagCloud();
         String xhtml = tagCloud.doLayout();
 
         Assert.assertEquals("xhtml",
-                "<center>no tags at the moment</center>", xhtml);
+                "<center>(no tags defined yet)</center>", xhtml);
     }
 
     @Test
     public void testShow0MostPopular() throws IOException {
-        TagCloud tagCloud = new TagCloud(getTestProjects(), 0);
+        TagCloud tagCloud = new TestTagCloud(0, true);
         String xhtml = tagCloud.doLayout();
 
         Assert.assertEquals("xhtml",
-                "<center>no tags at the moment</center>", xhtml);
+                "<center>(no tags defined yet)</center>", xhtml);
     }
 
 }
+

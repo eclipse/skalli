@@ -37,7 +37,7 @@ function focusSearch()
 
 <%
     int viewMax = 50;
-    TagCloud tagCloud = TagCloud.getInstance(viewMax);
+    TagCloud tagCloud = new TagCloud(viewMax);
 %>
 
 <div class="searcharea">
