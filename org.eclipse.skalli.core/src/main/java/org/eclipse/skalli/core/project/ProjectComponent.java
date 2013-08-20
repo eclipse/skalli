@@ -594,8 +594,10 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
     public SortedSet<Member> getMembers(UUID uuid) {
         TreeSet<Member> ret = new TreeSet<Member>();
         Project project = getByUUID(uuid);
-        for (RoleProvider roleProvider : roleProviders) {
-            ret.addAll(roleProvider.getMembers(project));
+        if (project != null) {
+            for (RoleProvider roleProvider : roleProviders) {
+                ret.addAll(roleProvider.getMembers(project));
+            }
         }
         return ret;
     }
@@ -604,8 +606,10 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
     public SortedSet<Member> getMembers(UUID uuid, String... roles) {
         TreeSet<Member> ret = new TreeSet<Member>();
         Project project = getByUUID(uuid);
-        for (RoleProvider roleProvider : roleProviders) {
-            ret.addAll(roleProvider.getMembers(project, roles));
+        if (project != null) {
+            for (RoleProvider roleProvider : roleProviders) {
+                ret.addAll(roleProvider.getMembers(project, roles));
+            }
         }
         return ret;
     }
@@ -614,8 +618,10 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
     public Map<String, SortedSet<Member>> getMembersByRole(UUID uuid) {
         Map<String, SortedSet<Member>> ret = new HashMap<String, SortedSet<Member>>();
         Project project = getByUUID(uuid);
-        for (RoleProvider roleProvider : roleProviders) {
-            ret.putAll(roleProvider.getMembersByRole(project));
+        if (project != null) {
+            for (RoleProvider roleProvider : roleProviders) {
+                ret.putAll(roleProvider.getMembersByRole(project));
+            }
         }
         return ret;
     }
