@@ -54,32 +54,36 @@ public class ScrumRoleProvider extends RoleProviderBase {
 
     @Override
     public Map<String, SortedSet<Member>> getMembersByRole(Project project) {
-        ScrumProjectExt ext = project.getExtension(ScrumProjectExt.class);
-        if (ext == null) {
-            return Collections.emptyMap();
-        }
         Map<String, SortedSet<Member>> ret = new HashMap<String, SortedSet<Member>>();
-        ret.put(ROLE_SM, ext.getScrumMasters());
-        ret.put(ROLE_PO, ext.getProductOwners());
+        if (project != null) {
+            ScrumProjectExt ext = project.getExtension(ScrumProjectExt.class);
+            if (ext == null) {
+                return Collections.emptyMap();
+            }
+            ret.put(ROLE_SM, ext.getScrumMasters());
+            ret.put(ROLE_PO, ext.getProductOwners());
+        }
         return ret;
     }
 
     @Override
     public SortedSet<Member> getMembers(Project project) {
         TreeSet<Member> result = new TreeSet<Member>();
-        ScrumProjectExt ext = project.getExtension(ScrumProjectExt.class);
-        if (ext == null) {
-            return result;
+        if (project != null) {
+            ScrumProjectExt ext = project.getExtension(ScrumProjectExt.class);
+            if (ext == null) {
+                return result;
+            }
+            result.addAll(ext.getScrumMasters());
+            SortedSet<Member> set = ext.getProductOwners();
+            result.addAll(set);
         }
-        result.addAll(ext.getScrumMasters());
-        SortedSet<Member> set = ext.getProductOwners();
-        result.addAll(set);
         return result;
     }
 
     @Override
     public boolean addMember(Project project, Member person, String role) {
-        if (!SUPPORTED_ROLES.contains(role)) {
+        if (project == null || !SUPPORTED_ROLES.contains(role)) {
             return false;
         }
         if (project.isInherited(ScrumProjectExt.class)) {
