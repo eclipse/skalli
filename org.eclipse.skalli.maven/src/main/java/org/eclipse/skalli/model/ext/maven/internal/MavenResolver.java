@@ -76,9 +76,11 @@ public class MavenResolver implements Issuer {
         Set<String> moduleTags = reactorPom.getModuleTags();
         for (String moduleTag : moduleTags) {
             String normalizedPath = getNormalizedPath(reactorPomPath, moduleTag);
-            List<String> visitedPaths = new ArrayList<String>();
-            visitedPaths.add(normalizedPath);
-            mavenReactor.addModules(getModules(visitedPaths, scmLocation, normalizedPath, self));
+            if (normalizedPath != null) {
+                List<String> visitedPaths = new ArrayList<String>();
+                visitedPaths.add(normalizedPath);
+                mavenReactor.addModules(getModules(visitedPaths, scmLocation, normalizedPath, self));
+            }
         }
         return mavenReactor;
     }
@@ -96,7 +98,7 @@ public class MavenResolver implements Issuer {
         Set<String> moduleTags = modulePom.getModuleTags();
         for (String moduleTag : moduleTags) {
             String normalizedPath = getNormalizedPath(relativePath, moduleTag);
-            if (!visitedPaths.contains(normalizedPath)) {
+            if (normalizedPath != null && !visitedPaths.contains(normalizedPath)) {
                 visitedPaths.add(normalizedPath);
                 result.addAll(getModules(visitedPaths, scmLocation, normalizedPath, self));
             }
@@ -104,8 +106,23 @@ public class MavenResolver implements Issuer {
         return result;
     }
 
+    /**
+     * Concats <code>pathPrefix</code> and <code>path</code>, normalizes the result by
+     * removing double and single dot path segments, converts all file separators to forward slashes
+     * and removes a leading slash, if any.
+     *
+     * @param pathPrefix  the path prefix.
+     * @param path  the path relative to the path prefix.
+     * @return  the bnormalized path, or <code>null</code> of removing double and single dot path
+     * segments yielded an invalid path, e.g. a path like <tt>"foo/../../bar"</tt> would be treated
+     * as invalid.
+     */
     private String getNormalizedPath(String pathPrefix, String path) {
-        String normalizedPath = FilenameUtils.separatorsToUnix(FilenameUtils.normalize(pathPrefix + "/" + path)); //$NON-NLS-1$
+        String normalizedPath = FilenameUtils.normalize(pathPrefix + "/" + path); //$NON-NLS-1$
+        if (normalizedPath == null) {
+            return null;
+        }
+        normalizedPath = FilenameUtils.separatorsToUnix(normalizedPath);
         if (normalizedPath.charAt(0) == '/') {
             normalizedPath = normalizedPath.substring(1);
         }
