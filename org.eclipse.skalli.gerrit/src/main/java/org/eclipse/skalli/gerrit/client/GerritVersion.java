@@ -6,7 +6,8 @@ import org.apache.commons.lang.StringUtils;
 public enum GerritVersion {
     GERRIT_UNKNOWN_VERSION,
     GERRIT_2_0_X, GERRIT_2_1_X, GERRIT_2_1_7, GERRIT_2_1_8, GERRIT_2_2_X,
-    GERRIT_2_2_2, GERRIT_2_3_X, GERRIT_2_4_X, GERRIT_2_5_X, GERRIT_2_6_X;
+    GERRIT_2_2_2, GERRIT_2_3_X, GERRIT_2_4_X, GERRIT_2_5_X, GERRIT_2_6_X,
+    GERRIT_2_7_X;
 
     @SuppressWarnings("nls")
     public static GerritVersion asGerritVersion(String s) {
@@ -43,7 +44,11 @@ public enum GerritVersion {
         if (s.equals("2.6") || s.startsWith("2.6.") || s.startsWith("2.6-")) {
             return GERRIT_2_6_X;
         }
-        return GERRIT_UNKNOWN_VERSION;
+        if (s.equals("2.7") || s.startsWith("2.7.") || s.startsWith("2.7-")) {
+            return GERRIT_2_7_X;
+        }
+        // fall back to a resonable default version
+        return GERRIT_2_4_X;
     }
 
     public boolean supports(GerritFeature feature) {
@@ -64,6 +69,8 @@ public enum GerritVersion {
             return compareTo(GERRIT_2_3_X) >= 0 ;
         case ACCOUNT_CHECK_OBSOLETE:
             return compareTo(GERRIT_2_1_7) >= 0 ;
+        case SUPPORTS_REST:
+            return compareTo(GERRIT_2_6_X) >= 0 ;
         default:
             return false;
         }

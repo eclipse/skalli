@@ -30,8 +30,8 @@ public class GerritVersionTest {
 
         Assert.assertEquals(GerritVersion.GERRIT_UNKNOWN_VERSION, GerritVersion.asGerritVersion(null));
         Assert.assertEquals(GerritVersion.GERRIT_UNKNOWN_VERSION, GerritVersion.asGerritVersion(""));
-        Assert.assertEquals(GerritVersion.GERRIT_UNKNOWN_VERSION, GerritVersion.asGerritVersion("7.0"));
-        Assert.assertEquals(GerritVersion.GERRIT_UNKNOWN_VERSION, GerritVersion.asGerritVersion("foobar"));
+        Assert.assertEquals(GerritVersion.GERRIT_2_4_X, GerritVersion.asGerritVersion("7.0"));
+        Assert.assertEquals(GerritVersion.GERRIT_2_4_X, GerritVersion.asGerritVersion("foobar"));
     }
 
     @Test
@@ -41,5 +41,7 @@ public class GerritVersionTest {
         Assert.assertFalse(GerritVersion.GERRIT_2_2_2.supports(GerritFeature.LS_PROJECTS_ALL_ATTR));
         Assert.assertTrue(GerritVersion.GERRIT_2_3_X.supports(GerritFeature.LS_PROJECTS_ALL_ATTR));
         Assert.assertTrue(GerritVersion.GERRIT_2_4_X.supports(GerritFeature.LS_PROJECTS_ALL_ATTR));
+        Assert.assertFalse(GerritVersion.GERRIT_2_5_X.supports(GerritFeature.SUPPORTS_REST));
+        Assert.assertTrue(GerritVersion.GERRIT_2_6_X.supports(GerritFeature.SUPPORTS_REST));
     }
 }
