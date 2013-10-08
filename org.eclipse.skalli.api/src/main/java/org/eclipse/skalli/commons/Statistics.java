@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
@@ -159,19 +160,22 @@ public class Statistics {
 
     private static final String ANONYMOUS = "anonymous"; //$NON-NLS-1$
 
-    private long startupTime;
+    // instance startup timestamp
+    private final long startupTime;
+
+    // timestamp of the oldest/newest tracked info entry
     private long startDate;
     private long endDate;
 
     // sequence number to be assigned to the next tracked info entry
     private long sequenceNumber;
 
-    private SortedSet<UserInfo> users = new TreeSet<UserInfo>();
-    private SortedSet<UsageInfo> usages = new TreeSet<UsageInfo>();
-    private SortedSet<RefererInfo> referers = new TreeSet<RefererInfo>();
-    private SortedSet<BrowserInfo> browsers = new TreeSet<BrowserInfo>();
-    private SortedSet<SearchInfo> searches = new TreeSet<SearchInfo>();
-    private SortedSet<ResponseTimeInfo> responseTimes = new TreeSet<ResponseTimeInfo>();
+    private SortedSet<UserInfo> users = new ConcurrentSkipListSet<UserInfo>();
+    private SortedSet<UsageInfo> usages = new ConcurrentSkipListSet<UsageInfo>();
+    private SortedSet<RefererInfo> referers = new ConcurrentSkipListSet<RefererInfo>();
+    private SortedSet<BrowserInfo> browsers = new ConcurrentSkipListSet<BrowserInfo>();
+    private SortedSet<SearchInfo> searches = new ConcurrentSkipListSet<SearchInfo>();
+    private SortedSet<ResponseTimeInfo> responseTimes = new ConcurrentSkipListSet<ResponseTimeInfo>();
 
     private static Statistics instance = new Statistics();
 
@@ -232,7 +236,7 @@ public class Statistics {
      * @return the timestamp of the earliest data entry in
      * milliseconds since January 1, 1970, 00:00:00 GMT
      */
-    public long getStartDate() {
+    public synchronized long getStartDate() {
         return startDate > 0? startDate : startupTime;
     }
 
@@ -243,7 +247,7 @@ public class Statistics {
      * @return the timestamp of the latest data entry in
      * milliseconds since January 1, 1970, 00:00:00 GMT
      */
-    public long getEndDate() {
+    public synchronized long getEndDate() {
         return endDate > 0? endDate : System.currentTimeMillis();
     }
 
