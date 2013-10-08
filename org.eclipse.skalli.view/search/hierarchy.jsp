@@ -55,6 +55,9 @@ function collapseAll() {
         $(elem).css('display', 'none');
     });
 }
+$(function() {
+    $(document).tooltip();
+});
 </script>
 </head>
 <body>
@@ -145,7 +148,7 @@ function collapseAll() {
         } else {
           out.append("/VAADIN/themes/simple/icons/issues/info.png\" alt=\"Info\"");
         }
-        out.append(" title=\""+ tooltip +"\" />");
+        out.append(" title=\""+ StringEscapeUtils.escapeHtml(tooltip) +"\" />");
       }
     }
     out.append("</a>");
