@@ -12,7 +12,6 @@
 package org.eclipse.skalli.view.ext.impl.internal.infobox;
 
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -24,6 +23,7 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.FormatUtils;
 import org.eclipse.skalli.commons.HtmlBuilder;
 import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.commons.Link;
@@ -323,17 +323,11 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
         return mappedScmLinks.get(0).getUrl();
     }
 
-    @SuppressWarnings("nls")
     private String getDate(Entry entry) {
         String date = null;
         Date published = entry.getPublished();
-        if (entry.getPublished() != null) {
-            try {
-                SimpleDateFormat formatter = new SimpleDateFormat("d.M.yyyy hh:mm (zzz)");
-                date = formatter.format(published);
-            } catch (Exception e) {
-                date = published.toString();
-            }
+        if (published != null) {
+            date = FormatUtils.formatUTC(published.getTime());
         }
         return date;
     }
