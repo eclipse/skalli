@@ -108,11 +108,15 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
     private void marshalProjectsSection(HierarchicalStreamWriter writer, ProjectService projectService,
             List<UUID> uuids, long from, long to) {
         writer.startNode("projects");
+        List<Project> existing = new ArrayList<Project>();
         List<Project> newProjects = new ArrayList<Project>();
         List<Project> modifiedProjects = new ArrayList<Project>();
         for (UUID uuid: uuids) {
             Project project = projectService.getByUUID(uuid);
             if (project != null) {
+                if (isBefore(project.getRegistered(), to)) {
+                    existing.add(project);
+                }
                 if (isInRange(project.getRegistered(), from, to)) {
                     newProjects.add(project);
                 } else if (isInRange(project.getLastModifiedMillis(), from, to)) {
@@ -120,7 +124,7 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
                 }
             }
         }
-        writeNode(writer, "totalCount", uuids.size());
+        writeNode(writer, "totalCount", existing.size());
         writer.startNode("created");
         writeNode(writer, "totalCount", newProjects.size());
         if (query.showByFilter("byDate")) {
@@ -440,6 +444,11 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
     private boolean isInRange(long timestamp, long from, long to) {
         return (from <= 0 || from <=  timestamp) && (to <= 0 || timestamp <= to);
     }
+
+    private boolean isBefore(long timestamp, long to) {
+        return to <= 0 || timestamp <= to;
+    }
+
 
     @Override
     public Object unmarshal(HierarchicalStreamReader arg0, UnmarshallingContext arg1) {
