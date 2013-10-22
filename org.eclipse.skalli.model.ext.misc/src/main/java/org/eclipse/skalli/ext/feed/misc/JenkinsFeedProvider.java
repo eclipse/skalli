@@ -8,19 +8,20 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.feed.updater;
+package org.eclipse.skalli.ext.feed.misc;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.URLUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.feed.FeedProvider;
 import org.eclipse.skalli.services.feed.FeedUpdater;
+import org.eclipse.skalli.services.feed.URLFeedUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,11 +39,11 @@ public class JenkinsFeedProvider implements FeedProvider {
         if (ext != null) {
             String ciServer = ext.getCiUrl();
             if (StringUtils.isNotBlank(ciServer)) {
-                String projectId = project.getUuid().toString();
                 String url = null;
                 try {
                     url = StringUtils.removeEnd(ciServer, "/") + JENKINS_RSS_ALL; //$NON-NLS-1$
-                    SyndFeedUpdater feedUpdater = new SyndFeedUpdater(new URL(url), projectId, "jenkins", "Jenkins"); //$NON-NLS-1$
+                    URLFeedUpdater feedUpdater = new URLFeedUpdater(URLUtils.stringToURL(url),
+                            "jenkins", "Jenkins", project.getUuid()); //$NON-NLS-1$
                     result.add(feedUpdater);
                 } catch (MalformedURLException e) {
                     LOG.info(MessageFormat.format("{0} is not a valid URL. Fetching Jenkins feed for {1} not possible.",

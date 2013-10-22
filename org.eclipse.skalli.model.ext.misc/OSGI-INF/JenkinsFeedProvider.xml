@@ -11,7 +11,7 @@
  -->
 
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.eclipse.skalli.ext.feed.provider.jenkins">
-    <implementation class="org.eclipse.skalli.feed.updater.JenkinsFeedProvider"/>
+    <implementation class="org.eclipse.skalli.ext.feed.misc.JenkinsFeedProvider"/>
     <service>
         <provide interface="org.eclipse.skalli.services.feed.FeedProvider"/>
     </service>

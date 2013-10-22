@@ -6,7 +6,9 @@ Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Import-Package: com.thoughtworks.xstream,
+Import-Package: com.sun.syndication.feed.synd,
+ com.sun.syndication.io,
+ com.thoughtworks.xstream,
  com.thoughtworks.xstream.annotations,
  com.thoughtworks.xstream.converters,
  com.thoughtworks.xstream.io,
@@ -32,6 +34,7 @@ Import-Package: com.thoughtworks.xstream,
  org.apache.http.params,
  org.apache.http.util,
  org.eclipse.persistence.config,
+ org.jdom,
  org.jsoup,
  org.jsoup.nodes,
  org.jsoup.safety,

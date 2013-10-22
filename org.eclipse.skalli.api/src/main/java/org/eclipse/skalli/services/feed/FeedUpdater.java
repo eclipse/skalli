@@ -31,8 +31,9 @@ public interface FeedUpdater {
      * Missing required attributes, such as the {@link #setSource(String) source identifier},
      * are added by the {@link FeedManager}.
      *
-     * @param feedFactory  factory for the creation of <code>FeedEntry</code>s.
-     * @return a list of feed entries, or an empty list.
+     * @param feedFactory  the factory to use for creating feed entries.
+     * @return a list of feed entries delivered in the ordering provided by the remote feed, or
+     * an empty list.
      */
     public List<FeedEntry> updateFeed(FeedFactory feedFactory);
 

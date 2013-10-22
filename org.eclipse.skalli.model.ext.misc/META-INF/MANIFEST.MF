@@ -5,9 +5,7 @@ Bundle-SymbolicName: org.eclipse.skalli.model.ext.misc
 Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: com.sun.syndication.feed.synd,
- com.sun.syndication.io,
- com.thoughtworks.xstream,
+Import-Package: com.thoughtworks.xstream,
  com.thoughtworks.xstream.annotations,
  com.thoughtworks.xstream.converters,
  com.thoughtworks.xstream.io,
@@ -32,7 +30,6 @@ Import-Package: com.sun.syndication.feed.synd,
  org.eclipse.skalli.services.feed,
  org.eclipse.skalli.services.role,
  org.eclipse.skalli.services.search,
- org.jdom,
  org.osgi.service.component,
  org.restlet.resource,
  org.slf4j
