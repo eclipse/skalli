@@ -24,6 +24,7 @@ import org.eclipse.skalli.core.rest.resources.IssuesResource;
 import org.eclipse.skalli.core.rest.resources.ProjectResource;
 import org.eclipse.skalli.core.rest.resources.ProjectsResource;
 import org.eclipse.skalli.core.rest.resources.SubprojectsResource;
+import org.eclipse.skalli.core.rest.resources.TimelineResource;
 import org.eclipse.skalli.core.rest.resources.UserPermitsResource;
 import org.eclipse.skalli.core.rest.resources.UserResource;
 import org.eclipse.skalli.services.configuration.ConfigSection;
@@ -67,6 +68,7 @@ public class RestApplication extends Application {
         router.attach("/projects/{id}", ProjectResource.class); //$NON-NLS-1$
         router.attach("/projects/{id}/issues", IssuesResource.class); //$NON-NLS-1$
         router.attach("/projects/{id}/subprojects", SubprojectsResource.class); //$NON-NLS-1$
+        router.attach("/projects/{id}/timeline", TimelineResource.class); //$NON-NLS-1$
 
         router.attach("/user/{userId}", UserResource.class); //$NON-NLS-1$
         router.attach("/users/{userId}", UserResource.class); //$NON-NLS-1$
