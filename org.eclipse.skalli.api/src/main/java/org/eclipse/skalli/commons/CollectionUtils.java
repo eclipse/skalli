@@ -104,8 +104,12 @@ public class CollectionUtils {
         return result;
     }
 
+    public static boolean isBlank(Collection<?> c) {
+        return c != null && c.isEmpty();
+    }
+
     public static boolean isNotBlank(Collection<?> c) {
-        return c != null && !c.isEmpty();
+        return c != null && c.size() > 0;
     }
 
     public static String toString(Collection<?> c, char separator) {

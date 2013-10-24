@@ -21,8 +21,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.services.feed.Entry;
 import org.eclipse.skalli.services.feed.FeedService;
 import org.eclipse.skalli.services.persistence.EntityManagerServiceBase;
@@ -52,56 +51,22 @@ public class JPAFeedComponent extends EntityManagerServiceBase implements FeedSe
 
     @Override
     public List<Entry> findEntries(UUID projectId, int maxResults) throws StorageException {
-        if (projectId == null) {
-            throw new IllegalArgumentException("projectId expected to be not null");
-        }
-        if (maxResults < 0 && maxResults != FeedService.SELECT_ALL) {
-            throw new IllegalArgumentException("maxResults expected to be >= 0 or " + FeedService.SELECT_ALL);
-        }
-        if (maxResults == 0) {
-            return Collections.emptyList();
-        }
-
-        List<Entry> results = new ArrayList<Entry>();
-        EntityManager em = getEntityManager();
-        EntityTransaction tx = null;
-        try {
-            tx = em.getTransaction();
-            tx.begin();
-            Query q = em.createNamedQuery(EntryJPA.FIND_BY_PROJECT_ID);
-            if (maxResults > 0) {
-                q.setMaxResults(maxResults);
-            }
-            q.setParameter("projectId", projectId.toString());
-
-            results = (List<Entry>) q.getResultList();
-            if (results == null) {
-                results = new ArrayList<Entry>();
-            }
-            tx.rollback();
-        } catch (RuntimeException e) {
-            if (tx != null && tx.isActive()) {
-                tx.rollback();
-            }
-            throw new StorageException("Can't find feed entries for project " + projectId.toString(), e);
-        } finally {
-            em.close();
-        }
-        return results;
+        return findEntries(projectId, null, maxResults);
     }
 
     @Override
     public List<Entry> findEntries(UUID projectId, Collection<String> sources, int maxResults)
             throws StorageException {
         if (projectId == null) {
-            throw new IllegalArgumentException("projectId expected to be not null");
+            throw new IllegalArgumentException("argument 'projectId' must not be null");
         }
-        if (maxResults < 0 && maxResults != FeedService.SELECT_ALL) {
-            throw new IllegalArgumentException("maxResults expected to be >= 0 or " + FeedService.SELECT_ALL);
+        if (maxResults < 0) {
+            maxResults =  FeedService.SELECT_ALL;
         }
-        if (maxResults == 0 || CollectionUtils.isEmpty(sources)) {
+        if (maxResults == 0 || CollectionUtils.isBlank(sources)) {
             return Collections.emptyList();
         }
+        String jpaQuery = sources != null? EntryJPA.FIND_BY_PROJECT_AND_SOURCES : EntryJPA.FIND_BY_PROJECT_ID;
 
         List<Entry> results = new ArrayList<Entry>();
         EntityManager em = getEntityManager();
@@ -109,13 +74,14 @@ public class JPAFeedComponent extends EntityManagerServiceBase implements FeedSe
         try {
             tx = em.getTransaction();
             tx.begin();
-            Query q = em.createNamedQuery(EntryJPA.FIND_BY_PROJECT_AND_SOURCES);
+            Query q = em.createNamedQuery(jpaQuery);
             if (maxResults > 0) {
                 q.setMaxResults(maxResults);
             }
-            q.setParameter("projectId", projectId.toString());
-            q.setParameter("sources", sources);
-
+            q.setParameter(EntryJPA.PARAM_PROJECT_ID, projectId.toString());
+            if (sources != null) {
+                q.setParameter(EntryJPA.PARAM_SOURCES, sources);
+            }
             results = (List<Entry>) q.getResultList();
             if (results == null) {
                 results = new ArrayList<Entry>();
@@ -126,19 +92,17 @@ public class JPAFeedComponent extends EntityManagerServiceBase implements FeedSe
                 tx.rollback();
             }
             throw new StorageException(MessageFormat.format(
-                    "Can''t find feed entries for project {0} matching any of {1}",
-                    projectId.toString(), StringUtils.join(sources, ",")), e);
+                    "Can''t find feed entries for project {0}", projectId.toString(), e));
         } finally {
             em.close();
         }
         return results;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<String> findSources(UUID projectId) throws StorageException {
         if (projectId == null) {
-            throw new IllegalArgumentException("projectId expected to be not null");
+            throw new IllegalArgumentException("argument 'projectId' must not be null");
         }
         List<String> results;
         EntityManager em = getEntityManager();
@@ -147,7 +111,7 @@ public class JPAFeedComponent extends EntityManagerServiceBase implements FeedSe
             tx = em.getTransaction();
             tx.begin();
             Query q = em.createNamedQuery(EntryJPA.FIND_SOURCES_BY_PROJECT_ID);
-            q.setParameter("projectId", projectId.toString());
+            q.setParameter(EntryJPA.PARAM_PROJECT_ID, projectId.toString());
 
             results = (List<String>) q.getResultList();
             if (results == null) {
@@ -158,7 +122,8 @@ public class JPAFeedComponent extends EntityManagerServiceBase implements FeedSe
             if (tx != null && tx.isActive()) {
                 tx.rollback();
             }
-            throw new StorageException("Can't find feed sources for project " + projectId.toString(), e);
+            throw new StorageException(MessageFormat.format(
+                    "Can''t find feed sources for project {0}", projectId.toString()), e);
         } finally {
             em.close();
         }

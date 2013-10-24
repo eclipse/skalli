@@ -35,11 +35,11 @@ import org.eclipse.skalli.services.feed.Person;
 @Table(name = "Entry")
 @NamedQueries({
         @NamedQuery(name = EntryJPA.FIND_BY_PROJECT_ID,
-                query = "SELECT e FROM EntryJPA e where e.projectId = :projectId " + EntryJPA.ENTRYJPA_DEFAULT_ORDER_BY),
+                query = "SELECT e FROM EntryJPA e where e.projectId = :projectId " + EntryJPA.DEFAULT_ORDER_BY),
 
         @NamedQuery(name = EntryJPA.FIND_BY_PROJECT_AND_SOURCES,
                 query = "SELECT e FROM EntryJPA e where e.projectId = :projectId and e.source in :sources "
-                        + EntryJPA.ENTRYJPA_DEFAULT_ORDER_BY),
+                        + EntryJPA.DEFAULT_ORDER_BY),
 
         @NamedQuery(name = EntryJPA.FIND_SOURCES_BY_PROJECT_ID,
                 query = "SELECT DISTINCT e.source FROM EntryJPA e where e.projectId = :projectId "
@@ -52,7 +52,11 @@ public class EntryJPA implements FeedEntry {
     public static final String FIND_BY_PROJECT_ID = "EntryJPA.findByProjectID"; //$NON-NLS-1$
     public static final String FIND_BY_PROJECT_AND_SOURCES = "EntryJPA.findByProjectAndSources"; //$NON-NLS-1$
     public static final String FIND_SOURCES_BY_PROJECT_ID = "EntryJPA.findSourcesByProjectID"; //$NON-NLS-1$
-    static final String ENTRYJPA_DEFAULT_ORDER_BY = "order by e.published DESC, e.id ASC"; //$NON-NLS-1$
+
+    public static final String PARAM_PROJECT_ID = "projectId"; //$NON-NLS-1$
+    public static final String PARAM_SOURCES = "sources"; //$NON-NLS-1$
+
+    static final String DEFAULT_ORDER_BY = "order by e.published DESC, e.id ASC"; //$NON-NLS-1$
 
     public static final int ID_LENGTH = 40;
     public static final int URI_LENGTH = 512;

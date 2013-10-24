@@ -34,14 +34,14 @@ public interface FeedService {
      *
      * @param projectId  the unique identifier of the project.
      * @param maxResults the maximal number of entries to be returned
-     * or {@link FeedService#SELECT_ALL} if you want to get all entries.
+     * or {@link FeedService#SELECT_ALL} if all available entries should be returned.
      *
      * @return a list of timeline entries sorted by descending
      * {@link Entry#getPublished() publishing date}, or an empty list.
      *
      * @throws StorageException if the method failed to retrieve the timeline entries.
      */
-    List<Entry> findEntries(UUID projectId, int maxResults) throws StorageException;
+    public List<Entry> findEntries(UUID projectId, int maxResults) throws StorageException;
 
     /**
      * Returns up to <code>maxResult</code> timeline entries for a project coming
@@ -49,16 +49,18 @@ public interface FeedService {
      *
      * @param projectId the unique identifier of the project.
      * @param sources a collection of sources from which timeline entries should
-     * be provided.
+     * be provided, or <code>null</code> if entries from all available sources should
+     * be returned. If the sources collection is empty, an empty entry list will be
+     * returned.
      * @param maxResults the maximal number of entries to be returned
-     * or {@link FeedService#SELECT_ALL} if you want to get all entries.
+     * or {@link FeedService#SELECT_ALL} if all available entries should be returned.
      *
      * @return a list of timeline entries ordered by descending
      * {@link Entry#getPublished() publishing date}, or an empty list.
      *
      * @throws StorageException if the method failed to retrieve the timeline entries.
      */
-    List<Entry> findEntries(UUID projectId, Collection<String> sources, int maxResults) throws StorageException;
+    public List<Entry> findEntries(UUID projectId, Collection<String> sources, int maxResults) throws StorageException;
 
     /**
      * Returns a list of sources of timeline entries this service can provide for a given project.
@@ -75,5 +77,5 @@ public interface FeedService {
      *
      * @throws StorageException if the method failed to retrieve the sources.
      */
-    List<String> findSources(UUID projectId) throws StorageException;
+    public List<String> findSources(UUID projectId) throws StorageException;
 }

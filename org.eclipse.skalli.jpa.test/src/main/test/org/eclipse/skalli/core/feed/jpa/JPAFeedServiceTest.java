@@ -175,13 +175,6 @@ public class JPAFeedServiceTest {
     }
 
     @Test
-    public void testFindEntries_not_exisiting() throws Exception {
-        FeedService jPAFeedService =  getFeedService();
-        List<Entry> foundEntries = jPAFeedService.findEntries(notPersistedProjectUuid, 10);
-        assertThat(foundEntries.size(), is(0));
-    }
-
-    @Test
     public void testFindCalls() throws Exception {
 
         final Date testDate = new Date(1318946441120L);
@@ -297,30 +290,22 @@ public class JPAFeedServiceTest {
         }
 
         try {
-            jPAFeedService.findEntries(defaultProjectUuid, -2);
-            fail("IllegalArgumentException was expected.");
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), containsString("maxResults"));
-        }
-
-        @SuppressWarnings("unchecked")
-        Collection<String> empty_sources = Collections.EMPTY_LIST;
-        try {
-            jPAFeedService.findEntries(null, empty_sources, 4711);
+            jPAFeedService.findEntries(null, Collections.EMPTY_LIST, 4711);
             fail("IllegalArgumentException was expected.");
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage(), containsString("projectId"));
         }
+    }
 
-        List<Entry> result = jPAFeedService.findEntries(defaultProjectUuid, null, 4711);
-        assertThat(result.size(), is(0));
-
-        try {
-            jPAFeedService.findEntries(defaultProjectUuid, null, -2);
-            fail("IllegalArgumentException was expected.");
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), containsString("maxResults"));
-        }
+    @Test
+    public void testfindEmptyResult() throws Exception {
+        FeedService jPAFeedService =  getFeedService();
+        assertThat(jPAFeedService.findEntries(defaultProjectUuid, Collections.EMPTY_LIST, 4711).size(), is(0));
+        assertThat(jPAFeedService.findEntries(defaultProjectUuid, Collections.EMPTY_LIST,
+                FeedService.SELECT_ALL).size(), is(0));
+        assertThat(jPAFeedService.findEntries(defaultProjectUuid, Collections.EMPTY_LIST, -4711).size(), is(0));
+        assertThat(jPAFeedService.findEntries(defaultProjectUuid, null, 0).size(), is(0));
+        assertThat(jPAFeedService.findEntries(notPersistedProjectUuid, 10).size(), is(0));
     }
 
     @Test
