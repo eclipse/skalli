@@ -81,22 +81,41 @@ public class HtmlUtils {
 
     /**
      * Filters untrusted tags and attributes from the given HTML fragment by using
-     * the {@link #getWhiteList() whitelist} of allowed tags and attributes.
+     * the {@link #getWhiteList() default whitelist} of allowed tags and attributes.
      * Escapes the XML entities <tt>&amp;quot</tt>, <tt>&amp;amp</tt>, <tt>&amp;apos</tt>,
      * <tt>&amp;lt</tt>, and <tt>&amp;gt</tt> in the output.
      *
      * @param html  the HTML fragment to clean.
+     *
      * @return the cleaned input string.
      */
     public static String clean(String html) {
-        return clean(html, null, null);
+        return clean(html, null, null, null);
     }
 
     /**
      * Filters untrusted tags and attributes from the given HTML fragment by using
-     * the {@link #getWhiteList() whitelist} of allowed tags and attributes.
+     * a whitelist of allowed tags and attributes.
+     * Escapes the XML entities <tt>&amp;quot</tt>, <tt>&amp;amp</tt>, <tt>&amp;apos</tt>,
+     * <tt>&amp;lt</tt>, and <tt>&amp;gt</tt> in the output.
      *
      * @param html  the HTML fragment to clean.
+     * @param whitelist  whitelist of allowed tags and attributes, or <code>null</code>
+     * if the {@link #getWhiteList() default whitelist} should be used.
+     *
+     * @return the cleaned input string.
+     */
+    public static String clean(String html, Whitelist whitelist) {
+        return clean(html, whitelist, null, null);
+    }
+
+    /**
+     * Filters untrusted tags and attributes from the given HTML fragment by using
+     * a whitelist of allowed tags and attributes.
+     *
+     * @param html  the HTML fragment to clean.
+     * @param whitelist  whitelist of allowed tags and attributes, or <code>null</code>
+     * if the {@link #getWhiteList() default whitelist} should be used.
      * @param baseUri  base URL to resolve relative URLs against, or <code>null</code>.
      * @param escapeMode  determines how XML/HTML entities are to be escaped,
      * or <code>null</code>. The default escape mode is {@link EscapeMode.xhtml},
@@ -105,11 +124,14 @@ public class HtmlUtils {
      *
      * @return the cleaned input string.
      */
-    public static String clean(String html, String baseUri, EscapeMode escapeMode) {
+    public static String clean(String html, Whitelist whitelist, String baseUri, EscapeMode escapeMode) {
         if (StringUtils.isBlank(html)) {
             return html;
         }
-        String cleaned = Jsoup.clean(html, baseUri != null? baseUri : "", getWhiteList()); //$NON-NLS-1$
+        if (whitelist == null) {
+            whitelist = getWhiteList();
+        }
+        String cleaned = Jsoup.clean(html, baseUri != null? baseUri : "", whitelist); //$NON-NLS-1$
         Document cleanedDocument = Jsoup.parse(cleaned);
         cleanedDocument.outputSettings().escapeMode(escapeMode != null? escapeMode : EscapeMode.xhtml);
         return cleanedDocument.body().html();
