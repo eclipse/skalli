@@ -151,7 +151,11 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
         HashMap<String, SourceDetails> sourceFilter = new HashMap<String, SourceDetails>();
         Map<String, String> captions = getCaptions(project, sources);
         for (String source : sources) {
-            sourceFilter.put(source, new SourceDetails(true, captions.get(source)));
+            String caption = captions.get(source);
+            if (StringUtils.isBlank(caption)) {
+                caption = source;
+            }
+            sourceFilter.put(source, new SourceDetails(true, caption));
         }
 
         renderContentPanel(contentLayout, project, util.getLoggedInUserId(), sourceFilter);
@@ -162,6 +166,7 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
             HashMap<String, SourceDetails> sourceFilter) {
         layout.removeAllComponents();
         renderSourceFilters(layout, project, userId, sourceFilter);
+        renderSubscribeLink(layout, project);
         renderTimelineContent(layout, project, userId, sourceFilter);
     }
 
@@ -183,6 +188,13 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
             addSourceFilter(parentLayout, grid, source, sourceFilter, project, userId);
         }
         parentLayout.addComponent(grid);
+    }
+
+    private void renderSubscribeLink(Layout parentLayout, Project project) {
+        createLink(parentLayout, "Subscribe to Feed",
+                MessageFormat.format("/api/projects/{0}/timeline", //$NON-NLS-1$
+                project.getProjectId()),
+                DEFAULT_TARGET, STYLE_TIMELINE_ENTRY);
     }
 
     private Map<String, String> getCaptions(Project project, List<String> sources) {
