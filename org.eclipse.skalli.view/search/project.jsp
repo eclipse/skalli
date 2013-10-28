@@ -19,6 +19,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>${html:escapeHtml(project.name)} - ${html:escapeHtml(pagetitle)}</title>
+<link rel="alternate" type="application/rss+xml" title="Latest changes to ${html:escapeHtml(project.name)}"
+      href="${webLocator}/projects/api/${projectId}/timeline">
 <style type="text/css">
 @import "<%=Consts.JSP_STYLE%>";
 </style>
