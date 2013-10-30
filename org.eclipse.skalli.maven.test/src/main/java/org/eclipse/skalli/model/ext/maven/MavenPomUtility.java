@@ -12,10 +12,14 @@ package org.eclipse.skalli.model.ext.maven;
 
 import static org.eclipse.skalli.model.ext.maven.MavenCoordinateUtil.*;
 
+import java.util.Random;
+
 import org.eclipse.skalli.model.ext.maven.internal.MavenPom;
 
 @SuppressWarnings("nls")
 public class MavenPomUtility {
+
+    private static final char[] WHITESPACE = new char[] {' ', '\r', '\n', '\t'};
 
     public static final String MODULE2 = "module2";
     public static final String MODULE1 = "module1";
@@ -34,30 +38,29 @@ public class MavenPomUtility {
 
     public static void addParentTag(StringBuilder sb) {
         sb.append("<parent>");
-        sb.append("<groupId>").append(PARENT_GROUPID).append("</groupId>");
-        sb.append("<artifactId>").append(PARENT_ARTIFACT).append("</artifactId>");
-        sb.append("<relativePath>").append(PARENT_RELATIVE_PATH).append("</relativePath>");
+        append(sb, "groupId", PARENT_GROUPID);
+        append(sb, "artifactId", PARENT_ARTIFACT);
+        append(sb, "relativePath", PARENT_RELATIVE_PATH);
         sb.append("</parent>");
     }
 
     public static void addCoordinatesWithGroupId(StringBuilder sb) {
-        sb.append("<groupId>").append(GROUPID).append("</groupId>");
-        sb.append("<artifactId>").append(ARTIFACT).append("</artifactId>");
-        sb.append("<packaging>").append(PACKAGING).append("</packaging>");
-        sb.append("<name>").append("name-").append(GROUPID).append("-").append(ARTIFACT).append("</name>");
-        sb.append("<description>").append("description-").append(GROUPID).append("-").append(ARTIFACT)
-                .append("</description>");
+        append(sb, "groupId", GROUPID);
+        append(sb, "artifactId", ARTIFACT);
+        append(sb, "packaging", PACKAGING);
+        append(sb, "name", "name-", GROUPID, "-", ARTIFACT);
+        append(sb, "description", "description-", GROUPID, "-", ARTIFACT);
     }
 
     public static void addCoordinatesWithoutGroupId(StringBuilder sb) {
-        sb.append("<artifactId>").append(ARTIFACT).append("</artifactId>");
-        sb.append("<packaging>").append(PACKAGING).append("</packaging>");
+        append(sb, "artifactId", ARTIFACT);
+        append(sb, "packaging", PACKAGING);
     }
 
     public static void addModules(StringBuilder sb) {
         sb.append("<modules>");
-        sb.append("<module>").append(MODULE1).append("</module>");
-        sb.append("<module>").append(MODULE2).append("</module>");
+        append(sb, "module", MODULE1);
+        append(sb, "module", MODULE2);
         sb.append("</modules>");
     }
 
@@ -121,20 +124,51 @@ public class MavenPomUtility {
         return testContent.toString();
     }
 
+    public static String getPomWithWhitespace() {
+        StringBuilder testContent = new StringBuilder();
+        beginXml(testContent);
+        beginProject(testContent);
+        addParentTag(testContent);
+        addCoordinatesWithoutGroupId(testContent);
+        addModules(testContent);
+        endProject(testContent);
+        return testContent.toString();
+    }
+
     public static String getPomForModule(String moduleName, String parentPath) {
         StringBuilder testContent = new StringBuilder();
         beginXml(testContent);
         beginProject(testContent);
         testContent.append("<parent>");
-        testContent.append("<groupId>").append(PARENT_GROUPID).append("</groupId>");
-        testContent.append("<artifactId>").append(PARENT_ARTIFACT).append("</artifactId>");
+        append(testContent, "groupId", PARENT_GROUPID);
+        append(testContent, "artifactId", PARENT_ARTIFACT);
         if (parentPath != null) {
-            testContent.append("<relativePath>").append(parentPath).append("</relativePath>");
+            append(testContent, "relativePath", parentPath);
         }
         testContent.append("</parent>");
-        testContent.append("<artifactId>").append(moduleName).append("</artifactId>");
-        testContent.append("<packaging>").append(PACKAGING).append("</packaging>");
+        append(testContent, "artifactId", moduleName);
+        append(testContent, "packaging", PACKAGING);
         endProject(testContent);
         return testContent.toString();
+    }
+
+    private static void append(StringBuilder sb, String nodeName, String... values) {
+        sb.append('<').append(nodeName).append('>');
+        appendRandomWhitespace(sb);
+        if (values != null) {
+            for (String value: values) {
+                sb.append(value);
+            }
+        }
+        appendRandomWhitespace(sb);
+        sb.append("</").append(nodeName).append('>');
+    }
+
+    private static void appendRandomWhitespace(StringBuilder sb) {
+        Random rd = new Random();
+        int count = rd.nextInt(10);
+        for (int i = 0; i < count; ++i) {
+            sb.append(WHITESPACE[rd.nextInt(WHITESPACE.length-1)]);
+        }
     }
 }

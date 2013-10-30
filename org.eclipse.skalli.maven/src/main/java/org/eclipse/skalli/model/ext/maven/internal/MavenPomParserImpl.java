@@ -15,6 +15,7 @@ import java.io.InputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.maven.MavenModule;
@@ -65,7 +66,10 @@ public class MavenPomParserImpl implements MavenPomParser {
 
         NodeList modules = document.getElementsByTagName(MODULE);
         for (int i = 0; i < modules.getLength(); ++i) {
-            result.getModuleTags().add(modules.item(i).getTextContent());
+            String text = StringUtils.strip(modules.item(i).getTextContent());
+            if (StringUtils.isNotBlank(text)) {
+                result.getModuleTags().add(text);
+            }
         }
 
         return result;
@@ -97,7 +101,7 @@ public class MavenPomParserImpl implements MavenPomParser {
             for (int i = 0; i < children.getLength(); i++) {
                 Node node = children.item(i);
                 if (tagName.equals(node.getNodeName())) {
-                    textContent = node.getTextContent();
+                    textContent =  StringUtils.strip(node.getTextContent());
                     break;
                 }
             }
