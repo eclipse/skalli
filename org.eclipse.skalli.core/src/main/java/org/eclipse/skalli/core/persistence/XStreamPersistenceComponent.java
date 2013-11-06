@@ -11,12 +11,14 @@
 package org.eclipse.skalli.core.persistence;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.ComparatorUtils;
 import org.eclipse.skalli.core.storage.FileStorageComponent;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.services.BundleProperties;
@@ -113,7 +115,8 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
         loadModel(entityClass);
 
         // generate unique id
-        if (entity.getUuid() == null) {
+        UUID entityId = entity.getUuid();
+        if (entityId == null) {
             entity.setUuid(UUID.randomUUID());
         }
 
@@ -134,6 +137,8 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
                     entity.getUuid(), entityClass.getName()));
             return;
         }
+
+        EntityBase oldEntity = getCachedEntity(entityClass, entityId);
         try {
             xstreamPersistence.saveEntity(entityService, entity, userId,
                     getAliases(entityClass), getConverters(entityClass));
@@ -144,16 +149,17 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
         }
 
         // reload the entity to proof that is has been persisted successfully;
-        // if so, update the caches
-        T savedEntity = loadEntity(entityClass, entity.getUuid());
+        // if so, update the caches and re-calculate the parent/child relations
+        T savedEntity = loadEntity(entityClass, entityId);
         if (savedEntity != null) {
             updateCache(savedEntity);
-            if (entity.isDeleted()) {
+            adjustEntityRelations(entityClass, oldEntity, savedEntity);
+            if (savedEntity.isDeleted()) {
                 AUDIT_LOG.info(MessageFormat.format("Entity {0} of type ''{1}'' has been deleted by user ''{2}''",
-                        entity.getUuid(), entityClass.getSimpleName(), userId));
+                        entityId, entityClass.getSimpleName(), userId));
             } else {
                 AUDIT_LOG.info(MessageFormat.format("Entity {0} of type ''{1}'' has been changed by user ''{2}''",
-                        entity.getUuid(), entityClass.getSimpleName(), userId));
+                        entityId, entityClass.getSimpleName(), userId));
             }
         } else {
             throw new RuntimeException(MessageFormat.format("Failed to save entity {0} of type {1}",
@@ -161,15 +167,6 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
         }
     }
 
-    /**
-     * Loads the entity with the given UUID.
-     * This method loads the parent hierarchy of the entity, too, if available.
-     *
-     * @param entityClass  the class the entity belongs to.
-     * @param uuid  the unique identifier of the entity.
-     *
-     * @return  the entity, or <code>null</code> if the requested EntityBase could not be found.
-     */
     @Override
     public <T extends EntityBase> T loadEntity(Class<T> entityClass, UUID uuid) {
         if (xstreamPersistence == null) {
@@ -193,13 +190,13 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
                     entityClass, uuid, entityClass.getName()), e);
         }
 
-        if (entity == null) {
-            return null;
+        // resolve the parent chain; if necessary, load missing entities from storage
+        if (entity != null) {
+            T parentEntity = getParentChain(entityClass, entity);
+            if (parentEntity != null) {
+                entity.setParentEntity(parentEntity);
+            }
         }
-        registerEntityClass(entityClass);
-        resolveParentEntity(entityClass, entity);
-        updateParentEntityInCache(entityClass, uuid, entity);
-
         return entity;
     }
 
@@ -271,9 +268,9 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
     }
 
     /**
-     * Loads all entities of the given class.
+     * Loads all entities of a given class from storage.
      *
-     * Resolves the parent hierarchy of the loaded entities and stores the
+     * Resolves the parent/child hierarchy of the loaded entities and stores the
      * result in the model caches (deleted entities in {@link #deleted},
      * all others in {@link #cache}).
      * <p>
@@ -307,10 +304,18 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
         } catch (MigrationException e) {
             throw new RuntimeException(e);
         }
-        for (EntityBase entityBase : loadedEntities) {
-            updateCache(entityBase);
+        for (EntityBase loadedEntity : loadedEntities) {
+            updateCache(loadedEntity);
         }
-        resolveParentEntities(entityClass);
+        resolveEntityRelations(entityClass);
+    }
+
+    <T extends EntityBase> T getCachedEntity(Class<T> entityClass, UUID uuid) {
+        T entity = cache.getEntity(entityClass, uuid);
+        if (entity == null) {
+            entity = deleted.getEntity(entityClass, uuid);
+        }
+        return entity;
     }
 
     /**
@@ -349,60 +354,214 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
     }
 
     /**
-     * Resolves the parent hierarchies for all entities of the given class.
-     * This method resolves the parents both for deleted and non-deleted entities.
-     * It assumes, that the entity caches for the given entity class have already
-     * been initialized with {@link #loadModel(Class)}.
+     * Resolves all parent/child relations between entities of the
+     * given class (separately for deleted and non-deleted entities!).
+     * This method assumes that the caches have already been filled from
+     * storage so that all referenced parents/children/siblings of any
+     * entity in the cache can be resolved without loading additional
+     * data from storage.
      * <p>
      * This method is package protected for testing purposes.
      *
-     * @param <T>  type of an antity derived from <code>EntityBase</code>.
-     * @param entityClass  the class of entities to resolve.
+     * @param entityClass  the class of entities to resolve relations for.
      */
-    <T extends EntityBase> void resolveParentEntities(Class<T> entityClass) {
-        resolveParentEntities(entityClass, cache.getEntities(entityClass));
-        resolveParentEntities(entityClass, deleted.getEntities(entityClass));
+    <T extends EntityBase> void resolveEntityRelations(Class<T> entityClass) {
+        resolveEntityRelations(entityClass, cache.getEntities(entityClass));
+        resolveEntityRelations(entityClass, deleted.getEntities(entityClass));
     }
 
-    private <T extends EntityBase> void resolveParentEntities(Class<T> entityClass, List<T> entities) {
+    /**
+     * Resolves all parent/child relations between entities in a
+     * given collection. This method assumes that the collection of entities
+     * is "self contained", i.e. all referenced parents/children/siblings
+     * are also contained in the given list.
+     * <p>
+     * This method is package protected for testing purposes.
+     *
+     * @param entityClass  the class of entities to resolve relations for.
+     * @param entities the entities to resolve relations for.
+     */
+    <T extends EntityBase> void resolveEntityRelations(Class<T> entityClass, Collection<T> entities) {
         for (T entity : entities) {
-            UUID parentId = entity.getParentEntityId();
-            if (parentId != null) {
-                T parentEntity = getParentEntity(entityClass, entity);
-                if (parentEntity == null) {
-                    LOG.warn(MessageFormat.format(
-                            "Entity {0} references entity {1} as parent entity - but there is no such entity",
-                            entity.getUuid(), parentId));
-                    continue;
-                }
-                if (parentEntity.isDeleted() && !entity.isDeleted()) {
-                    LOG.warn(MessageFormat.format(
-                            "Entity {0} cannot reference deleted entity {1} as parent entity",
-                            entity.getUuid(), parentId));
-                    continue;
-                }
-                entity.setParentEntity(parentEntity);
-            }
+            resolveEntityRelations(entityClass, entity);
         }
     }
 
-    private <T extends EntityBase> void resolveParentEntity(Class<T> entityClass, T entity) {
+    /**
+     * Determines the parent of the given entity and inserts the entity as
+     * child of that parent. This method assumes that the parent is already in the cache.
+     * <p>
+     * This method is package protected for testing purposes.
+     *
+     * @param entityClass  the class of the entity.
+     * @param entity  the entity to resolve.
+     */
+    <T extends EntityBase> void resolveEntityRelations(Class<T> entityClass, EntityBase entity) {
+        T parentEntity = getParentEntity(entityClass, entity);
+        entity.setParentEntity(parentEntity);
+        if (parentEntity != null) {
+            insertChildEntity(parentEntity, entity);
+        }
+    }
+
+    /**
+     * Adjusts the parent/child relations of an entity after it has been changed
+     * or created. If the parent changed or the deleted flag has been switched,
+     * the entity is removed from the old parent (if any) and assigned to
+     * the new parent (if any).
+     *
+     * @param entityClass  the class of the entity.
+     * @param oldEntity  the old entity instance, or <code>null</code> if the entity
+     * did not exist before.
+     * @param newEntity  the new entity instance, never <code>null</code>.
+     */
+    <T extends EntityBase> void adjustEntityRelations(Class<T> entityClass,
+            EntityBase oldEntity, EntityBase newEntity) {
+        T newParent = getParentEntity(entityClass, newEntity);
+        newEntity.setParentEntity(newParent);
+        if (oldEntity != null) {
+            T oldParent = getParentEntity(entityClass, oldEntity);
+            if (!ComparatorUtils.equals(oldParent, newParent)
+                    || oldEntity.isDeleted() != newEntity.isDeleted()) {
+                removeChildEntity(oldParent, oldEntity);
+            }
+        }
+        insertChildEntity(newParent, newEntity);
+    }
+
+    /**
+     * Assigns a child entity to a given parent entity.
+     * <p>
+     * If there was no child yet, insert the entity as first child.
+     * If an entity with the same uuid was already in the list of children,
+     * replace the entity with the new value. Otherwise append the entity
+     * to the end of the siblings chain. If the parent entity is <code>null</code>,
+     * or parent and child have different deleted flags, the method does nothing.
+     * <p>
+     * This method is package protected for testing purposes.
+     *
+     * @param parentEntity  the parent entity, or <code>null</code>.
+     * @param entity the entity to replace or append.
+     */
+    void insertChildEntity(EntityBase parentEntity, EntityBase entity) {
+        if (parentEntity == null) {
+            return;
+        }
+        if (parentEntity.isDeleted() != entity.isDeleted()) {
+            return;
+        }
+        EntityBase next = parentEntity.getFirstChild();
+        if (next == null) {
+            parentEntity.setFirstChild(entity);
+            return;
+        }
+        EntityBase prev = null;
+        while (next != null) {
+            if (next.equals(entity)) {
+                if (prev != null) {
+                    prev.setNextSibling(entity);
+                } else {
+                    parentEntity.setFirstChild(entity);
+                }
+                entity.setNextSibling(next.getNextSibling());
+                return;
+            }
+            prev = next;
+            next = next.getNextSibling();
+        }
+        prev.setNextSibling(entity);
+    }
+
+    /**
+     * Removes a child entity from a given parent entity.
+     * <p>
+     * If the parent entity has no children, or there is no entity
+     * with the same uuid among the children, this method does nothing.
+     * Otherwise the child entity matching the uuid is removed and the
+     * siblings chain is adjusted. If the parent entity is <code>null</code>,
+     * the method does nothing.
+     * <p>
+     * This method is package protected for testing purposes.
+     *
+     * @param parentEntity  the parent entity, or <code>null</code>.
+     * @param entity  the entity to remove.
+     */
+    void removeChildEntity(EntityBase parentEntity, EntityBase entity) {
+        if (parentEntity == null) {
+            return;
+        }
+        EntityBase next = parentEntity.getFirstChild();
+        if (next == null) {
+            return;
+        }
+        EntityBase prev = null;
+        while (next != null) {
+            if (next.equals(entity)) {
+                if (prev != null) {
+                    prev.setNextSibling(next.getNextSibling());
+                } else {
+                    parentEntity.setFirstChild(next.getNextSibling());
+                }
+                next.setNextSibling(null);
+                return;
+            }
+            prev = next;
+            next = next.getNextSibling();
+        }
+    }
+
+    /**
+     * Loads the whole chain of parent entities from storage (if neccessary),
+     * and returns the parent entity of the given entity.
+     * <p>
+     * This method is package protected for testing purposes.
+     *
+     * @param entityClass  the class of the entity.
+     * @param entity  the entity for which to lookup the parent.
+     *
+     * @return  the parent entity, or <code>null</code> if the entity has no parent, the parent
+     * is deleted but the entity is not, or the parent entity could not be read from storage.
+     */
+    <T extends EntityBase> T getParentChain(Class<T> entityClass, EntityBase entity) {
+        T parentEntity = null;
         UUID parentId = entity.getParentEntityId();
         if (parentId != null) {
-            EntityBase parentEntity = null;
             parentEntity = getParentEntity(entityClass, entity);
             if (parentEntity == null) {
-                // Fallback: try to load it
                 parentEntity = loadEntity(entityClass, parentId);
+                if (parentEntity == null) {
+                    LOG.warn(MessageFormat.format(
+                            "Entity {0} references entity {1} as parent entity but there is no such entity",
+                            entity.getUuid(), parentId));
+                    return null;
+                }
             }
-            if (parentEntity == null) {
-                throw new RuntimeException(MessageFormat.format("Parent entity {0} does not exist", parentId));
+            if (parentEntity.isDeleted() && !entity.isDeleted()) {
+                LOG.warn(MessageFormat.format(
+                        "Entity {0} cannot reference deleted entity {1} as parent entity",
+                        entity.getUuid(), parentId));
+                return null;
             }
-            entity.setParentEntity(parentEntity);
         }
+        return parentEntity;
     }
 
-    private <T extends EntityBase> T getParentEntity(Class<T> entityClass, EntityBase entity) {
+    /**
+     * Returns the parent entity of the given entity from the cache: If the given entity is
+     * {@link EntityBase#isDeleted() deleted} the lookup is performed in the cache of
+     * deleted entities. For all other entities the lookup is performed first in
+     * the cache of non-deleted entities. If there is no match, the lookup is repeated
+     * in the cache of deleted entities.
+     * <p>
+     * This method is package protected for testing purposes.
+     *
+     * @param entityClass  the class of the entity.
+     * @param entity  the entity for which to lookup the parent.
+     *
+     * @return  the parent entity, or <code>null</code> if the parent entity is not in the caches
+     * or the entity has no parent.
+     */
+    <T extends EntityBase> T getParentEntity(Class<T> entityClass, EntityBase entity) {
         T parentEntity = null;
         UUID parentId = entity.getParentEntityId();
         if (parentId != null) {
@@ -419,13 +578,5 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
             }
         }
         return parentEntity;
-    }
-
-    private <T extends EntityBase> void updateParentEntityInCache(Class<T> entityClass, UUID uuid, T entity) {
-        for (T childEntity : cache.getEntities(entityClass)) {
-            if (uuid.equals(childEntity.getParentEntityId())) {
-                childEntity.setParentEntity(entity);
-            }
-        }
     }
 }

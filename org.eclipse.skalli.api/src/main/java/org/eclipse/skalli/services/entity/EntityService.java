@@ -106,8 +106,10 @@ public interface EntityService<T extends EntityBase> {
 
     /**
      * Loads the entity with the given unique identifier from storage.
-     * The chain of {@link EntityBase#getParentEntity() parent entities} of the given entity is
-     * resolved recursively.
+     * <p>
+     * The chain of {@link EntityBase#getParentEntity() parent entities} of the entity is resolved and
+     * loaded from storage if necessary, but neither the {@link EntityBase#getFirstChild() children}
+     * nor {@link EntityBase#getNextSibling() siblings} of the entity are resolved.
      * <p>
      * This method returns a fresh instance of the entity, which excusively belongs to the caller.
      * It can safely be changed and persisted afterwards.

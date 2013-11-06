@@ -43,6 +43,10 @@ public class PropertyTestUtil {
         TestExtensibleEntityBase parent = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[1]);
         values.put(EntityBase.PROPERTY_PARENT_ENTITY, parent);
         values.put(EntityBase.PROPERTY_PARENT_ENTITY_ID, TestUUIDs.TEST_UUIDS[1]);
+        TestExtensibleEntityBase firstChild = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[2]);
+        values.put(EntityBase.PROPERTY_FIRST_CHILD, firstChild);
+        TestExtensibleEntityBase nextSibling = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[3]);
+        values.put(EntityBase.PROPERTY_NEXT_SIBLING, nextSibling);
         Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ENGLISH); //$NON-NLS-1$
         String lastModified = DatatypeConverter.printDateTime(now);
         values.put(EntityBase.PROPERTY_LAST_MODIFIED, lastModified);

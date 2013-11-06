@@ -34,8 +34,18 @@ public interface PersistenceService {
     public <T extends EntityBase> void persist(Class<T> entityClass, EntityBase entity, String userId);
 
     /**
-     * Loads the entity with the given UUID and its parent hierarchy, if available,
-     * directly from the underyling storage service without caching it.
+     * Loads the entity with the given unique identifier from storage.
+     * <p>
+     * The chain of {@link EntityBase#getParentEntity() parent entities} of the entity is resolved and
+     * loaded from storage if necessary, but neither the {@link EntityBase#getFirstChild() children}
+     * nor {@link EntityBase#getNextSibling() siblings} of the entity are resolved.
+     * <p>
+     * This method returns a fresh instance of the entity, which excusively belongs to the caller.
+     * It can safely be changed and persisted afterwards.
+     * <p>
+     * Note that the entities in the parent hierarchy are in general shared objects and should be
+     * treated in a read-only fashion. Changing properties of parent entities may have undesirable
+     * side effects.
      *
      * @param <T> a type derived from <code>EntityBase</code>.
      * @param entityClass  the class the entity belongs to.

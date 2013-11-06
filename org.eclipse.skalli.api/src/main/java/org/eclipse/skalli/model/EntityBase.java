@@ -13,7 +13,9 @@ package org.eclipse.skalli.model;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -49,6 +51,14 @@ public abstract class EntityBase {
     @Derived
     @PropertyName
     public static final String PROPERTY_PARENT_ENTITY = "parentEntity"; //$NON-NLS-1$
+
+    @Derived
+    @PropertyName
+    public static final String PROPERTY_FIRST_CHILD = "firstChild"; //$NON-NLS-1$
+
+    @Derived
+    @PropertyName
+    public static final String PROPERTY_NEXT_SIBLING = "nextSibling"; //$NON-NLS-1$
 
     @Derived
     @PropertyName
@@ -92,6 +102,20 @@ public abstract class EntityBase {
      * or <code>null</code> if this entity has no parent.
      */
     private transient EntityBase parentEntity;
+
+    /**
+     * Non-persistent pointer to the next sibling of this entity,
+     * or <code>null</code> if this is the last sibling in the chain
+     * or the entity is {@link #isDeleted() deleted}.
+     */
+    private transient EntityBase nextSibling;
+
+    /**
+     * Non-persistent pointer to the first child of this entity,
+     * or <code>null</code> if this entity has no children
+     * or all children are {@link #isDeleted() deleted}.
+     */
+    private transient EntityBase firstChild;
 
     /**
      * Date of last modification in ISO 8601 format
@@ -181,6 +205,77 @@ public abstract class EntityBase {
      */
     public void setParentEntityId(UUID parentEntityId) {
         this.parentEntityId = parentEntityId;
+    }
+
+    /**
+     * Returns the next sibling of this entity,
+     * or <code>null</code> if this entity has no next sibling
+     * or the entity is {@link #isDeleted() deleted}.
+     *
+     * Note that deleted entities never are reported as
+     * children or siblings of another entity, but they nevertheless
+     * may have a {@link #getParentEntity() parent entity}.
+     */
+    public EntityBase getNextSibling() {
+        return nextSibling;
+    }
+
+    /**
+     * Sets the next sibling of this entity.
+     *
+     * Note, this method should not be called directly except for
+     * testing purposes. The siblings of an entity are determined
+     * when the entity is loaded.
+     *
+     * @param nextSibling  the next sibling of this entity,
+     * or <code>null</code> if this entity has no further siblings.
+     */
+    public void setNextSibling(EntityBase nextSibling) {
+        this.nextSibling = nextSibling;
+    }
+
+    /**
+     * Returns the first child of this entity,
+     * or <code>null</code> if this entity has no children
+     * or all children are {@link #isDeleted() deleted}.
+     *
+     * Note that deleted entities never are reported as
+     * children or siblings of another entity, but they nevertheless
+     * may have a {@link #getParentEntity() parent entity}.
+     */
+    public EntityBase getFirstChild() {
+        return firstChild;
+    }
+
+    /**
+     * Sets the first child of this entity.
+     * Note, this method should not be called directly except for
+     * testing purposes. The children of an entity are determined
+     * when the entity is loaded.
+     *
+     * @param firstChild  the first child of this entity,
+     * or <code>null</code> if this entity has no children.
+     */
+    public void setFirstChild(EntityBase firstChild) {
+        this.firstChild = firstChild;
+    }
+
+    /**
+     * Returns the children of this entity as list. This method follows
+     * the {@link #getNextSibling() siblings chain} starting with the
+     * {@link #getFirstChild() first child}.
+     *
+     * @return  the list of children, or an empty list if this entity
+     * has no children.
+     */
+    public List<EntityBase> getChildren() {
+        ArrayList<EntityBase> subprojects = new ArrayList<EntityBase>();
+        EntityBase next = getFirstChild();
+        while (next != null) {
+            subprojects.add(next);
+            next = next.getNextSibling();
+        }
+        return subprojects;
     }
 
     /**

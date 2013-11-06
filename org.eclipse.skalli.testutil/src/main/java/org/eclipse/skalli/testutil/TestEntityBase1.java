@@ -12,18 +12,17 @@ package org.eclipse.skalli.testutil;
 
 import java.util.UUID;
 
-import org.eclipse.skalli.model.EntityBase;
+public class TestEntityBase1 extends TestEntityBase {
 
-public class TestEntityBase1 extends EntityBase {
     public TestEntityBase1() {
+        super();
     }
 
     public TestEntityBase1(UUID uuid) {
-        setUuid(uuid);
+        super(uuid);
     }
 
     public TestEntityBase1(UUID uuid, UUID parentEntityId) {
-        setUuid(uuid);
-        setParentEntityId(parentEntityId);
+        super(uuid, parentEntityId);
     }
 }
