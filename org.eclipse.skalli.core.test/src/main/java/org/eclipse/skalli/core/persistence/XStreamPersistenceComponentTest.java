@@ -41,14 +41,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 @SuppressWarnings("nls")
-public class XStreamPersistenceServiceTest {
+public class XStreamPersistenceComponentTest {
 
-    private XStreamPersistenceServiceMock persistenceService;
+    private XStreamPersistenceComponent persistenceService;
     private HashMapStorageService hashMapStorageService;
 
     private List<ServiceRegistration<?>> serviceRegistrations = new ArrayList<ServiceRegistration<?>>();
 
-    @Before
+     @Before
     public void setup() throws Exception {
         serviceRegistrations.add(BundleManager.registerService(ExtensionService.class,
                 new TestExtensibleEntityExtensionService(), null));
@@ -56,7 +56,7 @@ public class XStreamPersistenceServiceTest {
                 new TestExtensibleEntityEntityService(0), null));
         Assert.assertEquals(2, serviceRegistrations.size());
         hashMapStorageService = new HashMapStorageService();
-        persistenceService = new XStreamPersistenceServiceMock(hashMapStorageService);
+        persistenceService = new XStreamPersistenceComponent(hashMapStorageService);
     }
 
     @After
@@ -78,7 +78,7 @@ public class XStreamPersistenceServiceTest {
         for (TestExtensibleEntityBase entity : expectedEntities) {
             Assert.assertNotNull(entity);
 
-            byte[] blob = hashMapStorageService.getBlobStore().get(
+            byte[] blob = hashMapStorageService.asMap().get(
                     new HashMapStorageService.Key(entity.getClass().getSimpleName(), entity.getUuid().toString()));
             Document doc = XMLUtils.documentFromString(new String(blob, "UTF-8"));
 
@@ -178,8 +178,6 @@ public class XStreamPersistenceServiceTest {
                 .getParentEntity());
     }
 
-    // helper stuff
-
     private List<TestExtensibleEntityBase> createTestEntityHierarchy()
             throws Exception {
         List<TestExtensibleEntityBase> entities = new LinkedList<TestExtensibleEntityBase>();
@@ -226,9 +224,8 @@ public class XStreamPersistenceServiceTest {
         }
     }
 
-    private ExtensionEntityBase createExtension(Class<? extends ExtensionEntityBase> clazz, boolean bool, String str,
-            String... items)
-            throws Exception {
+    private ExtensionEntityBase createExtension(Class<? extends ExtensionEntityBase> clazz,
+            boolean bool, String str, String... items) throws Exception {
         TestExtension ext = (TestExtension) clazz.newInstance();
         ext.setBool(bool);
         ext.setStr(str);

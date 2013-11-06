@@ -35,7 +35,6 @@ import org.eclipse.skalli.core.xstream.ExtensionsMapConverter;
 import org.eclipse.skalli.core.xstream.NoopConverter;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.services.extension.DataMigration;
-import org.eclipse.skalli.services.persistence.StorageService;
 import org.eclipse.skalli.testutil.HashMapStorageService;
 import org.eclipse.skalli.testutil.HashMapStorageService.Key;
 import org.eclipse.skalli.testutil.TestExtensibleEntityBase;
@@ -53,6 +52,8 @@ import com.thoughtworks.xstream.converters.Converter;
 
 @SuppressWarnings("nls")
 public class XStreamPersistenceTest {
+
+    private static final int CURRENT_MODEL_VERSION = 43;
 
     private static final String ALIAS_EXT1 = "ext1";
     private static final String ALIAS_EXT2 = "ext2";
@@ -82,76 +83,33 @@ public class XStreamPersistenceTest {
     private static final String XML_WITHOUT_VERSION = "<bla><uuid>" + TestUUIDs.TEST_UUIDS[0]
             + "</uuid><hello>world</hello><blubb>noop</blubb></bla>";
 
-    private static final String XML_WITH_EXTENSIONS = createXML(TIME0, USER0, ALIASES, VALUES, LAST_MODIFIED, LAST_MODIFIED_BY);
+    private static final String XML_WITH_EXTENSIONS = createXML(TIME0, USER0, ALIASES, VALUES,
+            LAST_MODIFIED, LAST_MODIFIED_BY);
 
-    private static Map<String, Class<?>> getAliases() {
-        Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
-        aliases.put(ALIAS_EXT1, TestExtension.class);
-        aliases.put(ALIAS_EXT2, TestExtension1.class);
-        return aliases;
-    }
 
-    private static <T extends EntityBase> Set<Converter> getConverters() {
-        return CollectionUtils.asSet(new NoopConverter(), new UUIDListConverter(), new ExtensionsMapConverter());
-    }
-
-    private static Map<String, Class<?>> getNotMatchingAliases() {
-        Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
-        aliases.put("notext1", TestExtension.class);
-        aliases.put("notext2", TestExtension1.class);
-        return aliases;
-    }
-
-    private static TestExtensibleEntityBase getExtensibleEntity() {
-        TestExtensibleEntityBase entity = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
-        entity.addExtension(new TestExtension());
-        entity.addExtension(new TestExtension1());
-        return entity;
-    }
-
-    private static DataMigration getMigrationMock() throws Exception {
-        DataMigration mockMigration = EasyMock.createMock(DataMigration.class);
-        EasyMock.reset(mockMigration);
-        mockMigration.handlesType(EasyMock.isA(String.class));
-        EasyMock.expectLastCall().andReturn(true).anyTimes();
-        mockMigration.getFromVersion();
-        EasyMock.expectLastCall().andReturn(42).anyTimes();
-        mockMigration.migrate(EasyMock.isA(Document.class));
-        EasyMock.expectLastCall();
-        return mockMigration;
-    }
-
+    // XStreamPersistence instance under test backed by a HashMap-based storage service
     private static class TestXStreamPersistence extends XStreamPersistence {
-
         public TestXStreamPersistence() {
             super(new HashMapStorageService());
         }
 
-        private HashMapStorageService getHashMapStorageService() {
-            return (HashMapStorageService) super.getStorageService();
-        }
-
-        private static Key getHashMapKeyForEntry(TestExtensibleEntityBase entity)
-        {
+        private static Key getHashMapKeyForEntry(TestExtensibleEntityBase entity) {
             return new HashMapStorageService.Key(TestExtensibleEntityBase.class.getSimpleName(),
                     entity.getUuid().toString());
         }
 
         private byte[] getContentFromHashMap(TestExtensibleEntityBase entityKey) {
-            return getHashMapStorageService().getBlobStore().get(getHashMapKeyForEntry(entityKey));
+            return ((HashMapStorageService) storageService).asMap().get(getHashMapKeyForEntry(entityKey));
         }
 
         private Document getDocumentFromHashMap(TestExtensibleEntityBase entityKey) throws Exception {
             return XMLUtils.documentFromString(new String(getContentFromHashMap(entityKey), "UTF-8"));
         }
-
     }
 
-    private static final int CURRENT_MODEL_VERSION = 43;
 
     @Test
     public void testSaveLoadCycle() throws Exception {
-
         TestExtensibleEntityBase entity = getExtensibleEntity();
         TestExtensibleEntityEntityService entityService =
                 new TestExtensibleEntityEntityService(CURRENT_MODEL_VERSION);
@@ -215,15 +173,6 @@ public class XStreamPersistenceTest {
         lastModifiedExt1 = xp.getLastModifiedAttribute(updatedExtensions.get(ALIAS_EXT1));
         assertLoadedEntityIsExpectedOne(updatedEntity, USER1, USER1, USER0, lastModified, lastModifiedExt1,
                 lastModifiedExt2, TEXT1 + " is now updated", false);
-
-    }
-
-    private Set<ClassLoader> getTestExtensibleEntityBaseClassLodades() {
-        Set<ClassLoader> entityClassLoaders = new HashSet<ClassLoader>();
-        entityClassLoaders.add(TestExtensibleEntityBase.class.getClassLoader());
-        entityClassLoaders.add(TestExtension.class.getClassLoader());
-        entityClassLoaders.add(TestExtension1.class.getClassLoader());
-        return entityClassLoaders;
     }
 
     @Test
@@ -432,14 +381,12 @@ public class XStreamPersistenceTest {
     }
 
     @Test
-    public void testSetLastModiefiedAttribute() throws SAXException, IOException, ParserConfigurationException
-    {
+    public void testSetLastModiefiedAttribute() throws SAXException, IOException, ParserConfigurationException {
         XStreamPersistence xp = new TestXStreamPersistence();
         Element element = XMLUtils.documentFromString("<dummy></dummy>").getDocumentElement();
         xp.setLastModifiedAttribute(element);
         Attr lastMod = element.getAttributeNode("lastModified");
         assertIsXsdDateTime(lastMod.getTextContent());
-
     }
 
     @Test
@@ -452,7 +399,6 @@ public class XStreamPersistenceTest {
         } catch (RuntimeException e) {
             assertTrue(e.getMessage().contains("element already has a 'version' attribute"));
         }
-
     }
 
     @Test
@@ -496,13 +442,6 @@ public class XStreamPersistenceTest {
         assertTrue(XMLDiff.identical(documentElement, documentElement));
     }
 
-    @Test
-    public void testStorageService() {
-        StorageService storageService = new HashMapStorageService();
-        XStreamPersistence xp = new XStreamPersistence(storageService);
-        assertEquals(storageService, xp.getStorageService());
-    }
-
     private void assertPostProcessedXML(Document newDoc, Document oldDoc, String userId,
             String expectedGlobalLastModified, String expectedGlobalLastModifiedBy, String[] expectedAliases,
             String[] expectedExtLastModified, String[] expectedExtLastModifiedBy) throws Exception {
@@ -541,19 +480,15 @@ public class XStreamPersistenceTest {
         DatatypeConverter.parseDateTime(lexicalXSDDateTime);
     }
 
-
-    /**
-     * checks that in a range of seconds the dateString matches the expected one
-     */
+    //checks that within a range of seconds the dateString matches the expectedDateString
     private void assertLastModifiedDate(String dateString, String expectedDateString) {
         assertThat(dateString, startsWith(expectedDateString.substring(0, "YYYY-MM-DDTHH:MM:SS".length())));
     }
 
-    private void assertLoadedEntityIsExpectedOne(TestExtensibleEntityBase loadedEntity, String user, String userExt1,
-            String userExt2, String lastModified,
-            String lastModifiedExt1,
-            String lastModifiedExt2, String ext1Text, boolean ext1boolean) {
-        //the length, up to times should be the same
+    private void assertLoadedEntityIsExpectedOne(TestExtensibleEntityBase loadedEntity,
+            String user, String userExt1, String userExt2,
+            String lastModified, String lastModifiedExt1, String lastModifiedExt2,
+            String ext1Text, boolean ext1boolean) {
         assertNotNull(loadedEntity);
         assertLastModifiedDate(loadedEntity.getLastModified(), lastModified);
         assertEquals(user, loadedEntity.getLastModifiedBy());
@@ -566,6 +501,51 @@ public class XStreamPersistenceTest {
         TestExtension1 ext2 = ((TestExtensibleEntityBase) loadedEntity).getExtension(TestExtension1.class);
         assertNotNull(ext2);
         assertLastModifiedDate(ext2.getLastModified(), lastModifiedExt2);
+    }
+
+    private Map<String, Class<?>> getAliases() {
+        Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
+        aliases.put(ALIAS_EXT1, TestExtension.class);
+        aliases.put(ALIAS_EXT2, TestExtension1.class);
+        return aliases;
+    }
+
+    private <T extends EntityBase> Set<Converter> getConverters() {
+        return CollectionUtils.asSet(new NoopConverter(), new UUIDListConverter(), new ExtensionsMapConverter());
+    }
+
+    private Set<ClassLoader> getTestExtensibleEntityBaseClassLodades() {
+        Set<ClassLoader> entityClassLoaders = new HashSet<ClassLoader>();
+        entityClassLoaders.add(TestExtensibleEntityBase.class.getClassLoader());
+        entityClassLoaders.add(TestExtension.class.getClassLoader());
+        entityClassLoaders.add(TestExtension1.class.getClassLoader());
+        return entityClassLoaders;
+    }
+
+    private Map<String, Class<?>> getNotMatchingAliases() {
+        Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
+        aliases.put("notext1", TestExtension.class);
+        aliases.put("notext2", TestExtension1.class);
+        return aliases;
+    }
+
+    private TestExtensibleEntityBase getExtensibleEntity() {
+        TestExtensibleEntityBase entity = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);
+        entity.addExtension(new TestExtension());
+        entity.addExtension(new TestExtension1());
+        return entity;
+    }
+
+    private DataMigration getMigrationMock() throws Exception {
+        DataMigration mockMigration = EasyMock.createMock(DataMigration.class);
+        EasyMock.reset(mockMigration);
+        mockMigration.handlesType(EasyMock.isA(String.class));
+        EasyMock.expectLastCall().andReturn(true).anyTimes();
+        mockMigration.getFromVersion();
+        EasyMock.expectLastCall().andReturn(42).anyTimes();
+        mockMigration.migrate(EasyMock.isA(Document.class));
+        EasyMock.expectLastCall();
+        return mockMigration;
     }
 
     private static String createXML(String docLastModified, String docLastModifiedBy,

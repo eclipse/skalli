@@ -65,14 +65,88 @@ public class XStreamPersistence implements Issuer {
 
     private static final Logger LOG = LoggerFactory.getLogger(XStreamPersistence.class);
 
-    private StorageService storageService;
+    StorageService storageService;
 
     public XStreamPersistence(StorageService storageService) {
         this.storageService = storageService;
     }
 
-    StorageService getStorageService() {
-        return storageService;
+    public <T extends EntityBase> T loadEntity(EntityService<T> entityService, String key, Set<ClassLoader> classLoaders,
+            Set<DataMigration> migrations, Map<String, Class<?>> aliases, Set<Converter> converters)
+            throws StorageException, MigrationException {
+        if (entityService == null) {
+            throw new StorageException(MessageFormat.format(
+                    "Could not load entity {0}: No corresponding entity service available", key));
+        }
+        Class<T> entityClass = entityService.getEntityClass();
+        LOG.info(MessageFormat.format("Loading entity {0} of type {1}", key, entityClass));
+        Document doc = getEntityAsDom(entityClass, key);
+        if (doc == null) {
+            return null;
+        }
+
+        preProcessXML(doc, migrations, aliases, entityService.getModelVersion());
+        mapInheritedExtensions(doc, byAlias(aliases));
+
+        EntityBase entity = domToEntity(classLoaders, aliases, converters, doc);
+        if (entity == null) {
+            return null;
+        }
+
+        postProcessEntity(doc, entity, aliases);
+        LOG.info(MessageFormat.format("Loaded entity {0}", entity.getUuid()));
+
+        return entityClass.cast(entity);
+    }
+
+    public <T extends EntityBase> List<T> loadEntities(EntityService<T> entityService, Set<ClassLoader> entityClassLoaders,
+            Set<DataMigration> migrations, Map<String, Class<?>> aliases, Set<Converter> converters)
+            throws StorageException, MigrationException {
+        List<T> loadEntities = new ArrayList<T>();
+        List<String> keys = storageService.keys(entityService.getEntityClass().getSimpleName());
+        for (String key : keys) {
+            T entity = loadEntity(entityService, key, entityClassLoaders, migrations, aliases, converters);
+            if (entity != null) {
+                loadEntities.add(entity);
+            }
+        }
+        return loadEntities;
+    }
+
+    public void saveEntity(EntityService<?> entityService, EntityBase entity, String userId,
+            Map<String, Class<?>> aliases, Set<Converter> converters) throws StorageException, MigrationException {
+
+        Class<? extends EntityBase> entityClass = entity.getClass();
+        String category = entityClass.getSimpleName();
+        String key = entity.getUuid().toString();
+
+        if (entityClass.isAnnotationPresent(Historized.class)) {
+            storageService.archive(category, key);
+        }
+
+        Document newDoc = entityToDom(entity, aliases, converters);
+        mapInheritedExtensions(newDoc, byClassNames(aliases));
+
+        Document oldDoc = getEntityAsDom(entityClass, entity.getUuid().toString());
+        postProcessXML(newDoc, oldDoc, aliases, userId, entityService.getModelVersion());
+
+        InputStream is;
+        try {
+            is = XMLUtils.documentToStream(newDoc);
+        } catch (TransformerException e) {
+            throw new StorageException(MessageFormat.format("Failed to transform entity {0} to XML", entity), e);
+        }
+
+        storageService.write(category, key, is);
+    }
+
+    void preProcessXML(Document doc, Set<DataMigration> migrations, Map<String, Class<?>> aliases, int modelVersion)
+            throws MigrationException {
+        int version = getVersionAttribute(doc);
+        if (migrations != null) {
+            DataMigrator migrator = new DataMigrator(migrations, aliases);
+            migrator.migrate(doc, version, modelVersion);
+        }
     }
 
     void postProcessXML(Document newDoc, Document oldDoc, Map<String, Class<?>> aliases, String userId, int modelVersion)
@@ -91,30 +165,6 @@ public class XStreamPersistence implements Issuer {
             setLastModifiedAttributes(newExt, (identical || XMLDiff.identical(newExt, oldExt))? oldExt : null, userId);
         }
         setVersionAttribute(newDoc, modelVersion);
-    }
-
-    void setLastModifiedAttributes(Element newElement, Element oldElement, String userId) {
-        String lastModified = oldElement != null? getLastModifiedAttribute(oldElement) : null;
-        if (lastModified != null) {
-            setLastModifiedAttribute(newElement, lastModified);
-        } else {
-            setLastModifiedAttribute(newElement);
-        }
-        String lastModifiedBy = oldElement != null? getLastModifiedByAttribute(oldElement) : null;
-        if (lastModifiedBy != null) {
-            setLastModifiedByAttribute(newElement, lastModifiedBy);
-        } else{
-            setLastModifiedByAttribute(newElement, userId);
-        }
-    }
-
-    void preProcessXML(Document doc, Set<DataMigration> migrations, Map<String, Class<?>> aliases, int modelVersion)
-            throws MigrationException {
-        int version = getVersionAttribute(doc);
-        if (migrations != null) {
-            DataMigrator migrator = new DataMigrator(migrations, aliases);
-            migrator.migrate(doc, version, modelVersion);
-        }
     }
 
     void postProcessEntity(Document doc, EntityBase entity, Map<String, Class<?>> aliases)
@@ -136,6 +186,97 @@ public class XStreamPersistence implements Issuer {
                 }
             }
         }
+    }
+
+    int getVersionAttribute(Document doc) {
+        int version = 0;
+        String versionAttr = doc.getDocumentElement().getAttribute(TAG_VERSION);
+        if (StringUtils.isNotBlank(versionAttr)) {
+            version = Integer.parseInt(versionAttr);
+        }
+        return version;
+    }
+
+    void setVersionAttribute(Document doc, int version) {
+        Element documentElement = doc.getDocumentElement();
+        if (doc.getDocumentElement().hasAttribute(TAG_VERSION)) {
+            throw new RuntimeException(MessageFormat.format("<{0}> element already has a ''{1}'' attribute",
+                    documentElement.getNodeName(), TAG_VERSION));
+        }
+        documentElement.setAttribute(TAG_VERSION, Integer.toString(version));
+    }
+
+    String getLastModifiedAttribute(Element element) {
+        String value = element.getAttribute(TAG_LAST_MODIFIED);
+        return StringUtils.isNotBlank(value) ? value : null;
+    }
+
+    String getLastModifiedByAttribute(Element element) {
+        String value = element.getAttribute(TAG_MODIFIED_BY);
+        return StringUtils.isNotBlank(value) ? value : null;
+    }
+
+    void setLastModifiedAttribute(Element element) {
+        Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ENGLISH); //$NON-NLS-1$
+        String lastModified = DatatypeConverter.printDateTime(now);
+        setLastModifiedAttribute(element, lastModified);
+    }
+
+    void setLastModifiedAttribute(Element element, String lastModified) {
+        if (StringUtils.isNotBlank(lastModified)) {
+            element.setAttribute(TAG_LAST_MODIFIED, lastModified);
+        }
+    }
+
+    void setLastModifiedByAttribute(Element element, String userId) {
+        if (StringUtils.isNotBlank(userId)) {
+            element.setAttribute(TAG_MODIFIED_BY, userId);
+        }
+    }
+
+    void setLastModifiedAttributes(Element newElement, Element oldElement, String userId) {
+        String lastModified = oldElement != null? getLastModifiedAttribute(oldElement) : null;
+        if (lastModified != null) {
+            setLastModifiedAttribute(newElement, lastModified);
+        } else {
+            setLastModifiedAttribute(newElement);
+        }
+        String lastModifiedBy = oldElement != null? getLastModifiedByAttribute(oldElement) : null;
+        if (lastModifiedBy != null) {
+            setLastModifiedByAttribute(newElement, lastModifiedBy);
+        } else{
+            setLastModifiedByAttribute(newElement, userId);
+        }
+    }
+
+    SortedMap<String, Element> getExtensions(Document doc, Map<String, Class<?>> aliases, boolean byClassName)
+            throws MigrationException {
+        TreeMap<String, Element> result = new TreeMap<String, Element>();
+        if (aliases != null && aliases.size() > 0) {
+            List<Element> extensionElements = MigrationUtils.getExtensions(doc, aliases.keySet());
+            for (Element extensionElement : extensionElements) {
+                String name = extensionElement.getNodeName();
+                if (byClassName) {
+                    Class<?> extensionClass = aliases.get(name);
+                    if (extensionClass != null) {
+                        result.put(extensionClass.getName(), extensionElement);
+                    }
+                } else {
+                    result.put(name, extensionElement);
+                }
+            }
+        }
+        return result;
+    }
+
+    SortedMap<String, Element> getExtensionsByAlias(Document doc, Map<String, Class<?>> aliases)
+            throws MigrationException {
+        return getExtensions(doc, aliases, false);
+    }
+
+    SortedMap<String, Element> getExtensionsByClassName(Document doc, Map<String, Class<?>> aliases)
+            throws MigrationException {
+        return getExtensions(doc, aliases, true);
     }
 
     void mapInheritedExtensions(Document doc, Map<String, String> aliases) throws MigrationException {
@@ -182,121 +323,6 @@ public class XStreamPersistence implements Issuer {
         return map;
     }
 
-    String getLastModifiedAttribute(Element element) {
-        String value = element.getAttribute(TAG_LAST_MODIFIED);
-        return StringUtils.isNotBlank(value) ? value : null;
-    }
-
-    void setLastModifiedAttribute(Element element) {
-        Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ENGLISH); //$NON-NLS-1$
-        String lastModified = DatatypeConverter.printDateTime(now);
-        setLastModifiedAttribute(element, lastModified);
-    }
-
-    void setLastModifiedAttribute(Element element, String lastModified) {
-        if (StringUtils.isNotBlank(lastModified)) {
-            element.setAttribute(TAG_LAST_MODIFIED, lastModified);
-        }
-    }
-
-    String getLastModifiedByAttribute(Element element) {
-        String value = element.getAttribute(TAG_MODIFIED_BY);
-        return StringUtils.isNotBlank(value) ? value : null;
-    }
-
-    void setLastModifiedByAttribute(Element element, String userId) {
-        if (StringUtils.isNotBlank(userId)) {
-            element.setAttribute(TAG_MODIFIED_BY, userId);
-        }
-    }
-
-    SortedMap<String, Element> getExtensionsByAlias(Document doc, Map<String, Class<?>> aliases)
-            throws MigrationException {
-        return getExtensions(doc, aliases, false);
-    }
-
-    SortedMap<String, Element> getExtensions(Document doc, Map<String, Class<?>> aliases, boolean byClassName)
-            throws MigrationException {
-        TreeMap<String, Element> result = new TreeMap<String, Element>();
-        if (aliases != null && aliases.size() > 0) {
-            List<Element> extensionElements = MigrationUtils.getExtensions(doc, aliases.keySet());
-            for (Element extensionElement : extensionElements) {
-                String name = extensionElement.getNodeName();
-                if (byClassName) {
-                    Class<?> extensionClass = aliases.get(name);
-                    if (extensionClass != null) {
-                        result.put(extensionClass.getName(), extensionElement);
-                    }
-                } else {
-                    result.put(name, extensionElement);
-                }
-            }
-        }
-        return result;
-    }
-
-    void setVersionAttribute(Document doc, int version) {
-        Element documentElement = doc.getDocumentElement();
-        if (doc.getDocumentElement().hasAttribute(TAG_VERSION)) {
-            throw new RuntimeException(MessageFormat.format("<{0}> element already has a ''{1}'' attribute",
-                    documentElement.getNodeName(), TAG_VERSION));
-        }
-        documentElement.setAttribute(TAG_VERSION, Integer.toString(version));
-    }
-
-    SortedMap<String, Element> getExtensionsByClassName(Document doc, Map<String, Class<?>> aliases)
-            throws MigrationException {
-        return getExtensions(doc, aliases, true);
-    }
-
-    int getVersionAttribute(Document doc) {
-        int version = 0;
-        String versionAttr = doc.getDocumentElement().getAttribute(TAG_VERSION);
-        if (StringUtils.isNotBlank(versionAttr)) {
-            version = Integer.parseInt(versionAttr);
-        }
-        return version;
-    }
-
-    void saveEntity(EntityService<?> entityService, EntityBase entity, String userId,
-            Map<String, Class<?>> aliases, Set<Converter> converters) throws StorageException, MigrationException {
-
-        Class<? extends EntityBase> entityClass = entity.getClass();
-        String category = entityClass.getSimpleName();
-        String key = entity.getUuid().toString();
-
-        if (entityClass.isAnnotationPresent(Historized.class)) {
-            storageService.archive(category, key);
-        }
-
-        Document newDoc = entityToDom(entity, aliases, converters);
-        mapInheritedExtensions(newDoc, byClassNames(aliases));
-
-        Document oldDoc = readEntityAsDom(entityClass, entity.getUuid().toString());
-        postProcessXML(newDoc, oldDoc, aliases, userId, entityService.getModelVersion());
-
-        InputStream is;
-        try {
-            is = XMLUtils.documentToStream(newDoc);
-        } catch (TransformerException e) {
-            throw new StorageException(MessageFormat.format("Failed to transform entity {0} to XML", entity), e);
-        }
-
-        storageService.write(category, key, is);
-    }
-
-    private Document entityToDom(EntityBase entity, Map<String, Class<?>> aliases, Set<Converter> converters)
-            throws StorageException {
-        Document newDoc = null;
-        try {
-            XStream xstream = IgnoreUnknownElementsXStream.getXStreamInstance(converters, null, aliases);
-            String xml = xstream.toXML(entity);
-            newDoc = XMLUtils.documentFromString(xml);
-        } catch (Exception e) {
-            throw new StorageException(MessageFormat.format("Failed to transform entity {0} to XML", entity), e);
-        }
-        return newDoc;
-    }
 
     private EntityBase domToEntity(Set<ClassLoader> entityClassLoaders, Map<String, Class<?>> aliases,
             Set<Converter> converters, Document doc) throws StorageException {
@@ -316,35 +342,20 @@ public class XStreamPersistence implements Issuer {
         return entity;
     }
 
-    <T extends EntityBase> T loadEntity(EntityService<T> entityService, String key, Set<ClassLoader> classLoaders,
-            Set<DataMigration> migrations, Map<String, Class<?>> aliases, Set<Converter> converters)
-            throws StorageException, MigrationException {
-        if (entityService == null) {
-            throw new StorageException(MessageFormat.format(
-                    "Could not load entity {0}: No corresponding entity service available", key));
+    private Document entityToDom(EntityBase entity, Map<String, Class<?>> aliases, Set<Converter> converters)
+            throws StorageException {
+        Document newDoc = null;
+        try {
+            XStream xstream = IgnoreUnknownElementsXStream.getXStreamInstance(converters, null, aliases);
+            String xml = xstream.toXML(entity);
+            newDoc = XMLUtils.documentFromString(xml);
+        } catch (Exception e) {
+            throw new StorageException(MessageFormat.format("Failed to transform entity {0} to XML", entity), e);
         }
-        Class<T> entityClass = entityService.getEntityClass();
-        LOG.info(MessageFormat.format("Loading entity {0} of type {1}", key, entityClass));
-        Document doc = readEntityAsDom(entityClass, key);
-        if (doc == null) {
-            return null;
-        }
-
-        preProcessXML(doc, migrations, aliases, entityService.getModelVersion());
-        mapInheritedExtensions(doc, byAlias(aliases));
-
-        EntityBase entity = domToEntity(classLoaders, aliases, converters, doc);
-        if (entity == null) {
-            return null;
-        }
-
-        postProcessEntity(doc, entity, aliases);
-        LOG.info(MessageFormat.format("Loaded entity {0}", entity.getUuid()));
-
-        return entityClass.cast(entity);
+        return newDoc;
     }
 
-    private Document readEntityAsDom(Class<? extends EntityBase> entityClass, String key) throws StorageException {
+    private Document getEntityAsDom(Class<? extends EntityBase> entityClass, String key) throws StorageException {
         InputStream stream = storageService.read(entityClass.getSimpleName(), key);
         if (stream == null) {
             LOG.warn(MessageFormat.format("Storage services has no entity with key {0}", key));
@@ -359,19 +370,5 @@ public class XStreamPersistence implements Issuer {
                     "Failed to convert stream to dom for entity {0} of type {1}", key, entityClass), e);
         }
         return doc;
-    }
-
-    <T extends EntityBase> List<T> loadEntities(EntityService<T> entityService, Set<ClassLoader> entityClassLoaders,
-            Set<DataMigration> migrations, Map<String, Class<?>> aliases, Set<Converter> converters)
-            throws StorageException, MigrationException {
-        List<T> loadEntities = new ArrayList<T>();
-        List<String> keys = storageService.keys(entityService.getEntityClass().getSimpleName());
-        for (String key : keys) {
-            T entity = loadEntity(entityService, key, entityClassLoaders, migrations, aliases, converters);
-            if (entity != null) {
-                loadEntities.add(entity);
-            }
-        }
-        return loadEntities;
     }
 }

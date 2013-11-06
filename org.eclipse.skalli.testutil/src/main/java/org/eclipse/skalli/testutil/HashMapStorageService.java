@@ -95,16 +95,16 @@ public class HashMapStorageService implements StorageService {
 
     }
 
-    private Map<Key, byte[]> blobStore = new HashMap<Key, byte[]>();
+    private Map<Key, byte[]> store = new HashMap<Key, byte[]>();
 
-    public Map<Key, byte[]> getBlobStore() {
-        return blobStore;
+    public Map<Key, byte[]> asMap() {
+        return store;
     }
 
     @Override
     public void write(String category, String key, InputStream blob) throws StorageException {
         try {
-            blobStore.put(new Key(category, key), IOUtils.toByteArray(blob));
+            store.put(new Key(category, key), IOUtils.toByteArray(blob));
         } catch (IOException e) {
             throw new StorageException(e);
         }
@@ -112,7 +112,7 @@ public class HashMapStorageService implements StorageService {
 
     @Override
     public InputStream read(String category, String key) throws StorageException {
-        byte[] content = blobStore.get(new Key(category, key));
+        byte[] content = store.get(new Key(category, key));
         if (content == null) {
             return null;
         }
@@ -130,7 +130,7 @@ public class HashMapStorageService implements StorageService {
     @Override
     public List<String> keys(String category) throws StorageException {
         List<String> result = new ArrayList<String>();
-        Set<Key> allKeys = blobStore.keySet();
+        Set<Key> allKeys = store.keySet();
         for (Key key : allKeys) {
             if (key.getCategory().equalsIgnoreCase(category)) {
                 result.add(key.getKey());
@@ -141,7 +141,7 @@ public class HashMapStorageService implements StorageService {
 
     @Override
     public String toString() {
-        return "HashMapStorageService [blobStore=" + blobStore + "]";
+        return "HashMapStorageService [blobStore=" + store + "]";
     }
 
 

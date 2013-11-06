@@ -43,11 +43,11 @@ public class StorageCommandTest {
 
         assertEquals(
                 TEST_CONTENT_1,
-                new String(destination.getBlobStore().get(
+                new String(destination.asMap().get(
                         new HashMapStorageService.Key(CATEGORY_PROJECT, KEY_1))));
         assertEquals(
                 TEST_CONTENT_2,
-                new String(destination.getBlobStore().get(
+                new String(destination.asMap().get(
                         new HashMapStorageService.Key(CATEGORY_PROJECT, KEY_2))));
     }
 
