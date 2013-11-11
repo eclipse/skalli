@@ -160,7 +160,12 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
     @Override
     public Map<UUID, List<Project>> getSubProjects() {
         Map<UUID, List<Project>> result = new HashMap<UUID, List<Project>>();
-        for (Project project : getAll()) {
+        List<UUID> uuids = new ArrayList<UUID>(keySet());
+        for (UUID uuid : uuids) {
+            Project project = getByUUID(uuid);
+            if (project == null) {
+                continue;
+            }
             Project parent = (Project) project.getParentEntity();
             if (parent == null) {
                continue;

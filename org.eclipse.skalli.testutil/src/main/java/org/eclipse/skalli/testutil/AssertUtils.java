@@ -13,7 +13,10 @@ package org.eclipse.skalli.testutil;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.SortedMap;
+import java.util.UUID;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.eclipse.skalli.model.Project;
 import org.junit.Assert;
 
 @SuppressWarnings("nls")
@@ -63,6 +66,23 @@ public class AssertUtils {
         while (it1.hasNext()) {
             T next1 = it1.next();
             Assert.assertTrue(message + "[" + next1 + " found]", collection2.contains(next1));
+        }
+    }
+
+    public static void assertEquals(Collection<Project> projects, UUID...uuids) {
+        Assert.assertNotNull(projects);
+        Assert.assertEquals(uuids.length, projects.size());
+        Iterator<Project> it = projects.iterator();
+        for (UUID uuid: uuids) {
+            Assert.assertEquals(uuid, it.next().getUuid());
+        }
+    }
+
+    public static void assertEqualsAnyOrder(Collection<Project> projects, UUID...uuids) {
+        Assert.assertNotNull(projects);
+        Assert.assertEquals(uuids.length, projects.size());
+        for (Project project: projects) {
+            Assert.assertTrue(ArrayUtils.contains(uuids, project.getUuid()));
         }
     }
 
