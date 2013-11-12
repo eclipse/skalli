@@ -10,9 +10,11 @@
  *******************************************************************************/
 package org.eclipse.skalli.model;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeSet;
 
+import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.PropertyTestUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -69,5 +71,49 @@ public class ProjectTest {
 
         p.setName("$$()");
         Assert.assertEquals("helloworld", p.getOrConstructShortName());
+    }
+
+    @Test
+    public void testSubProjects() throws Exception {
+        Project parent = new Project();
+        parent.setProjectId("parent");
+
+        Project child1 = new Project();
+        child1.setProjectId("foobar");
+        child1.setName("B");
+
+        Project child2 = new Project();
+        child2.setProjectId("bar");
+        child2.setName("C");
+
+        Project child3 = new Project();
+        child3.setProjectId("foo");
+        child3.setName("A");
+
+        Project child4 = new Project();
+        child4.setProjectId("foob");
+        child4.setName("A");
+
+        Project child5 = new Project();
+        child5.setProjectId("fo");
+        child5.setName("A");
+
+        parent.setFirstChild(child1);
+        child1.setNextSibling(child2);
+        child2.setNextSibling(child3);
+        child3.setNextSibling(child4);
+        child4.setNextSibling(child5);
+
+        AssertUtils.assertEquals("getSubProjects()",
+                Arrays.asList(child2, child5, child3, child4, child1),
+                parent.getSubProjects());
+
+        AssertUtils.assertEquals("getSubProjects(CompareByProjectId)",
+                Arrays.asList(child2, child5, child3, child4, child1),
+                parent.getSubProjects(new Project.CompareByProjectId()));
+
+        AssertUtils.assertEquals("getSubProjects(CompareByProjectName)",
+                Arrays.asList(child5, child3, child4, child1, child2),
+                parent.getSubProjects(new Project.CompareByProjectName()));
     }
 }
