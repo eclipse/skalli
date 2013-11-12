@@ -166,6 +166,12 @@ public class ProjectComponentTest {
         p.addExtension(ext);
         projects.add(p);
 
+        projects.get(0).setFirstChild(projects.get(1));
+        projects.get(1).setFirstChild(projects.get(2));
+        projects.get(2).setFirstChild(projects.get(3));
+        projects.get(3).setFirstChild(projects.get(4));
+        projects.get(3).setNextSibling(projects.get(5));
+
         mockIPS = createNiceMock(PersistenceService.class);
         mockTS = createNiceMock(ProjectTemplateService.class);
         mockES = createNiceMock(EventService.class);
@@ -338,9 +344,9 @@ public class ProjectComponentTest {
         AssertUtils.assertEquals(ps.getSubProjects(uuids[1], null, 0), EMPTY_UUID_LIST);
         AssertUtils.assertEquals(ps.getSubProjects(uuids[1], null, 1), uuids[2]);
         AssertUtils.assertEquals(ps.getSubProjects(uuids[1], null, 2), uuids[2], uuids[3]);
-        AssertUtils.assertEquals(ps.getSubProjects(uuids[1], null, 3), uuids[2], uuids[3], uuids[6], uuids[8]);
-        AssertUtils.assertEquals(ps.getSubProjects(uuids[1], null, Integer.MAX_VALUE), uuids[2], uuids[3], uuids[6], uuids[7], uuids[8]);
-        AssertUtils.assertEquals(ps.getSubProjects(uuids[1], null, -1), uuids[2], uuids[3], uuids[6], uuids[7], uuids[8]);
+        AssertUtils.assertEquals(ps.getSubProjects(uuids[1], null, 3), uuids[6], uuids[8], uuids[2], uuids[3]);
+        AssertUtils.assertEquals(ps.getSubProjects(uuids[1], null, Integer.MAX_VALUE), uuids[6], uuids[7], uuids[8], uuids[2], uuids[3]);
+        AssertUtils.assertEquals(ps.getSubProjects(uuids[1], null, -1), uuids[6], uuids[7], uuids[8], uuids[2], uuids[3]);
         AssertUtils.assertEquals(ps.getSubProjects(uuids[8], null, -1), EMPTY_UUID_LIST);
         verify(mocks);
     }

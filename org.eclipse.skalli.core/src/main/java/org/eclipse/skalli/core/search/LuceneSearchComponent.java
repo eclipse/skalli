@@ -159,7 +159,7 @@ public class LuceneSearchComponent implements SearchService, EventListener<Event
     }
 
     @Override
-    public List<SearchHit<Project>> asSearchHits(List<Project> projects) {
+    public List<SearchHit<Project>> asSearchHits(Collection<Project> projects) {
         return luceneIndex.entitiesToHit(projects);
     }
 

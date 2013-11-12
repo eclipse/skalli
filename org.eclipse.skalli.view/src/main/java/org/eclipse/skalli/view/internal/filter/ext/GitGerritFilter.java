@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -408,13 +407,13 @@ public class GitGerritFilter implements Filter {
         List<Project> relatedProjects = projectService.getParentChain(project.getUuid());
 
         // second, add my siblings unless I'm a top-level project
-        UUID parent = project.getParentProject();
+        Project parent = (Project)project.getParentEntity();
         if (parent != null) {
-            relatedProjects.addAll(projectService.getSubProjects(parent));
+            relatedProjects.addAll(parent.getSubProjects());
         }
 
         // finally, add my own subprojects
-        relatedProjects.addAll(projectService.getSubProjects(project.getUuid()));
+        relatedProjects.addAll(project.getSubProjects());
 
         return getRepositoryNames(relatedProjects, scmPattern);
     }

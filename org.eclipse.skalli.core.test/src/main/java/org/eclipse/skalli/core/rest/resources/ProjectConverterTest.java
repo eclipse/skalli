@@ -135,7 +135,7 @@ public class ProjectConverterTest {
             expected.append("  <link rel=\"parent\" href=\"https://localhost/api/projects/");
             expected.append(enc(project.getParentProject().toString())).append("\"/>");
         }
-        List<Project> subprojects = projectService.getSubProjects(project.getUuid());
+        SortedSet<Project> subprojects = project.getSubProjects();
         if (subprojects.size() > 0) {
             expected.append("  <subprojects>");
             for (Project subproject : subprojects) {

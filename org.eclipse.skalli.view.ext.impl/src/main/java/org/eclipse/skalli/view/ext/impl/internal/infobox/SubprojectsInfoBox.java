@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext.impl.internal.infobox;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -79,8 +79,7 @@ public class SubprojectsInfoBox extends InfoBoxBase implements InfoBox {
         UUID uuid = project.getUuid();
 
         List<Project> parents = projectService.getParentChain(uuid);
-        List<Project> subprojects = projectService.getSubProjects(uuid);
-        Collections.sort(subprojects, new SubprojectComparator(templateService));
+        SortedSet<Project> subprojects = project.getSubProjects(new SubprojectComparator(templateService));
         int indent = 0;
         StringBuilder sb = new StringBuilder();
 
@@ -149,7 +148,6 @@ public class SubprojectsInfoBox extends InfoBoxBase implements InfoBox {
 
     @Override
     public boolean isVisible(Project project, String loggedInUserId) {
-        List<Project> subprojects = projectService.getSubProjects(project.getUuid());
-        return project.getParentProject() != null || subprojects.size() > 0;
+        return project.getParentProject() != null || project.getFirstChild() != null;
     }
 }

@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.UUID;
 
 import javax.servlet.Filter;
@@ -298,13 +299,12 @@ public abstract class AbstractSearchFilter implements Filter {
      * Key: UUID.toString() of a project in searchHits; Value: list of SearchHits of subprojects of that project.
      */
     protected Map<String, List<SearchHit<Project>>> getSubprojects(List<SearchHit<Project>> searchHits) {
-        ProjectService projectService = getProjectService();
         SearchService searchService = getSearchService();
         Map<String, List<SearchHit<Project>>> subrojects = new HashMap<String, List<SearchHit<Project>>>();
         for (SearchHit<Project> searchHit : searchHits) {
             Project project = searchHit.getEntity();
             UUID uuid = project.getUuid();
-            List<Project> subprojects = projectService.getSubProjects(uuid);
+            SortedSet<Project> subprojects = project.getSubProjects();
             if (subprojects.size() > 0) {
                 subrojects.put(uuid.toString(), searchService.asSearchHits(subprojects));
             }

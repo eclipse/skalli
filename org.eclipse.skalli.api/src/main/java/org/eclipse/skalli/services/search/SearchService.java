@@ -122,5 +122,5 @@ public interface SearchService {
      * @param projects  the projects to convert.
      * @return the list of search hits, or an empty list.
      */
-    public List<SearchHit<Project>> asSearchHits(List<Project> projects);
+    public List<SearchHit<Project>> asSearchHits(Collection<Project> projects);
 }

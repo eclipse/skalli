@@ -129,7 +129,7 @@ public class LuceneIndex<T extends EntityBase> {
         writer.addDocument(doc);
     }
 
-    List<SearchHit<T>> entitiesToHit(List<T> entities) {
+    List<SearchHit<T>> entitiesToHit(Collection<T> entities) {
         List<SearchHit<T>> ret = new LinkedList<SearchHit<T>>();
         for (T entity : entities) {
             ret.add(entityToHit(entity));

@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.project;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.UUID;
 
 import org.eclipse.skalli.model.Project;
@@ -36,10 +36,7 @@ public class ProjectNodeImpl implements ProjectNode {
 
     protected void initialize(ProjectService service, Project project, Comparator<Project> c) {
         this.project = project;
-        List<Project> orderedSubProjects = service.getSubProjects(project.getUuid());
-        if (c != null) {
-            Collections.sort(orderedSubProjects, c);
-        }
+        SortedSet<Project> orderedSubProjects = project.getSubProjects(c);
         for (Project subProject : orderedSubProjects) {
             ProjectNodeImpl subNode = new ProjectNodeImpl(service, subProject, c);
             children.add(subNode);

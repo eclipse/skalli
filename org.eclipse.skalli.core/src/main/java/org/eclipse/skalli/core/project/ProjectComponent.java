@@ -26,11 +26,13 @@ import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.Project.CompareByProjectId;
 import org.eclipse.skalli.model.ProjectNature;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ValidationException;
@@ -181,45 +183,49 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
     }
 
     @Override
-    public List<Project> getSubProjects(UUID uuid) {
+    public SortedSet<Project> getSubProjects(UUID uuid) {
         return getSubProjects(uuid, null, 1);
     }
 
     @Override
-    public List<Project> getSubProjects(UUID uuid, Comparator<Project> c) {
+    public SortedSet<Project> getSubProjects(UUID uuid, Comparator<Project> c) {
         return getSubProjects(uuid, c, 1);
     }
 
     @Override
-    public List<Project> getSubProjects(UUID uuid, Comparator<Project> c, int depth) {
+    public SortedSet<Project> getSubProjects(UUID uuid, Comparator<Project> c, int depth) {
         depth = depth < 0 ? Integer.MAX_VALUE : depth;
-        List<Project> result = new ArrayList<Project>();
         if (depth == 0) {
-            return result;
+            return CollectionUtils.emptySortedSet();
         }
-        for (Project project : getAll()) {
-            if (isSubproject(project, uuid, depth)) {
-                result.add(project);
-            }
+
+        Project project = getByUUID(uuid);
+        if (project == null) {
+            return CollectionUtils.emptySortedSet();
         }
-        if (c != null) {
-            Collections.sort(result, c);
+
+        if (depth == 1) {
+            return project.getSubProjects(c);
         }
-        return result;
+
+        SortedSet<Project> subprojects = c != null ?
+                new TreeSet<Project>(c) :
+                new TreeSet<Project>(new CompareByProjectId());
+
+        addSubProjects(project, subprojects, 1, depth);
+        return subprojects;
     }
 
-    private boolean isSubproject(Project project, UUID uuid, int depth) {
-        for (int i = 0; i < depth; i++) {
-            project = (Project) project.getParentEntity();
-            if (project == null) {
-                return false;
-            }
-            UUID parentUUID = project.getUuid();
-            if (uuid.equals(parentUUID)) {
-                return true;
-            }
+    private void addSubProjects(EntityBase parent, SortedSet<Project> subprojects, int currentDepth, int depth) {
+        if (currentDepth > depth) {
+            return;
         }
-        return false;
+        EntityBase next = (Project)parent.getFirstChild();
+        while (next != null) {
+            subprojects.add((Project)next);
+            addSubProjects(next, subprojects, currentDepth + 1, depth);
+            next = next.getNextSibling();
+        }
     }
 
     @Override
