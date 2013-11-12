@@ -44,7 +44,6 @@ import org.eclipse.skalli.services.extension.ExtensionValidator;
 import org.eclipse.skalli.services.extension.PropertyValidator;
 import org.eclipse.skalli.services.persistence.PersistenceService;
 import org.eclipse.skalli.services.project.InvalidParentChainException;
-import org.eclipse.skalli.services.project.ProjectNode;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.role.RoleProvider;
 import org.eclipse.skalli.services.template.NoSuchTemplateException;
@@ -305,21 +304,19 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
     }
 
     @Override
-    public List<ProjectNode> getRootProjectNodes(Comparator<Project> c) {
-        List<ProjectNode> rootNodes = new LinkedList<ProjectNode>();
-        List<Project> projects = getProjects(c);
-        for (Project project : projects) {
+    public List<Project> getRootProjects(Comparator<Project> c) {
+        List<Project> rootProjects = new ArrayList<Project>();
+        List<UUID> uuids = new ArrayList<UUID>(keySet());
+        for (UUID uuid : uuids) {
+            Project project = getByUUID(uuid);
+            if (project == null) {
+                continue;
+            }
             if (project.getParentProject() == null) {
-                ProjectNode projectNode = new ProjectNodeImpl(this, project, c);
-                rootNodes.add(projectNode);
+                rootProjects.add(project);
             }
         }
-        return rootNodes;
-    }
-
-    @Override
-    public ProjectNode getProjectNode(UUID uuid, Comparator<Project> c) {
-        return new ProjectNodeImpl(this, uuid, c);
+        return rootProjects;
     }
 
     @Override

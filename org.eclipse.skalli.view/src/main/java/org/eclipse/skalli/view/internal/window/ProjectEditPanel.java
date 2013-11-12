@@ -23,6 +23,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Project;
@@ -35,7 +36,6 @@ import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.group.GroupUtils;
 import org.eclipse.skalli.services.issues.Issues;
 import org.eclipse.skalli.services.issues.IssuesService;
-import org.eclipse.skalli.services.project.ProjectNode;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
@@ -645,7 +645,7 @@ public class ProjectEditPanel extends Panel implements ProjectPanel {
                 application.refresh((Project) project.getParentEntity());
                 application.refresh((Project) modifiedProject.getParentEntity());
                 if (!modifiedProject.isDeleted()) {
-                    refreshSubProjects();
+                    refreshSubProjects(modifiedProject);
                     navigator.navigateProjectView(modifiedProject);
                 }
                 else {
@@ -657,16 +657,12 @@ public class ProjectEditPanel extends Panel implements ProjectPanel {
             }
         }
 
-        private void refreshSubProjects() {
-            ProjectService projectService = Services.getRequiredService(ProjectService.class);
-            ProjectNode node = projectService.getProjectNode(modifiedProject.getUuid(), null);
-            refreshNode(projectService, node);
-        }
-
-        private void refreshNode(ProjectService projectService, ProjectNode node) {
-            for (ProjectNode child : node.getSubProjects()) {
-                application.refresh(child.getProject());
-                refreshNode(projectService, child);
+        private void refreshSubProjects(EntityBase parent) {
+            EntityBase next = parent.getFirstChild();
+            while (next != null) {
+                application.refresh((Project)next);
+                refreshSubProjects(next);
+                next = next.getNextSibling();
             }
         }
 

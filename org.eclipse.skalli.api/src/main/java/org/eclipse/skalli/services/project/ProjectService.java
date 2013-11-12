@@ -77,27 +77,13 @@ public interface ProjectService extends EntityService<Project>, Issuer {
     public List<Project> getProjects(List<UUID> uuids);
 
     /**
-     * returns a sorted list of root project nodes that can be used to
-     * traverse the project hierarchy.
+     * Returns a sorted list of root projects (projects without parent) that can be
+     * used to traverse the project hierarchy using {@link Project#getSubprojects()}.
      *
      * @param c the comparator to use to sort the result list
-     * @return sorted list of project nodes (see
-     *          {@link org.eclipse.skalli.services.projects.ProjectNode})
+     * @return sorted list of projects.
      */
-    public List<ProjectNode> getRootProjectNodes(Comparator<Project> c);
-
-    /**
-     * returns a project node for a certain project UUID that can be used to
-     * traverse the project hierarchy starting from this project
-     *
-     * @param uuid project UUID (see
-     *          {@link org.eclipse.skalli.services.projects.Project#getUuid()})
-     * @param c the comparator to use to sort the child nodes of the returned
-     *          <code>ProjectNode</code>
-     * @return project node (see
-     *          {@link org.eclipse.skalli.services.projects.ProjectNode})
-     */
-    public ProjectNode getProjectNode(UUID uuid, Comparator<Project> c);
+    public List<Project> getRootProjects(Comparator<Project> c);
 
     /**
      * Returns all subprojects mapped to their respective parent projects.
