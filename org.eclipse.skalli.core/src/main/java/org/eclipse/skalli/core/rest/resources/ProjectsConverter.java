@@ -11,13 +11,9 @@
 package org.eclipse.skalli.core.rest.resources;
 
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
-import org.eclipse.skalli.services.project.ProjectService;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -49,12 +45,9 @@ class ProjectsConverter extends RestConverterBase<Projects> {
         writer.addAttribute("start", Integer.toString(start)); //$NON-NLS-1$
         writer.addAttribute("count", Integer.toString(projects.size())); //$NON-NLS-1$
 
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
-        Map<UUID, List<Project>> subprojects = projectService.getSubProjects();
-
         for (Project project : projects) {
             writer.startNode("project"); //$NON-NLS-1$
-            new ProjectConverter(getHost(), extensions, subprojects, true).marshal(project, writer, context);
+            new ProjectConverter(getHost(), extensions, true).marshal(project, writer, context);
             writer.endNode();
         }
     }

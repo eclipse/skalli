@@ -11,8 +11,6 @@
 package org.eclipse.skalli.core.rest.resources;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,16 +39,8 @@ class ProjectConverter extends CommonProjectConverter {
         super(host, omitNSAttributes);
     }
 
-    public ProjectConverter(String host, Map<UUID, List<Project>> subprojects, boolean omitNSAttributes) {
-        super(host, subprojects, omitNSAttributes);
-    }
-
     public ProjectConverter(String host, String[] extensions, boolean omitNSAttributes) {
-        super(host, extensions, null, omitNSAttributes);
-    }
-
-    public ProjectConverter(String host, String[] extensions, Map<UUID, List<Project>> subprojects, boolean omitNSAttributes) {
-        super(host, extensions, subprojects, omitNSAttributes);
+        super(host, extensions, omitNSAttributes);
     }
 
     @Override
