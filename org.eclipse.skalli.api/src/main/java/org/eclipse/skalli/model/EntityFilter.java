@@ -8,12 +8,21 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.services.persistence;
+package org.eclipse.skalli.model;
 
-import org.eclipse.skalli.model.EntityBase;
-
+/**
+ * Functional interface for filtering of entities.
+ */
 public interface EntityFilter<T extends EntityBase> {
 
+    /**
+     * Checks if the given entity matches the filter criteria.
+     *
+     * @param entityClass  the class of the entity.
+     * @param entity  the entity to check.
+     *
+     * @return <code>true</code> if the entity is accecpted by the filter.
+     */
     public boolean accept(Class<T> entityClass, T entity);
 
 }

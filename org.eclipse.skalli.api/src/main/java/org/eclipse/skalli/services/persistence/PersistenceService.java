@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.EntityFilter;
 import org.eclipse.skalli.model.Project;
 
 /**
@@ -77,6 +78,18 @@ public interface PersistenceService {
      * @returns a list of entities, or an empty list.
      */
     public <T extends EntityBase> List<T> getEntities(Class<T> entityClass);
+
+    /**
+     * Returns all entities of a given entity class matching the given filter.
+     *
+     * @param <T> a type derived from <code>EntityBase</code>.
+     * @param entityClass  the class of the entities to retrieve.
+     * @param filter an entity filter, or <code>null</code>. If no filter
+     * is specified, all entities are returned.
+     *
+     * @returns a list of entities, or an empty list.
+     */
+    public <T extends EntityBase> List<T> getEntities(Class<T> entityClass, EntityFilter<T> filter);
 
     /**
      * Returns the overall number of entities of a given entity class.

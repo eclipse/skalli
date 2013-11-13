@@ -21,11 +21,11 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.ComparatorUtils;
 import org.eclipse.skalli.core.storage.FileStorageComponent;
 import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.EntityFilter;
 import org.eclipse.skalli.services.BundleProperties;
 import org.eclipse.skalli.services.entity.EntityService;
 import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.MigrationException;
-import org.eclipse.skalli.services.persistence.EntityFilter;
 import org.eclipse.skalli.services.persistence.PersistenceService;
 import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
@@ -210,6 +210,12 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
     public <T extends EntityBase> List<T> getEntities(Class<T> entityClass) {
         loadModel(entityClass);
         return cache.getEntities(entityClass);
+    }
+
+    @Override
+    public <T extends EntityBase> List<T> getEntities(Class<T> entityClass, EntityFilter<T> filter) {
+        loadModel(entityClass);
+        return cache.getEntities(entityClass, filter);
     }
 
     @Override

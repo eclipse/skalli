@@ -18,6 +18,7 @@ import java.util.SortedSet;
 import java.util.UUID;
 
 import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.EntityFilter;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Project;
@@ -77,6 +78,21 @@ public interface EntityService<T extends EntityBase> {
      * @returns a list of entities, or an empty list.
      */
     public List<T> getAll();
+
+    /**
+     * Returns all entities matching the given filter.
+     * <p>
+     * Note that the list of entities returned by this method can change without notice,
+     * e.g. when properties of an entry are changed or whole entities are deleted.
+     * This may lead to surprising effects especially when iterating through the list
+     * (see {@link ConcurrentModificationException}).
+     *
+     * @param filter an entity filter, or <code>null</code>. If no filter
+     * is specified, all entities are returned.
+     *
+     * @returns a list of entities, or an empty list.
+     */
+    public List<T> getAll(EntityFilter<T> filter);
 
     /**
      * Returns the overall number of entities.

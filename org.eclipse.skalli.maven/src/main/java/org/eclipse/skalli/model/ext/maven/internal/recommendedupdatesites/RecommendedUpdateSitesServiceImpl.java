@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.model.EntityFilter;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ValidationException;
@@ -27,7 +28,6 @@ import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpda
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpdateSitesService;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.UpdateSite;
 import org.eclipse.skalli.services.entity.EntityServiceBase;
-import org.eclipse.skalli.services.persistence.EntityFilter;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.user.UserUtils;
 import org.osgi.service.component.ComponentConstants;

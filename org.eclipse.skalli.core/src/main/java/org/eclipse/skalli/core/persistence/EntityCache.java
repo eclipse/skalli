@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.skalli.model.EntityBase;
-import org.eclipse.skalli.services.persistence.EntityFilter;
+import org.eclipse.skalli.model.EntityFilter;
 
 /**
  * Most trivial implementation of an in-memory cache for all kind of entities.
@@ -196,7 +196,8 @@ class EntityCache {
      *
      * @param <T> a type derived from <code>EntityBase</code>.
      * @param entityClass  the class of the entity.
-     * @param filter an entity filter.
+     * @param filter an entity filter, or <code>null</code>. If no filter
+     * is specified, all entities are returned.
      *
      * @return all entities of the given type matching the filter,
      * or an empty list.
@@ -210,7 +211,7 @@ class EntityCache {
         if (entityMap != null && entityMap.size() > 0) {
             for (EntityBase value : entityMap.values()) {
                 T entity = entityClass.cast(value);
-                if (filter.accept(entityClass, entity)) {
+                if (filter == null || filter.accept(entityClass, entity)) {
                     result.add(entity);
                 }
             }

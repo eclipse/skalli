@@ -22,6 +22,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.EntityFilter;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ValidationException;
@@ -133,6 +134,10 @@ public abstract class EntityServiceBase<T extends EntityBase> implements EntityS
     @Override
     public List<T> getAll() {
         return getPersistenceService().getEntities(getEntityClass());
+    }
+
+    public List<T> getAll(EntityFilter<T> filter) {
+        return getPersistenceService().getEntities(getEntityClass(), filter);
     }
 
     @Override

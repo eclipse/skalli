@@ -17,6 +17,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 
+import org.eclipse.skalli.model.EntityFilter;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ValidationException;
@@ -24,7 +25,6 @@ import org.eclipse.skalli.services.entity.EntityServiceBase;
 import org.eclipse.skalli.services.extension.DataMigration;
 import org.eclipse.skalli.services.favorites.Favorites;
 import org.eclipse.skalli.services.favorites.FavoritesService;
-import org.eclipse.skalli.services.persistence.EntityFilter;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;

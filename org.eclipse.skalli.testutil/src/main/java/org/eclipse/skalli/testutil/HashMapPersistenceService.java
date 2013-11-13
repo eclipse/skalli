@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.eclipse.skalli.model.EntityBase;
-import org.eclipse.skalli.services.persistence.EntityFilter;
+import org.eclipse.skalli.model.EntityFilter;
 import org.eclipse.skalli.services.persistence.PersistenceService;
 
 /**
@@ -70,13 +70,21 @@ public class HashMapPersistenceService implements PersistenceService {
 
     @Override
     public <T extends EntityBase> List<T> getEntities(Class<T> entityClass) {
+        return getEntities(entityClass, null);
+    }
+
+    @Override
+    public <T extends EntityBase> List<T> getEntities(Class<T> entityClass, EntityFilter<T> filter) {
         assertIsAssignable(entityClass);
         ArrayList<T> list = new ArrayList<T>(entities.size());
         for (EntityBase entity: entities.values()) {
-            list.add(entityClass.cast(entity));
+            if (filter == null || filter.accept(entityClass, entityClass.cast(entity))) {
+                list.add(entityClass.cast(entity));
+            }
         }
         return list;
     }
+
 
     @Override
     public <T extends EntityBase> int size(Class<T> entityClass) {
@@ -132,5 +140,4 @@ public class HashMapPersistenceService implements PersistenceService {
     public void refreshAll() {
         // nothing to do
     }
-
 }

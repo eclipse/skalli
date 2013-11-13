@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.model.EntityFilter;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Severity;
@@ -64,7 +65,18 @@ public class TestEntityService<T extends EntityBase> implements EntityService<T>
 
     @Override
     public List<T> getAll() {
-        return new ArrayList<T>(entities.values());
+        return getAll(null);
+    }
+
+    @Override
+    public List<T> getAll(EntityFilter<T> filter) {
+        ArrayList<T> all = new ArrayList<T>();
+        for (T next: entities.values()) {
+            if (filter == null || filter.accept(entityClass, next)) {
+                all.add(next);
+            }
+        }
+        return all;
     }
 
     @Override
