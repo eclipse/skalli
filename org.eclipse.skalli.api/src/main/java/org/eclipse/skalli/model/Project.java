@@ -44,7 +44,7 @@ public class Project extends ExtensibleEntityBase {
     public static class CompareByProjectName implements Comparator<Project> {
         @Override
         public int compare(Project o1, Project o2) {
-            int result = o1.getProjectId().compareToIgnoreCase(o2.getProjectId());
+            int result = o1.getName().compareToIgnoreCase(o2.getName());
             if (result == 0) {
                 result = o1.getProjectId().compareTo(o2.getProjectId());
             }
