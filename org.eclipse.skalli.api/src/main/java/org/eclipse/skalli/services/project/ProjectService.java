@@ -160,6 +160,9 @@ public interface ProjectService extends EntityService<Project>, Issuer {
 
     /**
      * Returns the chain of parent projects of the given project.
+     * <p>
+     * Note, this method can also be used to retrieve the parent chain
+     * of a deleted project.
      *
      * @param uuid
      *          a project's UUID (see
@@ -175,6 +178,8 @@ public interface ProjectService extends EntityService<Project>, Issuer {
      * that matches the given project nature. Since the project is member of its own
      * parent chain (see {@link #getParentChain(UUID)}), this method will return
      * the project itself, if it matches the given project nature.
+     * <p>
+     * Note, this method can also be applied to deleted projects.
      *
      * @param uuid
      *          a project's UUID (see

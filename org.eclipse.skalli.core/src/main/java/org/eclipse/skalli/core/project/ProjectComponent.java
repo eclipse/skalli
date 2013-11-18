@@ -230,22 +230,30 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
 
     @Override
     public List<Project> getParentChain(UUID uuid) {
-        return getParentChain(getByUUID(uuid));
+        Project project = getByUUID(uuid);
+        if (project == null) {
+            project = getDeletedProject(uuid);
+            if (project == null) {
+                return Collections.emptyList();
+            }
+        }
+        return getParentChain(project);
     }
 
     private List<Project> getParentChain(Project project) {
         List<Project> result = new LinkedList<Project>();
-        if (project != null) {
-            result.add(project);
-            UUID parentUUID = project.getParentProject();
-            while (parentUUID != null) {
-                Project parent = getByUUID(parentUUID);
+        result.add(project);
+        UUID parentUUID = project.getParentProject();
+        while (parentUUID != null) {
+            Project parent = getByUUID(parentUUID);
+            if (parent == null) {
+                parent = getDeletedProject(parentUUID);
                 if (parent == null) {
                     throw new InvalidParentChainException(project.getUuid(), parentUUID);
                 }
-                result.add(parent);
-                parentUUID = parent.getParentProject();
             }
+            result.add(parent);
+            parentUUID = parent.getParentProject();
         }
         return result;
     }
@@ -256,7 +264,10 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
         while (parentUUID != null) {
             Project parent = getByUUID(parentUUID);
             if (parent == null) {
-                throw new InvalidParentChainException(uuid, parentUUID);
+                parent = getDeletedProject(parentUUID);
+                if (parent == null) {
+                    throw new InvalidParentChainException(uuid, parentUUID);
+                }
             }
             String templateId = parent.getProjectTemplateId();
             ProjectTemplate template = projectTemplateService.getProjectTemplateById(templateId);
@@ -266,7 +277,7 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
             if (nature.equals(template.getProjectNature())) {
                 return parent;
             }
-            parentUUID = getByUUID(parentUUID).getParentProject();
+            parentUUID = parent.getParentEntityId();
         }
         return null;
     }
