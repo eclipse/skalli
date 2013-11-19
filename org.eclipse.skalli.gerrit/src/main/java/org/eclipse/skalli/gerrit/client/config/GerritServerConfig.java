@@ -15,19 +15,27 @@ import org.eclipse.skalli.services.configuration.Protect;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias("gerrit")
-public class GerritConfig {
+@XStreamAlias("server")
+public class GerritServerConfig {
 
     private String protocol;
     private String host;
     private String port;
+
+    private String id;
+    private String name;
+    private String description;
+    private String contact;
+
+    private boolean preferred;
+
     @Protect
     private String user;
     @Protect
     private String privateKey;
     @Protect
     private String passphrase;
-    private String contact;
+
     private String scmTemplate;
     private String groupDescription;
     private String projectDescription;
@@ -39,7 +47,7 @@ public class GerritConfig {
     private boolean subprojectsOnly;
 
     // do not remove: required by xstream
-    public GerritConfig() {
+    public GerritServerConfig() {
     }
 
     public String getProtocol() {
@@ -66,41 +74,113 @@ public class GerritConfig {
         this.port = port;
     }
 
-    public String getUser() {
-        return user;
+
+    public String getId() {
+        return id;
     }
 
-    public void setUser(String user) {
-        this.user = user;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getPrivateKey() {
-        return privateKey;
+    public String getName() {
+        return name;
     }
 
-    public void setPrivateKey(String privateKey) {
-        this.privateKey = privateKey;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getPassphrase() {
-        return passphrase;
+    public String getDescription() {
+        return description;
     }
 
-    public void setPassphrase(String passphrase) {
-        this.passphrase = passphrase;
-    }
-
-    public void setContact(String contact) {
-        this.contact = contact;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getContact() {
         return contact;
     }
 
+    public void setContact(String contact) {
+        this.contact = contact;
+    }
+
+    public boolean isPreferred() {
+        return preferred;
+    }
+
+    public void setPreferred(boolean preferred) {
+        this.preferred = preferred;
+    }
+
+    /**
+     * Returns the user identifier to use for accessing a Gerrit server.
+     * Note, this user needs permissions for the Gerrit "create-project" and
+     * "create-group" commands.
+     *
+     * @return the unique user identifier.
+     */
+    public String getUser() {
+        return user;
+    }
+
+    /**
+     * Sets the user identifier to use for accessing a Gerrit server.
+     * Note, this user needs permissions for the Gerrit "create-project" and
+     * "create-group" commands.
+     *
+     * @param user  the unique user identifier to use.
+     */
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    /**
+     * Returns the private key for SSH access.
+     *
+     * @return the configured private key, or <code>null</code> if no
+     * private key is configured or required.
+     */
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    /**
+     * Sets the private key for SSH access.
+     *
+     * @param privateKey private key to use, or <code>null</code>.
+     */
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
+    }
+
+    /**
+     * Returns the passphrase for the private key (if SSH access is used),
+     * otherwise the password for user/password authentication.
+     *
+     * @return the configured passphrase, or <code>null</code> if no
+     * passphrase is configured or required.
+     */
+    public String getPassphrase() {
+        return passphrase;
+    }
+
+    /**
+     * Sets the passphrase for the private key (if SSH access is used),
+     * otherwise the password for user/password authentication.
+     *
+     * @param passphrase  the passphrase to use, or <code>null</code>.
+     */
+    public void setPassphrase(String passphrase) {
+        this.passphrase = passphrase;
+    }
+
     /**
      * Returns the template from which the SCM location is
      * derived for new Gerrit projects.
+     *
      * @return the configured SCM templates, or <code>null</code>.
      */
     public String getScmTemplate() {
@@ -129,6 +209,7 @@ public class GerritConfig {
     /**
      * Returns the default description to be assigned to new Gerrit projects.
      * The description might contains variables.
+     *
      * @returns the configured description, or <code>null</code>.
      */
     public String getProjectDescription() {
@@ -137,6 +218,7 @@ public class GerritConfig {
 
     /**
      * Sets the default description to be assigned to new Gerrit groups.
+     *
      * @param description  the description to set, or <code>null</code>.
      */
     public void setGrouptDescription(String description) {
@@ -146,6 +228,7 @@ public class GerritConfig {
     /**
      * Returns the default description to be assigned to new Gerrit groups.
      * The description might contains variables.
+     *
      * @returns the configured description, or <code>null</code>.
      */
     public String getGroupDescription() {
@@ -154,6 +237,7 @@ public class GerritConfig {
 
     /**
      * Sets the default description to be assigned to new Gerrit projects.
+     *
      * @param description  the description to set, or <code>null</code>.
      */
     public void setProjectDescription(String description) {
@@ -162,6 +246,7 @@ public class GerritConfig {
 
     /**
      * Returns the default parent project to be assigned to new Gerrit projects.
+     *
      * @return the configured parent projects to be assigned, or <code>null</code>.
      */
     public String getParent() {
@@ -170,6 +255,7 @@ public class GerritConfig {
 
     /**
      * Sets the default parent project to be assigned to new Gerrit projects.
+     *
      * @param parent  the parent to set, or <code>null</code>. If not specified
      * upon project creation Gerrit assigns the built-in <tt>"All Projects"</tt>
      * project as parent.
@@ -180,6 +266,7 @@ public class GerritConfig {
 
     /**
      * Returns the name of the default branch to be created for new Gerrit projects.
+     *
      * @return the initial branch to create, or <code>null</code>.
      */
     public String getBranch() {
@@ -188,6 +275,7 @@ public class GerritConfig {
 
     /**
      * Sets the name of the default branch to be created for new Gerrit projects.
+     *
      * @param branch the branch to set, or <code>null</code>. If not specified
      * upon project creation Gerrit creates a <tt>"master"</tt> branch by default.
      */
@@ -197,6 +285,7 @@ public class GerritConfig {
 
     /**
      * Returns the submit type (merge strategy) to be applied for new Gerrit projects.
+     *
      * @return the submitType  the submit type.
      */
     public SubmitType getSubmitType() {
@@ -205,6 +294,7 @@ public class GerritConfig {
 
     /**
      * Sets the submit type (merge strategy) to be applied for new Gerrit projects.
+     *
      * @param submitType the submitType to set.
      */
     public void setSubmitType(SubmitType submitType) {
@@ -222,6 +312,7 @@ public class GerritConfig {
     /**
      * Defines whether commits for new Gerrit project shall be subject to a
      * contributor agreement.
+     *
      * @param useContributorAgreement if <code>true</code> commits for new
      * Gerrit projects shall be subject to a contributor agreement.
      */
@@ -240,6 +331,7 @@ public class GerritConfig {
     /**
      * Defines whether commits for new Gerrit projects must have a
      * <tt>"Signed-off-by:"</tt> header.
+     *
      * @param useSignedOffBy  if <code>true</code> commits for new Gerrit projects
      * must have a <tt>"Signed-off-by:"</tt> header.
      */
@@ -265,6 +357,4 @@ public class GerritConfig {
     public void setSubprojectsOnly(boolean subprojectsOnly) {
         this.subprojectsOnly = subprojectsOnly;
     }
-
-
 }

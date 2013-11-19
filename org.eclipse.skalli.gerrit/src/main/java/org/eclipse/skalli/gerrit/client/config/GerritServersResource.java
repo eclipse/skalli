@@ -10,12 +10,23 @@
  *******************************************************************************/
 package org.eclipse.skalli.gerrit.client.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.skalli.services.configuration.ConfigResourceBase;
 
-public class GerritResource extends ConfigResourceBase<GerritConfig> {
+public class GerritServersResource extends ConfigResourceBase<GerritServersConfig> {
 
     @Override
-    protected Class<GerritConfig> getConfigClass() {
-        return GerritConfig.class;
+    protected Class<GerritServersConfig> getConfigClass() {
+        return GerritServersConfig.class;
     }
+
+    @Override
+    protected List<Class<?>> getAdditionalConfigClasses() {
+        List<Class<?>> ret = new ArrayList<Class<?>>();
+        ret.add(GerritServerConfig.class);
+        return ret;
+    }
+
 }

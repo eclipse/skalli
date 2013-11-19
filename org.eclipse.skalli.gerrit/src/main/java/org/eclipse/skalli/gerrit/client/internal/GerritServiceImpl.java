@@ -13,7 +13,8 @@ package org.eclipse.skalli.gerrit.client.internal;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritService;
-import org.eclipse.skalli.gerrit.client.config.GerritConfig;
+import org.eclipse.skalli.gerrit.client.config.GerritServerConfig;
+import org.eclipse.skalli.gerrit.client.config.GerritServersConfig;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,11 @@ public class GerritServiceImpl implements GerritService {
     }
 
     @Override
-    public GerritClient getClient(String onBehalfOf) {
+    public GerritClient getClient(String id, String onBehalfOf) {
+        if (StringUtils.isBlank(id)) {
+            LOG.warn("Failed to create a Gerrit client: No server id specified");
+            return null;
+        }
         if (StringUtils.isBlank(onBehalfOf)) {
             LOG.warn("Failed to create a Gerrit client: No acting user available");
             return null;
@@ -44,12 +49,16 @@ public class GerritServiceImpl implements GerritService {
             return null;
         }
 
-        GerritConfig gerritConfig = configService.readConfiguration(GerritConfig.class);
-        if (gerritConfig == null) {
+        GerritServersConfig gerritServers = configService.readConfiguration(GerritServersConfig.class);
+        if (gerritServers == null) {
             LOG.warn("Failed to create a Gerrit client:  No Gerrit configuration available");
             return null;
         }
-
+        GerritServerConfig gerritConfig = gerritServers.getServer(id);
+        if (gerritConfig == null) {
+            LOG.warn("Failed to create a Gerrit client:  No Gerrit configuration for id=" + id);
+            return null;
+        }
         if (StringUtils.isBlank(gerritConfig.getHost())) {
             LOG.warn("Failed to create a Gerrit client:  No host configuration available");
             return null;

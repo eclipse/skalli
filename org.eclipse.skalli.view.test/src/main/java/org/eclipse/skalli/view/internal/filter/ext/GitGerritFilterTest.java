@@ -22,7 +22,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.eclipse.skalli.gerrit.client.GerritClient;
-import org.eclipse.skalli.gerrit.client.config.GerritConfig;
+import org.eclipse.skalli.gerrit.client.config.GerritServerConfig;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ext.commons.InfoExtension;
@@ -66,7 +66,7 @@ public class GitGerritFilterTest {
     }
 
     private void assertDefaultScmLocation(String scmPattern) {
-        GerritConfig gerritConfig = createGerritConfig(scmPattern);
+        GerritServerConfig gerritConfig = createGerritConfig(scmPattern);
         Project project = createProject();
         User user = createUser();
         GitGerritFilter filter = new GitGerritFilter();
@@ -76,7 +76,7 @@ public class GitGerritFilterTest {
 
     @Test
     public void testGetScmLocationAllProps() throws Exception {
-        GerritConfig gerritConfig = createGerritConfig(SCM_PATTERN_WITH_ALL_VARIABLES);
+        GerritServerConfig gerritConfig = createGerritConfig(SCM_PATTERN_WITH_ALL_VARIABLES);
         Project project = createProject();
         User user = createUser();
         GitGerritFilter filter = new GitGerritFilter();
@@ -122,8 +122,8 @@ public class GitGerritFilterTest {
                 "skalli" + TestUUIDs.TEST_UUIDS[3].toString());
     }
 
-    private GerritConfig createGerritConfig(String scmPattern) {
-        GerritConfig gerritConfig = new GerritConfig();
+    private GerritServerConfig createGerritConfig(String scmPattern) {
+        GerritServerConfig gerritConfig = new GerritServerConfig();
         gerritConfig.setProtocol("ssh");
         gerritConfig.setHost("example.org");
         gerritConfig.setPort(Integer.toString(GerritClient.DEFAULT_PORT));

@@ -26,7 +26,7 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritFeature;
 import org.eclipse.skalli.gerrit.client.GerritVersion;
-import org.eclipse.skalli.gerrit.client.config.GerritConfig;
+import org.eclipse.skalli.gerrit.client.config.GerritServerConfig;
 import org.eclipse.skalli.gerrit.client.exception.CommandException;
 import org.eclipse.skalli.gerrit.client.exception.ConnectionException;
 import org.eclipse.skalli.gerrit.client.exception.GerritClientException;
@@ -138,8 +138,8 @@ public class GerritClientTest {
         }
     }
 
-    private static GerritConfig getGerritConfig() {
-        GerritConfig gerritConfig = new GerritConfig();
+    private static GerritServerConfig getGerritConfig() {
+        GerritServerConfig gerritConfig = new GerritServerConfig();
         gerritConfig.setHost(TEST_HOST);
         gerritConfig.setPort(TEST_PORT);
         gerritConfig.setUser(TEST_ADMIN_ACCOUNT);
@@ -348,7 +348,7 @@ public class GerritClientTest {
 
     @Test(expected = ConnectionException.class)
     public void testInvalidSettingsHost() throws Exception {
-        GerritConfig gerritConfig = getGerritConfig();
+        GerritServerConfig gerritConfig = getGerritConfig();
         gerritConfig.setHost("some.host.corp");
         GerritClient invalidClient = new GerritClientImpl(gerritConfig, TEST_ONBEHALFOF);
         invalidClient.connect();
@@ -356,7 +356,7 @@ public class GerritClientTest {
 
     @Test(expected = ConnectionException.class)
     public void testInvalidSettingsPort() throws Exception {
-        GerritConfig gerritConfig = getGerritConfig();
+        GerritServerConfig gerritConfig = getGerritConfig();
         gerritConfig.setHost("50000");
         GerritClient invalidClient = new GerritClientImpl(gerritConfig, TEST_ONBEHALFOF);
         invalidClient.connect();
@@ -364,7 +364,7 @@ public class GerritClientTest {
 
     @Test(expected = ConnectionException.class)
     public void testInvalidSettingsUser() throws Exception {
-        GerritConfig gerritConfig = getGerritConfig();
+        GerritServerConfig gerritConfig = getGerritConfig();
         gerritConfig.setUser("LoremIpsum");
         GerritClient invalidClient = new GerritClientImpl(gerritConfig, TEST_ONBEHALFOF);
         invalidClient.connect();
@@ -372,7 +372,7 @@ public class GerritClientTest {
 
     @Test(expected = ConnectionException.class)
     public void testInvalidSettingsPrivateKey() throws Exception {
-        GerritConfig gerritConfig = getGerritConfig();
+        GerritServerConfig gerritConfig = getGerritConfig();
         gerritConfig.setPrivateKey("foobar");
         GerritClient invalidClient = new GerritClientImpl(gerritConfig, TEST_ONBEHALFOF);
         invalidClient.connect();
@@ -380,7 +380,7 @@ public class GerritClientTest {
 
     @Test(expected = ConnectionException.class)
     public void testInvalidSettingsPassphrase() throws Exception {
-        GerritConfig gerritConfig = getGerritConfig();
+        GerritServerConfig gerritConfig = getGerritConfig();
         gerritConfig.setPassphrase("foobar");
         GerritClient invalidClient = new GerritClientImpl(gerritConfig, TEST_ONBEHALFOF);
         invalidClient.connect();
@@ -417,7 +417,7 @@ public class GerritClientTest {
      */
     private static class EvilGerritClient extends GerritClientImpl {
 
-        private EvilGerritClient(GerritConfig gerritConfig, String onBehalfOf) {
+        private EvilGerritClient(GerritServerConfig gerritConfig, String onBehalfOf) {
             super(gerritConfig, onBehalfOf);
         }
 

@@ -13,7 +13,7 @@ package org.eclipse.skalli.gerrit.client.config;
 import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.restlet.resource.ServerResource;
 
-public class GerritConfigSection implements ConfigSection<GerritConfig> {
+public class GerritServersConfigSection implements ConfigSection<GerritServersConfig> {
 
     private static final String STORAGE_KEY = "gerrit"; //$NON-NLS-1$
     private static final String[] RESOURCE_PATHS = new String[] { "/gerrit" }; //$NON-NLS-1$
@@ -24,8 +24,8 @@ public class GerritConfigSection implements ConfigSection<GerritConfig> {
     }
 
     @Override
-    public Class<GerritConfig> getConfigClass() {
-        return GerritConfig.class;
+    public Class<GerritServersConfig> getConfigClass() {
+        return GerritServersConfig.class;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class GerritConfigSection implements ConfigSection<GerritConfig> {
     }
     @Override
     public Class<? extends ServerResource> getServerResource(String resourePath) {
-        return GerritResource.class;
+        return GerritServersResource.class;
     }
 
 }

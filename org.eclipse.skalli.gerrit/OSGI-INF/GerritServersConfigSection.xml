@@ -9,8 +9,8 @@
     Contributors:
         SAP AG - initial API and implementation
  -->
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.gerrit.client.config.GerritConfigSection">
-    <implementation class="org.eclipse.skalli.gerrit.client.config.GerritConfigSection"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.gerrit.config.servers">
+    <implementation class="org.eclipse.skalli.gerrit.client.config.GerritServersConfigSection"/>
     <service>
         <provide interface="org.eclipse.skalli.services.configuration.ConfigSection"/>
     </service>

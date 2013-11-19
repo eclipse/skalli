@@ -28,6 +28,6 @@ Import-Package: com.jcraft.jsch,
 Export-Package: org.eclipse.skalli.gerrit.client,
  org.eclipse.skalli.gerrit.client.config,
  org.eclipse.skalli.gerrit.client.exception
-Service-Component: OSGI-INF/GerritConfigSection.xml,
+Service-Component: OSGI-INF/GerritServersConfigSection.xml,
  OSGI-INF/GerritService.xml
 Bundle-ActivationPolicy: lazy

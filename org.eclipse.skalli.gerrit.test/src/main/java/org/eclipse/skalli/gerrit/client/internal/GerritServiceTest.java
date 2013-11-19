@@ -14,7 +14,8 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.eclipse.skalli.gerrit.client.config.GerritConfig;
+import org.eclipse.skalli.gerrit.client.config.GerritServerConfig;
+import org.eclipse.skalli.gerrit.client.config.GerritServersConfig;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.junit.Test;
 
@@ -22,6 +23,7 @@ import org.junit.Test;
 @SuppressWarnings("nls")
 public class GerritServiceTest {
 
+  private static final String ID = "someId";
   private static final String HOST = "some.host";
   private static final String PORT = "12345";
   private static final String USER = "some:user";
@@ -37,96 +39,106 @@ public class GerritServiceTest {
 
   @Test
   public void testGetClient() throws Exception {
-    ConfigurationService mockedConfigService = configAndReplay(HOST, PORT, USER, PRIVATEKEY, PASSPHRASE);
-    assertNotNull(getServiceImpl(mockedConfigService).getClient(ON_BEHALF_OF));
+    ConfigurationService mockedConfigService = configAndReplay(ID, HOST, PORT, USER, PRIVATEKEY, PASSPHRASE);
+    assertNotNull(getServiceImpl(mockedConfigService).getClient(ID, ON_BEHALF_OF));
     verify(mockedConfigService);
   }
 
   @Test
   public void testGetClientUserIdNull() throws Exception {
-    assertNull(getServiceImpl(null).getClient(null));
+    assertNull(getServiceImpl(null).getClient(ID, null));
   }
 
   @Test
   public void testGetClientConfigurationServiceNull() throws Exception {
-    assertNull(getServiceImpl(null).getClient(ON_BEHALF_OF));
+    assertNull(getServiceImpl(null).getClient(ID, ON_BEHALF_OF));
   }
 
 
   @Test
   public void testGetClientHostNull() throws Exception {
-    ConfigurationService mockedConfigService = configAndReplay(null, PORT, USER, PRIVATEKEY, PASSPHRASE);
-    assertNull(getServiceImpl(mockedConfigService).getClient(ON_BEHALF_OF));
+    ConfigurationService mockedConfigService = configAndReplay(ID, null, PORT, USER, PRIVATEKEY, PASSPHRASE);
+    assertNull(getServiceImpl(mockedConfigService).getClient(ID, ON_BEHALF_OF));
     verify(mockedConfigService);
   }
 
   @Test
   public void testGetClientHostEmpty() throws Exception {
-    ConfigurationService mockedConfigService = configAndReplay("", PORT, USER, PRIVATEKEY, PASSPHRASE);
-    assertNull(getServiceImpl(mockedConfigService).getClient(ON_BEHALF_OF));
+    ConfigurationService mockedConfigService = configAndReplay(ID, "", PORT, USER, PRIVATEKEY, PASSPHRASE);
+    assertNull(getServiceImpl(mockedConfigService).getClient(ID, ON_BEHALF_OF));
     verify(mockedConfigService);
   }
 
   @Test
   public void testGetClientPortNull() throws Exception {
-    ConfigurationService mockedConfigService = configAndReplay(HOST, null, USER, PRIVATEKEY, PASSPHRASE);
-    assertNotNull(getServiceImpl(mockedConfigService).getClient(ON_BEHALF_OF)); // client with default port 29418!
+    ConfigurationService mockedConfigService = configAndReplay(ID, HOST, null, USER, PRIVATEKEY, PASSPHRASE);
+    assertNotNull(getServiceImpl(mockedConfigService).getClient(ID, ON_BEHALF_OF)); // client with default port 29418!
     verify(mockedConfigService);
   }
 
   @Test
   public void testGetClientPortEmpty() throws Exception {
-    ConfigurationService mockedConfigService = configAndReplay(HOST, "", USER, PRIVATEKEY, PASSPHRASE);
-    assertNotNull(getServiceImpl(mockedConfigService).getClient(ON_BEHALF_OF)); // client with default port 29418!
+    ConfigurationService mockedConfigService = configAndReplay(ID, HOST, "", USER, PRIVATEKEY, PASSPHRASE);
+    assertNotNull(getServiceImpl(mockedConfigService).getClient(ID, ON_BEHALF_OF)); // client with default port 29418!
     verify(mockedConfigService);
   }
 
   @Test
   public void testGetClientPortNotNumeric() throws Exception {
-    ConfigurationService mockedConfigService = configAndReplay(HOST, "port", USER, PRIVATEKEY, PASSPHRASE);
-    assertNull(getServiceImpl(mockedConfigService).getClient(ON_BEHALF_OF));  // no fallback if port is invalid!
+    ConfigurationService mockedConfigService = configAndReplay(ID, HOST, "port", USER, PRIVATEKEY, PASSPHRASE);
+    assertNull(getServiceImpl(mockedConfigService).getClient(ID, ON_BEHALF_OF));  // no fallback if port is invalid!
     verify(mockedConfigService);
   }
 
   @Test
   public void testGetClientKeyNull() throws Exception {
-    ConfigurationService mockedConfigService = configAndReplay(HOST, PORT, USER, null, PASSPHRASE);
-    assertNull(getServiceImpl(mockedConfigService).getClient(ON_BEHALF_OF));
+    ConfigurationService mockedConfigService = configAndReplay(ID, HOST, PORT, USER, null, PASSPHRASE);
+    assertNull(getServiceImpl(mockedConfigService).getClient(ID, ON_BEHALF_OF));
     verify(mockedConfigService);
   }
 
   @Test
   public void testGetClientKeyEmpty() throws Exception {
-    ConfigurationService mockedConfigService = configAndReplay(HOST, PORT, USER, "", PASSPHRASE);
-    assertNull(getServiceImpl(mockedConfigService).getClient(ON_BEHALF_OF));
+    ConfigurationService mockedConfigService = configAndReplay(ID, HOST, PORT, USER, "", PASSPHRASE);
+    assertNull(getServiceImpl(mockedConfigService).getClient(ID, ON_BEHALF_OF));
     verify(mockedConfigService);
   }
 
   @Test
   public void testGetClientPassphraseNull() throws Exception {
-    ConfigurationService mockedConfigService = configAndReplay(HOST, PORT, USER, PRIVATEKEY, null);
-    assertNull(getServiceImpl(mockedConfigService).getClient(ON_BEHALF_OF));
+    ConfigurationService mockedConfigService = configAndReplay(ID, HOST, PORT, USER, PRIVATEKEY, null);
+    assertNull(getServiceImpl(mockedConfigService).getClient(ID, ON_BEHALF_OF));
     verify(mockedConfigService);
   }
 
   @Test
   public void testGetClientPassphraseEmpty() throws Exception {
-    ConfigurationService mockedConfigService = configAndReplay(HOST, PORT, USER, PRIVATEKEY, "");
-    assertNull(getServiceImpl(mockedConfigService).getClient(ON_BEHALF_OF));
+    ConfigurationService mockedConfigService = configAndReplay(ID, HOST, PORT, USER, PRIVATEKEY, "");
+    assertNull(getServiceImpl(mockedConfigService).getClient(ID, ON_BEHALF_OF));
     verify(mockedConfigService);
   }
 
-  private ConfigurationService configAndReplay(String host, String port, String user, String privateKey,
+  @Test
+  public void testGetClientUnknownId() throws Exception {
+    ConfigurationService mockedConfigService = configAndReplay(ID, HOST, PORT, USER, PRIVATEKEY, "");
+    assertNull(getServiceImpl(mockedConfigService).getClient("foo", ON_BEHALF_OF));
+    verify(mockedConfigService);
+  }
+
+  private ConfigurationService configAndReplay(String id, String host, String port, String user, String privateKey,
       String passphrase) {
-    GerritConfig gerritConfig = new GerritConfig();
+    GerritServerConfig gerritConfig = new GerritServerConfig();
+    gerritConfig.setId(id);
     gerritConfig.setHost(host);
     gerritConfig.setPort(port);
     gerritConfig.setUser(user);
     gerritConfig.setPrivateKey(privateKey);
     gerritConfig.setPassphrase(passphrase);
+    GerritServersConfig serversConfig = new GerritServersConfig();
+    serversConfig.addServer(gerritConfig);
     ConfigurationService mockedConfigService = createMock(ConfigurationService.class);
 
-    expect(mockedConfigService.readConfiguration(GerritConfig.class)).andReturn(gerritConfig);
+    expect(mockedConfigService.readConfiguration(GerritServersConfig.class)).andReturn(serversConfig);
 
     replay(mockedConfigService);
     return mockedConfigService;

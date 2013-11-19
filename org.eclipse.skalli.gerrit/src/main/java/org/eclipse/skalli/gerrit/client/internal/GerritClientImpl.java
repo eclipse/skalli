@@ -37,7 +37,7 @@ import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritFeature;
 import org.eclipse.skalli.gerrit.client.GerritVersion;
 import org.eclipse.skalli.gerrit.client.SubmitType;
-import org.eclipse.skalli.gerrit.client.config.GerritConfig;
+import org.eclipse.skalli.gerrit.client.config.GerritServerConfig;
 import org.eclipse.skalli.gerrit.client.exception.CommandException;
 import org.eclipse.skalli.gerrit.client.exception.ConnectionException;
 import org.eclipse.skalli.gerrit.client.internal.GSQL.ResultFormat;
@@ -71,7 +71,7 @@ public class GerritClientImpl implements GerritClient {
             ".*(show|insert|update|delete|merge|create|alter|rename|truncate|drop)\\s.*", Pattern.CASE_INSENSITIVE
                     | Pattern.MULTILINE);
 
-    final GerritConfig gerritConfig;
+    final GerritServerConfig gerritConfig;
     final int port;
     final String onBehalfOf;
 
@@ -80,7 +80,7 @@ public class GerritClientImpl implements GerritClient {
     ChannelExec channel = null;
     GerritVersion serverVersion = null;
 
-    GerritClientImpl(GerritConfig gerritConfig, String onBehalfOf) {
+    GerritClientImpl(GerritServerConfig gerritConfig, String onBehalfOf) {
         this.gerritConfig = gerritConfig;
         this.port = NumberUtils.toInt(gerritConfig.getPort(),  GerritClient.DEFAULT_PORT);
         this.onBehalfOf = onBehalfOf;

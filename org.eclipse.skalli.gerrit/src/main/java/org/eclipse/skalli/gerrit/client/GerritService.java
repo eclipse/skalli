@@ -15,12 +15,13 @@ public interface GerritService {
     /**
      * Returns a Gerrit client for communication with a configured Gerrit server.
      *
+     * @param id  the unique identifier of the Gerrit server.
      * @param onBehalfOf  the unique identifier of the user to act on behalf of.
      * Note, this user is usually the currently logged in user and not the user
      * with which the returned client communicates with Gerrit.
      *
      * @return a preconfigured Gerrit client.
      */
-    public GerritClient getClient(String onBehalfOf);
+    public GerritClient getClient(String id, String onBehalfOf);
 
 }
