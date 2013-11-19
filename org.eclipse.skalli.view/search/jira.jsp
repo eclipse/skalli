@@ -52,39 +52,41 @@
 <h3>
 <img src="/img/jira_logo.png" alt="JIRA Logo" style="width:32px; height:32px; margin-right:5px; vertical-align:middle;"/> Add Project to JIRA
 </h3>
-Click on the link below to open a JIRA dialog on the JIRA server in another browser window. Don't close the current window and process the form in the JIRA window. You may want to use the following data:<br/>
+Follow the link below to open the Jira Project Creation Self Service in another browser tab or window. Don't close the current tab! The self service form will be pre-populated with the following data:<br/>
 <br/>
-
 <table border="0" style="padding-left: 40px;">
- <colgroup>
+  <colgroup>
     <col width="80"/>
     <col width="400"/>
   </colgroup>
-
 <tr align="left">
 <td>Name:</td>
-<td><em>${html:escapeHtml(project.name)}</em></td>
+<td><em>${html:escapeHtml(name)}</em></td>
 </tr>
 <tr align="left">
 <td>Key:</td>
-<td><em>${project.projectId}</em></td>
+<td><em>${key}</em></td>
 </tr>
 <tr align="left">
 <td>Url: </td>
 <td><em>${projectUrl}</em></td>
 </tr>
 <tr align="left">
+<td>Project Type: </td>
+<td><em>${projectType}</em></td>
+</tr>
+<tr align="left">
 <td>Description: </td>
-<td><em>${html:clean(project.description)}</em></td>
+<td><em>${html:escapeHtml(abbrevDescr)}</em></td>
 </tr>
 </table>
 <br/>
-Copy the key of the created JIRA project to the clipboard before you close the JIRA browser window.
+Adapt the self service form to your needs and submit. Then copy &amp; paste the key of the freshly created JIRA project to the edit field below.
 <br/><br/>
 <a href="${remoteJiraUrl}" target="_blank">
-Follow this link to open a JIRA dialog on JIRA server.</a>
+JIRA Project Creation Self Service</a>
 <br/><br/>
-Paste the copied project key from clipboard to the following input field. Choose if you want to set the JIRA project as BugTracker and/or as Scrum Backlog to this project '${project.name}' and click on 'Save' if you want to persist this data. Click on 'Cancel' if you don't want to save any data to your project. <br/><br/>
+Choose whether you want to add a link to the Jira bug tracking page and/or Scrum backlog to your project. Click 'Save' to persist these links. Click 'Cancel' if you don't want to add these links to your project.<br/><br/>
 <form id="jiraform" name="jiraform" action="jira" method="post">
   <input type="hidden" name="<%= Consts.PARAM_ID %>" value="${project.projectId}"/>
   <table>
@@ -96,21 +98,21 @@ Paste the copied project key from clipboard to the following input field. Choose
     </tr>
     <tr>
       <td>
-        <div style="white-space: nowrap;">The Jira Project will be used</div><br/>
+        <div style="white-space: nowrap;">The Jira project will be used</div><br/>
       </td>
       <td width="100%">
         <c:choose>
           <c:when test="${devInfExtInherited}">
             <input type="checkbox" disabled="disabled"/>
-            <span class="disabled">to track bugs (not available as Development Information is inherited)</span>
+            <span class="disabled">for bug tracking (not available as Development Information is inherited)</span>
           </c:when>
           <c:when test="${addBugTracker}">
             <input type="checkbox" onclick="toggleBooleanValue('addBugTracker');document.jiraform.submit();" checked="checked" />
-            to track bugs
+            for bug tracking
           </c:when>
           <c:when test="${!addBugTracker}">
             <input type="checkbox" onclick="toggleBooleanValue('addBugTracker');document.jiraform.submit();"/>
-            to track bugs
+            for bug tracking
           </c:when>
         </c:choose>
         <input type="hidden" id="addBugTracker" name="addBugTracker" value="${ addBugTracker }" />
@@ -123,14 +125,14 @@ Paste the copied project key from clipboard to the following input field. Choose
           </c:when>
           <c:when test="${addScrumBacklog}">
             <input type="checkbox" onclick="toggleBooleanValue('addScrumBacklog');document.jiraform.submit();" checked="checked" />
-            as a Scrum backlog
+            as Scrum backlog
           </c:when>
           <c:when test="${!addScrumBacklog}">
             <input type="checkbox" onclick="toggleBooleanValue('addScrumBacklog');document.jiraform.submit();" />
-            as a Scrum backlog
+            as Scrum backlog
           </c:when>
         </c:choose>
-        <input type="hidden" id="addScrumBacklog" name="addScrumBacklog" value="${ addScrumBacklog }" />
+        <input type="hidden" id="addScrumBacklog" name="addScrumBacklog" value="${addScrumBacklog}" />
         <br/>
       </td>
     </tr>
@@ -147,12 +149,10 @@ Paste the copied project key from clipboard to the following input field. Choose
   <input type="submit" value="Cancel" name="<%= JiraFilter.PARAMETER_CANCEL %>" class="searchsubmit"/>
 </form>
 <script type="text/javascript">
-  inputHelp('jiraprojectkey', 'JIRA project key');
+  inputHelp('jiraprojectkey', 'JIRA Project Key');
   initForm('jiraform');
 </script>
-
 <br/>
-
 <c:choose>
   <c:when test="${validationException != null }">
     <span class="errorMessage">
@@ -165,17 +165,16 @@ Paste the copied project key from clipboard to the following input field. Choose
   <c:otherwise>
     <c:if test="${bugTracker != null && addBugTracker}">
       <div class="warningMessage">
-      Bug Tracker is already defined for this project ('${bugTracker}'), click on 'Save' to overwrite the current setting.
+      Bug Tracker is already defined for this project ('${bugTracker}')! Click 'Save' to overwrite the current setting.
       </div>
     </c:if>
     <c:if test="${scrumBacklog != null && addScrumBacklog}">
       <div class="warningMessage">
-      Scrum Backlog is already defined for this project ('${scrumBacklog}'), click on 'Save' to overwrite the current setting.
+      Scrum Backlog is already defined for this project ('${scrumBacklog}')! Click 'Save' to overwrite the current setting.
       </div>
     </c:if>
   </c:otherwise>
 </c:choose>
-
 </div>
 </body>
 </html>

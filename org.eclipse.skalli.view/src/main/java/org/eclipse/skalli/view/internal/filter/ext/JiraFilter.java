@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ValidationException;
@@ -58,6 +59,14 @@ public class JiraFilter implements Filter {
     public static final String REQUEST_ATTRIBUTE_VALIDATIONEXCEPTION = "validationException"; //$NON-NLS-1$
     public static final String REQUEST_ATTRIBUTE_SCRUMEXTINHERITED = "scrumExtInherited"; //$NON-NLS-1$
     public static final String REQUEST_ATTRIBUTE_DEVINFEXTINHERITED = "devInfExtInherited"; //$NON-NLS-1$
+
+    public static final String REQUEST_ATTRIBUTE_NAME = "name"; //$NON-NLS-1$
+    public static final String REQUEST_ATTRIBUTE_KEY = "key"; //$NON-NLS-1$
+    public static final String REQUEST_ATTRIBUTE_BACK_URL = "backUrl"; //$NON-NLS-1$
+    public static final String REQUEST_ATTRIBUTE_PROJECT_TYPE = "projectType"; //$NON-NLS-1$
+    public static final String REQUEST_ATTRIBUTE_ABBREVIATED_DESCIPTION = "abbrevDescr"; //$NON-NLS-1$
+    public static final String DEFAULT_PROJECT_TYPE = "All-in-one"; //$NON-NLS-1$
+
 
     // make jira configurable?
     public static final String JIRA_SERVER = "jtrack"; //$NON-NLS-1$
@@ -206,14 +215,25 @@ public class JiraFilter implements Filter {
             request.setAttribute(REQUEST_ATTRIBUTE_SCRUMBACKLOG, scrumExt.getBacklogUrl());
         }
 
+        // construct the Jira query parameters:
+        String name = project.getName();
+        String key = project.getOrConstructShortName().toUpperCase(Locale.ENGLISH);
+        String abbrevDescr = WordUtils.abbreviate(project.getDescription(), 100, 100, "..."); //$NON-NLS-1$
+        request.setAttribute(REQUEST_ATTRIBUTE_NAME, name);
+        request.setAttribute(REQUEST_ATTRIBUTE_KEY, key);
+        request.setAttribute(REQUEST_ATTRIBUTE_PROJECT_TYPE, DEFAULT_PROJECT_TYPE);
+        request.setAttribute(REQUEST_ATTRIBUTE_BACK_URL, projectUrl);
+        request.setAttribute(REQUEST_ATTRIBUTE_PROJECT_TYPE, DEFAULT_PROJECT_TYPE);
+        request.setAttribute(REQUEST_ATTRIBUTE_ABBREVIATED_DESCIPTION, abbrevDescr);
         StringBuilder jiraCreationUrl = new StringBuilder(JIRA_URL_CREATE);
         try {
-            jiraCreationUrl.append("?name=").append(URLEncoder.encode(project.getName(), encoding)); //$NON-NLS-1$
-            jiraCreationUrl
-                    .append("&amp;key=").append(URLEncoder.encode(project.getOrConstructShortName().toUpperCase(Locale.ENGLISH), encoding)); //$NON-NLS-1$
+            jiraCreationUrl.append("?name=").append(URLEncoder.encode(name, encoding)); //$NON-NLS-1$
+            jiraCreationUrl.append("&amp;key=").append(URLEncoder.encode(key, encoding)); //$NON-NLS-1$
             jiraCreationUrl.append("&amp;url=").append(URLEncoder.encode(projectUrl, encoding)); //$NON-NLS-1$
-            // Description shouldn't be used at the moment as GET requests should be 255 bytes or less (http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.2.1)
-            // jiraURL.append("&amp;description=").append(URLEncoder.encode(project.getDescription()));
+            jiraCreationUrl.append("&amp;projectType=").append(DEFAULT_PROJECT_TYPE); //$NON-NLS-1$
+            if (StringUtils.isNotBlank(project.getDescription())) {
+                jiraCreationUrl.append("&amp;description=").append(URLEncoder.encode(abbrevDescr, encoding)); //$NON-NLS-1$
+            }
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         }
