@@ -47,17 +47,24 @@ public class LDAPClient {
     private static final String SIMPLE_AUTHENTICATION = "simple"; //$NON-NLS-1$
     private static final String JNDI_SOCKET_FACTORY = "java.naming.ldap.factory.socket"; //$NON-NLS-1$
     private static final String DEFAULT_CONTEXT_FACTORY = "com.sun.jndi.ldap.LdapCtxFactory"; //$NON-NLS-1$
+    private static final String READ_TIMEOUT = "com.sun.jndi.ldap.read.timeout";//$NON-NLS-1$
     private static final String USE_CONNECTION_POOLING = "com.sun.jndi.ldap.connect.pool"; //$NON-NLS-1$
     private static final String CONNECT_POOL_PROTOCOLS = "com.sun.jndi.ldap.connect.pool.protocol"; //$NON-NLS-1$
     private static final String CONNECT_POOL_DEBUG = "com.sun.jndi.ldap.connect.pool.debug"; //$NON-NLS-1$
     private static final String CONNECT_POOL_MAXSIZE = "com.sun.jndi.ldap.connect.pool.maxsize"; //$NON-NLS-1$
     private static final String CONNECT_POOL_TIMEOUT = "com.sun.jndi.ldap.connect.pool.timeout"; //$NON-NLS-1$
 
+    private static final String DEFAULT_READ_TIMEOUT = "30000"; //$NON-NLS-1$
+    private static final String DEFAULT_CONNECT_TIMEOUT = "10000"; //$NON-NLS-1$
+
+    private static final String DEFAULT_POOL_MAXSIZE = "5"; //$NON-NLS-1$
+    private static final String DEFAULT_POOL_PROTOCOLS = "plain ssl"; //$NON-NLS-1$
+
     static {
         // heaven knows why the following params are system properties while all other params can be set per context...
-        System.setProperty(CONNECT_POOL_PROTOCOLS, "plain ssl"); //$NON-NLS-1$
-        System.setProperty(CONNECT_POOL_MAXSIZE, "5"); //$NON-NLS-1$
-        System.setProperty(CONNECT_POOL_TIMEOUT, "10000"); //$NON-NLS-1$
+        System.setProperty(CONNECT_POOL_PROTOCOLS, DEFAULT_POOL_PROTOCOLS);
+        System.setProperty(CONNECT_POOL_MAXSIZE, DEFAULT_POOL_MAXSIZE);
+        System.setProperty(CONNECT_POOL_TIMEOUT, DEFAULT_CONNECT_TIMEOUT);
         if (LOG.isDebugEnabled()) {
             System.setProperty(CONNECT_POOL_DEBUG, "fine"); //$NON-NLS-1$
         }
@@ -108,6 +115,7 @@ public class LDAPClient {
                 FrameworkUtil.getBundle(LDAPClient.class).getBundleContext());
 
         // com.sun.jndi.ldap.LdapCtxFactory specific properties
+        env.put(READ_TIMEOUT, DEFAULT_READ_TIMEOUT);
         env.put(USE_CONNECTION_POOLING, "true"); //$NON-NLS-1$
 
         // extremly ugly classloading workaround:
