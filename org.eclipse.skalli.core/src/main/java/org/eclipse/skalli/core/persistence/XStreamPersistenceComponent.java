@@ -149,12 +149,11 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
         }
 
         // reload the entity to proof that is has been persisted successfully;
-        // if so, update the caches and re-calculate the parent/child relations
-        T savedEntity = loadEntity(entityClass, entityId);
-        if (savedEntity != null) {
-            updateCache(savedEntity);
-            adjustEntityRelations(entityClass, oldEntity, savedEntity);
-            if (savedEntity.isDeleted()) {
+        // if so, adjust the parent/child relations of entity and put it into the cache.
+        if (loadEntity(entityClass, entityId) != null) {
+            adjustEntityRelations(entityClass, oldEntity, entity);
+            updateCache(entity);
+            if (entity.isDeleted()) {
                 AUDIT_LOG.info(MessageFormat.format("Entity {0} of type ''{1}'' has been deleted by user ''{2}''",
                         entityId, entityClass.getSimpleName(), userId));
             } else {
@@ -414,7 +413,8 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
      * Adjusts the parent/child relations of an entity after it has been changed
      * or created. If the parent changed or the deleted flag has been switched,
      * the entity is removed from the old parent (if any) and assigned to
-     * the new parent (if any).
+     * the new parent (if any). Furthermore, the first child of the old entity
+     * becomes the first child of the new entity.
      *
      * @param entityClass  the class of the entity.
      * @param oldEntity  the old entity instance, or <code>null</code> if the entity
@@ -426,6 +426,7 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
         T newParent = getParentEntity(entityClass, newEntity);
         newEntity.setParentEntity(newParent);
         if (oldEntity != null) {
+            newEntity.setFirstChild(oldEntity.getFirstChild());
             T oldParent = getParentEntity(entityClass, oldEntity);
             if (!ComparatorUtils.equals(oldParent, newParent)
                     || oldEntity.isDeleted() != newEntity.isDeleted()) {

@@ -151,6 +151,33 @@ public class XStreamPersistenceComponentTest {
         }
     }
 
+    @Test
+    public void testPersistLoadPersistCycle() throws Exception {
+        List<TestExtensibleEntityBase> expectedEntities = createTestEntityHierarchy();
+        for (ExtensibleEntityBase entity : expectedEntities) {
+            persistenceService.persist(entity.getClass(), entity, "anyonomous");
+        }
+
+        // load a project with a parent and a child
+        TestExtensibleEntityBase parent =
+                persistenceService.loadEntity(TestExtensibleEntityBase.class, TestUUIDs.TEST_UUIDS[1]);
+        // ensure that it has no parent
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[2], parent.getParentEntityId());
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[2], parent.getParentEntity().getUuid());
+        // ensure that the children have not been reseolved
+        Assert.assertNull(parent.getFirstChild());
+
+        // save the loaded entity again
+        persistenceService.persist(TestExtensibleEntityBase.class, parent, "anonymous");
+
+        // ensure we still have the same parent
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[2], parent.getParentEntityId());
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[2], parent.getParentEntity().getUuid());
+        // ensure that the children have now been resolved!
+        Assert.assertNotNull(parent.getFirstChild());
+        Assert.assertEquals(TestUUIDs.TEST_UUIDS[0], parent.getFirstChild().getUuid());
+    }
+
     @Test(expected = RuntimeException.class)
     public void testPersistUnknownParent() throws Exception {
         List<TestExtensibleEntityBase> expectedEntities = createTestEntityHierarchy();

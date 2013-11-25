@@ -84,12 +84,11 @@ public class TestEntityBase extends EntityBase {
 
     public static void assertEquals(EntityBase o1, EntityBase o2) {
         if (o1 == null) {
-            Assert.assertNull(o2);
+            Assert.assertNull("o1==0, but o2!=null", o2);
             return;
         }
         if (o2 == null) {
-            Assert.assertNull(o1);
-            return;
+            Assert.fail("o2==null, but o1!=null");
         }
         Assert.assertTrue(o1 instanceof TestEntityBase);
         Assert.assertTrue(o2 instanceof TestEntityBase);

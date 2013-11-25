@@ -13,6 +13,7 @@ package org.eclipse.skalli.testutil;
 import java.util.Iterator;
 import java.util.UUID;
 
+import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 
@@ -34,6 +35,18 @@ public class TestExtensibleEntityBase extends ExtensibleEntityBase {
             equals &= parentId.equals(o2.getParentEntityId());
         } else {
             equals &= o2.getParentEntityId() == null;
+        }
+        EntityBase parent1 = o1.getParentEntity();
+        if (parent1 != null) {
+            equals &= parent1.equals(o2.getParentEntity());
+        } else {
+            equals &= o2.getParentEntity() == null;
+        }
+        EntityBase firstChild1 = o1.getFirstChild();
+        if (firstChild1 != null) {
+            equals &= firstChild1.equals(o2.getFirstChild());
+        } else {
+            equals &= o2.getFirstChild() == null;
         }
         Iterator<ExtensionEntityBase> it = o1.getAllExtensions().iterator();
         for (ExtensionEntityBase ext : o2.getAllExtensions()) {
