@@ -71,7 +71,9 @@ public class GerritServersConfig {
 
     /**
      * Returns the (first) Gerrit server configuration with a
-     * set {@link GerritServerConfig#isPreferred() preferred flag}.
+     * set {@link GerritServerConfig#isPreferred() preferred flag},
+     * or the first available server if no server is marked as
+     * preferred.
      *
      * @return the preferred server configuration, or the first
      * configuration in the list, or <code>null</code> if no

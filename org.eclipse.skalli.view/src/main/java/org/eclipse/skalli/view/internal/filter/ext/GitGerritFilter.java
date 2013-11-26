@@ -162,13 +162,13 @@ public class GitGerritFilter implements Filter {
                 "emptyCommit".equals(request.getParameter("emptyCommit")) :
                 StringUtils.isBlank(action);
 
-                // Determine which Gerrit server to use: if a serverId is known, take that
+        // Determine which Gerrit server to use: if a serverId is known, take that
         // dedicated server; otherwise search for a server with the "preferred" flag;
         // if no server is marked as preferred, take the first
         List<GerritServerConfig> gerritServers = gerritServersConfig.getServers();
         request.setAttribute("gerritServers", gerritServers); //$NON-NLS-1$
 
-        GerritServerConfig gerritServer = gerritId != null?
+        GerritServerConfig gerritServer = StringUtils.isNotBlank(gerritId)?
                 gerritServersConfig.getServer(gerritId) :
                 gerritServersConfig.getPreferredServer();
         request.setAttribute("gerritServer", gerritServer); //$NON-NLS-1$
