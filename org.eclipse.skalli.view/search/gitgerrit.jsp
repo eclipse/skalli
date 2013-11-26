@@ -27,44 +27,36 @@
     position: relative;
     max-width: 600px;
 }
-
 .warningmessage {
     color: #9E0000;
 }
-
 .errormessage {
     color: red;
     font-weight: bold;
 }
-
 .hint {
     font-style: italic;
 }
-
 .formheader {
     border-top-style: dotted;
     border-top-width: 1px;
     padding-top: 12px;
     font-style: italic;
 }
-
 .formlabel {
     padding-right: 10px;
     width: 80px;
     vertical-align: top;
 }
-
 .formfield {
     width: 35em;
     border-width: 1px;
     border-style: solid;
     border-color: #BBBBBB;
 }
-
 .buttonOnlyForm {
     display: inline;
 }
-
 .cancel,.cancel:active,.cancel:visited,.cancel:hover {
     color: #000000;
     font-family: arial, helvetica, verdana, sans-serif;
@@ -77,11 +69,13 @@
     text-decoration: none;
     cursor: default;
 }
-
 .marginTop {
     margin-top: 20px;
 }
 
+tr.paddingTop > td {
+    padding-top: 8px;
+}
 .logo {
     width: 32px;
     height: 32px;
@@ -122,6 +116,12 @@
                     </c:forEach>
                   </select></td>
               </tr>
+              <c:if test="${not empty fn:trim(gerritServer.description)}">
+                <tr class="paddingTop">
+                  <td>&nbsp;</td>
+                  <td><span class="hint">${html:clean(gerritServer.description)}</span></td>
+                </tr>
+              </c:if>
             </table>
           </c:if>
           <p class="formheader">
