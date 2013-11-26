@@ -391,10 +391,8 @@
           formElements.group.value = "";
           formElements.groupMode[0].checked = true;
         }
-        if (!formElements.parentMode[0].checked) {
-          formElements.parent.value = "";
-          formElements.parentMode[0].checked = true;
-        }
+        formElements.parent.value = "";
+        formElements.parentMode[0].checked = true;
         formElements.action.value = "refresh";
       }
       oForm.submit();
