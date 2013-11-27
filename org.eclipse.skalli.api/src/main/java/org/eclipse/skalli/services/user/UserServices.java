@@ -11,19 +11,22 @@
 package org.eclipse.skalli.services.user;
 
 import java.text.MessageFormat;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.services.BundleProperties;
-import org.eclipse.skalli.services.Services;
-import org.eclipse.skalli.services.configuration.ConfigurationService;
-import org.osgi.framework.Constants;
+import org.eclipse.skalli.services.configuration.Configurations;
+import org.osgi.service.component.ComponentConstants;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utiliy class that provides methods to retrieve the currently
- * active {@link UserService user service}.
+ * Utility class that provides methods for retrieving the currently active
+ * {@link UserService user service} and some frequently used utility
+ * functions for looking up users.
  */
 public class UserServices {
 
@@ -36,69 +39,80 @@ public class UserServices {
     private static final String USERSTORE_USE_LOCAL_FALLBACK_PROPERTY =
             CONFIG_KEY_USERSTORE + ".useLocalFallback"; //$NON-NLS-1$
 
-    private static UserServices instance = null;
+    private static Map<String, UserService> byType =
+            new ConcurrentHashMap<String, UserService>();
 
-    // this class is a singleton!
-    UserServices() {
+    private static volatile UserService activeUserService;
+
+    protected void activate(ComponentContext context) {
+        activeUserService = null;
+        LOG.info(MessageFormat.format("[UserServices] {0} : activated",
+                (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
+    }
+
+    protected void deactivate(ComponentContext context) {
+        activeUserService = null;
+        LOG.info(MessageFormat.format("[UserServices] {0} : deactivated",
+                (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
+    }
+
+    protected void bindUserService(UserService userService) {
+        String type = userService.getType();
+        if (StringUtils.isNotBlank(type)) {
+            byType.put(type, userService);
+            activeUserService = null;
+            LOG.info(MessageFormat.format("[UserServices(type={0})][registered {1}]", type, userService));
+        }
+    }
+
+    protected void unbindUserService(UserService userService) {
+        String type = userService.getType();
+        if (StringUtils.isNotBlank(type)) {
+            byType.remove(type);
+            activeUserService = null;
+            LOG.info(MessageFormat.format("[UserServices(type={0})][unregistered {1}]", type, userService));
+        }
     }
 
     /**
      * Returns the currently active {@link UserService}.
-     * Checks whether a dedicated user service has been {link ConfigKeyUserStore configured},
-     * otherwise falls backs to {@LocalUserStore} if the configuration permits that.
+     * <p>
+     * Checks whether a dedicated user service has been {@link ConfigKeyUserStore configured},
+     * otherwise falls backs to {@LocalUserStore}, if the configuration permits that.
      *
-     * @return the currently active user service.
-     *
-     * @throws IllegalStateException if no user service is available.
+     * @return the configured and active user service, or <code>null</code> if
+     * no user service is registered and fallback to the local user store is forbidden.
      */
     public static UserService getUserService() {
-        if (instance == null) {
-            instance = new UserServices();
-        }
-        return instance.getConfiguredUserService();
-    }
+        UserService userService = activeUserService;
+        if (userService == null) {
+            // retrieve params from configuration properties;
+            // use "local" userstore as fallback in case no explicit property/configuration is available
+            String type = BundleProperties.getProperty(USERSTORE_TYPE_PROPERTY, LOCAL_USERSTORE);
+            boolean useLocalFallback = BooleanUtils.toBoolean(
+                    BundleProperties.getProperty(USERSTORE_USE_LOCAL_FALLBACK_PROPERTY));
 
-    ConfigurationService getConfigService() {
-        return Services.getService(ConfigurationService.class);
-    }
-
-    UserService getConfiguredUserService() {
-        ConfigurationService configService = getConfigService();
-        UserService userService = null;
-
-        // retrieve params from configuration properties;
-        // use "local" userstore as fallback in case no explicit property/configuration is available
-        String type = BundleProperties.getProperty(USERSTORE_TYPE_PROPERTY, LOCAL_USERSTORE);
-        boolean isUseLocalFallback = BooleanUtils.toBoolean(
-                BundleProperties.getProperty(USERSTORE_USE_LOCAL_FALLBACK_PROPERTY));
-
-        // if there is a configuration via REST API available, override the properties
-        if (configService != null) {
-            UserStoreConfig config = configService.readConfiguration(UserStoreConfig.class);
-            if (config != null) {
-                type = config.getType();
-                isUseLocalFallback = config.isUseLocalFallback();
+            // if there is a configuration via REST API available, override the properties
+            UserStoreConfig userStoreConfig = Configurations.getConfiguration(UserStoreConfig.class);
+            if (userStoreConfig != null) {
+                type = userStoreConfig.getType();
+                useLocalFallback = userStoreConfig.isUseLocalFallback();
             }
-        }
 
-        // first: lookup the preferred user store
-        if (StringUtils.isNotBlank(type)) {
-            userService = getUserServiceByType(type);
-        }
+            // first: lookup the preferred user store
+            if (StringUtils.isNotBlank(type)) {
+                userService = byType.get(type);
+            }
 
-        // second: if the preferred user store is not available and fallback
-        // to the local store is allowed, use the local store
-        if (userService == null && isUseLocalFallback) {
-            LOG.info(MessageFormat.format("User service ''{0}'' not found, trying local user store", type));
-            userService = getUserServiceByType(LOCAL_USERSTORE);
+            // second: if the preferred user store is not available, but fallback
+            // to the local store is allowed, use the local store
+            if (userService == null && useLocalFallback) {
+                LOG.info(MessageFormat.format(
+                        "Preferred user service ''{0}'' not found, falling back to local user store", type));
+                userService = byType.get(LOCAL_USERSTORE);
+            }
+            activeUserService = userService;
         }
-        return userService;
-    }
-
-    UserService getUserServiceByType(String type) {
-        String filter = MessageFormat.format("(&({0}={1})(userService.type={2}))", //$NON-NLS-1$
-                Constants.OBJECTCLASS, UserService.class.getName(), type);
-        UserService userService = Services.getService(UserService.class, filter);
         return userService;
     }
 }

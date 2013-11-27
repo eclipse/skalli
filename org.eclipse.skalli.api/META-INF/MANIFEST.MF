@@ -77,5 +77,6 @@ Export-Package: org.eclipse.skalli.commons,
  org.eclipse.skalli.services.validation
 Service-Component: OSGI-INF/ExtensionServicesComponent.xml,
  OSGI-INF/EntityServicesComponent.xml,
+ OSGI-INF/UserServicesComponent.xml,
  OSGI-INF/ConfigurationsComponent.xml
 
