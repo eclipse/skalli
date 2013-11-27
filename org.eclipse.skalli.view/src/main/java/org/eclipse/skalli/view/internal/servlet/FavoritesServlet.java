@@ -23,7 +23,7 @@ import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.favorites.Favorites;
 import org.eclipse.skalli.services.favorites.FavoritesService;
-import org.eclipse.skalli.services.user.LoginUtils;
+import org.eclipse.skalli.view.LoginUtils;
 
 public class FavoritesServlet extends HttpServlet {
 

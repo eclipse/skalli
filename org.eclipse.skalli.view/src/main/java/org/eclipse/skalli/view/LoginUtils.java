@@ -8,7 +8,7 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.services.user;
+package org.eclipse.skalli.view;
 
 import java.security.Principal;
 import java.util.Locale;
@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.services.user.UserUtils;
 
 /**
  * Utility to retrieve the currenly logged in user.

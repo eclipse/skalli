@@ -13,7 +13,7 @@ package org.eclipse.skalli.view.internal.servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.skalli.services.user.LoginUtils;
+import org.eclipse.skalli.view.LoginUtils;
 import org.eclipse.skalli.view.internal.application.ProjectApplication;
 
 import com.vaadin.Application;

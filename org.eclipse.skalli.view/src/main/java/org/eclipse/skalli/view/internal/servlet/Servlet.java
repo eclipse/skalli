@@ -30,8 +30,8 @@ import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.group.GroupUtils;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.search.SearchService;
-import org.eclipse.skalli.services.user.LoginUtils;
 import org.eclipse.skalli.view.Consts;
+import org.eclipse.skalli.view.LoginUtils;
 import org.eclipse.skalli.view.internal.config.NewsConfig;
 
 /**

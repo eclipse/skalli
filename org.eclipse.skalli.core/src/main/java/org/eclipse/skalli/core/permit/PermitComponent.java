@@ -10,12 +10,14 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.permit;
 
+import java.security.Principal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -38,7 +40,6 @@ import org.eclipse.skalli.services.permit.PermitService;
 import org.eclipse.skalli.services.permit.PermitSet;
 import org.eclipse.skalli.services.role.RoleProvider;
 import org.eclipse.skalli.services.role.RoleService;
-import org.eclipse.skalli.services.user.LoginUtils;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -175,9 +176,14 @@ public class PermitComponent implements PermitService, EventListener<EventConfig
 
     @Override
     public String login(HttpServletRequest request, Project project) {
-        LoginUtils loginUtil = new LoginUtils(request);
-        String userId = loginUtil.getLoggedInUserId();
-
+        String userId = null;
+        Principal userPrincipal = request.getUserPrincipal();
+        if (userPrincipal != null) {
+            userId = userPrincipal.getName();
+            if (StringUtils.isNotBlank(userId)) {
+                userId = userId.toLowerCase(Locale.ENGLISH);
+            }
+        }
         HttpSession session = request.getSession();
         PermitSet permits = getSessionPermits(session, userId, project);
         if (permits == null) {

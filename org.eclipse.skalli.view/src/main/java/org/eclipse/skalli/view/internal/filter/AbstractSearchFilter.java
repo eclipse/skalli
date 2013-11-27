@@ -45,8 +45,8 @@ import org.eclipse.skalli.services.search.SearchResult;
 import org.eclipse.skalli.services.search.SearchService;
 import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
-import org.eclipse.skalli.services.user.LoginUtils;
 import org.eclipse.skalli.view.Consts;
+import org.eclipse.skalli.view.LoginUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
