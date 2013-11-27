@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.User;
-import org.eclipse.skalli.services.user.UserUtils;
+import org.eclipse.skalli.services.user.UserServices;
 
 /**
  * Utility to retrieve the currenly logged in user.
@@ -65,6 +65,6 @@ public class LoginUtils {
      * @throws IllegalStateException if no user service is available.
      */
     public User getLoggedInUser() {
-        return UserUtils.getUser(getLoggedInUserId());
+        return UserServices.getUser(getLoggedInUserId());
     }
 }

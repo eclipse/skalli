@@ -39,7 +39,7 @@ import org.eclipse.skalli.services.issues.IssuesService;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
-import org.eclipse.skalli.services.user.UserUtils;
+import org.eclipse.skalli.services.user.UserServices;
 import org.eclipse.skalli.view.ext.ExtensionFormService;
 import org.eclipse.skalli.view.ext.Navigator;
 import org.eclipse.skalli.view.ext.ProjectEditContext;
@@ -681,7 +681,7 @@ public class ProjectEditPanel extends Panel implements ProjectPanel {
         }
 
         private List<String> getConfirmationWarnings() {
-            User modifier = UserUtils.getUser(application.getLoggedInUser());
+            User modifier = UserServices.getUser(application.getLoggedInUser());
             List<String> warnings = new ArrayList<String>();
             for (ExtensionEntityBase extension : project.getAllExtensions()) {
                 Class<? extends ExtensionEntityBase> extensionClass = extension.getClass();

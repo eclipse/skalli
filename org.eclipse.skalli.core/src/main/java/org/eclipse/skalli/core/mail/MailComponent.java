@@ -32,7 +32,7 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ext.commons.PeopleExtension;
 import org.eclipse.skalli.services.mail.MailService;
-import org.eclipse.skalli.services.user.UserUtils;
+import org.eclipse.skalli.services.user.UserServices;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -91,7 +91,7 @@ public class MailComponent implements MailService {
     private List<Address> getAdresses(Set<Member> members) {
         List<Address> addressList = new ArrayList<Address>();
         for (Member member : members) {
-            User user = UserUtils.getUser(member.getUserID());
+            User user = UserServices.getUser(member.getUserID());
             if (StringUtils.isNotBlank(user.getEmail())) {
                 try {
                     Address address = new InternetAddress(user.getEmail());

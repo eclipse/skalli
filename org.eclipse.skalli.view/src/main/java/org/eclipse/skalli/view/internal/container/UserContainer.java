@@ -24,7 +24,6 @@ import org.eclipse.skalli.model.PropertyName;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.user.UserService;
 import org.eclipse.skalli.services.user.UserServices;
-import org.eclipse.skalli.services.user.UserUtils;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -124,7 +123,7 @@ public class UserContainer extends IndexedContainer implements Serializable {
         UserContainer container = UserContainer.createWithData();
         Item item = container.getItem(userId);
         if (item == null) {
-            User user = UserUtils.getUser(userId.toString());
+            User user = UserServices.getUser(userId.toString());
             if (user != null) {
                 item = container.addItem(user);
             }

@@ -49,7 +49,7 @@ import org.eclipse.skalli.services.role.RoleProvider;
 import org.eclipse.skalli.services.template.NoSuchTemplateException;
 import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
-import org.eclipse.skalli.services.user.UserUtils;
+import org.eclipse.skalli.services.user.UserServices;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -650,7 +650,7 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
         final Project project = (StringUtils.isNotBlank(templateId)) ? new Project(templateId) : new Project();
         project.setUuid(UUID.randomUUID());
 
-        if (StringUtils.isNotBlank(userId) && UserUtils.getUser(userId) != null) {
+        if (UserServices.getUser(userId) != null) {
             PeopleExtension peopleExt = new PeopleExtension();
             peopleExt.getLeads().add(new Member(userId));
             project.addExtension(peopleExt);

@@ -34,7 +34,7 @@ import org.eclipse.skalli.services.permit.PermitService;
 import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.project.ProjectUtils;
-import org.eclipse.skalli.services.user.UserUtils;
+import org.eclipse.skalli.services.user.UserServices;
 import org.eclipse.skalli.view.Consts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,7 +172,7 @@ public class LoginFilter implements Filter {
         if (!isAnonymousUser) {
             request.setAttribute(Consts.ATTRIBUTE_USERID, userId);
             String userDisplayName = userId;
-            user = UserUtils.getUser(userId);
+            user = UserServices.getUser(userId);
             if (user != null) {
                 userDisplayName = user.getDisplayName();
                 request.setAttribute(Consts.ATTRIBUTE_USER, user);

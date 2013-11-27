@@ -26,7 +26,7 @@ import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.permit.PermitService;
 import org.eclipse.skalli.services.project.ProjectService;
-import org.eclipse.skalli.services.user.UserUtils;
+import org.eclipse.skalli.services.user.UserServices;
 import org.restlet.ext.servlet.ServerServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,7 +102,7 @@ public class RestletServlet extends ServerServlet {
         User user = null;
         boolean isAnonymousUser = StringUtils.isBlank(userId);
         if (!isAnonymousUser) {
-            user = UserUtils.getUser(userId);
+            user = UserServices.getUser(userId);
         }
 
         // track the request statistics

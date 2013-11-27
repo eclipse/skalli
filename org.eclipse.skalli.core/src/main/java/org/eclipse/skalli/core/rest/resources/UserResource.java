@@ -16,7 +16,7 @@ import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.permit.Permits;
-import org.eclipse.skalli.services.user.UserUtils;
+import org.eclipse.skalli.services.user.UserServices;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -33,7 +33,7 @@ public class UserResource extends ResourceBase {
 
         String id = (String) getRequestAttributes().get(PARAM_USERID);
 
-        User user = UserUtils.getUser(id);
+        User user = UserServices.getUser(id);
         if (user.isUnknown()) {
             setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("User \"{0}\" not found", id)); //$NON-NLS-1$
             return null;

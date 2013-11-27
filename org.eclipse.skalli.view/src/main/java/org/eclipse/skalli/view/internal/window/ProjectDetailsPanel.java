@@ -26,7 +26,7 @@ import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.project.ProjectUtils;
 import org.eclipse.skalli.services.template.ProjectTemplate;
 import org.eclipse.skalli.services.template.ProjectTemplateService;
-import org.eclipse.skalli.services.user.UserUtils;
+import org.eclipse.skalli.services.user.UserServices;
 import org.eclipse.skalli.view.component.InformationBox;
 import org.eclipse.skalli.view.ext.ExtensionStreamSource;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
@@ -206,7 +206,7 @@ public class ProjectDetailsPanel extends CssLayout implements ProjectPanel {
 
         @Override
         public User getLoggedInUser() {
-            return UserUtils.getUser(application.getLoggedInUser());
+            return UserServices.getUser(application.getLoggedInUser());
         }
 
         @Override

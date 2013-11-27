@@ -18,7 +18,7 @@ import java.util.Set;
 
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.User;
-import org.eclipse.skalli.services.user.UserUtils;
+import org.eclipse.skalli.services.user.UserServices;
 import org.eclipse.skalli.view.component.PeopleSearchWindow.IPeopleSelectHandler;
 import org.eclipse.skalli.view.internal.container.UserContainer;
 
@@ -83,7 +83,7 @@ public class UsersPicker extends CustomField implements IPeopleSelectHandler {
             @Override
             public Component generateCell(Table source, Object itemId, Object columnId) {
                 String userId = itemId.toString();
-                User user = UserUtils.getUser(userId);
+                User user = UserServices.getUser(userId);
                 PeopleComponent peopleComponent = new PeopleComponent(user);
                 return peopleComponent;
             }

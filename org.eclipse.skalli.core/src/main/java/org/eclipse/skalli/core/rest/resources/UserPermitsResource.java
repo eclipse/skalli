@@ -26,7 +26,7 @@ import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.search.QueryParseException;
 import org.eclipse.skalli.services.search.SearchService;
-import org.eclipse.skalli.services.user.UserUtils;
+import org.eclipse.skalli.services.user.UserServices;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
@@ -47,7 +47,7 @@ public class UserPermitsResource extends ResourceBase {
         }
 
         String userId = (String) getRequestAttributes().get(PARAM_USERID);
-        User user = UserUtils.getUser(userId);
+        User user = UserServices.getUser(userId);
         if (user.isUnknown()) {
             setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("User \"{0}\" not found", userId)); //$NON-NLS-1$
             return null;

@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.BundleProperties;
 import org.eclipse.skalli.services.configuration.Configurations;
 import org.osgi.service.component.ComponentConstants;
@@ -114,5 +115,27 @@ public class UserServices {
             activeUserService = userService;
         }
         return userService;
+    }
+
+    /**
+     * Returns the {@link User} matching a given unique identifier.
+     * <p>
+     * This is a convenience method equivalent to obtaining the active user service
+     * with {@link #getUserService()} followed by {@link UserService#getUserById(String)}.
+     *
+     * @param userId  the unique identifier of the user.
+     *
+     * @return a user, which may be the {@link User#isUnknown() unknown} user,
+     * if the given unique identifier does not match any user or no user store is active.
+     * returns <code>null</code>, if the given <code>userId</code> is <code>null</code>
+     * or a blank string.
+     */
+    public static User getUser(String userId) {
+        User user = null;
+        if (StringUtils.isNotBlank(userId)) {
+            UserService userService =  getUserService();
+            user = userService != null? userService.getUserById(userId) : new User(userId);
+        }
+        return user;
     }
 }

@@ -29,7 +29,7 @@ import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpda
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.UpdateSite;
 import org.eclipse.skalli.services.entity.EntityServiceBase;
 import org.eclipse.skalli.services.project.ProjectService;
-import org.eclipse.skalli.services.user.UserUtils;
+import org.eclipse.skalli.services.user.UserServices;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -218,7 +218,7 @@ public class RecommendedUpdateSitesServiceImpl extends EntityServiceBase<Recomme
         if (StringUtils.isBlank(userId)) {
             issues.add(new Issue(Severity.FATAL, RecommendedUpdateSitesService.class, entity.getUuid(),
                     "Recommended update sites must have a user ID"));
-        } else if (UserUtils.getUser(userId) == null) {
+        } else if (UserServices.getUser(userId) == null) {
             issues.add(new Issue(Severity.FATAL, RecommendedUpdateSitesService.class, entity.getUuid(),
                     MessageFormat.format("Provided userId: {0} is invalid", userId)));
         }
