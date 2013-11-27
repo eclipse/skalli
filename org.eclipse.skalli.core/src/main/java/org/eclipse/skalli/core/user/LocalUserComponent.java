@@ -98,6 +98,11 @@ public class LocalUserComponent extends EntityServiceBase<User> implements UserS
     }
 
     @Override
+    public String getType() {
+        return "local"; //$NON-NLS-1$
+    }
+
+    @Override
     public synchronized List<User> getUsers() {
         return getAll();
     }

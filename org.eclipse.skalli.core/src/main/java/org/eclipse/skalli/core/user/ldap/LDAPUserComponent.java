@@ -100,6 +100,11 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
     }
 
     @Override
+    public String getType() {
+        return "ldap"; //$NON-NLS-1$
+    }
+
+    @Override
     public synchronized List<User> findUser(String searchText) {
         if (StringUtils.isBlank(searchText)) {
             return Collections.emptyList();

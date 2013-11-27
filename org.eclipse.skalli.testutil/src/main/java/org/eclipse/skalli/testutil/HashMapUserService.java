@@ -23,9 +23,15 @@ import org.eclipse.skalli.services.user.UserService;
 /**
  * Simple {@link UserService} implementation derived from {@link HashMap}.
  */
+@SuppressWarnings("nls")
 public class HashMapUserService extends HashMap<String, User> implements UserService {
 
     private static final long serialVersionUID = -2289396624054177002L;
+
+    @Override
+    public String getType() {
+        return "HashMapUserService";
+    }
 
     @Override
     public List<User> getUsers() {

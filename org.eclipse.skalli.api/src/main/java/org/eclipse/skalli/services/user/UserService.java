@@ -23,6 +23,15 @@ import org.eclipse.skalli.model.User;
 public interface UserService {
 
     /**
+     * Returns the type of the user service, e.g. <tt>"local"</tt> for the built-in
+     * local user store, or <tt>"ldap"</tt> for an LDAP user store.
+     *
+     * @return  the type of the user service, never <code>null</code>. Note, the type
+     * <tt>"local"</tt> is reserved for the built-in user store.
+     */
+    public String getType();
+
+    /**
      * Returns all currently cached users. Note, this method <b>does not</b> load
      * all users from the user store (e.g. an LDAP directory), but only returns
      * those users that already have been cached previously.
