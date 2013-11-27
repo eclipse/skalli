@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -100,6 +101,9 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
 
     @Override
     public synchronized List<User> findUser(String searchText) {
+        if (StringUtils.isBlank(searchText)) {
+            return Collections.emptyList();
+        }
         LDAPClient ldap = getLDAPClient();
         if (ldap == null) {
             return Collections.emptyList();
@@ -115,18 +119,19 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
 
     @Override
     public synchronized User getUserById(String userId) {
-        // look in cache
-        String lowerUserId = StringUtils.lowerCase(userId);
-        User user = cache.get(StringUtils.lowerCase(lowerUserId));
+        if (StringUtils.isBlank(userId)) {
+            return null;
+        }
+        String lowerCaseUserId = userId.toLowerCase(Locale.ENGLISH);
+        User user = cache.get(lowerCaseUserId);
         if (user == null) {
-            // get from server
             LDAPClient ldap = getLDAPClient();
             if (ldap == null) {
                 return null;
             }
             user = ldap.searchUserById(userId);
             if (user != null) {
-                cache.put(StringUtils.lowerCase(user.getUserId()), user);
+                cache.put(lowerCaseUserId, user);
             }
         }
         return user;
@@ -139,29 +144,36 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
 
     @Override
     public Set<User> getUsersById(Set<String> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return Collections.emptySet();
+        }
         Set<User> users = new HashSet<User>(userIds.size());
-        Set<String> userIdsToSearch = new HashSet<String>(0);
-
-        // look in cache
+        Set<String> notFoundInCache = new HashSet<String>();
         for (String userId : userIds) {
-            User user = cache.get(StringUtils.lowerCase(userId));
+            if (StringUtils.isBlank(userId)) {
+                continue;
+            }
+            String lowerCaseUserId = userId.toLowerCase(Locale.ENGLISH);
+            User user = cache.get(lowerCaseUserId);
             if (user != null) {
                 users.add(user);
             } else {
-                userIdsToSearch.add(userId);
+                notFoundInCache.add(lowerCaseUserId);
             }
         }
-        // search unknown in ldap
-        if (userIdsToSearch.size() > 0) {
+        if (notFoundInCache.size() > 0) {
             LDAPClient ldap = getLDAPClient();
             if (ldap == null) {
                 return users;
             }
-            Set<User> ldapUsers = ldap.searchUsersByIds(userIdsToSearch);
+            Set<User> ldapUsers = ldap.searchUsersByIds(notFoundInCache);
             for (User user : ldapUsers) {
                 if (user != null) {
-                    cache.put(StringUtils.lowerCase(user.getUserId()), user);
-                    users.add(user);
+                    String userId = user.getUserId();
+                    if (StringUtils.isNotBlank(userId)) {
+                        cache.put(userId.toLowerCase(Locale.ENGLISH), user);
+                        users.add(user);
+                    }
                 }
             }
         }
