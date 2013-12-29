@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.FormatUtils;
+import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.model.EntityBase;
 
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
@@ -132,10 +133,10 @@ public abstract class RestConverterBase<T> implements RestConverter {
      * @param writer  the writer to use for marshaling.
      */
     protected void marshalNSAttributes(HierarchicalStreamWriter writer, RestConverter converter) {
-        writer.addAttribute(RestUtils.XMLNS, converter.getNamespace());
-        writer.addAttribute(RestUtils.XMLNS_XSI, RestUtils.XSI_INSTANCE_NS);
+        writer.addAttribute(XMLUtils.XMLNS, converter.getNamespace());
+        writer.addAttribute(XMLUtils.XMLNS_XSI, XMLUtils.XSI_INSTANCE_NS);
         if (StringUtils.isNotBlank(host) && StringUtils.isNotBlank(converter.getXsdFileName())) {
-            writer.addAttribute(RestUtils.XSI_SCHEMA_LOCATION, getSchemaLocationAttribute(converter));
+            writer.addAttribute(XMLUtils.XSI_SCHEMA_LOCATION, getSchemaLocationAttribute(converter));
         }
     }
 

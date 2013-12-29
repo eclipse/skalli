@@ -51,9 +51,9 @@ public class ErrorRepresentation extends StringRepresentation {
         try {
             Document doc = XMLUtils.newDocument();
             Element root = doc.createElement("error"); //$NON-NLS-1$
-            root.setAttribute(RestUtils.XMLNS, RestUtils.API_NAMESPACE);
-            root.setAttribute(RestUtils.XMLNS_XSI, RestUtils.XSI_INSTANCE_NS);
-            root.setAttribute(RestUtils.XSI_SCHEMA_LOCATION,
+            root.setAttribute(XMLUtils.XMLNS, RestUtils.API_NAMESPACE);
+            root.setAttribute(XMLUtils.XMLNS_XSI, XMLUtils.XSI_INSTANCE_NS);
+            root.setAttribute(XMLUtils.XSI_SCHEMA_LOCATION,
                     MessageFormat.format("{0} {1}{2}error.xsd", RestUtils.API_NAMESPACE, host, RestUtils.URL_SCHEMAS)); //$NON-NLS-1$
             doc.appendChild(root);
 

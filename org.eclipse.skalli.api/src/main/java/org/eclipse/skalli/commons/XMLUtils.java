@@ -37,6 +37,17 @@ import org.xml.sax.SAXException;
 
 public class XMLUtils {
 
+    /** Namespace prefix (<tt>{@value}</tt>) */
+    public static final String XMLNS = "xmlns"; //$NON-NLS-1$
+
+    /** XML Schema namespace prefix (<tt>{@value}</tt>) */
+    public static final String XMLNS_XSI = "xmlns:xsi"; //$NON-NLS-1$
+
+    /** XML Schema Instance namespace (<tt>{@value}</tt>) */
+    public static final String XSI_INSTANCE_NS = "http://www.w3.org/2001/XMLSchema-instance"; //$NON-NLS-1$
+
+    /** XML Schema Location attribute (<tt>{@value}</tt>) */
+    public static final String XSI_SCHEMA_LOCATION = "xsi:schemaLocation"; //$NON-NLS-1$
     // no instances, please!
     private XMLUtils() {
     }

@@ -28,18 +28,6 @@ public class RestUtils {
     private RestUtils() {
     }
 
-    /** <tt>{@value}</tt> */
-    public static final String XMLNS = "xmlns"; //$NON-NLS-1$
-
-    /** <tt>{@value}</tt> */
-    public static final String XMLNS_XSI = "xmlns:xsi"; //$NON-NLS-1$
-
-    /** <tt>{@value}</tt> */
-    public static final String XSI_INSTANCE_NS = "http://www.w3.org/2001/XMLSchema-instance"; //$NON-NLS-1$
-
-    /** <tt>{@value}</tt> */
-    public static final String XSI_SCHEMA_LOCATION = "xsi:schemaLocation"; //$NON-NLS-1$
-
     /**
      * Default namespace (<tt>{@value}</tt>) reserved for the Skalli core model. Should be used as prefix
      * for the namespaces of REST extensions, e.g. <tt>"http://www.eclipse.org/skalli/2010/API/Extension-DevInf"</tt>.
