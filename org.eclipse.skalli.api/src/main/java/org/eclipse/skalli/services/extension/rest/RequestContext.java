@@ -12,9 +12,14 @@ package org.eclipse.skalli.services.extension.rest;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.CollectionUtils;
 import org.restlet.Request;
 import org.restlet.data.Form;
+import org.restlet.data.MediaType;
+import org.restlet.data.Preference;
 import org.restlet.data.Reference;
 import org.restlet.resource.ServerResource;
 
@@ -24,11 +29,22 @@ import org.restlet.resource.ServerResource;
  */
 public class RequestContext {
 
+    @SuppressWarnings("nls")
+    private static final Set<String> FORMAT_JSON =
+            CollectionUtils.asSet("json", "text/json", MediaType.APPLICATION_JSON.toString());
+
+    @SuppressWarnings("nls")
+    private static final Set<String> FORMAT_XML =
+            CollectionUtils.asSet("xml", MediaType.TEXT_XML.toString());
+
+    private static final String ACCEPT_QUERY_PARAM = "accept"; //$NON-NLS-1$
+
     private String action;
     private String path;
     private Reference resourceRef;
     private Form form;
     private Map<String,String> queryParams;
+    private MediaType mediaType;
 
     /**
      * Creates a request context from a given REST request.
@@ -48,6 +64,28 @@ public class RequestContext {
         } else {
             form = new Form();
             queryParams = Collections.emptyMap();
+        }
+        String formatParam = queryParams.get(ACCEPT_QUERY_PARAM);
+        if (StringUtils.isNotBlank(formatParam)) {
+            if  (FORMAT_XML.contains(formatParam)) {
+                mediaType = MediaType.TEXT_XML;
+            } else if (FORMAT_JSON.contains(formatParam)) {
+                mediaType = MediaType.APPLICATION_JSON;
+            } else {
+                mediaType = MediaType.valueOf(formatParam);
+            }
+        }
+        if (mediaType == null) {
+            float maxQuality = 0;
+            for (Preference<MediaType> acceptedMediaType: request.getClientInfo().getAcceptedMediaTypes()) {
+                if (acceptedMediaType.getQuality() > maxQuality) {
+                    maxQuality = acceptedMediaType.getQuality();
+                    mediaType = acceptedMediaType.getMetadata();
+                }
+            }
+        }
+        if (mediaType == null) {
+            mediaType = MediaType.TEXT_XML;
         }
     }
 
@@ -144,5 +182,28 @@ public class RequestContext {
      */
     public Map<String,String> getQueryAttributes() {
         return queryParams;
+    }
+
+    /**
+     * Returns the requested media type, never <code>null</code>.
+     * If no media type can be determined from the request, <tt>"text/xml"</tt>
+     * is returned.
+     */
+    public MediaType getMediaType() {
+        return mediaType;
+    }
+
+    /**
+     * Returns <code>true</code> if the media type is <tt>text/xml</tt>.
+     */
+    public boolean isXML() {
+        return MediaType.TEXT_XML.equals(mediaType);
+    }
+
+    /**
+     * Returns <code>true</code> if the media type is <tt>application/json</tt>.
+     */
+    public boolean isJSON() {
+        return MediaType.APPLICATION_JSON.equals(mediaType);
     }
 }

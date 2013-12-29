@@ -22,6 +22,7 @@ import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.permit.Permit.Level;
 import org.eclipse.skalli.services.permit.Permits;
 import org.restlet.data.Form;
+import org.restlet.data.MediaType;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
@@ -137,6 +138,21 @@ public abstract class ResourceBase extends ServerResource {
      */
     protected Map<String,String> getQueryAttributes() {
         return context.getQueryAttributes();
+    }
+
+    /**
+     * Returns the requested media type.
+     */
+    protected MediaType getMediaType() {
+        return context.getMediaType();
+    }
+
+    /**
+     * Returns <code>true</code>, if the requested media type is either
+     * <tt>text/xml</tt> or <tt>application/json</tt>.
+     */
+    protected boolean isSupportedMediaType() {
+        return context.isXML() || context.isJSON();
     }
 
     /**

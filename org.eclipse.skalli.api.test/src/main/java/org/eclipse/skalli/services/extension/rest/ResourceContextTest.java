@@ -10,20 +10,31 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.extension.rest;
 
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.restlet.Request;
+import org.restlet.data.MediaType;
 import org.restlet.data.Method;
+import org.restlet.data.Preference;
 import org.restlet.data.Reference;
 
 @SuppressWarnings("nls")
 public class ResourceContextTest {
 
+    private Reference resourceRef;
+
+    @Before
+    public void setup() throws Exception {
+        resourceRef = new Reference("http", "example.org", 8080, "/foo/bar", "a=foo&b=bar&c", "frag");
+
+    }
+
     @Test
     public void testConstructor() throws Exception {
-        Reference resourceRef = new Reference("http", "example.org", 8080, "/foo/bar", "a=foo&b=bar&c", "frag");
         Request request = new Request(Method.GET, resourceRef);
         RequestContext ctx = new RequestContext(request);
         Assert.assertEquals("GET", ctx.getAction());
@@ -44,6 +55,38 @@ public class ResourceContextTest {
         Assert.assertNotNull(ctx.getResourceRef());
         Assert.assertEquals("frag", ctx.getResourceRef().getFragment());
         Assert.assertNotNull(ctx.getQueryAsForm());
+    }
+
+    @Test
+    public void testAcceptHeader() throws Exception {
+        Request request = new Request(Method.GET, resourceRef);
+        List<Preference<MediaType>> prefs = request.getClientInfo().getAcceptedMediaTypes();
+        prefs.add(new Preference<MediaType>(MediaType.TEXT_XML, 0.2f));
+        prefs.add(new Preference<MediaType>(MediaType.APPLICATION_JSON, 0.7f));
+        prefs.add(new Preference<MediaType>(MediaType.TEXT_HTML, 0.1f));
+        RequestContext ctx = new RequestContext(request);
+        Assert.assertEquals(MediaType.APPLICATION_JSON, ctx.getMediaType());
+        Assert.assertTrue(ctx.isJSON());
+        Assert.assertFalse(ctx.isXML());
+    }
+
+    @Test
+    public void testAcceptQuery() throws Exception {
+        resourceRef.addQueryParameter("accept", "application/json");
+        Request request = new Request(Method.GET, resourceRef);
+        RequestContext ctx = new RequestContext(request);
+        Assert.assertEquals(MediaType.APPLICATION_JSON, ctx.getMediaType());
+        Assert.assertTrue(ctx.isJSON());
+        Assert.assertFalse(ctx.isXML());
+    }
+
+    @Test
+    public void testAcceptDefault() throws Exception {
+        Request request = new Request(Method.GET, resourceRef);
+        RequestContext ctx = new RequestContext(request);
+        Assert.assertEquals(MediaType.TEXT_XML, ctx.getMediaType());
+        Assert.assertFalse(ctx.isJSON());
+        Assert.assertTrue(ctx.isXML());
     }
 
 }
