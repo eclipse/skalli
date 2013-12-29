@@ -40,6 +40,10 @@ public abstract class ResourceBase extends ServerResource {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceBase.class);
 
     private static final String ERROR_ID_MISSING_AUTHORIZATION = "rest:permit({0}):00"; //$NON-NLS-1$
+    private static final String ERROR_ID_UNSUPPORTED_MEDIA_TYPE = "rest:mediaType({0}):00"; //$NON-NLS-1$
+
+    private static final String ERROS_MSG_UNSUPPORTED_MEDIA_TYPE =
+            "Unsupported media type {0}. Supported media types are 'text/xml' and 'application/json'."; //$NON-NLS-1$
 
     private RequestContext context;
 
@@ -173,6 +177,16 @@ public abstract class ResourceBase extends ServerResource {
         String messageId = MessageFormat.format(ERROR_ID_MISSING_AUTHORIZATION,
                 Permit.toString(action, path, Level.ALLOW));
         return createErrorRepresentation(Status.CLIENT_ERROR_FORBIDDEN, messageId, message);
+    }
+
+    /**
+     * Creates an {@link ErrorRepresentation error representation} for unsupported media types.
+     * Sets the response status to <tt>415 Unsupported Media Type</tt>.
+     */
+    protected Representation createUnsupportedMediaTypeRepresentation() {
+        return createErrorRepresentation(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE,
+                MessageFormat.format(ERROR_ID_UNSUPPORTED_MEDIA_TYPE, context.getMediaType()),
+                MessageFormat.format(ERROS_MSG_UNSUPPORTED_MEDIA_TYPE, context.getMediaType()));
     }
 
     /**
