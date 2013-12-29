@@ -286,7 +286,7 @@ public abstract class ResourceBase extends ServerResource {
      * @param message  the error message.
      */
     protected Representation createErrorRepresentation(Status status, String errorId, String message) {
-        ErrorRepresentation representation = new ErrorRepresentation(getHostRef().getHostIdentifier(), status, errorId, message);
+        ErrorRepresentation representation = new ErrorRepresentation(context, status, errorId, message);
         setStatus(status);
         return representation;
     }

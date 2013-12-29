@@ -1,17 +1,18 @@
 package org.eclipse.skalli.services.extension.rest;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.text.MessageFormat;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.FormatUtils;
 import org.eclipse.skalli.commons.XMLUtils;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.rest.RestService;
+import org.eclipse.skalli.services.rest.RestWriter;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
-import org.restlet.representation.StringRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.restlet.representation.WriterRepresentation;
 
 /**
  * REST representation for error responses as defined by <tt>/schemas/error.xsd</tt>.
@@ -20,9 +21,13 @@ import org.w3c.dom.Element;
  * at least for all kinds of HTTP 5xx server errors, and may return them for HTTP 4xx
  * client errors as well.
  */
-public class ErrorRepresentation extends StringRepresentation {
+public class ErrorRepresentation extends WriterRepresentation {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ErrorRepresentation.class);
+    private RequestContext context;
+    private Status status;
+    private String errorId;
+    private String message;
+    private String timestamp;
 
     /**
      * Constructs an error representation with the given status, error identifier and
@@ -37,46 +42,50 @@ public class ErrorRepresentation extends StringRepresentation {
      * The <tt>&lt;path&gt;</tt> should be the path of the original resource that caused
      * the error, but REST extensions may deviate from that convention.
      *
-     * @param host  the host, from which the error is sent.
+     * @param context  the parameters of the request like media type an host.
      * @param status  the status of the response, including the status code.
-     * @param errorId  a unique identifier for the error that has happened.
-     * @param message  the error message.
+     * @param errorId  a unique identifier for the error that has happened, or <code>null</code>.
+     * If no id is specified, one is generated from the status.
+     * @param message  the error message, or <code>null</code>.
+     * If no message is specified, one is generated from the status.
      */
-    public ErrorRepresentation(String host, Status status, String errorId, String message) {
-        super(getContent(host, status, errorId, message), MediaType.TEXT_XML);
+    public ErrorRepresentation(RequestContext context, Status status, String errorId, String message) {
+        super(context.getMediaType());
+        this.context = context;
+        this.status = status;
+        this.errorId = errorId;
+        this.message = message;
+        this.timestamp = FormatUtils.formatUTCWithMillis(System.currentTimeMillis());
     }
 
-    private static String getContent(String host, Status status, String errorId, String message) {
-        String timestamp = FormatUtils.formatUTCWithMillis(System.currentTimeMillis());
-        try {
-            Document doc = XMLUtils.newDocument();
-            Element root = doc.createElement("error"); //$NON-NLS-1$
-            root.setAttribute(XMLUtils.XMLNS, RestUtils.API_NAMESPACE);
-            root.setAttribute(XMLUtils.XMLNS_XSI, XMLUtils.XSI_INSTANCE_NS);
-            root.setAttribute(XMLUtils.XSI_SCHEMA_LOCATION,
-                    MessageFormat.format("{0} {1}{2}error.xsd", RestUtils.API_NAMESPACE, host, RestUtils.URL_SCHEMAS)); //$NON-NLS-1$
-            doc.appendChild(root);
+    // for testing purposes
+    String getTimestamp() {
+        return timestamp;
+    }
 
-            if (StringUtils.isBlank(errorId)) {
-                errorId = Integer.toString(status.getCode());
-            }
-            Element idElement = doc.createElement("errorId"); //$NON-NLS-1$
-            idElement.appendChild(doc.createTextNode(errorId));
-            root.appendChild(idElement);
-
-            Element timestampElement = doc.createElement("timestamp"); //$NON-NLS-1$
-            timestampElement.appendChild(doc.createTextNode(timestamp));
-            root.appendChild(timestampElement);
-
-            Element messageElement = doc.createElement("message"); //$NON-NLS-1$
-            messageElement.appendChild(doc.createTextNode(message));
-            root.appendChild(messageElement);
-            return XMLUtils.documentToString(doc);
-
-        } catch (Exception e) {
-            LOG.error("Failed to create error representation", e);
-            return MessageFormat.format("error: ({0}) {1} {2}", errorId, timestamp, message);
+    @Override
+    public void write(Writer writer) throws IOException {
+        RestService restService = Services.getRequiredService(RestService.class);
+        MediaType mediaType = getMediaType();
+        if (!restService.isSupportedMediaType(mediaType)) {
+            throw new IOException(MessageFormat.format("Unsupported media type ''{0}''", mediaType));
         }
+        RestWriter restWriter = restService.getRestWriter(mediaType, writer, context.getHost());
+        restWriter.object("error"); //$NON-NLS-1$
+        restWriter.namespace(XMLUtils.XMLNS, RestUtils.API_NAMESPACE);
+        restWriter.namespace(XMLUtils.XMLNS_XSI, XMLUtils.XSI_INSTANCE_NS);
+        restWriter.namespace(XMLUtils.XSI_SCHEMA_LOCATION, MessageFormat.format(
+                "{0} {1}/schemas/error.xsd", RestUtils.API_NAMESPACE, context.getHost())); //$NON-NLS-1$
+        if (StringUtils.isBlank(errorId)) {
+            errorId = MessageFormat.format("rest:{0}:{1}", context.getPath(), Integer.toString(status.getCode())); //$NON-NLS-1$
+        }
+        restWriter.pair("errorId", errorId); //$NON-NLS-1$
+        restWriter.pair("timestamp", timestamp); //$NON-NLS-1$
+        if (StringUtils.isBlank(message)) {
+            message = MessageFormat.format("{0} ({1})", status.getDescription(), status.getName()); //$NON-NLS-1$
+        }
+        restWriter.pair("message", message); //$NON-NLS-1$
+        restWriter.end();
+        restWriter.flush();
     }
-
 }

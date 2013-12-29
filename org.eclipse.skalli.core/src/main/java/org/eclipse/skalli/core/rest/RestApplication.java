@@ -30,6 +30,7 @@ import org.eclipse.skalli.core.rest.resources.UserPermitsResource;
 import org.eclipse.skalli.core.rest.resources.UserResource;
 import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.eclipse.skalli.services.extension.rest.ErrorRepresentation;
+import org.eclipse.skalli.services.extension.rest.RequestContext;
 import org.eclipse.skalli.services.extension.rest.RestExtension;
 import org.eclipse.skalli.services.rest.RestService;
 import org.eclipse.skalli.services.rest.RestWriter;
@@ -128,11 +129,12 @@ public class RestApplication extends Application implements RestService {
             public Representation getRepresentation(Status status, Request request, Response response) {
                 Throwable t = status.getThrowable();
                 if (t != null) {
-                    String errorId = MessageFormat.format("rest:{0}:00", request.getOriginalRef().getPath()); //$NON-NLS-1$
+                    RequestContext context = new RequestContext(request);
+                    String errorId = MessageFormat.format("rest:{0}:00", context.getPath()); //$NON-NLS-1$
                     String message = "An unexpected exception happend. Please report this error " +
                             "response to the server administrators.";
                     LOG.error(MessageFormat.format(MessageFormat.format("{0} ({1})", message, errorId), t)); //$NON-NLS-1$
-                    return new ErrorRepresentation(request.getHostRef().getHostIdentifier(), status, errorId, message);
+                    return new ErrorRepresentation(context, status, errorId, message);
                 }
                 return super.getRepresentation(status, request, response);
             }
