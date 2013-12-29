@@ -77,4 +77,61 @@ public class URLUtils {
         }
         return new URL(uri.toASCIIString());
     }
+
+    /**
+     * Removes trailing and leading slashes and whitespace from a given
+     * URL path string.
+     *
+     * @param s the string to transform, may be <code>null</code>.
+     *
+     * @return  the string without leading and trailing slashes and whitespace.
+     */
+    public static String removeSlashStartEnd(String s) {
+        String ret = StringUtils.trim(s);
+        if (!StringUtils.isEmpty(ret)) {
+            while (ret.startsWith("/")){ //$NON-NLS-1$
+                ret = ret.substring(1);
+            }
+            while (ret.endsWith("/")) { //$NON-NLS-1$
+                ret = ret.substring(0, ret.length() - 1);
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Constructs an URL from a web locator (something like
+     * <tt>"http://example.org:8080"</tt>) and given path segments.
+     * <p>
+     * This method handles leading and trailing slashes and whitespace
+     * in all arguments.
+     *
+     * @param webLocator  a web locator, or <code>null</code>. If no web locator
+     * is specified, the returned string is just a path (without leading slash).
+     * @param pathSegments the path segments to concatenate. If no path segements
+     * are specified, the <code>webLocator</code> is returned.
+     *
+     * @return an URL, which may be an absolute URL with a web locator,
+     * or just a (relative) path. The result may be the empty string, but
+     * never <code>null</code>.
+     */
+    public static String concat(String webLocator, Object... pathSegments) {
+        StringBuilder ret = new StringBuilder();
+        if (webLocator != null) {
+            ret.append(removeSlashStartEnd(webLocator));
+        }
+        if (pathSegments != null) {
+            for (Object next: pathSegments) {
+                String pathSegment = next != null ? removeSlashStartEnd(next.toString()) : null;
+                if (StringUtils.isNotBlank(pathSegment)) {
+                    if (ret.length() > 0) {
+                        ret.append('/');
+                    }
+                    ret.append(pathSegment);
+                }
+            }
+        }
+        return ret.toString();
+    }
+
 }
