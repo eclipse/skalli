@@ -21,6 +21,10 @@ public class HttpUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpUtils.class);
 
+    // no instances, please!
+    private HttpUtils() {
+    }
+
     public static void consumeQuietly(HttpResponse response) {
         if (response != null) {
             try {
@@ -30,5 +34,4 @@ public class HttpUtils {
             }
         }
     }
-
 }

@@ -37,19 +37,44 @@ import org.xml.sax.SAXException;
 
 public class XMLUtils {
 
+    // no instances, please!
     private XMLUtils() {
     }
 
+    /**
+     * Returns a new, empty XML document.
+     * @throws ParserConfigurationException  a serious serious configuration error occured.
+     */
     public static Document newDocument() throws ParserConfigurationException {
         return getDocumentBuilder().newDocument();
     }
 
+    /**
+     * Reads and parses an XML document from a given file.
+     *
+     * @param file  the file to read and parse.
+     * @return  an XML document parsed from the given file.
+     *
+     * @throws SAXException  if a parsing error occurd.
+     * @throws IOException  if an i/o error occured.
+     * @throws ParserConfigurationException  a serious serious configuration error occured.
+     */
     public static Document documentFromFile(File file) throws SAXException, IOException, ParserConfigurationException {
         DocumentBuilder docBuilder = getDocumentBuilder();
         Document doc = docBuilder.parse(file);
         return doc;
     }
 
+    /**
+     * Reads and parses an XML document from a given stream.
+     *
+     * @param in  the stream to read and parse.
+     * @return  an XML document parsed from the given stream.
+     *
+     * @throws SAXException  if a parsing error occurd.
+     * @throws IOException  if an i/o error occured.
+     * @throws ParserConfigurationException  a serious serious configuration error occured.
+     */
     public static Document documentFromStream(InputStream in) throws SAXException, IOException,
             ParserConfigurationException {
         DocumentBuilder docBuilder = getDocumentBuilder();
@@ -57,6 +82,16 @@ public class XMLUtils {
         return doc;
     }
 
+    /**
+     * Reads and parses an XML document from a given string.
+     *
+     * @param xml  the string to read and parse.
+     * @return  an XML document parsed from the given string.
+     *
+     * @throws SAXException  if a parsing error occurd.
+     * @throws IOException  if an i/o error occured.
+     * @throws ParserConfigurationException  a serious serious configuration error occured.
+     */
     public static Document documentFromString(String xml) throws SAXException, IOException,
             ParserConfigurationException {
         DocumentBuilder docBuilder = getDocumentBuilder();
@@ -64,6 +99,14 @@ public class XMLUtils {
         return doc;
     }
 
+    /**
+     * Transforms the given XML document into its textual representation.
+     *
+     * @param doc  the document to transform.
+     * @return  the XML document transformed to a string.
+     *
+     * @throws TransformerException  if the transformation failed.
+     */
     public static String documentToString(Document doc) throws TransformerException {
         StreamResult result = new StreamResult(new StringWriter());
         transform(doc, result);
@@ -71,6 +114,17 @@ public class XMLUtils {
         return xmlString;
     }
 
+    /**
+     * Transforms the given XML document into its textual representation and
+     * writes the result to a file.
+     *
+     * @param doc  the document to transform.
+     * @param file  the target file.
+     *
+     * @throws TransformerException  if the transformation failed.
+     * @throws FileNotFoundException  if a folder with the same name exists,
+     * or the file cannot be created or opened.
+     */
     public static void documentToFile(Document doc, File file) throws TransformerException, FileNotFoundException {
         FileOutputStream fos = new FileOutputStream(file);
         try {
@@ -81,6 +135,15 @@ public class XMLUtils {
         }
     }
 
+    /**
+     * Transforms the given XML document into its textual representation and
+     * provides the result as input stream.
+     *
+     * @param doc  the document to transform.
+     * @return  an input stream from which the textual representation of the XML document can be read.
+     *
+     * @throws TransformerException  if the transformation failed.
+     */
     public static InputStream documentToStream(Document doc) throws TransformerException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {

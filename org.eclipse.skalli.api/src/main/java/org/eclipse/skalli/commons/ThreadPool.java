@@ -7,6 +7,10 @@ public class ThreadPool {
 
     private static ExecutorService threadPool = Executors.newCachedThreadPool();
 
+    // no instances, please!
+    private ThreadPool() {
+    }
+
     public static void submit(Runnable task) {
         threadPool.submit(task);
     }

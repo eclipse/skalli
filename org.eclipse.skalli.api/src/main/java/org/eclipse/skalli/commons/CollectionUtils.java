@@ -30,6 +30,10 @@ import java.util.TreeSet;
 
 public class CollectionUtils {
 
+    // no instances, please!
+    private CollectionUtils() {
+    }
+
     public static <T> Set<T> asSet(T... args) {
         Set<T> result = new HashSet<T>();
         if (args != null) {

@@ -22,6 +22,16 @@ import org.apache.commons.lang.StringUtils;
 
 public class URLUtils {
 
+    // no instances, please!
+    private URLUtils() {
+    }
+
+    /**
+     * Utility method to convert an enumeration of URLs to a corresponding list.
+     *
+     * @param u  the enumeration to evaluate, or <code>null</code>.
+     * @return a list if URLs, or an empty list.
+     */
     public static List<URL> asURLs(Enumeration<URL> u) {
         List<URL> ret = new LinkedList<URL>();
         if (u != null) {

@@ -14,6 +14,10 @@ import org.apache.commons.lang.time.DateFormatUtils;
 
 public class FormatUtils {
 
+    // no instances, please!
+    private FormatUtils() {
+    }
+
     /**
      * Returns the given timestamp in the ISO 8601 format <tt>"yyyy-MM-dd'T'HH:mm:ss'Z'"</tt>.
      * Note, the given format also meets the requirement of the xsd:dateTime format used in

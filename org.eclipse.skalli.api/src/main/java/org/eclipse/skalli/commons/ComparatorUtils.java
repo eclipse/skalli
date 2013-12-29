@@ -15,6 +15,20 @@ import java.util.SortedSet;
 
 public class ComparatorUtils {
 
+    // no instances, please!
+    private ComparatorUtils() {
+    }
+
+    /**
+     * Checks if the given objects are equal. This method handles null
+     * pointers in both arguments.
+     *
+     * @param o1  first object, or <code>null</code>.
+     * @param o2  second object, or <code>null</code>.
+     *
+     * @return  if both objects are {@link Object#equals(Object) equal},
+     * or both arguments are <code>null</code>.
+     */
     public static boolean equals(Object o1, Object o2) {
         if (o1 == o2) {
             return true;

@@ -24,6 +24,10 @@ public class UUIDUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(UUIDUtils.class);
 
+    // no instances, please!
+    private UUIDUtils() {
+    }
+
     /**
      * Checks if the given string is a valid {@link java.util.UUID}.
      * @param s  the string to check.

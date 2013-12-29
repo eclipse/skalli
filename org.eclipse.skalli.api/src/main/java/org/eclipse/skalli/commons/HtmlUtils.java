@@ -24,6 +24,7 @@ import org.jsoup.safety.Whitelist;
  */
 public class HtmlUtils {
 
+    // no instances, please!
     private HtmlUtils() {
     }
 
