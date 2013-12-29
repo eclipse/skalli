@@ -125,7 +125,16 @@ public interface ExtensionService<T extends ExtensionEntityBase> {
      *
      * @return a converter, or <code>null</code> if the extension has no REST API.
      */
+    @Deprecated
     public RestConverter getRestConverter(String host);
+
+    /**
+     * Returns an XStream converter to render model extensions represented by this
+     * extension service as REST resources.
+     *
+     * @return a converter, or <code>null</code> if the extension has no REST API.
+     */
+    public RestConverter<T> getRestConverter();
 
     /**
      * Returns the indexer that should be used to index instances of

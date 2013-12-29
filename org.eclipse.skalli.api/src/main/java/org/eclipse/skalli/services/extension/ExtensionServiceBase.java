@@ -82,6 +82,11 @@ public abstract class ExtensionServiceBase<T extends ExtensionEntityBase> implem
     }
 
     @Override
+    public RestConverter<T> getRestConverter() {
+        return null;
+    }
+
+    @Override
     public Indexer<T> getIndexer() {
         return null;
     }

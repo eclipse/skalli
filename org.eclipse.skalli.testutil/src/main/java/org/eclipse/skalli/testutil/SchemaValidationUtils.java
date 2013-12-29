@@ -51,7 +51,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 @SuppressWarnings("nls")
 public class SchemaValidationUtils {
 
-    public static void validate(Object o, RestConverter converter, String xsdFile)
+    public static void validate(Object o, RestConverter<?> converter, String xsdFile)
             throws Exception {
         DocumentBuilderFactory dbf = getDocumentBuilderFactory(xsdFile);
         StringBufferHierarchicalStreamWriter writer = new StringBufferHierarchicalStreamWriter();
@@ -59,7 +59,7 @@ public class SchemaValidationUtils {
         validate(o, writer, dbf);
     }
 
-    public static void validate(List<?> list, RestConverter converter, String xsdFile)
+    public static void validate(List<?> list, RestConverter<?> converter, String xsdFile)
             throws Exception {
         DocumentBuilderFactory dbf = getDocumentBuilderFactory(xsdFile);
         for (Object o : list) {
@@ -156,17 +156,16 @@ public class SchemaValidationUtils {
         return out.toString();
     }
 
-    @SuppressWarnings("rawtypes")
     private static <T extends ExtensionEntityBase>
             boolean marshalExtension(ExtensibleEntityBase extensible, T extension, HierarchicalStreamWriter writer) {
         boolean done = false;
-        for (ExtensionService extensionService : ExtensionServices.getAll()) {
-            RestConverter converter = extensionService.getRestConverter("https://localhost");
-            Class<T> extensionClass = (Class<T>) extension.getClass();
+        for (ExtensionService<?> extensionService : ExtensionServices.getAll()) {
+            RestConverter<?> converter = extensionService.getRestConverter("https://localhost");
+            Class<? extends ExtensionEntityBase> extensionClass = extension.getClass();
             if (converter != null && extensionClass.equals(converter.getConversionClass())) {
                 marshal(extension,
-                        new ConverterWrapper("https://localhost", converter, extensionService.getShortName(), extensible
-                                .isInherited(extensionClass)), writer);
+                        new ConverterWrapper("https://localhost", converter, extensionService.getShortName(),
+                                extensible.isInherited(extensionClass)), writer);
                 done = true;
                 break;
             }
@@ -174,7 +173,7 @@ public class SchemaValidationUtils {
         return done;
     }
 
-    private static void marshal(Object o, RestConverter converter, HierarchicalStreamWriter writer) {
+    private static void marshal(Object o, RestConverter<?> converter, HierarchicalStreamWriter writer) {
         MarshallingContext context = new MarshallingContextMock(writer);
         converter.marshal(o, writer, context);
     }

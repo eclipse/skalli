@@ -10,8 +10,11 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest.resources;
 
+import java.io.IOException;
+
 import org.eclipse.skalli.services.extension.ExtensionServiceBase;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
+import org.eclipse.skalli.services.rest.RestWriter;
 import org.eclipse.skalli.testutil.TestExtension;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -21,6 +24,55 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 @SuppressWarnings("nls")
 class TestExtensionService extends ExtensionServiceBase<TestExtension> {
+
+    private static class TestRestConverter implements RestConverter<TestExtension> {
+
+        @Override
+        public void marshal(Object obj, RestWriter writer) throws IOException {
+        }
+
+        @Override
+        public void marshal(Object obj, HierarchicalStreamWriter hierarchicalstreamwriter,
+                MarshallingContext marshallingcontext) {
+        }
+
+        @Override
+        public Object unmarshal(HierarchicalStreamReader hierarchicalstreamreader,
+                UnmarshallingContext unmarshallingcontext) {
+            return null;
+        }
+
+        @Override
+        public boolean canConvert(@SuppressWarnings("rawtypes") Class class1) {
+            return class1.equals(TestExtension.class);
+        }
+
+        @Override
+        public String getAlias() {
+            return null;
+        }
+
+        @Override
+        public Class<TestExtension> getConversionClass() {
+            return TestExtension.class;
+        }
+
+        @Override
+        public String getApiVersion() {
+            return "1.0";
+        }
+
+        @Override
+        public String getNamespace() {
+            return "tiffy";
+        }
+
+        @Override
+        public String getXsdFileName() {
+            return "tiffy.xsd";
+        }
+    }
+
     @Override
     public Class<TestExtension> getExtensionClass() {
         return TestExtension.class;
@@ -31,51 +83,15 @@ class TestExtensionService extends ExtensionServiceBase<TestExtension> {
         return "testExtension";
     }
 
+    @Deprecated
     @Override
-    public RestConverter getRestConverter(String host) {
-        return new RestConverter() {
-            @Override
-            public void marshal(Object obj, HierarchicalStreamWriter hierarchicalstreamwriter,
-                    MarshallingContext marshallingcontext) {
-            }
+    public RestConverter<TestExtension> getRestConverter(String host) {
+        return new TestRestConverter();
+    }
 
-            @Override
-            public Object unmarshal(HierarchicalStreamReader hierarchicalstreamreader,
-                    UnmarshallingContext unmarshallingcontext) {
-                return null;
-            }
-
-            @Override
-            public boolean canConvert(@SuppressWarnings("rawtypes") Class class1) {
-                return class1.equals(TestExtension.class);
-            }
-
-            @Override
-            public String getAlias() {
-                return null;
-            }
-
-            @Override
-            public Class<?> getConversionClass() {
-                return TestExtension.class;
-            }
-
-            @Override
-            public String getApiVersion() {
-                return "1.0";
-            }
-
-            @Override
-            public String getNamespace() {
-                return "tiffy";
-            }
-
-            @Override
-            public String getXsdFileName() {
-                return "tiffy.xsd";
-            }
-        };
-
+    @Override
+    public RestConverter<TestExtension> getRestConverter() {
+        return new TestRestConverter();
     }
 
     @Override

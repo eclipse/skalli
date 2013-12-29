@@ -13,6 +13,7 @@ package org.eclipse.skalli.services.extension.rest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,6 +21,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.rest.RestService;
+import org.eclipse.skalli.services.rest.RestWriter;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.representation.WriterRepresentation;
@@ -37,6 +41,9 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
 public class ResourceRepresentation<T> extends WriterRepresentation {
 
     private T object;
+    private RequestContext context;
+    private RestConverter<T> converter;
+
     private XStream xstream;
     private Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
     private Set<RestConverter> converters = new HashSet<RestConverter>();
@@ -58,6 +65,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      *
      * @param object  a bean instance.
      */
+    @Deprecated
     public ResourceRepresentation(T object) {
         this();
         this.object = object;
@@ -75,6 +83,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      * @param converters  additional converters that may be necessary for
      * conversion of certain properties or inner beans of the bean.
      */
+    @Deprecated
     public ResourceRepresentation(T object, RestConverter... converters) {
         this(object);
         if (converters != null) {
@@ -84,15 +93,46 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
         }
     }
 
+    /**
+     * Creates a resource representation for converting a given object to
+     * a specific media type, e.g. to XML or JSON format.
+     * <p>
+     * Allows to specify additional converters for the conversion of
+     * certain properties of the object.
+     *
+     * @param context the request context.
+     * @param @param object the object to convert.
+     * @param converter the converter to use.
+     */
+    public ResourceRepresentation(RequestContext context, T object, RestConverter<T> converter) {
+        super(context.getMediaType());
+        this.object = object;
+        this.context = context;
+        this.converter = converter;
+    }
+
     @Override
     public void write(Writer writer) throws IOException {
         if (object != null) {
-            writer.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"); //$NON-NLS-1$
-            XStream xstream = getXStream();
-            if (compact) {
-                xstream.marshal(object, new CompactWriter(writer));
+            if (context == null) {
+                writer.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"); //$NON-NLS-1$
+                XStream xstream = getXStream();
+                if (compact) {
+                    xstream.marshal(object, new CompactWriter(writer));
+                } else {
+                    xstream.toXML(object, writer);
+                }
+            } else if (converter.canConvert(object.getClass())) {
+                RestService restService = Services.getRequiredService(RestService.class);
+                MediaType mediaType = getMediaType();
+                if (!restService.isSupportedMediaType(mediaType)) {
+                    throw new IOException(MessageFormat.format("Unsupported media type ''{0}''", mediaType));
+                }
+                RestWriter restWriter = restService.getRestWriter(mediaType, writer, context.getHost());
+                converter.marshal(object, restWriter);
+                restWriter.flush();
             } else {
-                xstream.toXML(object, writer);
+                throw new IOException("Failed to create resource representation");
             }
         }
     }
@@ -110,6 +150,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      * @throws ClassCastExeption  if the XML representation of the bean cannot be casted to the
      * requested class.
      */
+    @Deprecated
     public T read(Representation representation, Class<T> c) throws IOException {
         return read(representation.getStream(), c);
     }
@@ -127,6 +168,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      * @throws ClassCastExeption  if the XML representation of the bean cannot be casted to the
      * requested class.
      */
+    @Deprecated
     public T read(InputStream in, Class<T> c) throws IOException {
         return c.cast(getXStream().fromXML(in));
     }
@@ -141,6 +183,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      *
      * @param annotatedClass  the class to add to the conversion.
      */
+    @Deprecated
     public void addAnnotatedClass(Class<?> annotatedClass) {
         if (annotatedClass != null) {
             annotatedClasses.add(annotatedClass);
@@ -153,6 +196,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      * @param name  the alias.
      * @param type  the class for which to use the alias.
      */
+    @Deprecated
     public void addAlias(String name, Class<?> type) {
         if (StringUtils.isNotBlank(name) && type != null) {
             aliases.put(name,  type);
@@ -165,6 +209,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      *
      * @param converter  the REST converter to add.
      */
+    @Deprecated
     public void addConverter(RestConverter converter) {
         if (converter != null) {
             converters.add(converter);
@@ -176,6 +221,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      * @param classLoader  the classloader to use, or <code>null</code>
      * if the default classloader should be used.
      */
+    @Deprecated
     public void setClassLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
     }
@@ -187,6 +233,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      * @param xstream  a <code>XStream</code> instance, or <code>null</code>
      * if the default <code>XStream</code> instance should be used.
      */
+    @Deprecated
     public void setXStream(XStream xstream) {
         this.xstream = xstream;
     }
@@ -199,6 +246,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      *
      * @param compact if <code>true</code> the output is compacted.
      */
+    @Deprecated
     public void setCompact(boolean compact) {
         this.compact = compact;
     }
@@ -215,6 +263,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      * {@link XStream#NO_REFERENCES} is set so that references betweem tags
      * are always resolved.
      */
+    @Deprecated
     protected XStream getXStream() {
         if (xstream != null) {
             return xstream;
@@ -242,6 +291,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
         return result;
     }
 
+    @Deprecated
     private static class MapperWrapperIgnoreUnknownElements extends MapperWrapper {
         public MapperWrapperIgnoreUnknownElements(MapperWrapper next) {
             super(next);

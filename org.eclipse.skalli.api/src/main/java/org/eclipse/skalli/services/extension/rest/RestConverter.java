@@ -10,25 +10,32 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.extension.rest;
 
+import java.io.IOException;
+
 import org.eclipse.skalli.model.EntityBase;
-import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.services.extension.ExtensionService;
-import org.eclipse.skalli.services.extension.ExtensionServices;
+import org.eclipse.skalli.services.rest.RestWriter;
 
 import com.thoughtworks.xstream.converters.Converter;
 
 /**
- * Interfacing that represents REST converters for {@link EntityBase entities} and
- * their {@link ExtensionEntityBase extensions} or, more general, Java beans with
- * a REST representation. REST converters for entities are provided through
- * {@link ExtensionServices extension services}.
+ * Interface for a REST converter able to marshal and unmarshal instances of a given class,
+ * e.g. an {@link EntityBase entity}.
  * <p>
  * Implementations of this interface should usually be derived from {@link RestConverterBase}.
- *<p>
- * This interface is an extension to the {@link Converter XStream converter} interface and
- * adds certain methods for defining aliases, namespaces/schemas and API versions.
  */
-public interface RestConverter extends Converter {
+public interface RestConverter<T> extends Converter {
+
+    /**
+     * Marshals the given object instance to the specified writer.
+     *
+     * @param obj  the object instance to marshal.
+     * @param writer  the writer to use for marshalling.
+     *
+     * @throws RestException  if the marshalling failed.
+     * @throws IOException  if an i/o error occured.
+     */
+    public void marshal(Object obj, RestWriter writer) throws IOException;
 
     /**
      * Defines the alias that should be used to represent an entity or extension
@@ -38,6 +45,7 @@ public interface RestConverter extends Converter {
      * compatible with the rules for naming of XML tags. Must not be <code>null</code>
      * or an empty string.
      */
+    @Deprecated
     public String getAlias();
 
     /**
@@ -47,7 +55,7 @@ public interface RestConverter extends Converter {
      *
      * @return the entity, extension or bean class. Must not be <code>null</code>.
      */
-    public Class<?> getConversionClass();
+    public Class<T> getConversionClass();
 
     /**
      * The API version to render in the REST representation.

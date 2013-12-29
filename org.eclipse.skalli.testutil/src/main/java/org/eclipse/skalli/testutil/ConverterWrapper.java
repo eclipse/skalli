@@ -10,39 +10,49 @@
  *******************************************************************************/
 package org.eclipse.skalli.testutil;
 
+import java.io.IOException;
+
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Derived;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
+import org.eclipse.skalli.services.rest.RestWriter;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
+@SuppressWarnings("rawtypes")
 public class ConverterWrapper implements RestConverter {
 
     private static final String XSI_INSTANCE_NS = "http://www.w3.org/2001/XMLSchema-instance"; //$NON-NLS-1$
     private static final String URL_SCHEMAS = "/schemas/"; //$NON-NLS-1$
 
-    private RestConverter converter;
+    private RestConverter<?> converter;
     private String nodeName;
     private boolean isInherited;
     private boolean omitInheritedAttribute;
     private String host;
 
-    public ConverterWrapper(String host, RestConverter converter, String nodeName) {
+    public ConverterWrapper(String host, RestConverter<?> converter, String nodeName) {
         this.host = host;
         this.converter = converter;
         this.nodeName = nodeName;
         this.omitInheritedAttribute = true;
     }
 
-    public ConverterWrapper(String host, RestConverter converter, String nodeName, boolean isInherited) {
+    public ConverterWrapper(String host, RestConverter<?> converter, String nodeName, boolean isInherited) {
         this.converter = converter;
         this.nodeName = nodeName;
         this.isInherited = isInherited;
         this.omitInheritedAttribute = false;
+    }
+
+    @Override
+    public void marshal(Object obj, RestWriter writer) throws IOException {
+        writer.object(nodeName);
+        writer.end();
     }
 
     @Override
