@@ -11,6 +11,9 @@
  -->
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.rest">
     <implementation class="org.eclipse.skalli.core.rest.RestApplication"/>
+    <service>
+        <provide interface="org.eclipse.skalli.services.rest.RestService"/>
+    </service>
     <reference
         name="ConfigSection"
         interface="org.eclipse.skalli.services.configuration.ConfigSection"

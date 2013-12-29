@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest;
 
+import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,10 +31,13 @@ import org.eclipse.skalli.core.rest.resources.UserResource;
 import org.eclipse.skalli.services.configuration.ConfigSection;
 import org.eclipse.skalli.services.extension.rest.ErrorRepresentation;
 import org.eclipse.skalli.services.extension.rest.RestExtension;
+import org.eclipse.skalli.services.rest.RestService;
+import org.eclipse.skalli.services.rest.RestWriter;
 import org.restlet.Application;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Restlet;
+import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ServerResource;
@@ -42,7 +46,7 @@ import org.restlet.service.StatusService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RestApplication extends Application {
+public class RestApplication extends Application implements RestService {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestApplication.class);
 
@@ -133,6 +137,22 @@ public class RestApplication extends Application {
                 return super.getRepresentation(status, request, response);
             }
         });
+    }
+
+    @Override
+    public boolean isSupportedMediaType(MediaType mediaType) {
+        return  MediaType.TEXT_XML.equals(mediaType) ||  MediaType.APPLICATION_JSON.equals(mediaType);
+    }
+
+    @Override
+    public RestWriter getRestWriter(MediaType mediaType, Writer writer, String host) {
+        if (MediaType.TEXT_XML.equals(mediaType)) {
+            return new XMLRestWriter(writer, host);
+        } else if (MediaType.APPLICATION_JSON.equals(mediaType)) {
+            return new JSONRestWriter(writer, host);
+        } else {
+            throw new IllegalArgumentException(MessageFormat.format("Unsupported media type ''{0}''", mediaType));
+        }
     }
 
     private void attachConfigurationResources(Router router) {
