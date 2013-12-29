@@ -12,7 +12,6 @@ package org.eclipse.skalli.services.extension.rest;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Collections;
 import java.util.Map;
 import java.util.SortedSet;
 
@@ -22,7 +21,6 @@ import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.permit.Permit.Level;
 import org.eclipse.skalli.services.permit.Permits;
-import org.restlet.Request;
 import org.restlet.data.Form;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
@@ -42,26 +40,20 @@ public abstract class ResourceBase extends ServerResource {
 
     private static final String ERROR_ID_MISSING_AUTHORIZATION = "rest:permit({0}):00"; //$NON-NLS-1$
 
-    private String action;
-    private String path;
-    private Reference resourceRef;
-    private Form form;
-    private Map<String,String> queryParams;
+    private RequestContext context;
 
     @Override
     protected void doInit() {
         super.doInit();
-        path = getReference().getPath();
-        action = getMethod().getName();
-        Request request = getRequest();
-        resourceRef = request != null ? request.getResourceRef() : null;
-        form = resourceRef != null ? resourceRef.getQueryAsForm() : null;
-        if (form != null) {
-            queryParams = form.getValuesMap();
-        } else {
-            form = new Form();
-            queryParams = Collections.emptyMap();
-        }
+        context = new RequestContext(this);
+    }
+
+    /**
+     * Returns the resource context providing information
+     * about the request like query attributes and request path.
+     */
+    protected RequestContext getResourceContext() {
+        return context;
     }
 
     /**
@@ -69,14 +61,14 @@ public abstract class ResourceBase extends ServerResource {
      * prefix <code>/api</code>.
      */
     protected String getPath() {
-        return path;
+        return context.getPath();
     }
 
     /**
      * Returns the action of this request.
      */
     protected String getAction() {
-        return action;
+        return context.getAction();
     }
 
     /**
@@ -86,7 +78,7 @@ public abstract class ResourceBase extends ServerResource {
      * @see org.restlet.Request#getResourceRef().
      */
     protected Reference getResourceRef() {
-        return resourceRef;
+        return context.getResourceRef();
     }
 
     /**
@@ -95,7 +87,7 @@ public abstract class ResourceBase extends ServerResource {
      * could not be determined.
      */
     protected String getHost() {
-        return resourceRef != null ? resourceRef.getHostIdentifier() : null;
+        return context.getHost();
     }
 
     /**
@@ -103,7 +95,7 @@ public abstract class ResourceBase extends ServerResource {
      * if there is no query.
      */
     protected Form getQueryAsForm() {
-        return form;
+        return context.getQueryAsForm();
     }
 
     /**
@@ -111,7 +103,7 @@ public abstract class ResourceBase extends ServerResource {
      * if there is no query.
      */
     protected String getQueryString() {
-        return form.getQueryString();
+        return context.getQueryString();
     }
 
     /**
@@ -125,7 +117,7 @@ public abstract class ResourceBase extends ServerResource {
      * attribute.
      */
     protected String getQueryAttribute(String name) {
-        return queryParams.get(name);
+        return context.getQueryAttribute(name);
     }
 
     /**
@@ -135,7 +127,7 @@ public abstract class ResourceBase extends ServerResource {
      * @param name  the name of the attribute.
      */
     protected boolean hasQueryAttribute(String name) {
-        return queryParams.containsKey(name);
+        return context.hasQueryAttribute(name);
     }
 
     /**
@@ -144,7 +136,7 @@ public abstract class ResourceBase extends ServerResource {
      * or an empty map if there is no query.
      */
     protected Map<String,String> getQueryAttributes() {
-        return queryParams;
+        return context.getQueryAttributes();
     }
 
     /**
@@ -154,12 +146,11 @@ public abstract class ResourceBase extends ServerResource {
      *
      * @param action  the action to perform.
      * @param path  path of the resource on which the action is to be performed.
-     *
-     * @return <code>null</code>, if the user is authorized to perform the action,
-     * otherwise an {@link ErrorRepresenation}.
      */
     protected Representation createUnauthorizedRepresentation() {
         String loggedInUser = Permits.getLoggedInUser();
+        String action = context.getAction();
+        String path = context.getPath();
         String message = StringUtils.isBlank(loggedInUser)?
                 MessageFormat.format("{0} {1}: Forbidden for anonymous users", action, path) :
                 MessageFormat.format("{0} {1}: Forbidden for user ''{2}''", action, path, loggedInUser);
