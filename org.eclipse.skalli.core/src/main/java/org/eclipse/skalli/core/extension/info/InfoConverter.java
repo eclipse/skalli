@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.extension.info;
 
+import java.io.IOException;
+
 import org.eclipse.skalli.model.ext.commons.InfoExtension;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 
@@ -23,10 +25,24 @@ public class InfoConverter extends RestConverterBase<InfoExtension> {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-Info"; //$NON-NLS-1$
 
+    public InfoConverter() {
+        super(InfoExtension.class);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(InfoExtension extension) throws IOException {
+        writer
+          .pair("homepage", extension.getPageUrl())
+          .collection("mailingLists", "mailingList", extension.getMailingLists());
+    }
+
+    @Deprecated
     public InfoConverter(String host) {
         super(InfoExtension.class, "info", host); //$NON-NLS-1$
     }
 
+    @Deprecated
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         InfoExtension info = (InfoExtension) source;

@@ -10,8 +10,11 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.extension.tags;
 
+import java.io.IOException;
+
 import org.eclipse.skalli.model.ext.commons.TagsExtension;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.restlet.data.MediaType;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -23,10 +26,29 @@ public class TagsConverter extends RestConverterBase<TagsExtension> {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-Tags"; //$NON-NLS-1$
 
+    public TagsConverter() {
+        super(TagsExtension.class);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(TagsExtension extension) throws IOException {
+        if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
+            writer.key("tags");
+        }
+        writer.array("tag");
+        for (String tag : extension.getTags()) {
+            writer.value(tag);
+        }
+        writer.end();
+    }
+
+    @Deprecated
     public TagsConverter(String host) {
         super(TagsExtension.class, "tags", host); //$NON-NLS-1$
     }
 
+    @Deprecated
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         TagsExtension ext = (TagsExtension) source;

@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.example.skalli.ext.helloworld.internal;
 
+import java.io.IOException;
+
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 import org.example.skalli.model.ext.helloworld.HelloWorldProjectExt;
 
@@ -23,6 +25,18 @@ class HelloWorldConverter extends RestConverterBase<HelloWorldProjectExt> {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-HelloWorld"; //$NON-NLS-1$
 
+    public HelloWorldConverter() {
+        super(HelloWorldProjectExt.class);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(HelloWorldProjectExt ext) throws IOException {
+        writer.pair("name", ext.getName());
+        writer.collection("friends", "friend", ext.getFriends());
+    }
+
+    @Deprecated
     public HelloWorldConverter(String host) {
         super(HelloWorldProjectExt.class, "helloWorld", host);
     }
@@ -42,6 +56,7 @@ class HelloWorldConverter extends RestConverterBase<HelloWorldProjectExt> {
         return null;
     }
 
+    @Deprecated
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         HelloWorldProjectExt ext = (HelloWorldProjectExt) source;
@@ -51,6 +66,7 @@ class HelloWorldConverter extends RestConverterBase<HelloWorldProjectExt> {
 
     }
 
+    @Deprecated
     private void writeFriends(HierarchicalStreamWriter writer, HelloWorldProjectExt ext) {
         writer.startNode("friends");
         for (String friend : ext.getFriends()) {

@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest.resources;
 
+import java.io.IOException;
+
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -22,6 +24,9 @@ class PropertyUpdateConverter extends RestConverterBase<PropertyUpdate> {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API"; //$NON-NLS-1$
 
+    @Override
+    protected void marshal(PropertyUpdate obj) throws IOException {
+    }
 
     public PropertyUpdateConverter() {
         super(PropertyUpdate.class, "dataChangePattern"); //$NON-NLS-1$

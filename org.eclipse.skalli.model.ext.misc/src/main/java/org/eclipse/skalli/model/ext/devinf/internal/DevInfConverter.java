@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.devinf.internal;
 
+import java.io.IOException;
+
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 
@@ -23,10 +25,28 @@ class DevInfConverter extends RestConverterBase<DevInfProjectExt> {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-DevInf"; //$NON-NLS-1$
 
+    public DevInfConverter() {
+        super(DevInfProjectExt.class);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(DevInfProjectExt extension) throws IOException {
+        writer
+        .pair("bugtrackerUrl", extension.getBugtrackerUrl())
+        .pair("ciUrl", extension.getCiUrl())
+        .pair("metricsUrl", extension.getMetricsUrl())
+        .pair("scmUrl", extension.getScmUrl())
+        .collection("scmLocations", "scmLocation", extension.getScmLocations())
+        .collection("javadocs", "javadoc", extension.getJavadocs());
+    }
+
+    @Deprecated
     public DevInfConverter(String host) {
         super(DevInfProjectExt.class, "devInf", host); //$NON-NLS-1$
     }
 
+    @Deprecated
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         DevInfProjectExt ext = (DevInfProjectExt) source;

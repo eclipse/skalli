@@ -52,12 +52,16 @@ public class RestUtils {
 
     /** URL prefix for the collection of users (<tt>{@value}</tt>) */
     public static final String URL_USER = URL_API + "user/"; //$NON-NLS-1$
+    public static final String URL_USERS = URL_API + "users/"; //$NON-NLS-1$
 
     /** URL suffix for the collection of issues of a project (<tt>{@value}</tt>) */
     public final static String URL_ISSUES = "/issues"; //$NON-NLS-1$
 
     /** URL prefix for the browseable collection of projects (<tt>{@value}</tt>) */
     public final static String URL_BROWSE = "/projects/"; //$NON-NLS-1$
+
+    /** URL prefix for the browseable collection of subprojects (<tt>{@value}</tt>) */
+    public final static String URL_SUBPROJECTS = "/subprojects"; //$NON-NLS-1$
 
     /** Query parameter  <tt>{@value}</tt>) */
     public static final String PARAM_ID = "id"; //$NON-NLS-1$

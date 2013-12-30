@@ -80,9 +80,15 @@ public class ExtensionServiceInfo
         return DESCRIPTION;
     }
 
+    @Deprecated
     @Override
     public RestConverter getRestConverter(String host) {
         return new InfoConverter(host);
+    }
+
+    @Override
+    public RestConverter<InfoExtension> getRestConverter() {
+        return new InfoConverter();
     }
 
     @Override

@@ -10,10 +10,14 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest.resources;
 
+import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.eclipse.skalli.services.extension.rest.RestUtils;
+import org.restlet.data.MediaType;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -27,6 +31,40 @@ public class SubprojectsConverter extends RestConverterBase<Subprojects> {
 
     private String[] extensions;
 
+    public SubprojectsConverter() {
+        super(Subprojects.class);
+    }
+
+    public SubprojectsConverter(String[] extensions) {
+        super(Subprojects.class);
+        this.extensions = extensions;
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(Subprojects subprojects) throws IOException {
+        writer.object("subprojects");
+            namespaces();
+            apiVersion();
+            UUID uuid = subprojects.getUUID();
+            writer.links()
+              .link(SELF_RELATION, RestUtils.URL_PROJECTS, uuid, RestUtils.URL_SUBPROJECTS)
+              .link(PROJECT_RELATION, RestUtils.URL_PROJECTS, uuid)
+            .end();
+            if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
+                writer.key("subprojects");
+            }
+            writer.array("project");
+            for (Project subproject : subprojects.getSubprojects()) {
+                writer.object();
+                    new CommonProjectConverter(extensions, true).marshal(subproject, writer);
+                writer.end();
+            }
+            writer.end();
+        writer.end();
+    }
+
+    @Deprecated
     public SubprojectsConverter(String host, String[] extensions) {
         super(Subprojects.class, "subprojects", host); //$NON-NLS-1$
         this.extensions = extensions;

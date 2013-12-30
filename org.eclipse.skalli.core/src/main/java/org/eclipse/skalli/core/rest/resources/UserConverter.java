@@ -10,8 +10,11 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest.resources;
 
+import java.io.IOException;
+
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.eclipse.skalli.services.extension.rest.RestUtils;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -23,10 +26,40 @@ class UserConverter extends RestConverterBase<User> {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API"; //$NON-NLS-1$
 
+    public UserConverter() {
+        super(User.class);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(User user) throws IOException {
+        writer.object("user");
+        namespaces();
+        apiVersion();
+        writer.link(SELF_RELATION, RestUtils.URL_USERS, user.getUserId());
+        writer.pair("userId", user.getUserId());
+        if (!user.isUnknown()) {
+            writer
+            .pair("firstname", user.getFirstname())
+            .pair("lastname", user.getLastname())
+            .pair("email", user.getEmail())
+            .pair("phone", user.getTelephone())
+            .pair("mobile", user.getMobile())
+            .pair("sip", user.getSip())
+            .pair("company", user.getCompany())
+            .pair("department", user.getDepartment())
+            .pair("location", user.getLocation())
+            .pair("room", user.getRoom());
+        }
+        writer.end();
+    }
+
+    @Deprecated
     public UserConverter(String host) {
         super(User.class, "user", host); //$NON-NLS-1$
     }
 
+    @Deprecated
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         User user = (User) source;

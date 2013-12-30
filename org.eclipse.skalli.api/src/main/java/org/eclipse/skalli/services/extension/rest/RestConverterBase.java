@@ -41,6 +41,9 @@ public abstract class RestConverterBase<T> implements RestConverter<T> {
     /** Relation type for a link to another project's detail page (<tt>rel={@value}</tt>) */
     protected static final String BROWSE_RELATION = "browse"; //$NON-NLS-1$
 
+    /** Relation type for a permant link to another project's detail page (<tt>rel={@value}</tt>) */
+    protected static final String PROJECT_PERMALINK = "permalink"; //$NON-NLS-1$
+
     /** Relation type for a link to the project's issues resource (<tt>rel={@value}</tt>) */
     protected static final String ISSUES_RELATION = "issues"; //$NON-NLS-1$
 
@@ -49,6 +52,9 @@ public abstract class RestConverterBase<T> implements RestConverter<T> {
 
     /** Relation type for a link to a subproject of a project (<tt>rel={@value}</tt>) */
     protected static final String SUBPROJECT_RELATION = "subproject"; //$NON-NLS-1$
+
+    /** Relation type for a link to the collection of subprojects of a project (<tt>rel={@value}</tt>) */
+    protected static final String SUBPROJECTS_RELATION = "subprojects"; //$NON-NLS-1$
 
     /** Relation type for a link to a user resource (<tt>rel={@value}</tt>) */
     protected static final String USER_RELATION = "user"; //$NON-NLS-1$

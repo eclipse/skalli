@@ -10,10 +10,13 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest.resources;
 
+import java.io.IOException;
+
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.permit.PermitSet;
+import org.restlet.data.MediaType;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -28,11 +31,42 @@ public class PermitSetConverter extends RestConverterBase<PermitSet> {
     private String owner;
 
     @SuppressWarnings("nls")
+    public PermitSetConverter(String owner) {
+        super(PermitSet.class);
+        this.owner = StringUtils.isNotBlank(owner)? owner : "anonymous";
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(PermitSet permits) throws IOException {
+        writer.object("permits");
+        namespaces();
+        apiVersion();
+        writer.pair("owner", owner);
+        if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
+            writer.key("permits");
+        }
+        writer.array("permit");
+        for (Permit permit: permits) {
+            String path = StringUtils.replace(permit.getPath(), "/projects/?/", "/projects/**/");
+            writer.object();
+                writer.pair("action", permit.getAction());
+                writer.pair("path", path);
+                writer.pair("level", permit.getLevel());
+            writer.end();
+        }
+        writer.end();
+        writer.end();
+    }
+
+    @Deprecated
+    @SuppressWarnings("nls")
     public PermitSetConverter(String owner, String host) {
         super(PermitSet.class, "permits", host);
         this.owner = StringUtils.isNotBlank(owner)? owner : "anonymous";
     }
 
+    @Deprecated
     @SuppressWarnings("nls")
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {

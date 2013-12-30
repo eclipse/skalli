@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal.recommendedupdatesites;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +19,8 @@ import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.RecommendedUpdateSites;
 import org.eclipse.skalli.model.ext.maven.recommendedupdatesites.UpdateSite;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.eclipse.skalli.services.extension.rest.RestUtils;
+import org.restlet.data.MediaType;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -30,7 +33,37 @@ public class UpdateSitesConverter extends RestConverterBase<RecommendedUpdateSit
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-Maven"; //$NON-NLS-1$
 
     public UpdateSitesConverter() {
-        this(null);
+        super(RecommendedUpdateSites.class);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(RecommendedUpdateSites recommendedUpdateSites) throws IOException {
+        writer.object("updateSites");
+        namespaces();
+        apiVersion();
+        writer.pair("name", recommendedUpdateSites.getName());
+        writer.pair("description", recommendedUpdateSites.getDescription());
+        writer.pair("shortName", recommendedUpdateSites.getShortName());
+        if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
+            writer.key("updateSites");
+        }
+        writer.array("updateSite");
+        for (UpdateSite updateSite : recommendedUpdateSites.getUpdateSites()) {
+            writer.object()
+              .links()
+                .link(PROJECT_RELATION, RestUtils.URL_PROJECTS, updateSite.getProjectUUID())
+                .link(PROJECT_PERMALINK, RestUtils.URL_BROWSE, updateSite.getProjectUUID())
+              .end()
+              .pair("projectUUID", updateSite.getProjectUUID())
+              .pair("groupId", updateSite.getGroupId())
+              .pair("artifactId", updateSite.getArtifactId())
+              .pair("name", updateSite.getName())
+              .pair("description", updateSite.getDescription())
+            .end();
+        }
+        writer.end();
+        writer.end();
     }
 
     public UpdateSitesConverter(String host) {

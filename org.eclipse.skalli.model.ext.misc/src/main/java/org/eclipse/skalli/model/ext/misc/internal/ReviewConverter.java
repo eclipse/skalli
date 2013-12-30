@@ -10,10 +10,13 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.misc.internal;
 
+import java.io.IOException;
+
 import org.eclipse.skalli.model.ext.misc.ProjectRating;
 import org.eclipse.skalli.model.ext.misc.ReviewEntry;
 import org.eclipse.skalli.model.ext.misc.ReviewProjectExt;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.restlet.data.MediaType;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -25,10 +28,41 @@ class ReviewConverter extends RestConverterBase<ReviewProjectExt> {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-Review"; //$NON-NLS-1$
 
+    public ReviewConverter() {
+        super(ReviewProjectExt.class);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(ReviewProjectExt extension) throws IOException {
+        writer.pair("ratingStyle", extension.getRatingStyle().toString());
+        writer.pair("allowAnonymous", extension.getAllowAnonymous());
+        writer.pair("numberVotes", extension.getNumberVotes());
+        writer.pair("numberThumbsUp", extension.getNumberThumbsUp());
+        writer.pair("numberThumbsDown", extension.getNumberThumbsDown());
+        writer.pair("averageRating", extension.getAverageRating().toString());
+        if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
+            writer.key("reviews");
+        }
+        writer.array("review");
+        for (ReviewEntry entry : extension.getReviews()) {
+            writer
+            .object()
+              .pair("voter", entry.getVoter())
+              .pair("comment", entry.getComment())
+              .pair("timestamp", entry.getTimestamp())
+              .pair("rating", entry.getRating().toString())
+            .end();
+        }
+        writer.end();
+    }
+
+    @Deprecated
     public ReviewConverter(String host) {
         super(ReviewProjectExt.class, "reviews", host); //$NON-NLS-1$
     }
 
+    @Deprecated
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         ReviewProjectExt ext = (ReviewProjectExt) source;

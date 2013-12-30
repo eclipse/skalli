@@ -81,10 +81,17 @@ public class ExtensionServiceTags extends ExtensionServiceBase<TagsExtension> {
         return "model-tags.xsd"; //$NON-NLS-1$;
     }
 
+    @Deprecated
     @Override
     public RestConverter getRestConverter(String host) {
         return new TagsConverter(host);
     }
+
+    @Override
+    public RestConverter<TagsExtension> getRestConverter() {
+        return new TagsConverter();
+    }
+
 
     @Override
     public Indexer<TagsExtension> getIndexer() {

@@ -20,7 +20,15 @@ public abstract class MonitorConverterBase extends RestConverterBase<Object> {
     private static final Logger LOG = LoggerFactory.getLogger(MonitorConverterBase.class);
 
     protected String serviceComponentName;
+    protected String resourceName;
 
+    public MonitorConverterBase(String serviceComponentName, String resourceName) {
+        super(Object.class);
+        this.serviceComponentName = serviceComponentName;
+        this.resourceName = resourceName;
+    }
+
+    @Deprecated
     public MonitorConverterBase(String serviceComponentName, String resourceName, String host) {
         super(Object.class, resourceName, host);
         this.serviceComponentName = serviceComponentName;

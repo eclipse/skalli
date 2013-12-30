@@ -10,9 +10,12 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.extension.people;
 
+import java.io.IOException;
+
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.ext.commons.PeopleExtension;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.eclipse.skalli.services.extension.rest.RestUtils;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -24,10 +27,41 @@ public class PeopleConverter extends RestConverterBase<PeopleExtension> {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-People"; //$NON-NLS-1$
 
+    private static final String URL_USERS = RestUtils.URL_API + "users/"; //$NON-NLS-1$
+
+    public PeopleConverter() {
+        super(PeopleExtension.class);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    public void marshal(PeopleExtension extension) throws IOException {
+        writer.array("leads", "lead");
+        for (Member member : extension.getLeads()) {
+            writer
+                .object()
+                .pair("userId", member.getUserID())
+                .link(USER_RELATION, URL_USERS, member.getUserID())
+                .end();
+        }
+        writer.end();
+        writer.array("members", "member");
+        for (Member member : extension.getMembers()) {
+            writer
+                .object()
+                .pair("userId", member.getUserID())
+                .link(USER_RELATION, URL_USERS, member.getUserID())
+                .end();
+        }
+        writer.end();
+    }
+
+    @Deprecated
     public PeopleConverter(String host) {
         super(PeopleExtension.class, "people", host); //$NON-NLS-1$
     }
 
+    @Deprecated
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         PeopleExtension ext = (PeopleExtension) source;

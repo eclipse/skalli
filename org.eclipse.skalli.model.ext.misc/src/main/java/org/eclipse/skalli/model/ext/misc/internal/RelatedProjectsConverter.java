@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.misc.internal;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
@@ -19,9 +20,12 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.misc.RelatedProjectsExt;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.eclipse.skalli.services.extension.rest.RestUtils;
+import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.search.SearchHit;
 import org.eclipse.skalli.services.search.SearchResult;
 import org.eclipse.skalli.services.search.SearchService;
+import org.restlet.data.MediaType;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -33,10 +37,62 @@ public class RelatedProjectsConverter extends RestConverterBase<RelatedProjectsE
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-RelatedProjects"; //$NON-NLS-1$
 
+    public RelatedProjectsConverter() {
+        super(RelatedProjectsExt.class);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(RelatedProjectsExt extension) throws IOException {
+        UUIDList relatedProjects = new UUIDList();
+        boolean calculated = extension.getCalculated();
+        writer.pair("calculated", calculated);
+        if (calculated) {
+            SearchService searchService = Services.getService(SearchService.class);
+            if (searchService != null) {
+                SearchResult<Project> hits = searchService.getRelatedProjects((Project)extension.getExtensibleEntity(), 3);
+                for (SearchHit<Project> hit : hits.getResult()) {
+                    relatedProjects.add(hit.getEntity().getUuid());
+                }
+            }
+        } else  {
+            relatedProjects = extension.getRelatedProjects();
+        }
+        marshalLinksSection(relatedProjects, Services.getRequiredService(ProjectService.class));
+    }
+
+    void marshalLinksSection(UUIDList relatedProjects, ProjectService projectService) throws IOException {
+        writer.links();
+        if (writer.isMediaType(MediaType.TEXT_XML)) {
+            for (UUID uuid: relatedProjects) {
+                Project project = projectService.getByUUID(uuid);
+                if (project != null) {
+                    writer.link(PROJECT_RELATION, RestUtils.URL_PROJECTS, uuid);
+                }
+            }
+        } else {
+            for (UUID uuid: relatedProjects) {
+                Project project = projectService.getByUUID(uuid);
+                if (project != null) {
+                    writer.object();
+                    writer.attribute("rel", PROJECT_RELATION);
+                    writer.attribute("href", writer.hrefOf(RestUtils.URL_PROJECTS, uuid));
+                    writer.attribute("uuid", uuid);
+                    writer.attribute("id", project.getProjectId());
+                    writer.attribute("name", project.getName());
+                    writer.end();
+                }
+            }
+        }
+        writer.end();
+    }
+
+    @Deprecated
     public RelatedProjectsConverter(String host) {
         super(RelatedProjectsExt.class, "relatedProjects", host); //$NON-NLS-1$
     }
 
+    @Deprecated
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         RelatedProjectsExt ext = (RelatedProjectsExt)source;

@@ -10,12 +10,14 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.ext.impl.internal.rest;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 import org.eclipse.skalli.view.ext.InfoBox;
+import org.restlet.data.MediaType;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -27,6 +29,35 @@ public class InfoBoxesConverter extends RestConverterBase<InfoBoxes> {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API"; //$NON-NLS-1$
 
+    public InfoBoxesConverter() {
+        super(InfoBoxes.class);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(InfoBoxes infoboxes) throws IOException {
+        writer.object("infoboxes");
+            namespaces();
+            apiVersion();
+            if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
+                writer.key("infoboxes");
+            }
+            writer.array("infobox");
+            for (InfoBox infoBox : infoboxes.getInfoBoxes()) {
+                List<String> actions = infoBox.getSupportedActions();
+                String shortName = infoBox.getShortName();
+                if (StringUtils.isNotBlank(shortName)) {
+                    writer.pair("shortName", shortName);
+                    if (CollectionUtils.isNotBlank(actions)) {
+                        writer.collection("actions", "action", actions);
+                    }
+                }
+            }
+            writer.end();
+        writer.end();
+    }
+
+    @Deprecated
     public InfoBoxesConverter(String host) {
         super(InfoBoxes.class, "infoboxes", host); //$NON-NLS-1$
     }

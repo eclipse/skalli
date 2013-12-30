@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest.resources;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -26,19 +27,30 @@ import org.eclipse.skalli.services.role.RoleProvider;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 
-class ProjectConverter extends CommonProjectConverter {
-
-    public static final String API_VERSION = "1.4"; //$NON-NLS-1$
-    public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API"; //$NON-NLS-1$
+public class ProjectConverter extends CommonProjectConverter {
 
     public ProjectConverter() {
-        super(null, true);
+        super(true);
     }
 
+    public ProjectConverter(boolean omitNSAttributes) {
+        super(omitNSAttributes);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    public void marshal(Project project) throws IOException {
+        writer.object("project");
+        super.marshal(project);
+        writer.end();
+    }
+
+    @Deprecated
     public ProjectConverter(String host, boolean omitNSAttributes) {
         super(host, omitNSAttributes);
     }
 
+    @Deprecated
     public ProjectConverter(String host, String[] extensions, boolean omitNSAttributes) {
         super(host, extensions, omitNSAttributes);
     }
@@ -125,20 +137,5 @@ class ProjectConverter extends CommonProjectConverter {
         }
 
         return extensions;
-    }
-
-    @Override
-    public String getApiVersion() {
-        return API_VERSION;
-    }
-
-    @Override
-    public String getNamespace() {
-        return NAMESPACE;
-    }
-
-    @Override
-    public String getXsdFileName() {
-        return "project.xsd"; //$NON-NLS-1$
     }
 }

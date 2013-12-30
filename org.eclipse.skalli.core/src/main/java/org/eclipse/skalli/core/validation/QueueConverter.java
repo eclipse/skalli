@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.validation;
 
+import java.io.IOException;
 import java.util.Queue;
 
 import org.eclipse.skalli.core.rest.monitor.MonitorConverterBase;
@@ -24,6 +25,39 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 class QueueConverter extends MonitorConverterBase {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
 
+    public QueueConverter(String serviceComponentName, String resourceName) {
+        super(serviceComponentName, resourceName);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(Object obj) throws IOException {
+        writer.object(resourceName);
+            namespaces();
+            apiVersion();
+            ValidationComponent service = getServiceInstance(ValidationService.class, ValidationComponent.class);
+            if (service != null) {
+                Queue<QueuedEntity<? extends EntityBase>> queuedEntities = service.getQueuedEntities();
+                writer.pair("queueSize", queuedEntities.size());
+                writer.array("queuedEntities", "queuedEntity");
+                for (QueuedEntity<?> queuedEntity: queuedEntities) {
+                    writer
+                    .object()
+                      .pair("entityClass", queuedEntity.getEntityClass().getName())
+                      .pair("entityId", queuedEntity.getEntityId())
+                      .pair("minSeverity", queuedEntity.getMinSeverity().toString())
+                      .pair("userId", queuedEntity.getUserId())
+                      .pair("priority", queuedEntity.priorityAsString())
+                      .datetime("queuedAt", queuedEntity.getQueuedAt())
+                      .datetime("startedAt", queuedEntity.getStartedAt())
+                    .end();
+                }
+                writer.end();
+        }
+        writer.end();
+    }
+
+    @Deprecated
     public QueueConverter(String serviceComponentName, String resourceName, String host) {
         super(serviceComponentName, resourceName, host);
     }

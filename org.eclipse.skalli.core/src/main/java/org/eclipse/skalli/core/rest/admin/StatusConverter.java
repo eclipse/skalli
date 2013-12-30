@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest.admin;
 
+import java.io.IOException;
+
 import org.eclipse.skalli.commons.FormatUtils;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
@@ -27,6 +29,47 @@ class StatusConverter extends RestConverterBase<Object> {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Admin"; //$NON-NLS-1$
 
+    public StatusConverter() {
+        super(Object.class);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(Object obj) throws IOException {
+        writer.object("status");
+            namespaces();
+            apiVersion();
+            writer.array("schedules", "schedule");
+            SchedulerService schedulerService = Services.getService(SchedulerService.class);
+            if (schedulerService != null) {
+                for (RunnableSchedule schedule : schedulerService.getSchedules()) {
+                    long lastStarted = schedule.getLastStarted();
+                    long lastCompleted = schedule.getLastCompleted();
+                    writer
+                    .pair("name", schedule.getCaption())
+                    .pair("runnable", schedule.getClass().getName())
+                    .pair("runAt", schedule.getSchedule());
+                    if (lastStarted > 0) {
+                        writer.pair("lastStarted", FormatUtils.formatUTCWithMillis(lastStarted));
+                    }
+                    if (lastCompleted > 0) {
+                        writer.pair("lastCompleted", FormatUtils.formatUTCWithMillis(lastCompleted));
+                    }
+                }
+            }
+            writer.end();
+            writer.array("bundles", "bundle");
+            for (Bundle bundle : Services.getBundles()) {
+                writer
+                .pair("name", bundle.getSymbolicName())
+                .pair("version", bundle.getVersion().toString())
+                .pair("state", getBundleState(bundle.getState()));
+            }
+            writer.end();
+        writer.end();
+    }
+
+    @Deprecated
     public StatusConverter(String host) {
         super(Object.class, "status", host); //$NON-NLS-1$
     }
@@ -50,6 +93,7 @@ class StatusConverter extends RestConverterBase<Object> {
         }
     }
 
+    @Deprecated
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         marshalNSAttributes(writer);

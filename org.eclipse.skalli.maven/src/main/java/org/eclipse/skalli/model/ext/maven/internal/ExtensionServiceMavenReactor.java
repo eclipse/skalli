@@ -61,9 +61,15 @@ public class ExtensionServiceMavenReactor
         return DESCRIPTION;
     }
 
+    @Deprecated
     @Override
     public RestConverter getRestConverter(String host) {
         return new MavenReactorConverter(host);
+    }
+
+    @Override
+    public RestConverter<MavenReactorProjectExt> getRestConverter() {
+        return new MavenReactorConverter();
     }
 
     @Override

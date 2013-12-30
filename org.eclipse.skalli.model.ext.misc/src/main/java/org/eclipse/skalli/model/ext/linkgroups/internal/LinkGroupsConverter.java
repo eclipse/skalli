@@ -10,12 +10,15 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.linkgroups.internal;
 
+import java.io.IOException;
 import java.util.Collection;
 
+import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.commons.Link;
 import org.eclipse.skalli.model.ext.linkgroups.LinkGroup;
 import org.eclipse.skalli.model.ext.linkgroups.LinkGroupsProjectExt;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.restlet.data.MediaType;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -27,10 +30,44 @@ class LinkGroupsConverter extends RestConverterBase<LinkGroupsProjectExt> {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-LinkGroups"; //$NON-NLS-1$
 
+    public LinkGroupsConverter() {
+        super(LinkGroupsProjectExt.class);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(LinkGroupsProjectExt extension) throws IOException {
+        Collection<LinkGroup> linkGroups = extension.getLinkGroups();
+        if (CollectionUtils.isNotBlank(linkGroups)) {
+            writer.array("linkGroup");
+            for (LinkGroup linkGroup : linkGroups) {
+                writer.object();
+                writer.attribute("caption", linkGroup.getCaption());
+                if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
+                    writer.key("links");
+                }
+                writer.array("link");
+                for (Link link : linkGroup.getItems()) {
+                    if (link != null) {
+                        writer.object();
+                        writer.attribute("ref", link.getUrl());
+                        writer.value(link.getLabel());
+                        writer.end();
+                    }
+                }
+                writer.end();
+                writer.end();
+            }
+            writer.end();
+        }
+    }
+
+    @Deprecated
     public LinkGroupsConverter(String host) {
         super(LinkGroupsProjectExt.class, "linkGroups", host); //$NON-NLS-1$
     }
 
+    @Deprecated
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         LinkGroupsProjectExt ext = (LinkGroupsProjectExt) source;

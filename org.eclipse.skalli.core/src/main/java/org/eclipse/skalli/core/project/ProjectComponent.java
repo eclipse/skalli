@@ -117,7 +117,7 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
     @Override
     public ProjectNature getProjectNature(UUID uuid) {
         ProjectTemplate projectTemplate = getProjectTemplate(uuid);
-        return projectTemplate != null ? projectTemplate.getProjectNature() : null;
+        return projectTemplate != null ? projectTemplate.getProjectNature() : ProjectNature.PROJECT;
     }
 
     private ProjectTemplate getProjectTemplate(UUID uuid) {

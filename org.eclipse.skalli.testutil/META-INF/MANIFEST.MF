@@ -32,6 +32,7 @@ Import-Package: com.thoughtworks.xstream.converters,
  org.junit,
  org.osgi.framework,
  org.osgi.service.component,
+ org.restlet.data,
  org.slf4j,
  org.w3c.dom,
  org.xml.sax

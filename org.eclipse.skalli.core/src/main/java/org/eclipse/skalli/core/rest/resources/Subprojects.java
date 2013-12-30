@@ -13,6 +13,7 @@ package org.eclipse.skalli.core.rest.resources;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.eclipse.skalli.model.Project;
 
@@ -21,6 +22,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("subprojects")
 public class Subprojects {
 
+    private UUID uuid;
     private LinkedHashSet<Project> subprojects;
 
     // do not remove: required by xstream
@@ -29,6 +31,15 @@ public class Subprojects {
 
     public Subprojects(Collection<Project> projects) {
         this.subprojects = new LinkedHashSet<Project>(projects);
+    }
+
+    public Subprojects(UUID uuid, Collection<Project> projects) {
+        this.uuid = uuid;
+        this.subprojects = new LinkedHashSet<Project>(projects);
+    }
+
+    public UUID getUUID() {
+        return uuid;
     }
 
     public Set<Project> getSubprojects() {

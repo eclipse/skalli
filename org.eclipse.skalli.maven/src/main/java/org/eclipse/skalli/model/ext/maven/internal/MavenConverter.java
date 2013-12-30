@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal;
 
+import java.io.IOException;
+
 import org.eclipse.skalli.model.ext.maven.MavenProjectExt;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 
@@ -23,10 +25,25 @@ class MavenConverter extends RestConverterBase<MavenProjectExt> {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Extension-Maven"; //$NON-NLS-1$
 
+    public MavenConverter() {
+        super(MavenProjectExt.class);
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(MavenProjectExt extension) throws IOException {
+        writer
+        .pair("groupID", extension.getGroupID())
+        .pair("siteUrl", extension.getSiteUrl())
+        .pair("pomPath", extension.getReactorPOM());
+    }
+
+    @Deprecated
     public MavenConverter(String host) {
         super(MavenProjectExt.class, "maven", host); //$NON-NLS-1$
     }
 
+    @Deprecated
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         MavenProjectExt ext = (MavenProjectExt) source;

@@ -10,6 +10,7 @@ Import-Package: com.thoughtworks.xstream.converters,
  org.eclipse.skalli.services.extension,
  org.eclipse.skalli.services.extension.rest,
  org.eclipse.skalli.services.extension.validators,
+ org.eclipse.skalli.services.rest,
  org.eclipse.skalli.view.component,
  org.eclipse.skalli.view.ext,
  org.slf4j

@@ -73,9 +73,15 @@ public class ExtensionServiceLinkGroups
         return aliases;
     }
 
+    @Deprecated
     @Override
     public RestConverter getRestConverter(String host) {
         return new LinkGroupsConverter(host);
+    }
+
+    @Override
+    public RestConverter<LinkGroupsProjectExt> getRestConverter() {
+        return new LinkGroupsConverter();
     }
 
     @Override

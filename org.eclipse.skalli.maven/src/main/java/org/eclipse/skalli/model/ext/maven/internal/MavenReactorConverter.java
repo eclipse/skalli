@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.maven.internal;
 
+import java.io.IOException;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
@@ -37,10 +38,49 @@ class MavenReactorConverter extends RestConverterBase<MavenReactorProjectExt> {
     private static final String TAG_VERSION = "version"; //$NON-NLS-1$
     private static final String TAG_COORDINATE = "coordinate"; //$NON-NLS-1$
 
+    public MavenReactorConverter() {
+        super(MavenReactorProjectExt.class);
+    }
+
+    @Override
+    protected void marshal(MavenReactorProjectExt extension) throws IOException {
+        MavenReactor reactor = extension.getMavenReactor();
+        if (reactor != null) {
+            MavenModule reactorCoordinate = reactor.getCoordinate();
+            if (reactorCoordinate != null) {
+                writer.object(TAG_COORDINATE);
+                writeCoordinate(reactorCoordinate);
+                writer.end();
+            }
+            TreeSet<MavenModule> modules = reactor.getModules();
+            if (modules.size() > 0) {
+                writer.array(TAG_MODULES, TAG_MODULE);
+                for (MavenModule moduleCoordinate : modules) {
+                    writer.object();
+                    writeCoordinate(moduleCoordinate);
+                    writer.end();
+                }
+                writer.end();
+            }
+        }
+    }
+
+    private void writeCoordinate(MavenModule reactorCoordinate) throws IOException {
+        writer.pair(TAG_GROUPID, reactorCoordinate.getGroupId());
+        writer.pair(TAG_ARTIFACTID, reactorCoordinate.getArtefactId());
+        writer.collection(TAG_VERSIONS, TAG_VERSION, reactorCoordinate.getSortedVersions());
+        if (StringUtils.isNotBlank(reactorCoordinate.getPackaging())) {
+            writer.pair(TAG_PACKAGING, reactorCoordinate.getPackaging());
+        }
+        writer.end();
+    }
+
+    @Deprecated
     public MavenReactorConverter(String host) {
         super(MavenReactorProjectExt.class, "mavenReactor", host); //$NON-NLS-1$
     }
 
+    @Deprecated
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         MavenReactorProjectExt ext = (MavenReactorProjectExt) source;
@@ -66,6 +106,7 @@ class MavenReactorConverter extends RestConverterBase<MavenReactorProjectExt> {
         }
     }
 
+    @Deprecated
     private void writeContent(HierarchicalStreamWriter writer, MavenModule reactorCoordinate) {
         writeNode(writer, TAG_GROUPID, reactorCoordinate.getGroupId());
         writeNode(writer, TAG_ARTIFACTID, reactorCoordinate.getArtefactId());

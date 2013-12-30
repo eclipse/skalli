@@ -49,4 +49,8 @@ public class Projects {
     public void addProjects(Collection<Project> projects) {
         getProjects().addAll(projects);
     }
+
+    public int size() {
+        return getProjects().size();
+    }
 }

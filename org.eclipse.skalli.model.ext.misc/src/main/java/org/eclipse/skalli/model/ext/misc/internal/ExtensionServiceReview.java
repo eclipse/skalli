@@ -71,9 +71,15 @@ public class ExtensionServiceReview
         return DESCRIPTION;
     }
 
+    @Deprecated
     @Override
     public RestConverter getRestConverter(String host) {
         return new ReviewConverter(host);
+    }
+
+    @Override
+    public RestConverter<ReviewProjectExt> getRestConverter() {
+        return new ReviewConverter();
     }
 
     @Override

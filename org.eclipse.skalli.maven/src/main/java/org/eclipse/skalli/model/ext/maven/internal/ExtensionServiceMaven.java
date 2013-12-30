@@ -90,9 +90,15 @@ public class ExtensionServiceMaven
         return DESCRIPTION;
     }
 
+    @Deprecated
     @Override
     public RestConverter getRestConverter(String host) {
         return new MavenConverter(host);
+    }
+
+    @Override
+    public RestConverter<MavenProjectExt> getRestConverter() {
+        return new MavenConverter();
     }
 
     @Override

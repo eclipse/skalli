@@ -102,10 +102,17 @@ public class ExtensionServicePeople
         return aliases;
     }
 
+    @Deprecated
     @Override
     public RestConverter getRestConverter(String host) {
         return new PeopleConverter(host);
     }
+
+    @Override
+    public RestConverter<PeopleExtension> getRestConverter() {
+        return new PeopleConverter();
+    }
+
 
     @Override
     public Indexer<PeopleExtension> getIndexer() {

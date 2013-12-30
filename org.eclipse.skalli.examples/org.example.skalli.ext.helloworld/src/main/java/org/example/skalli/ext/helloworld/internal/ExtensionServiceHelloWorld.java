@@ -96,9 +96,15 @@ public class ExtensionServiceHelloWorld extends ExtensionServiceBase<HelloWorldP
         return stringLengthValidator;
     }
 
+    @Deprecated
     @Override
     public RestConverter getRestConverter(String host) {
         return new HelloWorldConverter(host);
+    }
+
+    @Override
+    public RestConverter<HelloWorldProjectExt> getRestConverter() {
+        return new HelloWorldConverter();
     }
 
     @Override

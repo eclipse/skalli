@@ -141,9 +141,15 @@ public class ExtensionServiceDevInf
         return DESCRIPTION;
     }
 
+    @Deprecated
     @Override
     public RestConverter getRestConverter(String host) {
         return new DevInfConverter(host);
+    }
+
+    @Override
+    public RestConverter<DevInfProjectExt> getRestConverter() {
+        return new DevInfConverter();
     }
 
     @Override

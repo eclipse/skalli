@@ -75,8 +75,14 @@ public class ExtensionServiceRelatedProjects extends ExtensionServiceBase<Relate
         return null;
     }
 
+    @Deprecated
     @Override
     public RestConverter getRestConverter(String host) {
         return new RelatedProjectsConverter(host);
+    }
+
+    @Override
+    public RestConverter<RelatedProjectsExt> getRestConverter() {
+        return new RelatedProjectsConverter();
     }
 }

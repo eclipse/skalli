@@ -10,9 +10,12 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest.resources;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.UUID;
@@ -30,23 +33,184 @@ import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.rest.RestWriter;
 import org.eclipse.skalli.services.user.UserService;
 import org.eclipse.skalli.services.user.UserServices;
+import org.restlet.data.MediaType;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.UnmarshallingContext;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-public abstract class CommonProjectConverter extends RestConverterBase<Project> {
+public class CommonProjectConverter extends RestConverterBase<Project> {
+
+    public static final String API_VERSION = "1.4"; //$NON-NLS-1$
+    public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API"; //$NON-NLS-1$
 
     private final List<String> extensions;
     private boolean allExtensions;
     private boolean omitNSAttributes;
 
+    public CommonProjectConverter(boolean omitNSAttributes) {
+        this((String[])null, omitNSAttributes);
+    }
+
+    public CommonProjectConverter(String[] extensions, boolean omitNSAttributes) {
+        super(Project.class);
+        if (extensions != null) {
+            this.allExtensions = false;
+            this.extensions = Arrays.asList(extensions);
+        } else {
+            this.allExtensions = true;
+            this.extensions = Collections.emptyList();
+        }
+        this.omitNSAttributes = omitNSAttributes;
+    }
+
+    // for testing purposes
+    void setRestWriter(RestWriter writer) {
+        this.writer = writer;
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(Project project) throws IOException {
+        UUID uuid = project.getUuid();
+        if (!omitNSAttributes) {
+            namespaces();
+        }
+        commonAttributes(project);
+
+        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        UUID parent = project.getParentProject();
+        writer.pair("uuid", uuid);
+        writer.pair("id", project.getProjectId());
+        writer.pair("nature", projectService.getProjectNature(uuid).toString());
+        writer.pair("template", project.getProjectTemplateId());
+        writer.pair("name", project.getName());
+        writer.pair("shortName", project.getShortName());
+        writer.pair("phase", project.getPhase());
+        if (project.getRegistered() > 0) {
+            writer.timestamp("registered", project.getRegistered());
+        }
+        writer.pair("description", project.getDescription());
+        writer.links();
+            writer.link(PROJECT_RELATION, RestUtils.URL_PROJECTS, uuid);
+            writer.link(PROJECT_PERMALINK, RestUtils.URL_BROWSE, uuid);
+            writer.link(BROWSE_RELATION, RestUtils.URL_BROWSE, project.getProjectId());
+            writer.link(ISSUES_RELATION, RestUtils.URL_PROJECTS, uuid, RestUtils.URL_ISSUES);
+            writer.link(SUBPROJECTS_RELATION, RestUtils.URL_PROJECTS, uuid, RestUtils.URL_SUBPROJECTS);
+            if (parent != null) {
+                writer.link(PARENT_RELATION, RestUtils.URL_PROJECTS, parent);
+            }
+        writer.end();
+        marshalSubprojects(project);
+        marshalMembers(uuid, projectService.getMembers(uuid), projectService.getMembersByRole(uuid));
+        marshalExtensions(project, ExtensionServices.getAll());
+    }
+
+    @SuppressWarnings("nls")
+    void marshalSubprojects(Project project) throws IOException {
+        writer.key("subprojects").array();
+        SortedSet<Project> subprojectList = project.getSubProjects();
+        if (subprojectList.size() > 0) {
+            if (writer.isMediaType(MediaType.TEXT_XML)) {
+                for (Project subproject : subprojectList) {
+                    writer.link(SUBPROJECT_RELATION, RestUtils.URL_PROJECTS, subproject.getUuid());
+                }
+            } else {
+                for (Project subproject : subprojectList) {
+                    writer.object();
+                    writer.attribute("rel", SUBPROJECT_RELATION);
+                    writer.attribute("href", writer.hrefOf(RestUtils.URL_PROJECTS, subproject.getUuid()));
+                    writer.attribute("uuid", subproject.getUuid());
+                    writer.attribute("id", subproject.getProjectId());
+                    writer.attribute("name", subproject.getName());
+                    writer.end();
+                }
+            }
+        }
+        writer.end();
+    }
+
+    @SuppressWarnings("nls")
+    void marshalMembers(UUID uuid, SortedSet<Member> members, Map<String, SortedSet<Member>> membersByRole)
+            throws IOException {
+        writer.array("members", "member");
+        if (allExtensions || extensions.contains("members")) {
+            UserService userService = UserServices.getUserService();
+            for (Member member : members) {
+                String userId = member.getUserID();
+                writer.object();
+                    writer.pair("userId", userId);
+                    writer.link(USER_RELATION, RestUtils.URL_USERS, userId);
+                    if (userService != null) {
+                        User user = userService.getUserById(userId);
+                        if (!user.isUnknown()) {
+                            writer.pair("name", user.getDisplayName());
+                            writer.pair("firstName", user.getFirstname());
+                            writer.pair("lastName", user.getLastname());
+                            writer.pair("email", user.getEmail());
+                        }
+                    }
+
+                    if (writer.isMediaType(MediaType.TEXT_XML)) {
+                        writer.array("role");
+                    } else {
+                        writer.key("roles").array();
+                    }
+                    for (Entry<String, SortedSet<Member>> entry : membersByRole.entrySet()) {
+                        if (entry.getValue().contains(member)) {
+                            writer.value(entry.getKey());
+                        }
+                    }
+                    writer.end();
+                writer.end();
+            }
+        }
+        writer.end();
+    }
+
+    @SuppressWarnings("nls")
+    void marshalExtensions(ExtensibleEntityBase extensibleEntity, Collection<ExtensionService<?>> extensionServices)
+            throws IOException {
+        writer.object("extensions");
+        for (ExtensionService<?> extensionService : extensionServices) {
+            if (allExtensions || extensions.contains(extensionService.getShortName())) {
+                marshalExtension(extensibleEntity, extensionService);
+            }
+        }
+        writer.end();
+    }
+
+    @SuppressWarnings("nls")
+    void marshalExtension(ExtensibleEntityBase extensibleEntity,
+            ExtensionService<?> extensionService) throws IOException {
+        Class<? extends ExtensionEntityBase> extensionClass = extensionService.getExtensionClass();
+        if (extensionClass.equals(Project.class)) {
+            return;
+        }
+        ExtensionEntityBase extension = extensibleEntity.getExtension(extensionClass);
+        RestConverter<?> converter = extensionService.getRestConverter();
+        if (extension != null && converter != null && converter.canConvert(extensionClass)) {
+            writer.object(extensionService.getShortName());
+                namespaces(converter);
+                commonAttributes(extension, converter);
+                writer.attribute("inherited", extensibleEntity.isInherited(extensionClass));
+                writer.attribute("derived", extensionClass.isAnnotationPresent(Derived.class));
+                converter.marshal(extension, writer);
+            writer.end();
+        }
+    }
+
+    @Deprecated
     public CommonProjectConverter(String host, boolean omitNSAttributes) {
         this(host, null, omitNSAttributes);
         this.allExtensions = true;
     }
 
+    @Deprecated
     public CommonProjectConverter(String host, String[] extensions, boolean omitNSAttributes) {
         super(Project.class, "project", host); //$NON-NLS-1$
         if (extensions != null) {
@@ -58,6 +222,7 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
         this.omitNSAttributes = omitNSAttributes;
     }
 
+    @Deprecated
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         Project project = (Project) source;
@@ -102,6 +267,7 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
         marshalExtensions(project, writer, context);
     }
 
+    @Deprecated
     private void marshalMembers(UUID uuid, ProjectService projectService, HierarchicalStreamWriter writer) {
         if (allExtensions || extensions.contains("members")) { //$NON-NLS-1$
             writer.startNode("members"); //$NON-NLS-1$
@@ -131,6 +297,7 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
         }
     }
 
+    @Deprecated
     private void marshalExtensions(ExtensibleEntityBase extensibleEntity, HierarchicalStreamWriter writer,
             MarshallingContext context) {
         writer.startNode("extensions"); //$NON-NLS-1$
@@ -142,6 +309,7 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
         writer.endNode();
     }
 
+    @Deprecated
     protected void marshalExtension(ExtensibleEntityBase extensibleEntity, ExtensionService<?> extensionService,
             HierarchicalStreamWriter writer, MarshallingContext context) {
         Class<? extends ExtensionEntityBase> extensionClass = extensionService.getExtensionClass();
@@ -159,5 +327,26 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
             context.convertAnother(extension, converter);
             writer.endNode();
         }
+    }
+
+    @Deprecated
+    @Override
+    public Object unmarshal(HierarchicalStreamReader reader, UnmarshallingContext context) {
+    return null;
+    }
+
+    @Override
+    public String getApiVersion() {
+        return API_VERSION;
+    }
+
+    @Override
+    public String getNamespace() {
+        return NAMESPACE;
+    }
+
+    @Override
+    public String getXsdFileName() {
+        return "project.xsd"; //$NON-NLS-1$
     }
 }

@@ -10,31 +10,71 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest.resources;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.restlet.data.MediaType;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
-class ProjectsConverter extends RestConverterBase<Projects> {
+public class ProjectsConverter extends RestConverterBase<Projects> {
 
     private String[] extensions;
     private int start = 0;
 
+    public ProjectsConverter() {
+        super(Projects.class);
+    }
+
+    public ProjectsConverter(String[] extensions) {
+        super(Projects.class);
+        this.extensions = extensions;
+    }
+
+    public ProjectsConverter(String[] extensions, int start) {
+        this(extensions);
+        this.start = start;
+    }
+
+    @SuppressWarnings("nls")
+    @Override
+    protected void marshal(Projects projects) throws IOException {
+        writer.object("projects");
+            namespaces();
+            apiVersion();
+            writer.attribute("start", start);
+            writer.attribute("count", projects.size());
+            if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
+                writer.key("projects");
+            }
+            writer.array("project");
+            for (Project project : projects.getProjects()) {
+                writer.object();
+                    new CommonProjectConverter(extensions, true).marshal(project, writer);
+                writer.end();
+            }
+            writer.end();
+        writer.end();
+    }
+
+    @Deprecated
     public ProjectsConverter(String host, String[] extensions) {
         super(Projects.class, "projects", host); //$NON-NLS-1$
         this.extensions = extensions;
     }
 
+    @Deprecated
     public ProjectsConverter(String host, String[] extensions, int start) {
         this(host, extensions);
         this.start = start;
     }
 
+    @Deprecated
     @Override
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         marshalNSAttributes(writer);
