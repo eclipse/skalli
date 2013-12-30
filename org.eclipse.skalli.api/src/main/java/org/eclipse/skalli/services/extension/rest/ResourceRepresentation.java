@@ -40,6 +40,11 @@ import com.thoughtworks.xstream.mapper.MapperWrapper;
  */
 public class ResourceRepresentation<T> extends WriterRepresentation {
 
+    private static final String RELATIVE_LINKS = "relative"; //$NON-NLS-1$
+    private static final String LINKS_QUERY_ATTRIBUTE = "links"; //$NON-NLS-1$
+    private static final String MEMBERS_QUERY_ATTRIBUTE = "members"; //$NON-NLS-1$
+    private static final String ALL_MEMBERS = "all"; //$NON-NLS-1$
+
     private T object;
     private RequestContext context;
     private RestConverter<T> converter;
@@ -129,6 +134,14 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
                     throw new IOException(MessageFormat.format("Unsupported media type ''{0}''", mediaType));
                 }
                 RestWriter restWriter = restService.getRestWriter(mediaType, writer, context.getHost());
+                String hrefQueryAttr = context.getQueryAttribute(LINKS_QUERY_ATTRIBUTE);
+                if (RELATIVE_LINKS.equalsIgnoreCase(hrefQueryAttr)) {
+                    restWriter.set(RestWriter.RELATIVE_LINKS);
+                }
+                String membersQueryAttr = context.getQueryAttribute(MEMBERS_QUERY_ATTRIBUTE);
+                if (ALL_MEMBERS.equalsIgnoreCase(membersQueryAttr)) {
+                    restWriter.set(RestWriter.ALL_MEMBERS);
+                }
                 converter.marshal(object, restWriter);
                 restWriter.flush();
             } else {
