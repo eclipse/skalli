@@ -561,7 +561,11 @@ public class XStreamPersistenceComponentTest {
         EntityBase sibling = parent.getFirstChild();
         for (EntityBase expectedSibling: expectedSiblings) {
             Assert.assertNotNull(parent + " misses expected sibling " + expectedSibling, sibling);
-            Assert.assertEquals(expectedSibling, sibling);
+            // assert that the instances are not only equal (which means for
+            // EntityBase equality of the UUIDs), but identical pointers!
+            Assert.assertTrue(expectedSibling == sibling);
+            // assert that all siblings have the given parent
+            Assert.assertTrue(parent == sibling.getParentEntity());
             sibling = sibling.getNextSibling();
         }
         Assert.assertNull(parent + " has more siblings than expected", sibling);

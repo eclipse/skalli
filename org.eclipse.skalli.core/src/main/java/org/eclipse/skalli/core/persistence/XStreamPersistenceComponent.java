@@ -413,8 +413,8 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
      * Adjusts the parent/child relations of an entity after it has been changed
      * or created. If the parent changed or the deleted flag has been switched,
      * the entity is removed from the old parent (if any) and assigned to
-     * the new parent (if any). Furthermore, the first child of the old entity
-     * becomes the first child of the new entity.
+     * the new parent (if any). Furthermore, the children of the old entity
+     * are assigned to the new entity.
      *
      * @param entityClass  the class of the entity.
      * @param oldEntity  the old entity instance, or <code>null</code> if the entity
@@ -424,9 +424,8 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
     <T extends EntityBase> void adjustEntityRelations(Class<T> entityClass,
             EntityBase oldEntity, EntityBase newEntity) {
         T newParent = getParentEntity(entityClass, newEntity);
-        newEntity.setParentEntity(newParent);
         if (oldEntity != null) {
-            newEntity.setFirstChild(oldEntity.getFirstChild());
+            reassignChildren(oldEntity, newEntity);
             T oldParent = getParentEntity(entityClass, oldEntity);
             if (!ComparatorUtils.equals(oldParent, newParent)
                     || oldEntity.isDeleted() != newEntity.isDeleted()) {
@@ -434,6 +433,24 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
             }
         }
         insertChildEntity(newParent, newEntity);
+    }
+
+    /**
+     * Re-assigns the children of the oldEntity to the newEntity, i.e.
+     * iterates through the children of oldEntity and sets the parent
+     * pointer to newEntity. Furthermore, the firstChild pointer of
+     * newEntity is assigned from oldEntity.
+     *
+     * @param oldEntity  the old entity.
+     * @param newEntity  the new entity.
+     */
+    void reassignChildren(EntityBase oldEntity, EntityBase newEntity) {
+        EntityBase next = oldEntity.getFirstChild();
+        newEntity.setFirstChild(next);
+        while (next != null) {
+            next.setParentEntity(newEntity);
+            next = next.getNextSibling();
+        }
     }
 
     /**
@@ -454,6 +471,7 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
         if (parentEntity == null) {
             return;
         }
+        entity.setParentEntity(parentEntity);
         if (parentEntity.isDeleted() != entity.isDeleted()) {
             return;
         }
