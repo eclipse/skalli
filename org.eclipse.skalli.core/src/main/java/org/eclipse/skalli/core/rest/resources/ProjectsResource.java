@@ -91,7 +91,7 @@ public class ProjectsResource extends ResourceBase {
 
     private Projects getProjects(SearchQuery queryParams) throws QueryParseException {
         List<Project> projects = null;
-        if (StringUtils.isBlank(queryParams.getQuery()) || "*".equals(queryParams.getQuery())) { //$NON-NLS-1$
+        if (queryParams.isQueryAll()) {
             projects = Services.getRequiredService(ProjectService.class).getAll();
         } else {
             SearchResult<Project> searchResult = SearchUtils.searchProjects(queryParams);

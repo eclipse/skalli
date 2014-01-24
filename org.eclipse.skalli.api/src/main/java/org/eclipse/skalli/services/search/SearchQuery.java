@@ -82,6 +82,11 @@ public class SearchQuery {
         }
     }
 
+    public boolean isQueryAll() {
+        return "*".equals(query) || //$NON-NLS-1$
+                StringUtils.isBlank(query) && StringUtils.isBlank(user) && StringUtils.isBlank(tag);
+    }
+
     public String getProperty() {
         return property;
     }
