@@ -74,7 +74,9 @@ public class JiraFilter implements Filter {
     public static final String JIRA_URL_CREATE = JIRA_PROTOCOL + "://" + JIRA_SERVER //$NON-NLS-1$
             + "/secure/CreateProject!default.jspa"; //$NON-NLS-1$
     public static final String JIRA_URL_PROJECT = JIRA_PROTOCOL + "://" + JIRA_SERVER + "/browse/"; //$NON-NLS-1$ //$NON-NLS-2$
+
     private static final String encoding = "UTF-8"; //$NON-NLS-1$
+    private static final int MAX_LEN_DESCRIPTION = 100;
 
     @Override
     public void destroy() {
@@ -218,21 +220,24 @@ public class JiraFilter implements Filter {
         // construct the Jira query parameters:
         String name = project.getName();
         String key = project.getOrConstructShortName().toUpperCase(Locale.ENGLISH);
-        String abbrevDescr = WordUtils.abbreviate(project.getDescription(), 100, 100, "..."); //$NON-NLS-1$
+        String descr = project.getDescription();
+        if (StringUtils.isNotBlank(descr) && descr.length() > MAX_LEN_DESCRIPTION) {
+            descr = WordUtils.abbreviate(descr, MAX_LEN_DESCRIPTION-10, MAX_LEN_DESCRIPTION, "..."); //$NON-NLS-1$
+        }
         request.setAttribute(REQUEST_ATTRIBUTE_NAME, name);
         request.setAttribute(REQUEST_ATTRIBUTE_KEY, key);
         request.setAttribute(REQUEST_ATTRIBUTE_PROJECT_TYPE, DEFAULT_PROJECT_TYPE);
         request.setAttribute(REQUEST_ATTRIBUTE_BACK_URL, projectUrl);
         request.setAttribute(REQUEST_ATTRIBUTE_PROJECT_TYPE, DEFAULT_PROJECT_TYPE);
-        request.setAttribute(REQUEST_ATTRIBUTE_ABBREVIATED_DESCIPTION, abbrevDescr);
+        request.setAttribute(REQUEST_ATTRIBUTE_ABBREVIATED_DESCIPTION, descr);
         StringBuilder jiraCreationUrl = new StringBuilder(JIRA_URL_CREATE);
         try {
             jiraCreationUrl.append("?name=").append(URLEncoder.encode(name, encoding)); //$NON-NLS-1$
             jiraCreationUrl.append("&amp;key=").append(URLEncoder.encode(key, encoding)); //$NON-NLS-1$
             jiraCreationUrl.append("&amp;url=").append(URLEncoder.encode(projectUrl, encoding)); //$NON-NLS-1$
             jiraCreationUrl.append("&amp;projectType=").append(DEFAULT_PROJECT_TYPE); //$NON-NLS-1$
-            if (StringUtils.isNotBlank(project.getDescription())) {
-                jiraCreationUrl.append("&amp;description=").append(URLEncoder.encode(abbrevDescr, encoding)); //$NON-NLS-1$
+            if (StringUtils.isNotBlank(descr)) {
+                jiraCreationUrl.append("&amp;description=").append(URLEncoder.encode(descr, encoding)); //$NON-NLS-1$
             }
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
