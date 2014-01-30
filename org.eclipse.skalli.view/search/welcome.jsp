@@ -76,16 +76,16 @@ function focusSearch()
 <% } %>
 <c:if test="${newsConfig != null && newsConfig.messageDefined}">
     <div class="messages-section">
-      <c:if test="${newsConfig.alert != null}">
+      <c:forEach items="${newsConfig.alerts}" var="alert">
           <div class="alert-section">
-              <span class="alert-msg">${html:clean(newsConfig.alert)}</span>
+              <span class="alert-msg">${html:clean(alert)}</span>
           </div>
-      </c:if>
-      <c:if test="${newsConfig.info != null}">
+      </c:forEach>
+      <c:forEach items="${newsConfig.messages}" var="message">
           <div class="info-section">
-              <span class="info-msg">${html:clean(newsConfig.info)}</span>
+              <span class="info-msg">${html:clean(message)}</span>
           </div>
-      </c:if>
+      </c:forEach>
     </div>
 </c:if>
 </center>

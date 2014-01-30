@@ -10,16 +10,31 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.internal.config;
 
-import org.apache.commons.lang.StringUtils;
+import java.util.Collections;
+import java.util.List;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 @XStreamAlias("news")
 public class NewsConfig {
 
+    static class Messages {
+        @XStreamImplicit(itemFieldName="message")
+        private List<String> messages;
+
+        public List<String> getMessages() {
+            if (messages == null) {
+                return Collections.emptyList();
+            }
+            return messages;
+        }
+    }
+
     private String url;
-    private String alert;
-    private String info;
+
+    private Messages alerts;
+    private Messages messages;
 
     // do not remove: required by xstream
     public NewsConfig() {
@@ -33,23 +48,25 @@ public class NewsConfig {
         this.url = url;
     }
 
-    public String getAlert() {
-        return alert;
+    public List<String> getAlerts() {
+        if (alerts == null) {
+            return Collections.emptyList();
+        }
+        return alerts.getMessages();
     }
 
-    public void setAlert(String alert) {
-        this.alert = alert;
-    }
-
-    public String getInfo() {
-        return info;
-    }
-
-    public void setInfo(String info) {
-        this.info = info;
+    public List<String> getMessages() {
+        if (messages == null) {
+            return Collections.emptyList();
+        }
+        return messages.getMessages();
     }
 
     public boolean isMessageDefined() {
-        return StringUtils.isNotBlank(alert) || StringUtils.isNotBlank(info);
+        return getAlerts().size() > 0 || getMessages().size() > 0;
+    }
+
+    public boolean isAlertsDefined() {
+        return getAlerts().size() > 0;
     }
 }

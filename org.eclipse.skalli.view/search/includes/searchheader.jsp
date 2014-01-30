@@ -49,4 +49,13 @@
     </c:choose>
   </div>
 </div>
+<c:if test="${newsConfig != null && newsConfig.alertsDefined}">
+  <div class="searchheader-alerts">
+    <c:forEach items="${newsConfig.alerts}" var="alert">
+      <div class="searchheader-alert-box">
+          <span class="alert-msg">${html:clean(alert)}</span>
+      </div>
+    </c:forEach>
+  </div>
+</c:if>
 

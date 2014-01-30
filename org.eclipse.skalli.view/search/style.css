@@ -140,6 +140,31 @@ search header
     padding-left: 5px;
 }
 
+.searchheader-alerts {
+    margin-bottom: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 5px;
+    padding-bottom: 5px;
+    border-bottom-width: 1px;
+    border-bottom-color: grey;
+    border-bottom-style: solid;
+    text-align: center; 
+}
+
+.searchheader-alert-box {
+    margin-top: 3px;
+    margin-left: 3px;
+    margin-right: 3px;
+    border-style: solid;
+    border-width: 1px;
+    padding: 3px 15px 3px 15px;
+    background-repeat: no-repeat;
+    background-position: 4px 4px;
+    background-color: #fbe3e4;
+    border-color: #fbc2c4
+}
+
 /*
 navigation bar (left side)
 */
@@ -339,7 +364,7 @@ welcome page
     margin-top: 3px;
     border-style: solid;
     border-width: 1px;
-    padding: 4px 4px 4px 15px;
+    padding: 4px 15px 4px 15px;
     background-repeat: no-repeat;
     background-position: 4px 4px;
     background-color: #fbe3e4;
