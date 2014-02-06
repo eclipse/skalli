@@ -12,12 +12,27 @@ package org.eclipse.skalli.testutil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.eclipse.skalli.model.ExtensionEntityBase;
+import org.eclipse.skalli.model.Property;
 import org.eclipse.skalli.model.PropertyName;
 
 @SuppressWarnings("nls")
 public class TestExtension extends ExtensionEntityBase {
+
+    public static class Inner {
+        private String str = "";
+
+        public Inner(String str) {
+            this.str = str;
+        }
+
+        @Property
+        public String getStr() {
+            return str;
+        }
+    }
 
     @PropertyName
     public static final String PROPERTY_BOOL = "bool";
@@ -32,6 +47,7 @@ public class TestExtension extends ExtensionEntityBase {
     private String str = "";
     private ArrayList<String> items = new ArrayList<String>();
     private String unpublished;
+    private TreeMap<String,Inner> map = new TreeMap<String,Inner>();
 
     public TestExtension() {
     }
@@ -79,6 +95,15 @@ public class TestExtension extends ExtensionEntityBase {
 
     public void setUnpublished(String unpublished) {
         this.unpublished = unpublished;
+    }
+
+    @Property
+    public Inner getInner(String key) {
+        return map.get(key);
+    }
+
+    public void putInner(String key, Inner value) {
+        map.put(key, value);
     }
 
     public static boolean assertEquals(TestExtension o1, TestExtension o2) {

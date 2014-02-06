@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -439,6 +440,50 @@ public abstract class EntityBase {
     }
 
     /**
+     * Returns the value of a property specified by a series of {@link Expression expressions}
+     * corresponding to property accessor methods, i.e. methods annotated with {@link Property},
+     * or simple properties defined with {@link PropertyName}.
+     *
+     * @param expressions  the list of expressions specifying the property to return.
+     *
+     * @return the return value of the property accessor method or the value of the simple
+     * property corresponding to the last of the given expressions, which may be <code>null</code>.
+     * If any of the intermediate property accessors or properties returns/is <code>null</code>,
+     * the result will be <code>null</code>, too.
+     *
+     * @throws NoSuchPropertyException  if no property matches the given series of expressions,
+     * or invoking any of the property accessors failed. In the latter case, the cause
+     * of the failure can be retrieved with {@link NoSuchPropertyException#getCause()}.
+     */
+    public Object getProperty(Expression...expressions) {
+        if (expressions == null || expressions.length == 0) {
+            return null;
+        }
+        Object o = this;
+        for (int i = 0; i < expressions.length; ++i) {
+            Expression expression = expressions[i];
+            String[] args = expression.getArguments();
+            Class<?>[] argTypes = new Class<?>[args.length];
+            Arrays.fill(argTypes, String.class);
+            String propertyName = expression.getName();
+            try {
+                Method m = getMethod(o.getClass(), propertyName, argTypes);
+                if (m.getAnnotation(Property.class) != null || hasProperty(propertyName)) {
+                    o = m.invoke(o, (Object[])args);
+                    if (o == null) {
+                        return null;
+                    }
+                } else {
+                    throw new NoSuchPropertyException(this, expression);
+                }
+            } catch (Exception e) {
+                throw new NoSuchPropertyException(this, expression, e);
+            }
+        }
+        return o;
+    }
+
+    /**
      * Sets the value for the given property, if that property exists.
      *
      * @param propertyName  the identifier of the property.
@@ -487,7 +532,7 @@ public abstract class EntityBase {
                             throw new IllegalArgumentException(MessageFormat.format(
                                     "@PropertyName {0} defines a blank property name", field));
                         }
-                        Method method = getMethod(entityClass, propertyName);
+                        Method method = getMethod(entityClass, propertyName, null);
                         if (method != null) {
                             map.put(propertyName, method);
                         }
@@ -501,23 +546,23 @@ public abstract class EntityBase {
         return Collections.unmodifiableMap(map);
     }
 
-    private static Method getMethod(Class<? extends EntityBase> entityClass, String propertyName) {
-        Method getter = getMethod(entityClass, "get", propertyName); //$NON-NLS-1$
+    private static Method getMethod(Class<?> c, String propertyName, Class<?>[] argTypes) {
+        Method getter = getMethod(c, "get", propertyName, argTypes); //$NON-NLS-1$
         if (getter == null) {
-            getter = getMethod(entityClass, "is", propertyName); //$NON-NLS-1$
+            getter = getMethod(c, "is", propertyName, argTypes); //$NON-NLS-1$
         }
         return getter;
     }
 
-    private static Method getMethod(Class<? extends EntityBase> entityClass, String methodPrefix, String propertyName) {
+    private static Method getMethod(Class<?> c, String methodPrefix, String propertyName, Class<?>[] argTypes) {
         String methodName = methodPrefix + StringUtils.capitalize(propertyName);
         try {
-            return entityClass.getMethod(methodName, new Class[] {});
+            return c.getMethod(methodName, argTypes != null? argTypes : new Class[0]);
         } catch (NoSuchMethodException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(MessageFormat.format(
-                        "Entity of type {0} has no getter method for property \"{1}\"",
-                        entityClass, propertyName));
+                        "Entity of type \"{0}\" has no getter method for property \"{1}\"",
+                        c.getName(), propertyName));
             }
         }
         return null;
@@ -562,7 +607,7 @@ public abstract class EntityBase {
         } catch (NoSuchMethodException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(MessageFormat.format(
-                        "Entity of type {0} has no setter method matching the signature \"{1}({2})",
+                        "Entity of type \"{0}\" has no setter method matching the signature \"{1}({2})",
                         entityClass.getName(), methodName, argumentTypes[0].getName()));
             }
         }
