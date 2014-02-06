@@ -14,11 +14,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -80,6 +82,15 @@ public abstract class EntityBase {
                 .put(Float.class, float.class)
                 .put(Double.class, double.class)
                 .toMap();
+
+    /**
+     * Cache for properties of classes derived from <code>EntityBase</code>.
+     * The inner maps are immutable, but lazily initialized when {@link #getProperty(String)}
+     * is called first for a given entity class. The outter concurrent hash map guarantees
+     * non-blocking read operations for maximum performance.
+     */
+    private transient static ConcurrentHashMap<Class<?>, Map<String,Method>> propertyCache =
+            new ConcurrentHashMap<Class<?>, Map<String,Method>>();
 
     /**
      * The unique identifier of a project - set once, never changed.
@@ -355,45 +366,39 @@ public abstract class EntityBase {
     }
 
     /**
-     * Returns the identifiers of the properties this entity provides.
-     * A property is declared by defining a String constant with the
-     * identifier of the property as value and annotating this constant
-     * with {@link PropertyName}.
+     * Returns the names of the properties of this entity.
+     * <p>
+     * A property is declared by defining a string constant with the
+     * identifier of the property as value, annotating this constant
+     * with {@link PropertyName} and defining a corresponding
+     * getter method.
      *
-     * @return  a set of property identifiers, or an empty set, if the entity
-     * provides no properties.
+     * @return an immutable set of property names, or an empty set,
+     * if the entity has no properties.
      */
     public Set<String> getPropertyNames() {
-        return getPropertyNames(getClass());
+        return getProperties().keySet();
     }
 
     /**
-     * Returns the identifiers of the properties of a given entity class.
-     * A property is declared by defining a String constant with the
-     * identifier of the property as value and annotating this constant
-     * with {@link PropertyName}.
+     * Returns the names of the properties of a given entity class.
+     * <p>
+     * This method scans the given class for string constants annotated
+     * with {@link PropertyName}, which have a corresponding getter
+     * method. Example:
+     * <pre>
+     *   &#064;PropertyName public static final String PROPERTY_PROJECTID = "projectId";
+     *   public String getProjectId() { ... }
+     * <pre>
+     * The capitalized value of the string constant is prefixed with either <tt>"get"</tt>,
+     * or with <tt>"is"</tt> in case of a boolean property. If no getter method
+     * is provided, the property is ignored.
      *
-     * @return  a set of property identifiers, or an empty set, if the entity
-     * provides no properties or <code>entityClass</code> was <code>null</code>.
+     * @return an immutable set of property names, or an empty set, if the entity
+     * has no properties or <code>entityClass</code> was <code>null</code>.
      */
     public static Set<String> getPropertyNames(Class<? extends EntityBase> entityClass) {
-        Set<String> propertyNames = new HashSet<String>();
-        if (entityClass == null) {
-            return propertyNames;
-        }
-        for (Field field : entityClass.getFields()) {
-            if (field.getAnnotation(PropertyName.class) != null) {
-                try {
-                    propertyNames.add((String) field.get(null));
-                } catch (Exception e) {
-                    // should not happen, since fields annotated with @PropertyName are
-                    // expected to be public static final String constants, but if this
-                    // happens it is a severe issue
-                    throw new IllegalStateException("Invalid @PropertyName declaration: " + field, e);
-                }
-            }
-        }
-        return propertyNames;
+        return getProperties(entityClass).keySet();
     }
 
     /**
@@ -407,7 +412,7 @@ public abstract class EntityBase {
      * @see org.eclipse.skalli.services.projects.PropertyName
      */
     public boolean hasProperty(String propertyName) {
-        return getMethod(propertyName) != null;
+        return getProperties().containsKey(propertyName);
     }
 
     /**
@@ -421,37 +426,16 @@ public abstract class EntityBase {
      * @see org.eclipse.skalli.services.projects.PropertyName
      */
     public Object getProperty(String propertyName) {
-        Method method = getMethod(propertyName);
-        if (method == null) {
+        Map<String,Method> properties = getProperties();
+        if (!properties.containsKey(propertyName)) {
             throw new NoSuchPropertyException(this, propertyName);
         }
+        Method method = properties.get(propertyName);
         try {
             return method.invoke(this, new Object[] {});
         } catch (Exception e) {
             throw new NoSuchPropertyException(this, propertyName, e);
         }
-    }
-
-    private Method getMethod(String propertyName) {
-        Method getter = getMethod("get", propertyName); //$NON-NLS-1$
-        if (getter == null) {
-            getter = getMethod("is", propertyName); //$NON-NLS-1$
-        }
-        return getter;
-    }
-
-    private Method getMethod(String methodPrefix, String propertyName) {
-        String methodName = methodPrefix + StringUtils.capitalize(propertyName);
-        try {
-            return getClass().getMethod(methodName, new Class[] {});
-        } catch (NoSuchMethodException e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(MessageFormat.format(
-                        "Entity of type {0} has no getter method for property \"{1}\"",
-                        getClass(), propertyName));
-            }
-        }
-        return null;
     }
 
     /**
@@ -477,6 +461,66 @@ public abstract class EntityBase {
            throw new PropertyUpdateException(MessageFormat.format(
                    "Property \"{0}\" could not be updated", propertyName), e);
         }
+    }
+
+    private Map<String,Method> getProperties() {
+        Class<? extends EntityBase> entityClass = getClass();
+        Map<String,Method> properties = propertyCache.get(entityClass);
+        if (properties == null) {
+            Map<String,Method> map = getProperties(entityClass);
+            properties = propertyCache.putIfAbsent(entityClass, map);
+            if (properties == null) {
+                properties = map;
+            }
+        }
+        return properties;
+    }
+
+    private static Map<String,Method> getProperties(Class<? extends EntityBase> entityClass) {
+        Map<String,Method> map = new HashMap<String,Method>();
+        if (entityClass != null) {
+            for (Field field : entityClass.getFields()) {
+                if (field.getAnnotation(PropertyName.class) != null) {
+                    try {
+                        String propertyName = (String)field.get(null);
+                        if (StringUtils.isBlank(propertyName)) {
+                            throw new IllegalArgumentException(MessageFormat.format(
+                                    "@PropertyName {0} defines a blank property name", field));
+                        }
+                        Method method = getMethod(entityClass, propertyName);
+                        if (method != null) {
+                            map.put(propertyName, method);
+                        }
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException(MessageFormat.format(
+                                "Invalid @PropertyName declaration: {0}", field), e);
+                    }
+                }
+            }
+        }
+        return Collections.unmodifiableMap(map);
+    }
+
+    private static Method getMethod(Class<? extends EntityBase> entityClass, String propertyName) {
+        Method getter = getMethod(entityClass, "get", propertyName); //$NON-NLS-1$
+        if (getter == null) {
+            getter = getMethod(entityClass, "is", propertyName); //$NON-NLS-1$
+        }
+        return getter;
+    }
+
+    private static Method getMethod(Class<? extends EntityBase> entityClass, String methodPrefix, String propertyName) {
+        String methodName = methodPrefix + StringUtils.capitalize(propertyName);
+        try {
+            return entityClass.getMethod(methodName, new Class[] {});
+        } catch (NoSuchMethodException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(MessageFormat.format(
+                        "Entity of type {0} has no getter method for property \"{1}\"",
+                        entityClass, propertyName));
+            }
+        }
+        return null;
     }
 
     private Method getMethod(String methodPrefix, String propertyName, Class<?> propertyType) {

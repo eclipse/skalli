@@ -188,6 +188,14 @@ public class EntityBaseTest {
         base.getProperty("foobar");
     }
 
+    @Test(expected = NoSuchPropertyException.class)
+    public void testGetUnpublishedProperty() throws Exception {
+        TestExtension extBase = new TestExtension();
+        // TestExtension has a getUnpublished() method, but there is
+        // no @PropertyName constant for that property!
+        extBase.getProperty("unpublished");
+    }
+
     @Test
     public void testSetProperty() throws Exception {
         TestExtensibleEntityBase base = new TestExtensibleEntityBase(TestUUIDs.TEST_UUIDS[0]);

@@ -31,6 +31,7 @@ public class TestExtension extends ExtensionEntityBase {
     private boolean bool;
     private String str = "";
     private ArrayList<String> items = new ArrayList<String>();
+    private String unpublished;
 
     public TestExtension() {
     }
@@ -69,6 +70,15 @@ public class TestExtension extends ExtensionEntityBase {
 
     public boolean hasItem(String item) {
         return getItems().contains(item);
+    }
+
+    // getter with no corresponding @PropertyName constant
+    public String getUnpublished() {
+        return unpublished;
+    }
+
+    public void setUnpublished(String unpublished) {
+        this.unpublished = unpublished;
     }
 
     public static boolean assertEquals(TestExtension o1, TestExtension o2) {
