@@ -2,9 +2,11 @@ package org.eclipse.skalli.services.search;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.skalli.model.Expression;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
@@ -37,7 +39,7 @@ public class SearchQueryTest {
     @Test(expected = QueryParseException.class)
     public void testInvalidProperty() throws Exception {
         Map<String,String> testParams = new HashMap<String,String>();
-        testParams.put(SearchQuery.PARAM_PROPERTY, "x.y.z");
+        testParams.put(SearchQuery.PARAM_PROPERTY, "x#y#z");
         new SearchQuery(testParams);
     }
 
@@ -137,27 +139,118 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testGetSetProperty() throws Exception {
-        SearchQuery query = new SearchQuery();
-        query.setProperty("a.b");
-        assertEquals("a.b", query.getProperty());
-        assertEquals("a", query.getShortName());
-        assertEquals("b", query.getPropertyName());
-        query.setPropertyName("c");
-        assertEquals("a.c", query.getProperty());
-        query.setShortName("d");
-        assertEquals("d.c", query.getProperty());
-        query.setPropertyName(null);
-        assertNull(query.getProperty());
-        query.setPropertyName("");
-        assertNull(query.getProperty());
-        query.setPropertyName("x");
-        query.setShortName(null);
-        assertEquals(SearchQuery.PROJECT_PREFIX + "x", query.getProperty());
-        query.setShortName("");
-        assertEquals(SearchQuery.PROJECT_PREFIX + "x", query.getProperty());
-        query.setShortName("y");
-        assertEquals("y.x", query.getProperty());
+    public void testQueryToExpression() throws Exception {
+        assertExpression("property", "property", null);
+        assertExpression("property()", "property", null);
+        assertExpression("property('')", "property", new String[]{""});
+        assertExpression("property(\"\")", "property", new String[]{""});
+        assertExpression("property( \t \n )", "property", null);
+        assertExpression("property(\"a\")", "property", new String[]{"a"});
+        assertExpression("property('a')", "property", new String[]{"a"});
+        assertExpression("property('a\"b')", "property", new String[]{"a\"b"});
+        assertExpression("property(\"a'b\")", "property", new String[]{"a'b"});
+        assertExpression("property(\"a\"\"b\")", "property", new String[]{"a\"b"});
+        assertExpression("property('a''b')", "property", new String[]{"a'b"});
+        assertExpression("property(\"a\",\"b\")", "property", new String[]{"a", "b"});
+        assertExpression("property('a','b')", "property", new String[]{"a", "b"});
+        assertExpression("property(\"a\",'b')", "property", new String[]{"a", "b"});
+        assertExpression("property(\t\"a\"  ,\n  'b' )", "property", new String[]{"a", "b"});
+        assertExpression("property(a)", "property", new String[]{"a"});
+        assertExpression("property(a,b)", "property", new String[]{"a", "b"});
+        assertExpression("property(a,' b ')", "property", new String[]{"a", " b "});
+        assertExpression("property( a\t , \n b  )", "property", new String[]{"a", "b"});
+        assertExpression("property(a,'\"b')", "property", new String[]{"a", "\"b"});
+        assertExpression("property(\"a'b\",b)", "property", new String[]{"a'b", "b"});
+        assertExpression("property(a\",\"b)", "property", new String[]{"a\"", "b"});
     }
 
+    @Test
+    public void testInvalidQueryToExpressions() throws Exception {
+        assertInvalidExpression("()");
+        assertInvalidExpression("( \n)");
+        assertInvalidExpression(" \t()");
+        assertInvalidExpression("()\n  ");
+        assertInvalidExpression("('a')");
+        assertInvalidExpression("(a)");
+        assertInvalidExpression("inva%lid");
+        assertInvalidExpression("inva%lid('x')");
+        assertInvalidExpression("property(");
+        assertInvalidExpression("property(]");
+    }
+
+    @Test
+    public void testSetProperty() throws Exception {
+        assertProperty("a", SearchQuery.DEFAULT_SHORTNAME, new Expression("a"));
+        assertProperty(".a", SearchQuery.DEFAULT_SHORTNAME, new Expression("a"));
+        assertProperty(" .a", SearchQuery.DEFAULT_SHORTNAME, new Expression("a"));
+        assertProperty(" . a ", SearchQuery.DEFAULT_SHORTNAME, new Expression("a"));
+        assertProperty("a()", SearchQuery.DEFAULT_SHORTNAME, new Expression("a"));
+        assertProperty(".a()", SearchQuery.DEFAULT_SHORTNAME, new Expression("a"));
+        assertProperty("a('a')", SearchQuery.DEFAULT_SHORTNAME, new Expression("a", new String[]{"a"}));
+        assertProperty(".a('a')", SearchQuery.DEFAULT_SHORTNAME, new Expression("a", new String[]{"a"}));
+        assertProperty("ext.a", "ext", new Expression("a"));
+        assertProperty("ext#4711.a", "ext#4711", new Expression("a")); // extensions shortName can be any string!
+        assertProperty("ext. a", "ext", new Expression("a"));
+        assertProperty("ext .a", "ext", new Expression("a"));
+        assertProperty("ext.a.b", "ext", new Expression("a"), new Expression("b"));
+        assertProperty(" \r\next\r\n. a\t\t . b ", "ext", new Expression("a"), new Expression("b"));
+        assertProperty("ext.a().b", "ext", new Expression("a"), new Expression("b"));
+        assertProperty("ext. a(   ) .b", "ext", new Expression("a"), new Expression("b"));
+        assertProperty("ext.a.b()", "ext", new Expression("a"), new Expression("b"));
+        assertProperty("ext.a().b()", "ext", new Expression("a"), new Expression("b"));
+        assertProperty("ext.a(x,y).b(z)", "ext",
+                new Expression("a", new String[]{"x","y"}), new Expression("b", new String[]{"z"}));
+        assertProperty(" ext . a(   x   ,\"  y  \") . b('\r\nz')", "ext",
+                new Expression("a", new String[]{"x","  y  "}), new Expression("b", new String[]{"\r\nz"}));
+        assertProperty("ext.a(x.y).b(z)", "ext", new Expression("a", new String[]{"x.y"}),
+                new Expression("b", new String[]{"z"}));
+        assertProperty("ext.a('x.y').b(z)", "ext", new Expression("a", new String[]{"x.y"}),
+                new Expression("b", new String[]{"z"}));
+        assertProperty("ext.a(\"x.y\").b(z)", "ext", new Expression("a", new String[]{"x.y"}),
+                new Expression("b", new String[]{"z"}));
+    }
+
+    @Test
+    public void testSetInvalidProperty() throws Exception {
+        assertInvalidProperty("a.");
+        assertInvalidProperty("a . ");
+        assertInvalidProperty("a..b");
+        assertInvalidProperty("a;b");
+        assertInvalidProperty("ext#4711.a#0815"); // extensions shortName can be any string,
+    }
+
+    private void assertInvalidExpression(String queryString) throws Exception {
+        try {
+            assertExpression(queryString, null, (String[]) null);
+            fail("QueryParseException expected");
+        } catch (QueryParseException e) {
+        }
+    }
+
+    private void assertInvalidProperty(String queryString) throws Exception {
+        try {
+            assertProperty(queryString, null, (Expression[]) null);
+            fail("QueryParseException expected");
+        } catch (QueryParseException e) {
+        }
+    }
+
+    private void assertExpression(String queryString, String name, String[] args) throws Exception {
+        SearchQuery query = new SearchQuery();
+        Expression expr = query.asExpression(queryString);
+        assertEquals(name, expr.getName());
+        assertNotNull(expr.getArguments());
+        if (args == null) {
+            args = new String[0];
+        }
+        assertTrue(Arrays.equals(args, expr.getArguments()));
+    }
+
+    private void assertProperty(String queryString, String shortName, Expression...expressions) throws Exception {
+        SearchQuery query = new SearchQuery();
+        query.setProperty(queryString);
+        assertTrue(Arrays.equals(expressions, query.getExpressions()));
+        assertEquals(shortName, query.getShortName());
+    }
 }
+

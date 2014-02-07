@@ -10,13 +10,19 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.search;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javax.lang.model.SourceVersion;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang.text.StrMatcher;
+import org.apache.commons.lang.text.StrTokenizer;
+import org.eclipse.skalli.model.Expression;
 
 public class SearchQuery {
 
@@ -48,10 +54,12 @@ public class SearchQuery {
 
     private String property;
     private String shortName;
-    private String propertyName;
     private boolean negate;
     private Pattern pattern;
     private boolean isExtension;
+
+    private StrTokenizer tokenizer = getTokenizer();
+    private Expression[] expressions;
 
     private PagingInfo pagingInfo;
 
@@ -78,7 +86,7 @@ public class SearchQuery {
 
         String extensionParam = params.get(PARAM_EXTENSIONS);
         if (extensionParam != null) {
-            setExtensions(extensionParam.split(PARAM_LIST_SEPARATOR));
+            setExtensions(StringUtils.split(extensionParam, PARAM_LIST_SEPARATOR));
         }
     }
 
@@ -97,12 +105,18 @@ public class SearchQuery {
                 setNegate(true);
                 property = property.substring(1);
             }
-            String[] split = property.split("\\."); //$NON-NLS-1$
-            if (split.length < 1 || split.length > 2) {
-                throw new QueryParseException("Property should conform to the pattern <extension.propertyName>");
+            String[] parts = split(property);
+            if (parts.length == 1 || StringUtils.isBlank(parts[0])) {
+                shortName = DEFAULT_SHORTNAME;
+            } else {
+                shortName = parts[0].trim();
+                isExtension = true;
             }
-            setShortName(split.length == 1 ? DEFAULT_SHORTNAME : split[0]);
-            setPropertyName(split.length == 1 ? split[0] : split[1]);
+            int first = parts.length == 1? 0 : 1;
+            expressions = new Expression[parts.length - first];
+            for (int i = first, j = 0; i < parts.length; ++i, ++j) {
+                expressions[j] = asExpression(parts[i]);
+            }
         }
         this.property = property;
     }
@@ -156,20 +170,19 @@ public class SearchQuery {
         return shortName;
     }
 
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
-        this.property = StringUtils.isNotBlank(shortName)?
-                shortName + "." + propertyName : PROJECT_PREFIX + propertyName; //$NON-NLS-1$
-        this.isExtension = !DEFAULT_SHORTNAME.equals(shortName);
-    }
-
     public String getPropertyName() {
-        return propertyName;
+        if (expressions == null || expressions.length != 1) {
+            return null;
+        }
+        Expression first = expressions[0];
+        if (first.getArguments().length > 0) {
+            return null;
+        }
+        return first.getName();
     }
 
-    public void setPropertyName(String propertyName) {
-        this.propertyName = propertyName;
-        this.property = StringUtils.isNotBlank(propertyName)? shortName + "." + propertyName : null; //$NON-NLS-1$
+    public Expression[] getExpressions() {
+        return expressions;
     }
 
     public boolean isNegate() {
@@ -188,7 +201,7 @@ public class SearchQuery {
         this.pattern = pattern;
     }
 
-    public void setPattern(String pattern, boolean ignoreCase) throws QueryParseException {
+   public  void setPattern(String pattern, boolean ignoreCase) throws QueryParseException {
         if (StringUtils.isNotBlank(pattern)) {
             try {
                 int flags = Pattern.DOTALL;
@@ -220,5 +233,111 @@ public class SearchQuery {
 
     public int getCount() {
         return pagingInfo != null? pagingInfo.getCount() : Integer.MAX_VALUE;
+    }
+
+    StrTokenizer getTokenizer() {
+        StrTokenizer tokenizer = new StrTokenizer("", StrMatcher.commaMatcher(), StrMatcher.quoteMatcher());
+        tokenizer.setTrimmerMatcher(StrMatcher.trimMatcher());
+        return tokenizer;
+    }
+
+    private String[] split(String property) throws QueryParseException {
+        ArrayList<String> tokens = new ArrayList<String>();
+        char[] chars = property.toCharArray();
+        int last = chars.length - 1;
+        char quoteChar = 0;
+        boolean quoted = false;
+        boolean bracketed = false;
+        int nextTokenStart = 0;
+        int nextTokenLength = 0;
+        for (int i = 0; i <= last; ++i) {
+            char c = chars[i];
+            switch (c) {
+            case '.':
+                if (i == last) {
+                    throw new QueryParseException("Property must not end with trailing dot:" + property);
+                }
+                if (!quoted && !bracketed) {
+                    tokens.add(trimmed(chars, nextTokenStart, nextTokenLength));
+                    nextTokenStart = i + 1;
+                    nextTokenLength = 0;
+                } else {
+                    ++nextTokenLength;
+                }
+                break;
+            case '"':
+            case '\'':
+                if (quoted && c == quoteChar) {
+                    if (i == last || (i < last && chars[i+1] != quoteChar)) {
+                        quoteChar = 0;
+                        quoted = false;
+                    }
+                } else {
+                    quoteChar = c;
+                    quoted = true;
+                }
+                ++nextTokenLength;
+                break;
+            case '(':
+                if (!bracketed && !quoted) {
+                    bracketed = true;
+                }
+                ++nextTokenLength;
+                break;
+            case ')':
+                if (bracketed && !quoted) {
+                    bracketed = false;
+                }
+                ++nextTokenLength;
+                break;
+            default:
+                ++nextTokenLength;
+            }
+        }
+        if (nextTokenLength > 0) {
+            tokens.add(trimmed(chars, nextTokenStart, nextTokenLength));
+        }
+        return tokens.toArray(new String[tokens.size()]);
+    }
+
+    private String trimmed(char[] chars, int off, int len) {
+        if (len == 0) {
+            return ""; //$NON-NLS-1$
+        }
+        int first = off;
+        int last = off + len - 1;
+        int count = len;
+        while (first <= last && chars[first] <= ' ') { ++first; --count; }
+        while (last >= first && chars[last] <= ' ') { --last; --count; }
+        return new String(chars, first, count);
+    }
+
+    Expression asExpression(String s) throws QueryParseException {
+        int n = s.indexOf('(');
+        if (n < 0) {
+            if (!SourceVersion.isIdentifier(s)) {
+                throw new QueryParseException("Invalid property name :" + s);
+            }
+            return new Expression(s);
+        }
+        if (!s.endsWith(")")) { //$NON-NLS-1$
+            throw new QueryParseException("Invalid property expression: " + s);
+        }
+        String name = s.substring(0, n);
+        if (name.length() == 0) {
+            throw new QueryParseException("Property expression specifies no property name :" + s);
+        }
+        if (!SourceVersion.isIdentifier(name)) {
+            throw new QueryParseException("Invalid property name :" + s);
+        }
+        String argsList = s.substring(n+1, s.length()-1);
+        if (StringUtils.isBlank(argsList)) {
+            return new Expression(name);
+        }
+        if ("''".equals(argsList) || "\"\"".equals(argsList)) { //$NON-NLS-1$ //$NON-NLS-2$
+            return new Expression(name, ""); //$NON-NLS-1$
+        }
+        tokenizer.reset(argsList);
+        return new Expression(name, tokenizer.getTokenArray());
     }
 }
