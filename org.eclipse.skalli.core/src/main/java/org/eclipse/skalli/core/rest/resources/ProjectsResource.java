@@ -16,16 +16,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.Statistics;
-import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
+import org.eclipse.skalli.model.NoSuchPropertyException;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ValidationException;
@@ -103,49 +102,61 @@ public class ProjectsResource extends ResourceBase {
         int size = projects.size();
         int fromIndex = Math.min(queryParams.getStart(), size) ;
         int toIndex = Math.min(fromIndex + queryParams.getCount(), size);
-        Projects result = new Projects();
 
-        if (StringUtils.isBlank(queryParams.getPropertyName())) {
+        Projects result = new Projects();
+        if (StringUtils.isBlank(queryParams.getProperty())) {
             // if there is no property filter, just add the requested subset
             // of projects to the result and quit
             result.addProjects(projects.subList(fromIndex, toIndex));
         } else {
             // if there is a property filter, add only those projects
             // to the result that match the filter
-            Class<? extends ExtensionEntityBase> extClass = null;
-            if (queryParams.isExtension()) {
-                String shortName = queryParams.getShortName();
-                ExtensionService<?> extService = ExtensionServices.getByShortName(shortName);
-                extClass = extService != null? extService.getExtensionClass() : null;
-                // always render extensions that are referenced in the property query
-                queryParams.addExtension(shortName);
-            }
-            Set<String> propertyNames = EntityBase.getPropertyNames(extClass != null? extClass : Project.class);
-            if (!propertyNames.contains(queryParams.getPropertyName())) {
-                throw new QueryParseException(MessageFormat.format("Unknown property \"{0}\"", queryParams.getProperty()));
-            }
-
-            int index = 0;
-            for (Project project : projects) {
-                if (index >= toIndex) {
-                    break;
-                }
-                if (matchesPropertyQuery(project, extClass, queryParams)) {
-                    if (index >= fromIndex) {
-                        result.addProject(project);
-                    }
-                    ++index;
-                }
-            }
+            filterProjects(result, projects, queryParams, fromIndex, toIndex);
         }
-
         return result;
     }
 
-    boolean matchesPropertyQuery(Project project, Class<? extends ExtensionEntityBase> extClass, SearchQuery queryParams) {
-        String propertyName = queryParams.getPropertyName();
-        ExtensionEntityBase ext = extClass != null ? project.getExtension(extClass) : project;
-        Object propertyValue = ext != null ? ext.getProperty(propertyName) : null;
+    private void filterProjects(Projects result, List<Project> projects,
+            SearchQuery queryParams, int fromIndex, int toIndex) throws QueryParseException {
+
+        Class<? extends ExtensionEntityBase> extClass = null;
+        if (queryParams.isExtension()) {
+            String shortName = queryParams.getShortName();
+            ExtensionService<?> extService = ExtensionServices.getByShortName(shortName);
+            extClass = extService != null? extService.getExtensionClass() : null;
+
+            // always render extensions that are referenced in the property query
+            queryParams.addExtension(shortName);
+        }
+
+        int index = 0;
+        for (Project project : projects) {
+            if (index >= toIndex) {
+                break;
+            }
+            ExtensionEntityBase ext = extClass != null ? project.getExtension(extClass) : project;
+            if (ext == null) {
+                continue;
+            }
+            if (matchesPropertyQuery(project, ext, queryParams)) {
+                if (index >= fromIndex) {
+                    result.addProject(project);
+                }
+                ++index;
+            }
+        }
+    }
+
+    boolean matchesPropertyQuery(Project project, ExtensionEntityBase ext, SearchQuery queryParams)
+            throws QueryParseException {
+        Object propertyValue = null;
+        try {
+            propertyValue = ext.getProperty(queryParams.getExpressions());
+        } catch (NoSuchPropertyException e) {
+            throw new QueryParseException(MessageFormat.format(
+                    "Failed to retrieve property \"{0}\" of extension \"{1}\" of project \"{2}\"",
+                    e.getExpression(), queryParams.getShortName(), project), e);
+        }
         if (queryParams.isNegate()) {
             return isBlank(propertyValue);
         }
