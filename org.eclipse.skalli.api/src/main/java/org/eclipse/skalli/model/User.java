@@ -165,33 +165,32 @@ public class User extends EntityBase implements Comparable<User> {
     /**
      * Returns the display name of the user.
      *
-     * @return either the concatenation of first name and last name, or the email address
-     * if neither first nor last name are specified, or the user's unique identifier if the
-     * user is {@link #isUnknown() unknown}, or <code>super.toString()</code> if the instance
-     * is uninitialized, but never <code>null</code>.
+     * @return either the concatenation of {@link #getFirstname() first name} and {@link #getLastname() last name},
+     * or the {@link {@link #getEmail()} email address}, or the {@link #getUserId() userId} of the user in that
+     * sequence. For an {@link #isUnknown() unknown user} always the userId is returned. If not even a userId
+     * is known, <tt>"Anonymous"</tt> is returned.
      */
     public String getDisplayName() {
-        if (isUnknown()) {
-            return getUserId();
-        } else {
-            StringBuilder sb = new StringBuilder();
-            if (StringUtils.isNotBlank(firstname) && !UNKNOWN.equals(firstname)) {
-                sb.append(firstname);
-            }
-            if (StringUtils.isNotBlank(lastname) && !UNKNOWN.equals(lastname)) {
-                if (sb.length() > 0) {
-                    sb.append(' ');
-                }
-                sb.append(lastname);
-            }
-            if (sb.length() == 0 && StringUtils.isNotBlank(email) && !UNKNOWN.equals(email)) {
-                sb.append(email);
-            }
-            if (sb.length() == 0) {
-                sb.append(super.toString());
-            }
-            return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        if (hasFirstname()) {
+            sb.append(firstname);
         }
+        if (hasLastname()) {
+            if (sb.length() > 0) {
+                sb.append(' ');
+            }
+            sb.append(lastname);
+        }
+        if (sb.length() == 0 && hasEmail()) {
+            sb.append(email);
+        }
+        if (sb.length() == 0 && userId != null) {
+            sb.append(userId);
+        }
+        if (sb.length() == 0) {
+            sb.append("Anonymous");
+        }
+        return sb.toString();
     }
 
     public String getTelephone() {

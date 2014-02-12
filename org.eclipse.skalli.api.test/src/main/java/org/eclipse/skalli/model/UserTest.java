@@ -15,7 +15,6 @@ import static org.junit.Assert.*;
 import java.util.Map;
 
 import org.eclipse.skalli.testutil.PropertyTestUtil;
-import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
@@ -138,8 +137,11 @@ public class UserTest {
         assertEquals("homer@springfield.net", user.getDisplayName());
 
         user = new User();
-        user.setUuid(TestUUIDs.TEST_UUIDS[0]);
-        assertEquals(TestUUIDs.TEST_UUIDS[0].toString(), user.getDisplayName());
+        assertEquals("Anonymous", user.getDisplayName());
+        user = new User(null);
+        assertEquals("Anonymous", user.getDisplayName());
+        user = new User("");
+        assertEquals("Anonymous", user.getDisplayName());
     }
 
     @Test
