@@ -87,32 +87,42 @@ public class UserServices {
     public static UserService getUserService() {
         UserService userService = activeUserService;
         if (userService == null) {
-            // retrieve params from configuration properties;
-            // use "local" userstore as fallback in case no explicit property/configuration is available
-            String type = BundleProperties.getProperty(USERSTORE_TYPE_PROPERTY, LOCAL_USERSTORE);
-            boolean useLocalFallback = BooleanUtils.toBoolean(
-                    BundleProperties.getProperty(USERSTORE_USE_LOCAL_FALLBACK_PROPERTY));
-
-            // if there is a configuration via REST API available, override the properties
-            UserStoreConfig userStoreConfig = Configurations.getConfiguration(UserStoreConfig.class);
-            if (userStoreConfig != null) {
-                type = userStoreConfig.getType();
-                useLocalFallback = userStoreConfig.isUseLocalFallback();
+            synchronized (UserServices.class) {
+                userService = activeUserService;
+                if (userService == null) {
+                    activeUserService = userService = getActiveUserService();
+                }
             }
+        }
+        return userService;
+    }
 
-            // first: lookup the preferred user store
-            if (StringUtils.isNotBlank(type)) {
-                userService = byType.get(type);
-            }
+    private static UserService getActiveUserService() {
+        UserService userService = null;
+        // retrieve params from configuration properties;
+        // use "local" userstore as fallback in case no explicit property/configuration is available
+        String type = BundleProperties.getProperty(USERSTORE_TYPE_PROPERTY, LOCAL_USERSTORE);
+        boolean useLocalFallback = BooleanUtils.toBoolean(
+                BundleProperties.getProperty(USERSTORE_USE_LOCAL_FALLBACK_PROPERTY));
 
-            // second: if the preferred user store is not available, but fallback
-            // to the local store is allowed, use the local store
-            if (userService == null && useLocalFallback) {
-                LOG.info(MessageFormat.format(
-                        "Preferred user service ''{0}'' not found, falling back to local user store", type));
-                userService = byType.get(LOCAL_USERSTORE);
-            }
-            activeUserService = userService;
+        // if there is a configuration via REST API available, override the properties
+        UserStoreConfig userStoreConfig = Configurations.getConfiguration(UserStoreConfig.class);
+        if (userStoreConfig != null) {
+            type = userStoreConfig.getType();
+            useLocalFallback = userStoreConfig.isUseLocalFallback();
+        }
+
+        // first: lookup the preferred user store
+        if (StringUtils.isNotBlank(type)) {
+            userService = byType.get(type);
+        }
+
+        // second: if the preferred user store is not available, but fallback
+        // to the local store is allowed, use the local store
+        if (userService == null && useLocalFallback) {
+            LOG.info(MessageFormat.format(
+                    "Preferred user service ''{0}'' not found, falling back to local user store", type));
+            userService = byType.get(LOCAL_USERSTORE);
         }
         return userService;
     }
