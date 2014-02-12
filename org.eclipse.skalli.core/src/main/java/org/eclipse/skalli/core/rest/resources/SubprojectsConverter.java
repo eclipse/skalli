@@ -56,6 +56,9 @@ public class SubprojectsConverter extends RestConverterBase<Subprojects> {
         marshalApiVersion(writer);
 
         Set<Project> subprojects = subprojectsSource.getSubprojects();
+
+        writer.addAttribute("count", Integer.toString(subprojects.size())); //$NON-NLS-1$
+
         if (subprojects != null && subprojects.size() > 0) {
             for (Project subproject : subprojects) {
                 writer.startNode("project"); //$NON-NLS-1$
