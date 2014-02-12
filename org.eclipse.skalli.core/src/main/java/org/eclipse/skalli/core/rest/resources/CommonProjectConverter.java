@@ -22,6 +22,7 @@ import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
+import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServices;
@@ -29,6 +30,8 @@ import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.project.ProjectService;
+import org.eclipse.skalli.services.user.UserService;
+import org.eclipse.skalli.services.user.UserServices;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
@@ -102,10 +105,19 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
     private void marshalMembers(UUID uuid, ProjectService projectService, HierarchicalStreamWriter writer) {
         if (allExtensions || extensions.contains("members")) { //$NON-NLS-1$
             writer.startNode("members"); //$NON-NLS-1$
+            UserService userService = UserServices.getUserService();
             for (Member member : projectService.getMembers(uuid)) {
                 writer.startNode("member"); //$NON-NLS-1$
-                writeNode(writer, "userId", member.getUserID()); //$NON-NLS-1$
-                writeUserLink(writer, USER_RELATION, member.getUserID());
+                String userId = member.getUserID();
+                writeNode(writer, "userId", userId); //$NON-NLS-1$
+                writeUserLink(writer, USER_RELATION, userId);
+                if (userService != null) {
+                    User user = userService.getUserById(userId);
+                    if (!user.isUnknown()) {
+                        writeNode(writer, "name", user.getDisplayName()); //$NON-NLS-1$
+                        writeNode(writer, "email", user.getEmail()); //$NON-NLS-1$
+                    }
+                }
                 for (Entry<String, SortedSet<Member>> entry : projectService.getMembersByRole(uuid).entrySet()) {
                     if (entry.getValue().contains(member)) {
                         writeNode(writer, "role", entry.getKey()); //$NON-NLS-1$
