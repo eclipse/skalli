@@ -115,6 +115,8 @@ public abstract class CommonProjectConverter extends RestConverterBase<Project> 
                     User user = userService.getUserById(userId);
                     if (!user.isUnknown()) {
                         writeNode(writer, "name", user.getDisplayName()); //$NON-NLS-1$
+                        writeNode(writer, "firstName", user.getFirstname()); //$NON-NLS-1$
+                        writeNode(writer, "lastName", user.getLastname()); //$NON-NLS-1$
                         writeNode(writer, "email", user.getEmail()); //$NON-NLS-1$
                     }
                 }
