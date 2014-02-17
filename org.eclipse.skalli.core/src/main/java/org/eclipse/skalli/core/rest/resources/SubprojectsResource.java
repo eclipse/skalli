@@ -67,13 +67,7 @@ public class SubprojectsResource extends ResourceBase {
             return null;
         }
 
-        Comparator<Project> comparator = new Comparator<Project>() {
-            @Override
-            public int compare(Project p1, Project p2) {
-                // reverse ordering by project id!
-                return p2.getProjectId().compareTo(p1.getProjectId());
-            }
-        };
+        Comparator<Project> comparator = new Project.CompareByProjectId();
         Subprojects subprojects = new Subprojects(projectService.getSubProjects(project.getUuid(), comparator, depth));
         return new ResourceRepresentation<Subprojects>(subprojects,
                new SubprojectsConverter(resourceRef.getHostIdentifier(), extensions));
