@@ -11,6 +11,7 @@
 package org.eclipse.skalli.view.internal.filter;
 
 import java.io.IOException;
+import java.security.AccessControlException;
 import java.text.MessageFormat;
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.Statistics;
 import org.eclipse.skalli.commons.UUIDUtils;
@@ -82,8 +84,12 @@ public class LoginFilter implements Filter {
 
     private static final Logger LOG = LoggerFactory.getLogger(LoginFilter.class);
 
+    private boolean rejectAnonymousUsers;
+
     @Override
-    public void init(FilterConfig arg0) throws ServletException {
+    public void init(FilterConfig config) throws ServletException {
+        this.rejectAnonymousUsers = BooleanUtils.toBoolean(
+                config.getInitParameter("rejectAnonymousUsers")); //$NON-NLS-1$
     }
 
     @Override
@@ -164,11 +170,15 @@ public class LoginFilter implements Filter {
           // creation of projects and displaying of search results, too
         }
 
-        // determine the user and login
+        // login and ensure that the user is allowed to access
         PermitService permitService = Services.getRequiredService(PermitService.class);
         String userId = permitService.login(httpRequest, project);
         User user = null;
         boolean isAnonymousUser = StringUtils.isBlank(userId);
+        if (isAnonymousUser && rejectAnonymousUsers) {
+            FilterUtil.handleACException(httpRequest, response,
+                    new AccessControlException("Forbidden for anonymous users"));
+        }
         if (!isAnonymousUser) {
             request.setAttribute(Consts.ATTRIBUTE_USERID, userId);
             String userDisplayName = userId;
