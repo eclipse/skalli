@@ -10,7 +10,7 @@
 
    <launcherArgs>
       <programArgs>-console -consoleLog</programArgs>
-      <vmArgs>-Dosgi.compatibility.bootdelegation=true -Declipse.ignoreApp=true -Dosgi.noShutdown=true -Dorg.osgi.service.http.port=8080 -Dequinox.ds.print=true -Djetty.home=./jetty -Dlogback.configurationFile=./jetty/etc/logback.xml</vmArgs>
+      <vmArgs>-Dosgi.compatibility.bootdelegation=true -Declipse.ignoreApp=true -Dosgi.noShutdown=true -Dorg.osgi.service.http.port=8080 -Dequinox.ds.print=true -Djetty.home=./jetty -Dlogback.configurationFile=./jetty/etc/logback.xml -Dskalli.persistence.javax.persistence.jdbc.driver=org.apache.derby.jdbc.EmbeddedDriver -Dskalli.persistence.javax.persistence.jdbc.user=skalli -Dskalli.persistence.eclipselink.target-database=Derby -Dskalli.persistence.javax.persistence.jdbc.password=skalli -Dskalli.persistence.javax.persistence.jdbc.url=jdbc:derby:SkalliDB;create=true</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 

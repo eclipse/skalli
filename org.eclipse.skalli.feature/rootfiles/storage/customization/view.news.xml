@@ -1,4 +1,8 @@
 <org.eclipse.skalli.view.internal.config.NewsConfig>
   <url>http://wiki.eclipse.org/Skalli</url>
-  <info>Next Planned Maintenance Tonight 10pm</info>
+  <messages>
+    <messages>
+      <string>Next Planned Maintenance Tonight 10pm</string>
+    </messages>
+  </messages>
 </org.eclipse.skalli.view.internal.config.NewsConfig>
