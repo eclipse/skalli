@@ -59,7 +59,7 @@ public class LinkGroupsConverterTest extends RestWriterTestBase {
         LinkGroupsProjectExt links = newLinkGroups();
         RestWriter restWriter = getRestWriterJSON();
         marshalLinkGroupsExtension(links, restWriter);
-        assertEqualsJSON("{["
+        assertEqualsJSON("{\"groups\":["
                 + "{\"caption\":\"group1\","
                 + "\"links\":["
                 + "{\"ref\":\"urlA\",\"value\":\"a\"},"

@@ -227,7 +227,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
     }
 
     public static final String MEMBERS_SECTION_JSON() {
-        return "\"members\":["
+        return "{\"members\":["
             + "{\"userId\":\"bart\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org/api/users/bart\"},"
             + "\"roles\":[\"members\"]},"
             + "{\"userId\":\"homer\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org/api/users/homer\"},"
@@ -236,16 +236,16 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
             + "\"roles\":[\"members\"]},"
             + "{\"userId\":\"marge\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org/api/users/marge\"},"
             + "\"roles\":[\"leads\",\"members\"]}"
-            + "]";
+            + "]}";
     }
 
     public static final String EXTENSIONS_SECTION_JSON() {
-        return MessageFormat.format("\"extensions\":'{'"
+        return MessageFormat.format("'{'\"extensions\":'{'"
             + "\"info\":'{'\"apiVersion\":\"{0}\",\"lastModified\":\"{1}\",\"inherited\":true,\"derived\":false,"
             + "\"homepage\":\"foobar\",\"mailingLists\":[]},"
             + "\"tags\":'{'\"apiVersion\":\"{2}\",\"modifiedBy\":\"{3}\",\"inherited\":false,\"derived\":false,"
             + "\"tags\":[\"a\",\"b\"]}"
-            + "}", InfoConverter.API_VERSION, LAST_MODIFIED, TagsConverter.API_VERSION, LAST_MODIFIER);
+            + "}}", InfoConverter.API_VERSION, LAST_MODIFIED, TagsConverter.API_VERSION, LAST_MODIFIER);
     }
 
     public static final String MINIMAL_PROJECT_BEGIN_JSON(UUID uuid, String id, String name) {
@@ -371,10 +371,9 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
     }
 
     @Test
-    public void testMarshalProjectWithMembersJSON() throws Exception {
+    public void testMarshalProjectWitExtensionsJSON() throws Exception {
         Project project = newMinimalProjectWithExtensions();
         JSONRestWriter restWriter = new JSONRestWriter(writer, "http://example.org");
-        restWriter.set(JSONRestWriter.NAMED_ROOT);
         marshalExtensions(project, EXTENSION_SERVICES, restWriter);
         assertEqualsJSON(EXTENSIONS_SECTION_JSON());
     }
@@ -437,16 +436,20 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
     private void marshalMembers(SortedSet<Member> members,
             Map<String,SortedSet<Member>> membersByRole, RestWriter restWriter) throws Exception {
         CommonProjectConverter converter = new CommonProjectConverter(false);
+        restWriter.object();
         converter.setRestWriter(restWriter);
         converter.marshalMembers(TestUUIDs.TEST_UUIDS[0], members, membersByRole);
+        restWriter.end();
         restWriter.flush();
     }
 
     private void marshalExtensions(Project project, Collection<ExtensionService<?>> extensionServices,
             RestWriter restWriter) throws Exception {
         CommonProjectConverter converter = new CommonProjectConverter(false);
+        restWriter.object();
         converter.setRestWriter(restWriter);
         converter.marshalExtensions(project, extensionServices);
+        restWriter.end();
         restWriter.flush();
     }
 }

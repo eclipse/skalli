@@ -60,9 +60,8 @@ public class UserConverterTest extends RestWriterTestBase {
     public void testMarshalAnonymousUserJSON() throws Exception {
         User user = new User("me");
         JSONRestWriter restWriter = new JSONRestWriter(writer, "http://example.org");
-        restWriter.set(JSONRestWriter.NAMED_ROOT);
         marshalUser(user, restWriter);
-        assertEqualsJSON("\"user\":{\"apiVersion\":\"1.0\","
+        assertEqualsJSON("{\"apiVersion\":\"1.0\","
                 + "\"link\":{\"rel\":\"self\",\"href\":\"http://example.org/api/users/me\"},"
                 + "\"userId\":\"me\"}");
     }
@@ -71,9 +70,8 @@ public class UserConverterTest extends RestWriterTestBase {
     public void testMarshalUserJSON() throws Exception {
         User user = newUser();
         JSONRestWriter restWriter = new JSONRestWriter(writer, "http://example.org");
-        restWriter.set(JSONRestWriter.NAMED_ROOT);
         marshalUser(user, restWriter);
-        assertEqualsJSON("\"user\":{\"apiVersion\":\"1.0\","
+        assertEqualsJSON("{\"apiVersion\":\"1.0\","
                 + "\"link\":{\"rel\":\"self\",\"href\":\"http://example.org/api/users/me\"},"
                 + "\"userId\":\"me\","
                 + "\"firstname\":\"john\","

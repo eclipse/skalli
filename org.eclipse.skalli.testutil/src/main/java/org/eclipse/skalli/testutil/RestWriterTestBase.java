@@ -12,12 +12,16 @@ package org.eclipse.skalli.testutil;
 
 import java.io.StringWriter;
 
+import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.eclipse.skalli.services.rest.RestService;
 import org.eclipse.skalli.services.rest.RestWriter;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.restlet.data.MediaType;
+import org.xml.sax.SAXException;
 
 /**
  * Base class for {@link RestConverter} tests.
@@ -55,10 +59,22 @@ public class RestWriterTestBase {
     }
 
     protected void assertEqualsXML(String expected) throws Exception {
-        Assert.assertEquals(XML_HEADER + expected, writer.toString());
+        String actual = writer.toString();
+        try {
+            XMLUtils.documentFromString(actual);
+        } catch (SAXException e) {
+            Assert.fail("Invalid XML: " + actual);
+        }
+        Assert.assertEquals(XML_HEADER + expected, actual);
     }
 
     protected void assertEqualsJSON(String expected) throws Exception {
+        String actual = writer.toString();
+        try {
+            new JSONObject(actual);
+        } catch (JSONException e) {
+            Assert.fail("Invalid JSON: " + e.getMessage());
+        }
         Assert.assertEquals(expected, writer.toString());
     }
 }
