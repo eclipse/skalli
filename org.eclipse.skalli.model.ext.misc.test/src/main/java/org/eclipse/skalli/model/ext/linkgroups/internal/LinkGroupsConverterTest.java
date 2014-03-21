@@ -35,7 +35,7 @@ public class LinkGroupsConverterTest extends RestWriterTestBase {
         LinkGroupsProjectExt links = newLinkGroups();
         RestWriter restWriter = getRestWriterXML();
         marshalLinkGroupsExtension(links, restWriter);
-        assertEqualsXML("<linkGroups>"
+        assertEqualsXML("<linkGroups><linkGroups>"
                 + "<linkGroup caption=\"group1\">"
                 + "<link ref=\"urlA\">a</link>"
                 + "<link ref=\"urlB\">b</link>"
@@ -43,7 +43,7 @@ public class LinkGroupsConverterTest extends RestWriterTestBase {
                 + "<linkGroup caption=\"group2\">"
                 + "<link ref=\"urlX\">x</link>"
                 + "</linkGroup>"
-                + "</linkGroups>");
+                + "</linkGroups></linkGroups>");
     }
 
     @Test
@@ -59,7 +59,7 @@ public class LinkGroupsConverterTest extends RestWriterTestBase {
         LinkGroupsProjectExt links = newLinkGroups();
         RestWriter restWriter = getRestWriterJSON();
         marshalLinkGroupsExtension(links, restWriter);
-        assertEqualsJSON("{\"groups\":["
+        assertEqualsJSON("{\"linkGroups\":["
                 + "{\"caption\":\"group1\","
                 + "\"links\":["
                 + "{\"ref\":\"urlA\",\"value\":\"a\"},"
