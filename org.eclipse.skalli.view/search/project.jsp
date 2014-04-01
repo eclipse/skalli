@@ -73,6 +73,11 @@ setTimeout('if (typeof com_vaadin_terminal_gwt_DefaultWidgetSet == "undefined") 
 
     <%-- project header --%>
     <c:if test="${project!=null && editmode==false}">
+        <div class="permalink">
+            <a class="smallgrey" href="${webLocator}/projects/${projectUUID}">Permanent Link</a>
+            |
+            <a class="smallgrey" href="${webLocator}/api/projects/${projectUUID}">REST</a>
+        </div>
         <div class="projectheader">
             <c:choose>
                 <c:when test="${nature == 'PROJECT'}">

@@ -35,6 +35,15 @@ a:hover {
     text-decoration: underline;
 }
 
+a.smallgrey {
+    font-size:x-small;
+    color:#707070;
+}
+
+a.smallgrey:hover {
+    text-decoration: underline;
+}
+
 img {
     border: none;
 }
@@ -668,13 +677,18 @@ project page
     padding-right: 10px;
 }
 
+.projectarearight .permalink {
+    font-size:x-small;
+    color:#707070;    
+    text-align:right;
+}
+
 .projectarearight .projectheader {
     font-size: 28px;
     font-weight: bolder;
     text-shadow: silver 2px 1px;
     line-height: 28px;
     padding-bottom: 16px;
-    padding-top: 8px;
 }
 
 .projectarearight .projectheader img {
