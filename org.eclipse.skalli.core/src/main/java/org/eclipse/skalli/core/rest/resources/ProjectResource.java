@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.Services;
@@ -56,9 +57,14 @@ public class ProjectResource extends ResourceBase {
             setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("Project {0} not found", id)); //$NON-NLS-1$
             return null;
         }
+        String[] extensions = null;
+        String extensionParam = getQueryAttribute("extensions"); //$NON-NLS-1$
+        if (extensionParam != null) {
+            extensions = StringUtils.split(extensionParam, ',');
+        }
 
         return new ResourceRepresentation<Project>(project,
-                new ProjectConverter(getRequest().getResourceRef().getHostIdentifier(), false));
+                new ProjectConverter(getRequest().getResourceRef().getHostIdentifier(), extensions, false));
     }
 
     @Put
