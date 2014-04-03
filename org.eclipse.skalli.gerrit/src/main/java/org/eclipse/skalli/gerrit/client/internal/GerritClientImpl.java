@@ -542,7 +542,7 @@ public class GerritClientImpl implements GerritClient {
                 }
             }
             List<String> result = new LinkedList<String>();
-            InputStreamReader inR = new InputStreamReader(new ByteArrayInputStream(baosOut.toByteArray()), "ISO8859_1");
+            InputStreamReader inR = new InputStreamReader(new ByteArrayInputStream(baosOut.toByteArray()), "ISO-8859-1");
             BufferedReader buf = new BufferedReader(inR);
             String line;
             while ((line = buf.readLine()) != null) {
@@ -554,7 +554,7 @@ public class GerritClientImpl implements GerritClient {
             }
 
             if (baosErr.size() > 0) {
-                InputStreamReader errISR = new InputStreamReader(new ByteArrayInputStream(baosErr.toByteArray()));
+                InputStreamReader errISR = new InputStreamReader(new ByteArrayInputStream(baosErr.toByteArray()), "ISO-8859-1");
                 BufferedReader errBR = new BufferedReader(errISR);
                 StringBuffer errSB = new StringBuffer("Gerrit CLI returned with an error:");
                 String errLine;
