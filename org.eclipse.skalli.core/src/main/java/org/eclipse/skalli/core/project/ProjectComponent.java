@@ -417,15 +417,16 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
 
     private ProjectTemplate validateProjectTemplate(Project project, Set<Issue> issues) {
         ProjectTemplate projectTemplate = projectTemplateService.getProjectTemplateById(project.getProjectTemplateId());
-        if (projectTemplate == null) {
+        if (projectTemplate != null) {
+            validateDirectParent(projectTemplate, project, issues);
+            validateAllowedParents(projectTemplate, project, issues);
+        } else {
             issues.add(new Issue(Severity.FATAL, ProjectService.class, project.getUuid(),
                     Project.class, Project.PROPERTY_TEMPLATEID,
                     MessageFormat.format(
                             "Project references project template ''{0}'' but such a template is not registered",
                             project.getProjectTemplateId())));
         }
-        validateDirectParent(projectTemplate, project, issues);
-        validateAllowedParents(projectTemplate, project, issues);
         return projectTemplate;
     }
 
