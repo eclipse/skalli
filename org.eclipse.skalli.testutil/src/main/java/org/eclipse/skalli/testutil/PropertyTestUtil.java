@@ -368,7 +368,7 @@ public class PropertyTestUtil {
                 }
             }
             Collection<?> valueGet = (Collection<?>) methods.getMethod.invoke(instance);
-            assertEquals(clazz.getName() + "#" + methods.getMethod.getName(), collectionSet, valueGet);
+            assertEqualsAnyOrder(clazz.getName() + "#" + methods.getMethod.getName(), collectionSet, valueGet);
 
             // has-remove-has-add-has cycle
             Assert.assertTrue(clazz.getName() + "#" + methods.hasMethod.getName() + " before remove",
@@ -391,7 +391,7 @@ public class PropertyTestUtil {
         Object valueGet = methods.getMethod.invoke(instance);
         if (value != null) {
             if (Collection.class.isAssignableFrom(clazz)) {
-                assertEquals(msg, (Collection<?>) value, (Collection<?>) valueGet);
+                assertEqualsAnyOrder(msg, (Collection<?>) value, (Collection<?>) valueGet);
             } else {
                 Assert.assertEquals(msg, value, valueGet);
             }
@@ -407,14 +407,12 @@ public class PropertyTestUtil {
         }
     }
 
-    private static <T> void assertEquals(String message, Collection<?> collection1, Collection<?> collection2) {
-        Assert.assertEquals(message + ".size", collection1.size(), collection2.size());
+    private static void assertEqualsAnyOrder(String message, Collection<?> collection1, Collection<?> collection2) {
+        Assert.assertEquals(message + "[size]", collection1.size(), collection2.size());
         Iterator<?> it1 = collection1.iterator();
-        Iterator<?> it2 = collection2.iterator();
         while (it1.hasNext()) {
             Object next1 = it1.next();
-            Object next2 = it2.next();
-            Assert.assertTrue(message + ".equal", next1.equals(next2));
+            Assert.assertTrue(message + "[" + next1 + " found]", collection2.contains(next1));
         }
     }
 }
