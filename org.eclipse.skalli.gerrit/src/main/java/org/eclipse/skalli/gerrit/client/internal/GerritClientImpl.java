@@ -191,6 +191,7 @@ public class GerritClientImpl implements GerritClient {
         appendArgument(sb, "use-contributor-agreements", useContributorAgreements);
         appendArgument(sb, "use-signed-off-by", useSignedOffBy);
         appendArgument(sb, "require-change-id", true);
+        appendArgument(sb, "use-content-merge", true);
 
         // available since 2.1.6-rc1 & needed so that Hudson does not struggle with empty projects.
         appendArgument(sb, "empty-commit", emptyCommit);
