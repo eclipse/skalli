@@ -111,7 +111,7 @@ public class StatisticsConverterTest {
         set.add(info2);
         long timestamp1 = info1.getTimestamp();
         long timestamp2 = info2.getTimestamp();
-        converter.writeRequestInfos(writer, set);
+        converter.writeRequestInfos(writer, set, timestamp1, timestamp2);
         assertWriter(writer, MessageFormat.format(
                 "<request date=\"{0}\" timestamp=\"{1}\" user=\"{2}\" referer=\"/referer1\">/project1</request>\n" +
                 "<request date=\"{3}\" timestamp=\"{4}\" user=\"{5}\" referer=\"/referer2\">/project2</request>",
