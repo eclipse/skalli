@@ -69,7 +69,12 @@ public class SubprojectsResource extends ResourceBase {
 
         Comparator<Project> comparator = new Project.CompareByProjectId();
         Subprojects subprojects = new Subprojects(projectService.getSubProjects(project.getUuid(), comparator, depth));
-        return new ResourceRepresentation<Subprojects>(subprojects,
-               new SubprojectsConverter(resourceRef.getHostIdentifier(), extensions));
+
+        if (enforceOldStyleConverters()) {
+            return new ResourceRepresentation<Subprojects>(subprojects,
+                    new SubprojectsConverter(getHost(), extensions));
+        }
+        return new ResourceRepresentation<Subprojects>(getResourceContext(), subprojects,
+                new SubprojectsConverter(extensions));
     }
 }

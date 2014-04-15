@@ -24,8 +24,10 @@ public class StatusResource extends ResourceBase {
             return createUnauthorizedRepresentation();
         }
 
-        return new ResourceRepresentation<Object>(new Object(),
-                new StatusConverter(getRequest().getResourceRef().getHostIdentifier()));
+        if (enforceOldStyleConverters()) {
+            return new ResourceRepresentation<Object>(new Object(), new StatusConverter(getHost()));
+        }
+        return new ResourceRepresentation<Object>(getResourceContext(), new Object(), new StatusConverter());
     }
 
 }

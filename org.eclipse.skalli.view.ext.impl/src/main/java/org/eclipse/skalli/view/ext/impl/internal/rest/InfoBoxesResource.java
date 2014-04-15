@@ -27,7 +27,12 @@ public class InfoBoxesResource extends ResourceBase {
         }
 
         InfoBoxes infoboxes = new InfoBoxes(Services.getServices(InfoBox.class));
-        return new ResourceRepresentation<InfoBoxes>(infoboxes,
-               new InfoBoxesConverter(getHost()));
+
+        if (enforceOldStyleConverters()) {
+            return new ResourceRepresentation<InfoBoxes>(infoboxes,
+                   new InfoBoxesConverter(getHost()));
+        }
+        return new ResourceRepresentation<InfoBoxes>(getResourceContext(), infoboxes,
+                new InfoBoxesConverter());
     }
 }

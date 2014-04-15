@@ -39,6 +39,9 @@ public class UserResource extends ResourceBase {
             return null;
         }
 
-        return new ResourceRepresentation<User>(user, new UserConverter(getHost()));
+        if (enforceOldStyleConverters()) {
+            return new ResourceRepresentation<User>(user, new UserConverter(getHost()));
+        }
+        return new ResourceRepresentation<User>(getResourceContext(), user, new UserConverter());
     }
 }

@@ -90,7 +90,13 @@ public class UserPermitsResource extends ResourceBase {
         for (Project project: projects) {
             permits.addAll(permitService.getPermits(userId, project));
         }
-        return new ResourceRepresentation<PermitSet>(permits, new PermitSetConverter(userId, getHost()));
+
+        if (enforceOldStyleConverters()) {
+            return new ResourceRepresentation<PermitSet>(permits,
+                    new PermitSetConverter(userId, getHost()));
+        }
+        return new ResourceRepresentation<PermitSet>(getResourceContext(), permits,
+                new PermitSetConverter(userId));
     }
 
 }

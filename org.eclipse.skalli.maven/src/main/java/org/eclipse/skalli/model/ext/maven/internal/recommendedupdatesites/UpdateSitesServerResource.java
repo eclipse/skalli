@@ -56,8 +56,12 @@ public class UpdateSitesServerResource extends ResourceBase {
             return null;
         }
 
-        return new ResourceRepresentation<RecommendedUpdateSites>(updateSites,
-                new UpdateSitesConverter(getRequest().getResourceRef().getHostIdentifier()));
+        if (enforceOldStyleConverters()) {
+            return new ResourceRepresentation<RecommendedUpdateSites>(updateSites,
+                    new UpdateSitesConverter(getHost()));
+        }
+        return new ResourceRepresentation<RecommendedUpdateSites>(getResourceContext(), updateSites,
+                new UpdateSitesConverter());
     }
 
     @Put

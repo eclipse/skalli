@@ -44,8 +44,13 @@ public class StatisticsResource extends ResourceBase {
             query.setFilter(filter);
         }
         Statistics statistics = Statistics.getDefault();
-        return new ResourceRepresentation<Statistics>(statistics,
-                new StatisticsConverter(getRequest().getResourceRef().getHostIdentifier(), query));
+
+        if (enforceOldStyleConverters()) {
+            return new ResourceRepresentation<Statistics>(statistics,
+                    new StatisticsConverter(getHost(), query));
+        }
+        return new ResourceRepresentation<Statistics>(getResourceContext(), statistics,
+                new StatisticsConverter(query));
     }
 
     @Delete

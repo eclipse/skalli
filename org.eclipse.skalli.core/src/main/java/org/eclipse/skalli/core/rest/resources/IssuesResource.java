@@ -64,7 +64,9 @@ public class IssuesResource extends ResourceBase {
             return null;
         }
 
-        return new ResourceRepresentation<Issues>(issues,
-                new IssuesConverter(getRequest().getResourceRef().getHostIdentifier()));
+        if (enforceOldStyleConverters()) {
+            return new ResourceRepresentation<Issues>(issues, new IssuesConverter(getHost()));
+        }
+        return new ResourceRepresentation<Issues>(getResourceContext(), issues, new IssuesConverter());
     }
 }

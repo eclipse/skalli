@@ -37,6 +37,10 @@ public class ProjectConverter extends CommonProjectConverter {
         super(omitNSAttributes);
     }
 
+    public ProjectConverter(String[] extensions, boolean omitNSAttributes) {
+        super(extensions, omitNSAttributes);
+    }
+
     @SuppressWarnings("nls")
     @Override
     public void marshal(Project project) throws IOException {

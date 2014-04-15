@@ -18,6 +18,7 @@ import java.util.SortedSet;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.ValidationException;
+import org.eclipse.skalli.services.BundleProperties;
 import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.permit.Permit.Level;
 import org.eclipse.skalli.services.permit.Permits;
@@ -157,6 +158,40 @@ public abstract class ResourceBase extends ServerResource {
      */
     protected boolean isSupportedMediaType() {
         return context.isXML() || context.isJSON();
+    }
+
+    /**
+     * Checks whether the XStream-based REST converters should be used for
+     * rendering the response of this REST request.
+     * <p>
+     * This method checks whether the request has a query attribute named
+     * <tt>"rest"</tt>, or whether there is a system-wide
+     * {@link BundleProperties#getProperty(String) bundle/system property}
+     * named <tt>"skalli.rest"</tt> with a value <i>different</i> from <tt>"v1"</tt>.
+     * In that case, e.g. the request has a query attribute <tt>"rest=v2"</tt>,
+     * the method returns <code>false</code> to indicate that the new
+     * RestWriter-based converters should be employed. Otherwise the
+     * method returns <code>true</code>.
+     * <p>
+     * If the requested media type is different from <tt>"text/xml"</tt>,
+     * always <code>false</code> will be returned.
+     *
+     * @return <code>true</code>, if XStream-based converters should be used
+     * for rendering the response of this REST request.
+     */
+    @SuppressWarnings("nls")
+    protected boolean enforceOldStyleConverters() {
+        if (!context.isXML()) {
+            return false;
+        }
+        String restVersion = getQueryAttribute("rest");
+        if (StringUtils.isBlank(restVersion)) {
+            restVersion = BundleProperties.getProperty("skalli.rest");
+        }
+        if (StringUtils.isNotBlank(restVersion)) {
+            return "v1".equalsIgnoreCase(restVersion);
+        }
+        return true;
     }
 
     /**

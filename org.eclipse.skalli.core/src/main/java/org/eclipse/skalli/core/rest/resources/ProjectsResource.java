@@ -54,8 +54,6 @@ public class ProjectsResource extends ResourceBase {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProjectsResource.class);
 
-    public static final String PARAM_COMPACT = "compact"; //$NON-NLS-1$
-
     private static final String ID_PREFIX = "rest:api/projects:"; //$NON-NLS-1$
     private static final String ERROR_ID_UNEXPECTED = ID_PREFIX + "00"; //$NON-NLS-1$
     private static final String ERROR_ID_IO_ERROR = ID_PREFIX + "10"; //$NON-NLS-1$
@@ -82,10 +80,12 @@ public class ProjectsResource extends ResourceBase {
     }
 
     private Representation createProjectsResourceRepresentation(Projects projects, RestSearchQuery queryParams) {
-        ResourceRepresentation<Projects> representation = new ResourceRepresentation<Projects>(projects,
-                new ProjectsConverter(getHost(), queryParams.getExtensions(), queryParams.getStart()));
-        representation.setCompact(hasQueryAttribute(PARAM_COMPACT));
-        return representation;
+        if (enforceOldStyleConverters()) {
+            return new ResourceRepresentation<Projects>(projects,
+                    new ProjectsConverter(getHost(), queryParams.getExtensions(), queryParams.getStart()));
+        }
+        return new ResourceRepresentation<Projects>(getResourceContext(), projects,
+                new ProjectsConverter(queryParams.getExtensions(), queryParams.getStart()));
     }
 
     private Projects getProjects(SearchQuery queryParams) throws QueryParseException {
