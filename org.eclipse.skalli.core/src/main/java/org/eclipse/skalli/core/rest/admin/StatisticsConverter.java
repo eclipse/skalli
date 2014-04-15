@@ -178,7 +178,9 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
             writer.key("byDate").array();
             SortedSet<Statistics.UserInfo> userInfos = statistics.getUserInfo();
             for (Statistics.UserInfo userInfo: userInfos) {
-                writeInfoEntry(userInfo);
+                if (userInfo.inRange(from, to)) {
+                    writeInfoEntry(userInfo);
+                }
             }
             writer.end();
         }
@@ -228,7 +230,9 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
             writer.key("byDate").array();
             SortedSet<Statistics.SearchInfo> searchInfos = statistics.getSearchInfo();
             for (Statistics.SearchInfo searchInfo: searchInfos) {
-                writeInfoEntry(searchInfo);
+                if (searchInfo.inRange(from, to)) {
+                    writeInfoEntry(searchInfo);
+                }
             }
             writer.end();
         }
@@ -283,7 +287,9 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         if (query.showByFilter("byDate")) {
             writer.key("byDate").array();
             for (UsageInfo usageInfo: statistics.getUsageInfo()) {
-                writeInfoEntry(usageInfo);
+                if (usageInfo.inRange(from, to)) {
+                    writeInfoEntry(usageInfo);
+                }
             }
             writer.end();
         }
@@ -300,7 +306,9 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
             writer.pair("user", entries.getKey());
             writer.array();
             for (StatisticsInfo info: track) {
-                writeInfoEntry(info);
+                if (info.inRange(from, to)) {
+                    writeInfoEntry(info);
+                }
             }
             writer.end();
             writer.end();
@@ -582,7 +590,9 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
             writer.startNode("byDate");
             SortedSet<Statistics.UserInfo> userInfos = statistics.getUserInfo();
             for (Statistics.UserInfo userInfo: userInfos) {
-                writeInfoEntry(writer, userInfo);
+                if (userInfo.inRange(from, to)) {
+                    writeInfoEntry(writer, userInfo);
+                }
             }
             writer.endNode();
         }
@@ -635,7 +645,9 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
             writer.startNode("byDate");
             SortedSet<Statistics.SearchInfo> searchInfos = statistics.getSearchInfo();
             for (Statistics.SearchInfo searchInfo: searchInfos) {
-                writeInfoEntry(writer, searchInfo);
+                if (searchInfo.inRange(from, to)) {
+                    writeInfoEntry(writer, searchInfo);
+                }
             }
             writer.endNode();
         }
@@ -692,7 +704,7 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         }
         if (query.showByFilter("byDate")) {
             writer.startNode("byDate");
-            writeRequestInfos(writer, statistics.getUsageInfo());
+            writeRequestInfos(writer, statistics.getUsageInfo(), from, to);
             writer.endNode();
         }
         writer.endNode();
@@ -708,7 +720,9 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
             SortedSet<StatisticsInfo> track = entries.getValue();
             writeNode(writer, "user", entries.getKey());
             for (StatisticsInfo info: track) {
-                writeInfoEntry(writer, info);
+                if (info.inRange(from, to)) {
+                    writeInfoEntry(writer, info);
+                }
             }
             writer.endNode();
         }
@@ -754,9 +768,11 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
     }
 
     @Deprecated
-    void writeRequestInfos(HierarchicalStreamWriter writer, SortedSet<UsageInfo> usageInfos) {
+    void writeRequestInfos(HierarchicalStreamWriter writer, SortedSet<UsageInfo> usageInfos, long from, long to) {
         for (UsageInfo usageInfo: usageInfos) {
-            writeInfoEntry(writer, usageInfo);
+            if (usageInfo.inRange(from, to)) {
+                writeInfoEntry(writer, usageInfo);
+            }
         }
     }
 
