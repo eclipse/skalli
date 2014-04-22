@@ -33,9 +33,13 @@ public class RequestContext {
     private static final Set<String> FORMAT_JSON =
             CollectionUtils.asSet("json", "text/json", MediaType.APPLICATION_JSON.toString());
 
+    // for backward compatibility and to facilitate browser access,
+    // we also accept "html" and "text/html", but treat them as "text/xml"
     @SuppressWarnings("nls")
     private static final Set<String> FORMAT_XML =
-            CollectionUtils.asSet("xml", MediaType.TEXT_XML.toString());
+            CollectionUtils.asSet(
+                    "xml", MediaType.TEXT_XML.toString(),
+                    "html", MediaType.TEXT_HTML.toString());
 
     private static final String ACCEPT_QUERY_PARAM = "accept"; //$NON-NLS-1$
 
@@ -65,28 +69,7 @@ public class RequestContext {
             form = new Form();
             queryParams = Collections.emptyMap();
         }
-        String formatParam = queryParams.get(ACCEPT_QUERY_PARAM);
-        if (StringUtils.isNotBlank(formatParam)) {
-            if  (FORMAT_XML.contains(formatParam)) {
-                mediaType = MediaType.TEXT_XML;
-            } else if (FORMAT_JSON.contains(formatParam)) {
-                mediaType = MediaType.APPLICATION_JSON;
-            } else {
-                mediaType = MediaType.valueOf(formatParam);
-            }
-        }
-        if (mediaType == null) {
-            float maxQuality = 0;
-            for (Preference<MediaType> acceptedMediaType: request.getClientInfo().getAcceptedMediaTypes()) {
-                if (acceptedMediaType.getQuality() > maxQuality) {
-                    maxQuality = acceptedMediaType.getQuality();
-                    mediaType = acceptedMediaType.getMetadata();
-                }
-            }
-        }
-        if (mediaType == null) {
-            mediaType = MediaType.TEXT_XML;
-        }
+        mediaType = getMediaType(request);
     }
 
     /**
@@ -205,5 +188,38 @@ public class RequestContext {
      */
     public boolean isJSON() {
         return MediaType.APPLICATION_JSON.equals(mediaType);
+    }
+
+    private MediaType getMediaType(Request request) {
+        String accept = getQueryAttribute(ACCEPT_QUERY_PARAM);
+        if (StringUtils.isBlank(accept)) {
+            accept = getMaxQualityAccept(request);
+        }
+        MediaType mediaType = null;
+        if (StringUtils.isNotBlank(accept)) {
+            if  (FORMAT_XML.contains(accept)) {
+                mediaType = MediaType.TEXT_XML;
+            } else if (FORMAT_JSON.contains(accept)) {
+                mediaType = MediaType.APPLICATION_JSON;
+            } else {
+                mediaType = MediaType.valueOf(accept);
+            }
+        }
+        if (mediaType == null) {
+            mediaType = MediaType.TEXT_XML;
+        }
+        return mediaType;
+    }
+
+    private String getMaxQualityAccept(Request request) {
+        String formatParam = null;
+        float maxQuality = 0;
+        for (Preference<MediaType> acceptedMediaType: request.getClientInfo().getAcceptedMediaTypes()) {
+            if (acceptedMediaType.getQuality() > maxQuality) {
+                maxQuality = acceptedMediaType.getQuality();
+                formatParam = acceptedMediaType.getMetadata().getName();
+            }
+        }
+        return formatParam;
     }
 }
