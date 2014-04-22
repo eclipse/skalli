@@ -12,6 +12,7 @@ package org.eclipse.skalli.services.rest;
 
 import java.io.Writer;
 
+import org.eclipse.skalli.services.extension.rest.RequestContext;
 import org.restlet.data.MediaType;
 
 /**
@@ -30,14 +31,14 @@ public interface RestService {
     /**
      * Retrieves a REST writer for the given media type.
      *
-     * @param mediaType  the media type, for which to retrieve a REST writer
      * @param writer  the writer to wrap with a REST writer.
-     * @param host  the web locator.
+     * @param context  the request context providing the target media type
+     * and additional request parameters.
      *
      * @return  a preconfigured REST writer, never <code>null</code>.
      *
      * @throws IllegalArgumentException  if the given media type is not supported.
      */
-    public RestWriter getRestWriter(MediaType mediaType, Writer writer, String host);
+    public RestWriter getRestWriter(Writer writer, RequestContext context);
 
 }

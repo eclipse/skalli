@@ -34,11 +34,11 @@ public class ScrumConverterTest extends RestWriterTestBase {
         marshalScrumExtension(scrum, restWriter);
         assertEqualsXML("<scrum>"
                 + "<scrumMasters>"
-                + "<scrumMaster><userId>a</userId><link rel=\"user\" href=\"http://example.org/api/users/a\"/></scrumMaster>"
+                + "<scrumMaster><userId>a</userId><link rel=\"user\" href=\"http://example.org:8080/api/users/a\"/></scrumMaster>"
                 + "</scrumMasters>"
                 + "<productOwners>"
-                + "<productOwner><userId>b</userId><link rel=\"user\" href=\"http://example.org/api/users/b\"/></productOwner>"
-                + "<productOwner><userId>c</userId><link rel=\"user\" href=\"http://example.org/api/users/c\"/></productOwner>"
+                + "<productOwner><userId>b</userId><link rel=\"user\" href=\"http://example.org:8080/api/users/b\"/></productOwner>"
+                + "<productOwner><userId>c</userId><link rel=\"user\" href=\"http://example.org:8080/api/users/c\"/></productOwner>"
                 + "</productOwners></scrum>");
     }
 
@@ -56,10 +56,10 @@ public class ScrumConverterTest extends RestWriterTestBase {
         RestWriter restWriter = getRestWriterJSON();
         marshalScrumExtension(scrum, restWriter);
         assertEqualsJSON("{\"scrumMasters\":["
-                + "{\"userId\":\"a\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org/api/users/a\"}}],"
+                + "{\"userId\":\"a\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/a\"}}],"
                 + "\"productOwners\":["
-                + "{\"userId\":\"b\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org/api/users/b\"}},"
-                + "{\"userId\":\"c\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org/api/users/c\"}}]}");
+                + "{\"userId\":\"b\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/b\"}},"
+                + "{\"userId\":\"c\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/c\"}}]}");
     }
 
     private ScrumProjectExt newScrumExtension() {

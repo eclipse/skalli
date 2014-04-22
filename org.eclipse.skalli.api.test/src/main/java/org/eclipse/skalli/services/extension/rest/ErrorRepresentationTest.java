@@ -15,10 +15,7 @@ import java.text.MessageFormat;
 import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.testutil.RestWriterTestBase;
 import org.junit.Test;
-import org.restlet.Request;
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Reference;
 import org.restlet.data.Status;
 
 @SuppressWarnings("nls")
@@ -71,12 +68,5 @@ public class ErrorRepresentationTest extends RestWriterTestBase {
                 "'{'\"errorId\":\"rest:/foo/bar:{0}\",\"timestamp\":\"{1}\",\"message\":\"{2} ({3})\"}",
                 Status.CLIENT_ERROR_NOT_FOUND.getCode(), error.getTimestamp(),
                 Status.CLIENT_ERROR_NOT_FOUND.getDescription(), Status.CLIENT_ERROR_NOT_FOUND.getName()));
-    }
-
-    private RequestContext getRequestContext(MediaType mediaType) {
-        Reference resourceRef = new Reference("http", "example.org", 8080, "/foo/bar", "a=foo&b=bar&c", "frag");
-        resourceRef.addQueryParameter("accept", mediaType.getName());
-        Request request = new Request(Method.GET, resourceRef);
-        return new RequestContext(request);
     }
 }

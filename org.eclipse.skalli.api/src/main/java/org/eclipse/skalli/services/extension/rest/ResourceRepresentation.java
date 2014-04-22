@@ -129,11 +129,11 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
                 }
             } else if (converter.canConvert(object.getClass())) {
                 RestService restService = Services.getRequiredService(RestService.class);
-                MediaType mediaType = getMediaType();
+                MediaType mediaType = context.getMediaType();
                 if (!restService.isSupportedMediaType(mediaType)) {
                     throw new IOException(MessageFormat.format("Unsupported media type ''{0}''", mediaType));
                 }
-                RestWriter restWriter = restService.getRestWriter(mediaType, writer, context.getHost());
+                RestWriter restWriter = restService.getRestWriter(writer, context);
                 String hrefQueryAttr = context.getQueryAttribute(LINKS_QUERY_ATTRIBUTE);
                 if (RELATIVE_LINKS.equalsIgnoreCase(hrefQueryAttr)) {
                     restWriter.set(RestWriter.RELATIVE_LINKS);

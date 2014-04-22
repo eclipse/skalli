@@ -147,7 +147,9 @@ public class RestApplication extends Application implements RestService {
     }
 
     @Override
-    public RestWriter getRestWriter(MediaType mediaType, Writer writer, String host) {
+    public RestWriter getRestWriter(Writer writer, RequestContext context) {
+        MediaType mediaType = context.getMediaType();
+        String host = context.getHost();
         if (MediaType.TEXT_XML.equals(mediaType)) {
             return new XMLRestWriter(writer, host);
         } else if (MediaType.APPLICATION_JSON.equals(mediaType)) {

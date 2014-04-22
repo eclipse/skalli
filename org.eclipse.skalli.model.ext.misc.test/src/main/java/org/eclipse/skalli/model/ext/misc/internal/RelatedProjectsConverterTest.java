@@ -55,8 +55,8 @@ public class RelatedProjectsConverterTest extends RestWriterTestBase {
         marshalRelatedProjects(related, restWriter);
         assertEqualsXML("<relatedProjects>"
                 + "<calculated>false</calculated>"
-                + "<link rel=\"project\" href=\"http://example.org/api/projects/ab721fce-25c7-4c9f-b5ad-9f1f59b23b6a\"/>"
-                + "<link rel=\"project\" href=\"http://example.org/api/projects/5856b08a-0f87-4d91-b007-ac367ced247a\"/>"
+                + "<link rel=\"project\" href=\"http://example.org:8080/api/projects/ab721fce-25c7-4c9f-b5ad-9f1f59b23b6a\"/>"
+                + "<link rel=\"project\" href=\"http://example.org:8080/api/projects/5856b08a-0f87-4d91-b007-ac367ced247a\"/>"
                 + "</relatedProjects>");
     }
 
@@ -74,9 +74,9 @@ public class RelatedProjectsConverterTest extends RestWriterTestBase {
         RestWriter restWriter = getRestWriterJSON();
         marshalRelatedProjects(related, restWriter);
         assertEqualsJSON("{\"calculated\":false,\"links\":["
-                + "{\"rel\":\"project\",\"href\":\"http://example.org/api/projects/ab721fce-25c7-4c9f-b5ad-9f1f59b23b6a\","
+                + "{\"rel\":\"project\",\"href\":\"http://example.org:8080/api/projects/ab721fce-25c7-4c9f-b5ad-9f1f59b23b6a\","
                 + "\"uuid\":\"ab721fce-25c7-4c9f-b5ad-9f1f59b23b6a\",\"id\":\"testproject\",\"name\":\"Test Project\"},"
-                + "{\"rel\":\"project\",\"href\":\"http://example.org/api/projects/5856b08a-0f87-4d91-b007-ac367ced247a\","
+                + "{\"rel\":\"project\",\"href\":\"http://example.org:8080/api/projects/5856b08a-0f87-4d91-b007-ac367ced247a\","
                 + "\"uuid\":\"5856b08a-0f87-4d91-b007-ac367ced247a\",\"id\":\"eclipse.skalli\",\"name\":\"Skalli\"}"
                 + "]}");
     }

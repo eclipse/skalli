@@ -34,11 +34,11 @@ public class PeopleConverterTest extends RestWriterTestBase {
         marshalPeopleExtension(people, restWriter);
         assertEqualsXML("<people>"
                 + "<leads>"
-                + "<lead><userId>a</userId><link rel=\"user\" href=\"http://example.org/api/users/a\"/></lead>"
-                + "<lead><userId>b</userId><link rel=\"user\" href=\"http://example.org/api/users/b\"/></lead>"
+                + "<lead><userId>a</userId><link rel=\"user\" href=\"http://example.org:8080/api/users/a\"/></lead>"
+                + "<lead><userId>b</userId><link rel=\"user\" href=\"http://example.org:8080/api/users/b\"/></lead>"
                 + "</leads>"
                 + "<members>"
-                + "<member><userId>c</userId><link rel=\"user\" href=\"http://example.org/api/users/c\"/></member>"
+                + "<member><userId>c</userId><link rel=\"user\" href=\"http://example.org:8080/api/users/c\"/></member>"
                 + "</members></people>");
     }
 
@@ -56,10 +56,10 @@ public class PeopleConverterTest extends RestWriterTestBase {
         RestWriter restWriter = getRestWriterJSON();
         marshalPeopleExtension(people, restWriter);
         assertEqualsJSON("{\"leads\":["
-                + "{\"userId\":\"a\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org/api/users/a\"}},"
-                + "{\"userId\":\"b\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org/api/users/b\"}}],"
+                + "{\"userId\":\"a\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/a\"}},"
+                + "{\"userId\":\"b\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/b\"}}],"
                 + "\"members\":["
-                + "{\"userId\":\"c\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org/api/users/c\"}}]}");
+                + "{\"userId\":\"c\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/c\"}}]}");
     }
 
     private PeopleExtension newPeopleExtension() {

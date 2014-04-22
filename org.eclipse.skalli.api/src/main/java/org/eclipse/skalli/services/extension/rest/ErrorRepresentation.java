@@ -66,11 +66,11 @@ public class ErrorRepresentation extends WriterRepresentation {
     @Override
     public void write(Writer writer) throws IOException {
         RestService restService = Services.getRequiredService(RestService.class);
-        MediaType mediaType = getMediaType();
+        MediaType mediaType = context.getMediaType();
         if (!restService.isSupportedMediaType(mediaType)) {
             throw new IOException(MessageFormat.format("Unsupported media type ''{0}''", mediaType));
         }
-        RestWriter restWriter = restService.getRestWriter(mediaType, writer, context.getHost());
+        RestWriter restWriter = restService.getRestWriter(writer, context);
         restWriter.object("error"); //$NON-NLS-1$
         restWriter.namespace(XMLUtils.XMLNS, RestUtils.API_NAMESPACE);
         restWriter.namespace(XMLUtils.XMLNS_XSI, XMLUtils.XSI_INSTANCE_NS);

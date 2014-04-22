@@ -13,6 +13,7 @@ package org.eclipse.skalli.testutil;
 import java.io.StringWriter;
 
 import org.eclipse.skalli.commons.XMLUtils;
+import org.eclipse.skalli.services.extension.rest.RequestContext;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.eclipse.skalli.services.rest.RestService;
 import org.eclipse.skalli.services.rest.RestWriter;
@@ -20,7 +21,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
+import org.restlet.Request;
 import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Reference;
 import org.xml.sax.SAXException;
 
 /**
@@ -29,7 +33,13 @@ import org.xml.sax.SAXException;
 @SuppressWarnings("nls")
 public class RestWriterTestBase {
 
-    protected static final String HOST = "http://example.org";
+    protected static final String PROTOCOL = "http";
+    protected static final Method ACTION = Method.GET;
+    protected static final String HOST = "example.org";
+    protected static final int PORT = 8080;
+    protected static final String PATH = "/foo/bar";
+    protected static final String QUERY = "a=foo&b=bar&c";
+    protected static final String FRAGMENT = "frag";
 
     private static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
 
@@ -51,11 +61,23 @@ public class RestWriterTestBase {
     }
 
     protected RestWriter getRestWriterXML() {
-        return restService.getRestWriter(MediaType.TEXT_XML, writer, HOST);
+        return restService.getRestWriter(writer, getRequestContext(MediaType.TEXT_XML));
     }
 
     protected RestWriter getRestWriterJSON() {
-        return restService.getRestWriter(MediaType.APPLICATION_JSON, writer, HOST);
+        return restService.getRestWriter(writer, getRequestContext(MediaType.APPLICATION_JSON));
+    }
+
+    protected RequestContext getRequestContext(MediaType mediaType) {
+        return getRequestContext(ACTION, PROTOCOL, HOST, PORT, PATH, QUERY, FRAGMENT, mediaType);
+    }
+
+    protected RequestContext getRequestContext(Method action, String protocol, String host, int port, String path,
+           String query, String fragment, MediaType mediaType) {
+        Reference resourceRef = new Reference(protocol, host, port, path, query, fragment);
+        resourceRef.addQueryParameter("accept", mediaType.getName());
+        Request request = new Request(action, resourceRef);
+        return new RequestContext(request);
     }
 
     protected void assertEqualsXML(String expected) throws Exception {
