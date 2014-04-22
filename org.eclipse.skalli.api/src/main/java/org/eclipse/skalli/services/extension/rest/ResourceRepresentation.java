@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.rest.RequestContext;
 import org.eclipse.skalli.services.rest.RestService;
 import org.eclipse.skalli.services.rest.RestWriter;
 import org.restlet.data.MediaType;

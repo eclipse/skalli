@@ -22,6 +22,7 @@ import org.eclipse.skalli.services.BundleProperties;
 import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.permit.Permit.Level;
 import org.eclipse.skalli.services.permit.Permits;
+import org.eclipse.skalli.services.rest.RequestContext;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Reference;

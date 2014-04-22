@@ -8,7 +8,7 @@
  * Contributors:
  *     SAP AG - initial API and implementation
  *******************************************************************************/
-package org.eclipse.skalli.services.extension.rest;
+package org.eclipse.skalli.services.rest;
 
 import java.util.List;
 import java.util.Map;

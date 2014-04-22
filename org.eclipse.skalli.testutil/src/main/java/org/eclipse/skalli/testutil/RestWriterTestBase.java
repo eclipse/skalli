@@ -13,8 +13,8 @@ package org.eclipse.skalli.testutil;
 import java.io.StringWriter;
 
 import org.eclipse.skalli.commons.XMLUtils;
-import org.eclipse.skalli.services.extension.rest.RequestContext;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
+import org.eclipse.skalli.services.rest.RequestContext;
 import org.eclipse.skalli.services.rest.RestService;
 import org.eclipse.skalli.services.rest.RestWriter;
 import org.json.JSONException;

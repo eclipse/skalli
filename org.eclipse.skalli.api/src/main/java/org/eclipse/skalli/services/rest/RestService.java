@@ -12,7 +12,6 @@ package org.eclipse.skalli.services.rest;
 
 import java.io.Writer;
 
-import org.eclipse.skalli.services.extension.rest.RequestContext;
 import org.restlet.data.MediaType;
 
 /**
