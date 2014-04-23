@@ -11,15 +11,15 @@
 package org.eclipse.skalli.core.rest.resources;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.UUID;
 
+import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.model.Derived;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
@@ -48,7 +48,7 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
     public static final String API_VERSION = "1.4"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API"; //$NON-NLS-1$
 
-    private final List<String> extensions;
+    private Set<String> extensions;
     private boolean allExtensions;
     private boolean omitNSAttributes;
 
@@ -60,11 +60,11 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
     public CommonProjectConverter(String[] extensions, boolean omitNSAttributes) {
         super(Project.class);
         if (extensions != null) {
-            this.extensions = Arrays.asList(extensions);
+            this.extensions = CollectionUtils.asSet(extensions);
         } else {
-            this.extensions = Collections.<String> emptyList();
+            this.extensions = Collections.emptySet();
         }
-        this.allExtensions = false;
+        this.allExtensions = this.extensions.contains("*"); //$NON-NLS-1$
         this.omitNSAttributes = omitNSAttributes;
     }
 
@@ -214,9 +214,9 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
     public CommonProjectConverter(String host, String[] extensions, boolean omitNSAttributes) {
         super(Project.class, "project", host); //$NON-NLS-1$
         if (extensions != null) {
-            this.extensions = Arrays.asList(extensions);
+            this.extensions = CollectionUtils.asSet(extensions);
         } else {
-            this.extensions = Collections.<String> emptyList();
+            this.extensions = Collections.emptySet();
         }
         this.allExtensions = false;
         this.omitNSAttributes = omitNSAttributes;
