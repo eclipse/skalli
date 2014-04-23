@@ -54,17 +54,17 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
 
     public CommonProjectConverter(boolean omitNSAttributes) {
         this((String[])null, omitNSAttributes);
+        this.allExtensions = true;
     }
 
     public CommonProjectConverter(String[] extensions, boolean omitNSAttributes) {
         super(Project.class);
         if (extensions != null) {
-            this.allExtensions = false;
             this.extensions = Arrays.asList(extensions);
         } else {
-            this.allExtensions = true;
-            this.extensions = Collections.emptyList();
+            this.extensions = Collections.<String> emptyList();
         }
+        this.allExtensions = false;
         this.omitNSAttributes = omitNSAttributes;
     }
 

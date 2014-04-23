@@ -63,11 +63,13 @@ public class ProjectResource extends ResourceBase {
             extensions = StringUtils.split(extensionParam, ',');
         }
         if (enforceOldStyleConverters()) {
-            return new ResourceRepresentation<Project>(project,
-                new ProjectConverter(getHost(), extensions, false));
+            return extensions != null ?
+                new ResourceRepresentation<Project>(project, new ProjectConverter(getHost(), extensions, false)) :
+                new ResourceRepresentation<Project>(project, new ProjectConverter(getHost(), false));
         }
-        return new ResourceRepresentation<Project>(getResourceContext(), project,
-                new ProjectConverter(extensions, false));
+        return extensions != null ?
+            new ResourceRepresentation<Project>(getResourceContext(), project, new ProjectConverter(extensions, false)) :
+            new ResourceRepresentation<Project>(getResourceContext(), project, new ProjectConverter(false));
     }
 
     @Put
