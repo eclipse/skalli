@@ -72,7 +72,6 @@ class MavenReactorConverter extends RestConverterBase<MavenReactorProjectExt> {
         if (StringUtils.isNotBlank(reactorCoordinate.getPackaging())) {
             writer.pair(TAG_PACKAGING, reactorCoordinate.getPackaging());
         }
-        writer.end();
     }
 
     @Deprecated
