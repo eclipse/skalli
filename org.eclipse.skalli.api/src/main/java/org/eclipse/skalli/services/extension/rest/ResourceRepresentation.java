@@ -143,8 +143,15 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
                 if (ALL_MEMBERS.equalsIgnoreCase(membersQueryAttr)) {
                     restWriter.set(RestWriter.ALL_MEMBERS);
                 }
-                converter.marshal(object, restWriter);
-                restWriter.flush();
+                try {
+                    converter.marshal(object, restWriter);
+                } catch (RuntimeException e) {
+                    // don't trust the integrity of plugins!
+                    throw new IOException(MessageFormat.format("Failed to render response for {0}",
+                            context.getPath()), e);
+                } finally {
+                    restWriter.flush();
+                }
             } else {
                 throw new IOException("Failed to create resource representation");
             }
