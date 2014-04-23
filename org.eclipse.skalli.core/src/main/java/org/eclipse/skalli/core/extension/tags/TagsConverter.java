@@ -34,7 +34,7 @@ public class TagsConverter extends RestConverterBase<TagsExtension> {
     @Override
     protected void marshal(TagsExtension extension) throws IOException {
         if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
-            writer.key("tags");
+            writer.key("items");
         }
         writer.array("tag");
         for (String tag : extension.getTags()) {

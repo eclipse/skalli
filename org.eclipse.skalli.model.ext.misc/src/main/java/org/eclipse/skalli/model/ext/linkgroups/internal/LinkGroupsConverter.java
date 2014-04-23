@@ -39,7 +39,11 @@ class LinkGroupsConverter extends RestConverterBase<LinkGroupsProjectExt> {
     protected void marshal(LinkGroupsProjectExt extension) throws IOException {
         Collection<LinkGroup> linkGroups = extension.getLinkGroups();
         if (CollectionUtils.isNotBlank(linkGroups)) {
-            writer.array("linkGroups", "linkGroup");
+            if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
+                writer.key("items").array();
+            } else {
+                writer.array("linkGroups", "linkGroup");
+            }
             for (LinkGroup linkGroup : linkGroups) {
                 writer.object();
                 writer.attribute("caption", linkGroup.getCaption());

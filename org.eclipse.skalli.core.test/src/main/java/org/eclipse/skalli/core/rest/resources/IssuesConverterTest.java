@@ -82,7 +82,7 @@ public class IssuesConverterTest extends RestWriterTestBase {
         Issues issues = new Issues(TestUUIDs.TEST_UUIDS[0]);
         JSONRestWriter restWriter = new JSONRestWriter(writer, "http://example.org");
         marshalIssues(issues, restWriter);
-        assertEqualsJSON(COMMON_PART_JSON + "\"isStale\":false,\"issues\":[]}");
+        assertEqualsJSON(COMMON_PART_JSON + "\"isStale\":false,\"items\":[]}");
     }
 
     @Test
@@ -91,7 +91,7 @@ public class IssuesConverterTest extends RestWriterTestBase {
         JSONRestWriter restWriter = new JSONRestWriter(writer, "http://example.org");
         marshalIssues(issues, restWriter);
         assertEqualsJSON(COMMON_PART_JSON
-                + "\"isStale\":true,\"issues\":["
+                + "\"isStale\":true,\"items\":["
                 + nextIssueJSON(1) + ","
                 + nextIssueJSON(0)
                 + "]}");

@@ -47,7 +47,7 @@ class IssuesConverter extends RestConverterBase<Issues> {
             .pair("uuid", uuid)
             .pair("isStale", issues.isStale());
             if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
-                writer.key("issues");
+                writer.key("items");
             }
             writer.array("issue");
             for (Issue issue : issues.getIssues()) {

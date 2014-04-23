@@ -50,7 +50,7 @@ public class ProjectsConverter extends RestConverterBase<Projects> {
             writer.attribute("start", start);
             writer.attribute("count", projects.size());
             if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
-                writer.key("projects");
+                writer.key("items");
             }
             writer.array("project");
             for (Project project : projects.getProjects()) {

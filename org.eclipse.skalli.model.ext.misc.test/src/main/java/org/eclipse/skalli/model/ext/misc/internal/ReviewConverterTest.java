@@ -71,7 +71,7 @@ public class ReviewConverterTest extends RestWriterTestBase {
                 + ",\"numberThumbsUp\":0"
                 + ",\"numberThumbsDown\":0"
                 + ",\"averageRating\":\"NONE\""
-                + ",\"reviews\":[]}");
+                + ",\"items\":[]}");
     }
 
     @Test
@@ -86,7 +86,7 @@ public class ReviewConverterTest extends RestWriterTestBase {
                 + ",\"numberThumbsUp\":1"
                 + ",\"numberThumbsDown\":1"
                 + ",\"averageRating\":\"FACE_PLAIN\""
-                + ",\"reviews\":["
+                + ",\"items\":["
                 + "{\"voter\":\"homer\",\"comment\":\"foo\","
                 + "\"timestamp\":" + NOW + ",\"rating\":\"FACE_CRYING\"},"
                 + "{\"voter\":\"marge\",\"comment\":\"bar\","

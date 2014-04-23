@@ -44,7 +44,7 @@ public class PermitSetConverter extends RestConverterBase<PermitSet> {
         apiVersion();
         writer.pair("owner", owner);
         if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
-            writer.key("permits");
+            writer.key("items");
         }
         writer.array("permit");
         for (Permit permit: permits) {

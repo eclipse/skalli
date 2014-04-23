@@ -42,7 +42,7 @@ class ReviewConverter extends RestConverterBase<ReviewProjectExt> {
         writer.pair("numberThumbsDown", extension.getNumberThumbsDown());
         writer.pair("averageRating", extension.getAverageRating().toString());
         if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
-            writer.key("reviews");
+            writer.key("items");
         }
         writer.array("review");
         for (ReviewEntry entry : extension.getReviews()) {

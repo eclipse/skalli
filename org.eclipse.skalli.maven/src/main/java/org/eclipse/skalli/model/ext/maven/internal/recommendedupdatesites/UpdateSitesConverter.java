@@ -46,7 +46,7 @@ public class UpdateSitesConverter extends RestConverterBase<RecommendedUpdateSit
         writer.pair("description", recommendedUpdateSites.getDescription());
         writer.pair("shortName", recommendedUpdateSites.getShortName());
         if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
-            writer.key("updateSites");
+            writer.key("items");
         }
         writer.array("updateSite");
         for (UpdateSite updateSite : recommendedUpdateSites.getUpdateSites()) {

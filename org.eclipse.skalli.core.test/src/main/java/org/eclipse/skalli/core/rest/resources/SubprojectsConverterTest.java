@@ -55,7 +55,7 @@ public class SubprojectsConverterTest extends RestWriterTestBase {
         Subprojects subprojects = new Subprojects(TestUUIDs.TEST_UUIDS[0], Collections.<Project>emptyList());
         JSONRestWriter restWriter = new JSONRestWriter(writer, "http://example.org");
         marshalSubprojects(subprojects, restWriter);
-        assertEqualsJSON(COMMON_PART_JSON + ",\"subprojects\":[]}");
+        assertEqualsJSON(COMMON_PART_JSON + ",\"items\":[]}");
     }
 
     @Test
@@ -76,7 +76,7 @@ public class SubprojectsConverterTest extends RestWriterTestBase {
         JSONRestWriter restWriter = new JSONRestWriter(writer, "http://example.org");
         marshalSubprojects(subprojects, restWriter);
         assertEqualsJSON(COMMON_PART_JSON
-                + ",\"subprojects\":["
+                + ",\"items\":["
                 + CommonProjectConverterTest.MINIMAL_PROJECT_JSON(TestUUIDs.TEST_UUIDS[3], "id1", "name1")
                 + "," + CommonProjectConverterTest.MINIMAL_PROJECT_JSON(TestUUIDs.TEST_UUIDS[4], "id2", "name2")
                 + "," + CommonProjectConverterTest.MINIMAL_PROJECT_JSON(TestUUIDs.TEST_UUIDS[5], "id2", "name2")

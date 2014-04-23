@@ -40,7 +40,7 @@ public class InfoBoxesConverter extends RestConverterBase<InfoBoxes> {
             namespaces();
             apiVersion();
             if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
-                writer.key("infoboxes");
+                writer.key("items");
             }
             writer.array("infobox");
             for (InfoBox infoBox : infoboxes.getInfoBoxes()) {

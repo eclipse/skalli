@@ -52,7 +52,7 @@ public class SubprojectsConverter extends RestConverterBase<Subprojects> {
               .link(PROJECT_RELATION, RestUtils.URL_PROJECTS, uuid)
             .end();
             if (writer.isMediaType(MediaType.APPLICATION_JSON)) {
-                writer.key("subprojects");
+                writer.key("items");
             }
             writer.array("project");
             for (Project subproject : subprojects.getSubprojects()) {

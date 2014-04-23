@@ -244,7 +244,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
             + "\"info\":'{'\"apiVersion\":\"{0}\",\"lastModified\":\"{1}\",\"inherited\":true,\"derived\":false,"
             + "\"homepage\":\"foobar\",\"mailingLists\":[]},"
             + "\"tags\":'{'\"apiVersion\":\"{2}\",\"modifiedBy\":\"{3}\",\"inherited\":false,\"derived\":false,"
-            + "\"tags\":[\"a\",\"b\"]}"
+            + "\"items\":[\"a\",\"b\"]}"
             + "}}", InfoConverter.API_VERSION, LAST_MODIFIED, TagsConverter.API_VERSION, LAST_MODIFIER);
     }
 

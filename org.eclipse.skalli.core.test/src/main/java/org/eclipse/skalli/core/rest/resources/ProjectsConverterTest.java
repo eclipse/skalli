@@ -53,7 +53,7 @@ public class ProjectsConverterTest extends RestWriterTestBase {
         Projects projects = new Projects();
         JSONRestWriter restWriter = new JSONRestWriter(writer, "http://example.org");
         marshalProjects(projects, restWriter);
-        assertEqualsJSON(COMMON_PART_JSON(0,0) + ",\"projects\":[]}");
+        assertEqualsJSON(COMMON_PART_JSON(0,0) + ",\"items\":[]}");
     }
 
     @Test
@@ -74,7 +74,7 @@ public class ProjectsConverterTest extends RestWriterTestBase {
         JSONRestWriter restWriter = new JSONRestWriter(writer, "http://example.org");
         marshalProjects(projects, restWriter);
         assertEqualsJSON(COMMON_PART_JSON(0,3)
-                + ",\"projects\":["
+                + ",\"items\":["
                 + CommonProjectConverterTest.MINIMAL_PROJECT_JSON(TestUUIDs.TEST_UUIDS[3], "id1", "name1")
                 + "," + CommonProjectConverterTest.MINIMAL_PROJECT_JSON(TestUUIDs.TEST_UUIDS[4], "id2", "name2")
                 + "," + CommonProjectConverterTest.MINIMAL_PROJECT_JSON(TestUUIDs.TEST_UUIDS[5], "id2", "name2")

@@ -39,7 +39,7 @@ public class TagsConverterTest extends RestWriterTestBase {
         TagsExtension tags = new TagsExtension();
         RestWriter restWriter = getRestWriterJSON();
         marshalTagsExtension(tags, restWriter);
-        assertEqualsJSON("{\"tags\":[]}");
+        assertEqualsJSON("{\"items\":[]}");
     }
 
     @Test
@@ -47,7 +47,7 @@ public class TagsConverterTest extends RestWriterTestBase {
         TagsExtension tags = newTagsExtension();
         RestWriter restWriter = getRestWriterJSON();
         marshalTagsExtension(tags, restWriter);
-        assertEqualsJSON("{\"tags\":[\"a\",\"b\",\"c\"]}");
+        assertEqualsJSON("{\"items\":[\"a\",\"b\",\"c\"]}");
     }
 
     private TagsExtension newTagsExtension() {
