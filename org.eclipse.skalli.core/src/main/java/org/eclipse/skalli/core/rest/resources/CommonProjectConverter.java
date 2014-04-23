@@ -173,31 +173,30 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
     }
 
     @SuppressWarnings("nls")
-    void marshalExtensions(ExtensibleEntityBase extensibleEntity, Collection<ExtensionService<?>> extensionServices)
+    void marshalExtensions(Project project, Collection<ExtensionService<?>> extensionServices)
             throws IOException {
         writer.object("extensions");
         for (ExtensionService<?> extensionService : extensionServices) {
             if (allExtensions || extensions.contains(extensionService.getShortName())) {
-                marshalExtension(extensibleEntity, extensionService);
+                marshalExtension(project, extensionService);
             }
         }
         writer.end();
     }
 
     @SuppressWarnings("nls")
-    void marshalExtension(ExtensibleEntityBase extensibleEntity,
-            ExtensionService<?> extensionService) throws IOException {
+    void marshalExtension(Project project, ExtensionService<?> extensionService) throws IOException {
         Class<? extends ExtensionEntityBase> extensionClass = extensionService.getExtensionClass();
         if (extensionClass.equals(Project.class)) {
             return;
         }
-        ExtensionEntityBase extension = extensibleEntity.getExtension(extensionClass);
+        ExtensionEntityBase extension = project.getExtension(extensionClass);
         RestConverter<?> converter = extensionService.getRestConverter();
         if (extension != null && converter != null && converter.canConvert(extensionClass)) {
             writer.object(extensionService.getShortName());
                 namespaces(converter);
                 commonAttributes(extension, converter);
-                writer.attribute("inherited", extensibleEntity.isInherited(extensionClass));
+                writer.attribute("inherited", project.isInherited(extensionClass));
                 writer.attribute("derived", extensionClass.isAnnotationPresent(Derived.class));
                 converter.marshal(extension, writer);
             writer.end();
