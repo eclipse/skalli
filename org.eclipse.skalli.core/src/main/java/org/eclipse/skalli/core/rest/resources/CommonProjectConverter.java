@@ -11,6 +11,7 @@
 package org.eclipse.skalli.core.rest.resources;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -37,6 +38,8 @@ import org.eclipse.skalli.services.rest.RestWriter;
 import org.eclipse.skalli.services.user.UserService;
 import org.eclipse.skalli.services.user.UserServices;
 import org.restlet.data.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
@@ -47,6 +50,8 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
 
     public static final String API_VERSION = "1.4"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API"; //$NON-NLS-1$
+
+    private static final Logger LOG = LoggerFactory.getLogger(CommonProjectConverter.class);
 
     private Set<String> extensions;
     private boolean allExtensions;
@@ -198,7 +203,13 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
                 commonAttributes(extension, converter);
                 writer.attribute("inherited", project.isInherited(extensionClass));
                 writer.attribute("derived", extensionClass.isAnnotationPresent(Derived.class));
-                converter.marshal(extension, writer);
+                try {
+                    converter.marshal(extension, writer);
+                } catch (Exception e) {
+                    // don't let a buggy extension converter disturb the rendering of other converters!
+                    LOG.error(MessageFormat.format("Failed to render extension ''{0}'' of project ''{1}''",
+                            extensionService.getShortName(), project.getProjectId()), e);
+                }
             writer.end();
         }
     }
