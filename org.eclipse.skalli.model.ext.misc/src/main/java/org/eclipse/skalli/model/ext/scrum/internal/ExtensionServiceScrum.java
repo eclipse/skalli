@@ -99,6 +99,11 @@ public class ExtensionServiceScrum
     }
 
     @Override
+    public RestConverter<ScrumProjectExt> getRestConverter() {
+        return new ScrumConverter();
+    }
+
+    @Override
     public String getModelVersion() {
         return ScrumProjectExt.MODEL_VERSION;
     }
