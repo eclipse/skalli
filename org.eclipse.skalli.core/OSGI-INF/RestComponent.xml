@@ -9,7 +9,7 @@
     Contributors:
         SAP AG - initial API and implementation
  -->
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.rest">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.rest" immediate="true">
     <implementation class="org.eclipse.skalli.core.rest.RestApplication"/>
     <service>
         <provide interface="org.eclipse.skalli.services.rest.RestService"/>
