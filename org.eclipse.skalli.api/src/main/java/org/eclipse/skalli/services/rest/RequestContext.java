@@ -201,6 +201,8 @@ public class RequestContext {
                 mediaType = MediaType.TEXT_XML;
             } else if (FORMAT_JSON.contains(accept)) {
                 mediaType = MediaType.APPLICATION_JSON;
+            } else if ("*/*".equals(accept)) { //$NON-NLS-1$
+                mediaType = MediaType.TEXT_XML;
             } else {
                 mediaType = MediaType.valueOf(accept);
             }
