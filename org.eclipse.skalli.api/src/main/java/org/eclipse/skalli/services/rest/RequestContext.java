@@ -38,7 +38,7 @@ public class RequestContext {
     @SuppressWarnings("nls")
     private static final Set<String> FORMAT_XML =
             CollectionUtils.asSet(
-                    "xml", MediaType.TEXT_XML.toString(),
+                    "xml", MediaType.TEXT_XML.toString(), MediaType.APPLICATION_XML.toString(),
                     "html", MediaType.TEXT_HTML.toString());
 
     private static final String ACCEPT_QUERY_PARAM = "accept"; //$NON-NLS-1$
