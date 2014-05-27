@@ -15,12 +15,5 @@
     <service>
         <provide interface="org.eclipse.skalli.view.ext.InfoBox"/>
     </service>
-    <reference
-        name="ConfigurationService"
-        interface="org.eclipse.skalli.services.configuration.ConfigurationService"
-        cardinality="0..1"
-        policy="dynamic"
-        bind="bindConfigurationService"
-        unbind="unbindConfigurationService"/>
 </scr:component>
 

@@ -30,7 +30,6 @@ import org.eclipse.skalli.commons.Link;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
-import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.feed.Entry;
 import org.eclipse.skalli.services.feed.FeedManager;
 import org.eclipse.skalli.services.feed.FeedProvider;
@@ -93,16 +92,6 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
 
     protected void unbindFeedProvider(FeedProvider feedProvider) {
         feedProviders.remove(feedProvider);
-    }
-
-    private ConfigurationService configService;
-
-    protected void bindConfigurationService(ConfigurationService configService) {
-        this.configService = configService;
-    }
-
-    protected void unbindConfigurationService(ConfigurationService configService) {
-        this.configService = null;
     }
 
     @Override
@@ -317,12 +306,9 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
     }
 
     private String mapLink(Project project, String userId, String link) {
-        if (configService == null) {
-            return link;
-        }
         ScmLocationMapper mapper = new ScmLocationMapper(ScmLocationMapper.ALL_PROVIDERS,
                 ScmLocationMapper.PURPOSE_FEED_LINK);
-        List<Link> mappedScmLinks = mapper.getMappedLinks(link, userId, project, configService);
+        List<Link> mappedScmLinks = mapper.getMappedLinks(link, userId, project);
         if (mappedScmLinks.size() == 0) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(MessageFormat.format("no mapping for feed link =''{0}'' with purpose = ''{1}'' defined.",

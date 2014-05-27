@@ -10,7 +10,6 @@ import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapping;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.model.ext.maven.MavenPomResolver;
-import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.extension.PropertyMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,19 +20,7 @@ public abstract class MavenPomResolverBase implements MavenPomResolver {
 
     protected static final String DEFAULT_POM_FILENAME = "pom.xml"; //$NON-NLS-1$
 
-    private ConfigurationService configService;
-
     abstract protected String getProvider();
-
-    protected void bindConfigurationService(ConfigurationService configService) {
-        LOG.info(MessageFormat.format("bindConfigurationService({0})", configService)); //$NON-NLS-1$
-        this.configService = configService;
-    }
-
-    protected void unbindConfigurationService(ConfigurationService configService) {
-        LOG.info(MessageFormat.format("unbindConfigurationService({0})", configService)); //$NON-NLS-1$
-        this.configService = null;
-    }
 
     @Override
     public boolean canResolve(String scmLocation) {
@@ -48,16 +35,9 @@ public abstract class MavenPomResolverBase implements MavenPomResolver {
     }
 
     protected ScmLocationMapping getScmLocationMapping(String scmLocation) {
-        if (configService == null) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("no configuration service available");
-            }
-            return null;
-        }
-
         ScmLocationMapper mapper = new ScmLocationMapper(ScmLocationMapper.ALL_PROVIDERS,
                 ScmLocationMapper.MAVEN_RESOLVER);
-        List<ScmLocationMapping> mappings = mapper.getMappings(configService);
+        List<ScmLocationMapping> mappings = mapper.getFilteredMappings();
         if (mappings.isEmpty()) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(MessageFormat.format(

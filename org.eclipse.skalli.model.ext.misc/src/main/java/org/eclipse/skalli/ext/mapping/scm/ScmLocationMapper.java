@@ -18,7 +18,7 @@ import org.eclipse.skalli.commons.ComparatorUtils;
 import org.eclipse.skalli.commons.Link;
 import org.eclipse.skalli.commons.LinkMapping;
 import org.eclipse.skalli.model.EntityBase;
-import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.configuration.Configurations;
 import org.eclipse.skalli.services.extension.LinkMapper;
 
 /**
@@ -86,32 +86,13 @@ public class ScmLocationMapper extends LinkMapper<ScmLocationMapping> {
     }
 
     /**
-     * Returns all configured {@link ScmLocationMappings source location mappings}.
-     *
-     * @param configService  the configuration service that provides the source location mappings.
-     *
-     * @return  the configured source location mappings, or an empty list.
-     */
-    public static List<ScmLocationMapping> getAllMappings(ConfigurationService configService) {
-        if (configService != null) {
-            ScmLocationMappings mappingsConfig = configService.readConfiguration(ScmLocationMappings.class);
-            if (mappingsConfig != null && CollectionUtils.isNotBlank(mappingsConfig.getScmMappings())) {
-                return mappingsConfig.getScmMappings();
-            }
-        }
-        return Collections.emptyList();
-    }
-
-    /**
      * Returns configured {@link ScmLocationMappings source location mappings} that match
-     * the provider and any of the purposes of this souce location mapper.
-     *
-     * @param configService  the configuration service that provides the source location mappings.
+     * the provider and any of the purposes of this source location mapper.
      *
      * @return  the configured source location mappings, or an empty list.
      */
-    public List<ScmLocationMapping> getMappings(ConfigurationService configService) {
-        return filter(getAllMappings(configService));
+    public List<ScmLocationMapping> getFilteredMappings() {
+        return filter(getAllMappings());
     }
 
     /**
@@ -126,12 +107,11 @@ public class ScmLocationMapper extends LinkMapper<ScmLocationMapping> {
      * convert to links in case of successful matches.
      * @param userId  the unique identifier of a user.
      * @param entity  any (probably extensible) entity, usually a project.
-     * @param configService  the configuration service that provides the source location mappings.
      *
      * @return  a list of links, or an empty list.
      */
-    public List<Link> getMappedLinks(String s, String userId, EntityBase entity, ConfigurationService configService) {
-        return getMappedLinks(s, getMappings(configService), userId, entity);
+    public List<Link> getMappedLinks(String s, String userId, EntityBase entity) {
+        return getMappedLinks(s, getFilteredMappings(), userId, entity);
     }
 
     /**
@@ -145,5 +125,13 @@ public class ScmLocationMapper extends LinkMapper<ScmLocationMapping> {
     protected boolean accept(ScmLocationMapping mapping) {
         return super.accept(mapping)
                 && (ALL_PROVIDERS.equals(provider) || ComparatorUtils.equals(provider, mapping.getProvider()));
+    }
+
+    protected List<ScmLocationMapping> getAllMappings() {
+        ScmLocationMappings mappingsConfig = Configurations.getConfiguration(ScmLocationMappings.class);
+        if (mappingsConfig != null && CollectionUtils.isNotBlank(mappingsConfig.getScmMappings())) {
+            return mappingsConfig.getScmMappings();
+        }
+        return Collections.emptyList();
     }
 }

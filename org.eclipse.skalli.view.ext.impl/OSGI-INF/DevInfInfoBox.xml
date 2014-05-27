@@ -15,13 +15,6 @@
         <provide interface="org.eclipse.skalli.view.ext.InfoBox"/>
     </service>
     <reference
-        name="ConfigurationService"
-        interface="org.eclipse.skalli.services.configuration.ConfigurationService"
-        cardinality="1..1"
-        policy="dynamic"
-        bind="bindConfigurationService"
-        unbind="unbindConfigurationService"/>
-    <reference
         name="Clipboard"
         interface="org.eclipse.skalli.view.ext.Clipboard"
         bind="bindClipboard"

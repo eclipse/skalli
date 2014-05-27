@@ -14,12 +14,5 @@
     <service>
         <provide interface="org.eclipse.skalli.model.ext.maven.MavenPomResolver"/>
     </service>
-   <reference
-      bind="bindConfigurationService"
-      unbind="unbindConfigurationService"
-      interface="org.eclipse.skalli.services.configuration.ConfigurationService"
-      name="ConfigurationService"
-      cardinality="0..1"
-      policy="dynamic"/>
 </scr:component>
 

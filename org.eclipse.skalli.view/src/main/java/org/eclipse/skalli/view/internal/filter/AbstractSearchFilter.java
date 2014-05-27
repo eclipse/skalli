@@ -36,7 +36,6 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.Services;
-import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.favorites.Favorites;
 import org.eclipse.skalli.services.favorites.FavoritesService;
 import org.eclipse.skalli.services.project.ProjectService;
@@ -183,10 +182,6 @@ public abstract class AbstractSearchFilter implements Filter {
         return Services.getService(FavoritesService.class);
     }
 
-    protected ConfigurationService getConfigurationService() {
-        return Services.getService(ConfigurationService.class);
-    }
-
     protected User getUser(HttpServletRequest request) {
         LoginUtils util = new LoginUtils(request);
         return util.getLoggedInUser();
@@ -231,7 +226,6 @@ public abstract class AbstractSearchFilter implements Filter {
     }
 
     protected Map<String, List<String>> getSourceLinks(String userId, List<SearchHit<Project>> searchHits) {
-        ConfigurationService configService = getConfigurationService();
         Map<String, List<String>> links = new HashMap<String, List<String>>();
         for (SearchHit<Project> searchHit : searchHits) {
             Project project = searchHit.getEntity();
@@ -243,7 +237,7 @@ public abstract class AbstractSearchFilter implements Filter {
                             ScmLocationMapper.PURPOSE_BROWSE);
                     for (String scmLocation : devInf.getScmLocations()) {
                         List<String> scmUrls = new ArrayList<String>();
-                        List<Link> mappedLinks = mapper.getMappedLinks(scmLocation, userId, project, configService);
+                        List<Link> mappedLinks = mapper.getMappedLinks(scmLocation, userId, project);
                         for (Link link: mappedLinks) {
                             scmUrls.add(link.getUrl());
                         }

@@ -27,7 +27,6 @@ import org.eclipse.skalli.model.ext.maven.MavenReactor;
 import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
 import org.eclipse.skalli.model.ext.maven.MavenResolverService;
 import org.eclipse.skalli.services.Services;
-import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.extension.PropertyMapper;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;
@@ -50,16 +49,6 @@ public class ProjectMavenBox extends InfoBoxBase implements InfoBox {
     private static final String STYLE_MODULE_POPUP = "module-popup"; //$NON-NLS-1$
 
     private static final String DEFAULT_POM_FILENAME = "pom.xml"; //$NON-NLS-1$
-
-    private ConfigurationService configService;
-
-    protected void bindConfigurationService(ConfigurationService configService) {
-        this.configService = configService;
-    }
-
-    protected void unbindConfigurationService(ConfigurationService configService) {
-        this.configService = configService;
-    }
 
     @Override
     public String getIconPath() {
@@ -182,9 +171,6 @@ public class ProjectMavenBox extends InfoBoxBase implements InfoBox {
     }
 
     private String getReactorPomUrl(Project project, DevInfProjectExt devInf, MavenProjectExt mavenExt) {
-        if (configService == null) {
-            return null;
-        }
         String scmLocation = devInf.getScmLocation();
         if (StringUtils.isBlank(scmLocation)) {
             return null;
@@ -194,7 +180,7 @@ public class ProjectMavenBox extends InfoBoxBase implements InfoBox {
             return null;
         }
         ScmLocationMapper mapper = new ScmLocationMapper("git", ScmLocationMapper.PURPOSE_BROWSE); //$NON-NLS-1$
-        List<ScmLocationMapping> mappings = mapper.getMappings(configService);
+        List<ScmLocationMapping> mappings = mapper.getFilteredMappings();
         if (mappings.isEmpty()) {
             return null;
         }

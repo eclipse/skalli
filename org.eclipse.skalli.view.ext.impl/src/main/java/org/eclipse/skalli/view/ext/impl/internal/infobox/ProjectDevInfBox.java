@@ -23,7 +23,6 @@ import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapping;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
-import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.extension.PropertyMapper;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;
@@ -44,16 +43,6 @@ public class ProjectDevInfBox extends InfoBoxBase implements InfoBox {
     private static final String ICON_CI_SERVER = "/VAADIN/themes/simple/icons/devinf/ci_server.png"; //$NON-NLS-1$
     private static final String ICON_REVIEW = "/VAADIN/themes/simple/icons/devinf/review.png"; //$NON-NLS-1$
     private static final String ICON_JAVADOC = "/VAADIN/themes/simple/icons/devinf/javadoc.png"; //$NON-NLS-1$
-
-    private ConfigurationService configService;
-
-    protected void bindConfigurationService(ConfigurationService configService) {
-        this.configService = configService;
-    }
-
-    protected void unbindConfigurationService(ConfigurationService configService) {
-        this.configService = null;
-    }
 
     @Override
     public String getIconPath() {
@@ -123,7 +112,7 @@ public class ProjectDevInfBox extends InfoBoxBase implements InfoBox {
                         html.append(copyToClipboardLink(scmUrl, scmUrl));
                     }
                     List<Link> mappedScmLinks = mapper.getMappedLinks(scmLocation,
-                            util.getLoggedInUserId(), project, configService);
+                            util.getLoggedInUserId(), project);
                     html.appendLinks(mappedScmLinks);
                     html.append("</li>\n"); //$NON-NLS-1$
                 }
@@ -149,7 +138,7 @@ public class ProjectDevInfBox extends InfoBoxBase implements InfoBox {
         List<String> scmUrls = new ArrayList<String>();
         ScmLocationMapper mapper = new ScmLocationMapper(ScmLocationMapper.ALL_PROVIDERS,
                 ScmLocationMapper.PURPOSE_COPY_TO_CLIPBOARD);
-        List<ScmLocationMapping> clipboardMappings = mapper.getMappings(configService);
+        List<ScmLocationMapping> clipboardMappings = mapper.getFilteredMappings();
         for (ScmLocationMapping clipboardMapping : clipboardMappings) {
             String scmUrl = PropertyMapper.convert(scmLocation, clipboardMapping.getPattern(),
                     clipboardMapping.getTemplate(), project, userId);
@@ -173,7 +162,7 @@ public class ProjectDevInfBox extends InfoBoxBase implements InfoBox {
     private List<Link> getCreateBugUrl(String bugtrackerUrl,  String userId, Project project) {
         ScmLocationMapper mapper = new ScmLocationMapper(ScmLocationMapper.ALL_PROVIDERS,
                 ScmLocationMapper.PURPOSE_CREATE_BUG);
-        return mapper.getMappedLinks(bugtrackerUrl, userId, project, configService);
+        return mapper.getMappedLinks(bugtrackerUrl, userId, project);
     }
 
     @Override

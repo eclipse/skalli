@@ -18,7 +18,6 @@ import org.eclipse.skalli.commons.Link;
 import org.eclipse.skalli.ext.mapping.scm.ScmLocationMapper;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
-import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;
 import org.eclipse.skalli.view.ext.InfoBoxBase;
@@ -31,16 +30,6 @@ import com.vaadin.ui.Layout;
 public class ProjectActivityBox extends InfoBoxBase implements InfoBox {
 
     private static final String STYLE_ACTIVITY_INFOBOX = "infobox-activity"; //$NON-NLS-1$
-
-    private ConfigurationService configService;
-
-    protected void bindConfigurationService(ConfigurationService configService) {
-        this.configService = configService;
-    }
-
-    protected void unbindConfigurationService(ConfigurationService configService) {
-        this.configService = configService;
-    }
 
     @Override
     public String getIconPath() {
@@ -82,9 +71,6 @@ public class ProjectActivityBox extends InfoBoxBase implements InfoBox {
     }
 
     private Link getMappedLink(String purpose, Project project, String userId) {
-        if (configService == null) {
-            return null;
-        }
         DevInfProjectExt devInf = project.getExtension(DevInfProjectExt.class);
         if (devInf == null) {
             return null;
@@ -94,7 +80,7 @@ public class ProjectActivityBox extends InfoBoxBase implements InfoBox {
             return null;
         }
         ScmLocationMapper mapper = new ScmLocationMapper(ScmLocationMapper.ALL_PROVIDERS, purpose);
-        List<Link> links = mapper.getMappedLinks(scmLocation, userId, project, configService);
+        List<Link> links = mapper.getMappedLinks(scmLocation, userId, project);
         return CollectionUtils.isNotEmpty(links)? links.get(0) : null;
     }
 
