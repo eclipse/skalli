@@ -23,7 +23,7 @@ import org.restlet.data.Preference;
 import org.restlet.data.Reference;
 
 @SuppressWarnings("nls")
-public class ResourceContextTest {
+public class RequestContextTest {
 
     private Reference resourceRef;
 
