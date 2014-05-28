@@ -29,6 +29,8 @@ import org.restlet.resource.ServerResource;
  */
 public class RequestContext {
 
+    private static final String ACCEPT_ALL = "*/*"; //$NON-NLS-1$
+
     @SuppressWarnings("nls")
     private static final Set<String> FORMAT_JSON =
             CollectionUtils.asSet("json", "text/json", MediaType.APPLICATION_JSON.toString());
@@ -201,7 +203,7 @@ public class RequestContext {
                 mediaType = MediaType.TEXT_XML;
             } else if (FORMAT_JSON.contains(accept)) {
                 mediaType = MediaType.APPLICATION_JSON;
-            } else if ("*/*".equals(accept)) { //$NON-NLS-1$
+            } else if (ACCEPT_ALL.equals(accept)) { //$NON-NLS-1$
                 mediaType = MediaType.TEXT_XML;
             } else {
                 mediaType = MediaType.valueOf(accept);
@@ -213,15 +215,24 @@ public class RequestContext {
         return mediaType;
     }
 
+    /**
+     * Scans the <tt>Accept</tt> header for the media type with the highest <tt>"q"</tt> attribute.
+     * If the list of accepted media type contains {@value #ACCEPT_ALL}, {@value #ACCEPT_ALL} is returned.
+     */
     private String getMaxQualityAccept(Request request) {
-        String formatParam = null;
+        String maxQualityAccept = null;
         float maxQuality = 0;
         for (Preference<MediaType> acceptedMediaType: request.getClientInfo().getAcceptedMediaTypes()) {
-            if (acceptedMediaType.getQuality() > maxQuality) {
-                maxQuality = acceptedMediaType.getQuality();
-                formatParam = acceptedMediaType.getMetadata().getName();
+            String mediaType = acceptedMediaType.getMetadata().getName();
+            if (ACCEPT_ALL.equals(mediaType)) {
+                return ACCEPT_ALL;
+            }
+            float quality = acceptedMediaType.getQuality();
+            if (quality > maxQuality) {
+                maxQualityAccept = mediaType;
+                maxQuality = quality;
             }
         }
-        return formatParam;
+        return maxQualityAccept;
     }
 }
