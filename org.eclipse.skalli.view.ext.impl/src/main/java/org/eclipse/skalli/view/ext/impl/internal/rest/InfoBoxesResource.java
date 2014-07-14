@@ -15,6 +15,7 @@ import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.view.ext.InfoBox;
+import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 
@@ -24,6 +25,10 @@ public class InfoBoxesResource extends ResourceBase {
     public Representation retrieve() {
         if (!Permits.isAllowed(getAction(), getPath())) {
             return createUnauthorizedRepresentation();
+        }
+        if (!isSupportedMediaType()) {
+            setStatus(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
+            return null;
         }
 
         InfoBoxes infoboxes = new InfoBoxes(Services.getServices(InfoBox.class));

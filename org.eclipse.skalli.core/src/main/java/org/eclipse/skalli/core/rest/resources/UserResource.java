@@ -30,6 +30,10 @@ public class UserResource extends ResourceBase {
         if (!Permits.isAllowed(getAction(), getPath())) {
             return createUnauthorizedRepresentation();
         }
+        if (!isSupportedMediaType()) {
+            setStatus(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
+            return null;
+        }
 
         String id = (String) getRequestAttributes().get(PARAM_USERID);
 

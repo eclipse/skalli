@@ -36,6 +36,10 @@ public class IssuesResource extends ResourceBase {
         if (!Permits.isAllowed(getAction(), getPath())) {
             return createUnauthorizedRepresentation();
         }
+        if (!isSupportedMediaType()) {
+            setStatus(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
+            return null;
+        }
 
         String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
 

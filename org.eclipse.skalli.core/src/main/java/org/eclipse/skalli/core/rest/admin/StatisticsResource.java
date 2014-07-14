@@ -33,6 +33,10 @@ public class StatisticsResource extends ResourceBase {
         if (!Permits.isAllowed(getAction(), getPath())) {
             return createUnauthorizedRepresentation();
         }
+        if (!isSupportedMediaType()) {
+            setStatus(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
+            return null;
+        }
 
         StatisticsQuery query = new StatisticsQuery(getQueryAttributes());
         String section = (String) getRequestAttributes().get(PARAM_SECTION);

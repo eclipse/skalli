@@ -66,6 +66,10 @@ public class ProjectsResource extends ResourceBase {
         if (!Permits.isAllowed(getAction(), getPath())) {
             return createUnauthorizedRepresentation();
         }
+        if (!isSupportedMediaType()) {
+            setStatus(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
+            return null;
+        }
 
         try {
             RestSearchQuery queryParams = new RestSearchQuery(getQueryAsForm());

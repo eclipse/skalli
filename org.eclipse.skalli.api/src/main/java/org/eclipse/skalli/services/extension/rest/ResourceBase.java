@@ -216,16 +216,6 @@ public abstract class ResourceBase extends ServerResource {
     }
 
     /**
-     * Creates an {@link ErrorRepresentation error representation} for unsupported media types.
-     * Sets the response status to <tt>415 Unsupported Media Type</tt>.
-     */
-    protected Representation createUnsupportedMediaTypeRepresentation() {
-        return createErrorRepresentation(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE,
-                MessageFormat.format(ERROR_ID_UNSUPPORTED_MEDIA_TYPE, context.getMediaType()),
-                MessageFormat.format(ERROS_MSG_UNSUPPORTED_MEDIA_TYPE, context.getMediaType()));
-    }
-
-    /**
      * Creates an {@link ErrorRepresentation error representation} for i/o errors
      * and writes a corresponding log entry (severity ERROR). Sets the response status to
      * <tt>500 Internal Server Error</tt>.

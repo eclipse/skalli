@@ -44,6 +44,10 @@ public class UpdateSitesServerResource extends ResourceBase {
         if (!Permits.isAllowed(getAction(), getPath())) {
             return createUnauthorizedRepresentation();
         }
+        if (!isSupportedMediaType()) {
+            setStatus(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
+            return null;
+        }
 
         String id = (String) getRequestAttributes().get("id");//$NON-NLS-1$
         String userId = (String) getRequestAttributes().get("userId");//$NON-NLS-1$

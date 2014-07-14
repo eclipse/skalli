@@ -45,6 +45,10 @@ public class UserPermitsResource extends ResourceBase {
         if (!Permits.isAllowed(getAction(), getPath())) {
             return createUnauthorizedRepresentation();
         }
+        if (!isSupportedMediaType()) {
+            setStatus(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
+            return null;
+        }
 
         String userId = (String) getRequestAttributes().get(PARAM_USERID);
         User user = UserServices.getUser(userId);
