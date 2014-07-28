@@ -31,7 +31,8 @@
         <target.platform>projectportal</target.platform>
         <tycho.testArgLine>-Dworkdir=../org.eclipse.skalli.testutil</tycho.testArgLine>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jdoc.version>0.1.0</jdoc.version>
+        <java-version>1.7</java-version>
+        <target-platform>skalli</target-platform>
     </properties>
 
     <build>

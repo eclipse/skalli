@@ -14,12 +14,6 @@
 
     <name>Skalli (Incubation)</name>
 
-    <properties>
-        <java-version>1.7</java-version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <target-platform>skalli</target-platform>
-    </properties>
-
     <profiles>
         <profile>
             <id>run-gerrit-tests</id>
@@ -36,8 +30,8 @@
     </profiles>
 
     <modules>
-        <module>org.eclipse.skalli.target</module>
         <module>org.eclipse.skalli.parent</module>
+        <module>org.eclipse.skalli.target</module>
         <module>org.eclipse.skalli.api</module>
         <module>org.eclipse.skalli.core</module>
         <module>org.eclipse.skalli.jpa</module>
