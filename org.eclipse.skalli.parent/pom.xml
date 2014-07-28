@@ -82,7 +82,7 @@
                             <groupId>org.eclipse.skalli</groupId>
                             <artifactId>org.eclipse.skalli.target</artifactId>
                             <version>${project.version}</version>
-                            <classifier>skalli</classifier>
+                            <classifier>${target-platform}</classifier>
                         </artifact>
                     </target>
                     <environments>
@@ -118,8 +118,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>${java-version}</source>
+                    <target>${java-version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
@@ -128,8 +128,8 @@
                 <artifactId>tycho-compiler-plugin</artifactId>
                 <version>${tycho-version}</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>${java-version}</source>
+                    <target>${java-version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>

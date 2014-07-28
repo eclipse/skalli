@@ -14,6 +14,27 @@
 
     <name>Skalli (Incubation)</name>
 
+    <properties>
+        <java-version>1.7</java-version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <target-platform>skalli</target-platform>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>run-gerrit-tests</id>
+            <modules>
+                <module>org.eclipse.skalli.gerrit.test</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>run-selenium-tests</id>
+            <modules>
+                <module>org.eclipse.skalli.selenium</module>
+            </modules>
+        </profile>
+    </profiles>
+
     <modules>
         <module>org.eclipse.skalli.target</module>
         <module>org.eclipse.skalli.parent</module>
@@ -48,19 +69,4 @@
         <module>org.eclipse.skalli.p2</module>
         <module>org.eclipse.skalli.examples</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>gerrit</id>
-            <modules>
-                <module>org.eclipse.skalli.gerrit.test</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>selenium</id>
-            <modules>
-                <module>org.eclipse.skalli.selenium</module>
-            </modules>
-        </profile>
-    </profiles>
 </project>
