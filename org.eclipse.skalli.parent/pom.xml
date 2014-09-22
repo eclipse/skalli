@@ -104,6 +104,8 @@
                 <artifactId>tycho-surefire-plugin</artifactId>
                 <version>${tycho-version}</version>
                 <configuration>
+                    <useUIHarness>false</useUIHarness>
+                    <useUIThread>false</useUIThread>
                     <bundleStartLevel>
                         <bundle>
                             <id>org.eclipse.equinox.ds</id>
@@ -111,7 +113,6 @@
                             <autoStart>true</autoStart>
                         </bundle>
                     </bundleStartLevel>
-                    <useUIHarness>false</useUIHarness>
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
