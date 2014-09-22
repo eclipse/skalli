@@ -10,7 +10,7 @@ Import-Package: javax.persistence.criteria,
  javax.persistence.metamodel,
  org.easymock,
  org.eclipse.skalli.testutil,
- org.junit,
  org.osgi.framework
 Require-Bundle: org.eclipse.skalli.core,
- org.hamcrest
+ org.hamcrest,
+ org.junit

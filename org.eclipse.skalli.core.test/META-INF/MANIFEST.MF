@@ -12,7 +12,7 @@ Import-Package: org.apache.commons.io,
  org.easymock,
  org.eclipse.skalli.testutil,
  org.eclipse.skalli.testutil.feeds,
- org.junit,
  org.w3c.dom
-Require-Bundle: org.hamcrest
+Require-Bundle: org.hamcrest,
+  org.junit
 

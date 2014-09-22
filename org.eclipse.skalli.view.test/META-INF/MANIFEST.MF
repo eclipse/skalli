@@ -9,7 +9,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.apache.commons.io,
  org.apache.commons.io.filefilter,
  org.easymock,
- org.eclipse.skalli.testutil,
+ org.eclipse.skalli.testutil
+Require-Bundle: org.eclipse.skalli.core,
  org.junit
-Require-Bundle: org.eclipse.skalli.core
 

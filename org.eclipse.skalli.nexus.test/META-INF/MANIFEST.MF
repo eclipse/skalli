@@ -8,7 +8,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Fragment-Host: org.eclipse.skalli.nexus
 Import-Package: org.easymock,
  org.eclipse.skalli.commons,
- org.eclipse.skalli.testutil,
+ org.eclipse.skalli.testutil
+Require-Bundle: org.eclipse.skalli.core,
+ org.hamcrest,
  org.junit
-Require-Bundle: org.hamcrest,
- org.eclipse.skalli.core

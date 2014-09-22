@@ -5,9 +5,9 @@ Bundle-SymbolicName: org.eclipse.skalli.jpa.test
 Bundle-Version: 0.2.0.qualifier
 Fragment-Host: org.eclipse.skalli.jpa
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit,
- org.eclipse.skalli.testutil,
- org.eclipse.skalli.api
 Import-Package: org.apache.commons.codec.digest,
- org.hamcrest,
+ org.eclipse.skalli.testutil,
  org.osgi.framework
+Require-Bundle: org.eclipse.skalli.core,
+ org.hamcrest,
+ org.junit

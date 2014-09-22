@@ -11,7 +11,7 @@ Import-Package: org.apache.commons.io,
  org.easymock,
  org.eclipse.skalli.model.ext.devinf,
  org.eclipse.skalli.testutil,
- org.junit,
  org.osgi.framework
 Require-Bundle: org.eclipse.skalli.core,
- org.hamcrest
+ org.hamcrest,
+ org.junit

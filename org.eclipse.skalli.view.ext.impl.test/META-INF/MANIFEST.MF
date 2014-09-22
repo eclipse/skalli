@@ -7,6 +7,5 @@ Bundle-Vendor: Eclipse Skalli
 Fragment-Host: org.eclipse.skalli.view.ext.impl
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.easymock,
- org.eclipse.skalli.testutil,
- org.junit
-
+ org.eclipse.skalli.testutil
+Require-Bundle: org.junit
