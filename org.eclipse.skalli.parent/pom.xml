@@ -28,10 +28,10 @@
 
     <properties>
         <tycho-version>0.12.0</tycho-version>
-        <tycho.testArgLine>-Dworkdir=../org.eclipse.skalli.testutil</tycho.testArgLine>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java-version>1.6</java-version>
         <target-platform>skalli</target-platform>
+        <testArgs></testArgs>
     </properties>
 
     <build>
@@ -106,6 +106,7 @@
                 <configuration>
                     <useUIHarness>false</useUIHarness>
                     <useUIThread>false</useUIThread>
+                    <argLine>${testArgs} -Dworkdir=../org.eclipse.skalli.testutil</argLine>
                     <bundleStartLevel>
                         <bundle>
                             <id>org.eclipse.equinox.ds</id>
