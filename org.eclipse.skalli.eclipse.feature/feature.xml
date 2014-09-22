@@ -28,70 +28,112 @@
          id="org.eclipse.osgi"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.equinox.http.servlet"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
+         version="3.8.0.v20120529-1548"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.osgi.services"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.3.100.v20120522-1822"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.equinox.common"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.6.100.v20120522-1841"
+         unpack="false"/>
+
+    <plugin
+         id="org.eclipse.equinox.console"
+         download-size="0"
+         install-size="0"
+         version="1.0.0.v20120522-1841"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.equinox.ds"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.4.0.v20120522-1841"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.http.servlet"
+         download-size="0"
+         install-size="0"
+         version="1.1.300.v20120522-1841"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.equinox.util"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-         
-    <plugin
-         id="org.eclipse.equinox.console"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-         
-   <plugin
-         id="org.apache.felix.gogo.command"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
+         version="1.0.400.v20120522-2049"
          unpack="false"/>
 
    <plugin
-         id="org.apache.felix.gogo.runtime"
+         id="org.eclipse.gemini.jpa"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.1.0.RELEASE"
          unpack="false"/>
 
    <plugin
-         id="org.apache.felix.gogo.shell"
+         id="org.eclipse.gemini.dbaccess.util"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.1.0.RELEASE"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.gemini.dbaccess.derby"
+         download-size="0"
+         install-size="0"
+         version="1.1.0.RELEASE"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.gemini.naming"
+         download-size="0"
+         install-size="0"
+         version="1.0.1.RELEASE"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.persistence.antlr"
+         download-size="0"
+         install-size="0"
+         version="3.2.0.v201206041011"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.persistence.asm"
+         download-size="0"
+         install-size="0"
+         version="3.3.1.v201206041142"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.persistence.core"
+         download-size="0"
+         install-size="0"
+         version="2.4.0.v20120608-r11652"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.persistence.jpa"
+         download-size="0"
+         install-size="0"
+         version="2.4.0.v20120608-r11652"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.persistence.jpa.jpql"
+         download-size="0"
+         install-size="0"
+         version="2.0.0.v20120608-r11652"
          unpack="false"/>
 
 </feature>
