@@ -26,9 +26,29 @@
         <plugins>
             <plugin>
                 <groupId>org.eclipse.tycho</groupId>
+                <artifactId>target-platform-configuration</artifactId>
+                <configuration>
+                    <dependency-resolution>
+                        <extraRequirements combine.children="append">
+                            <requirement>
+                                <type>eclipse-plugin</type>
+                                <id>org.eclipse.gemini.dbaccess.derby</id>
+                                <versionRange>0.0.0</versionRange>
+                            </requirement>
+                            <requirement>
+                                <type>eclipse-plugin</type>
+                                <id>org.eclipse.gemini.jpa</id>
+                                <versionRange>0.0.0</versionRange>
+                            </requirement>
+                        </extraRequirements>
+                    </dependency-resolution>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
                 <artifactId>tycho-surefire-plugin</artifactId>
                 <configuration>
-                    <bundleStartLevel>
+                    <bundleStartLevel combine.children="append">
                         <bundle>
                             <id>org.eclipse.gemini.dbaccess.derby</id>
                             <level>1</level>

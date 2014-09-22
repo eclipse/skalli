@@ -27,7 +27,7 @@
     </licenses>
 
     <properties>
-        <tycho-version>0.12.0</tycho-version>
+        <tycho-version>0.21.0</tycho-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java-version>1.6</java-version>
         <target-platform>skalli</target-platform>
@@ -75,6 +75,19 @@
                             <classifier>${target-platform}</classifier>
                         </artifact>
                     </target>
+                    <dependency-resolution>
+                        <extraRequirements>
+                            <!--
+                                Needed for tycho-surefire tests,
+                                otherwise declarative services will not be started!
+                             -->
+                            <requirement>
+                                <type>eclipse-plugin</type>
+                                <id>org.eclipse.equinox.ds</id>
+                                <versionRange>0.0.0</versionRange>
+                            </requirement>
+                        </extraRequirements>
+                    </dependency-resolution>
                     <environments>
                         <environment>
                             <os>linux</os>
