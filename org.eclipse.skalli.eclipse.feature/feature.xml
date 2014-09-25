@@ -105,35 +105,35 @@
          id="org.eclipse.persistence.antlr"
          download-size="0"
          install-size="0"
-         version="3.2.0.v201206041011"
+         version="3.2.0.v201302191141"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.persistence.asm"
          download-size="0"
          install-size="0"
-         version="3.3.1.v201206041142"
+         version="3.3.1.v201302191223"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.persistence.core"
          download-size="0"
          install-size="0"
-         version="2.4.0.v20120608-r11652"
+         version="2.4.2.v20130514-5956486"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.persistence.jpa"
          download-size="0"
          install-size="0"
-         version="2.4.0.v20120608-r11652"
+         version="2.4.2.v20130514-5956486"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.persistence.jpa.jpql"
          download-size="0"
          install-size="0"
-         version="2.0.0.v20120608-r11652"
+         version="2.0.1.v20130514-5956486"
          unpack="false"/>
 
 </feature>
