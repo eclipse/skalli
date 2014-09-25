@@ -136,13 +136,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.apache.commons.logging"
-         download-size="0"
-         install-size="0"
-         version="1.1.1.v201101211721"
-         unpack="false"/>
-
-   <plugin
          id="org.apache.derby"
          download-size="0"
          install-size="0"

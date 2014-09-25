@@ -47,8 +47,6 @@
 <unit id="org.apache.commons.io.source" version="1.4.0.v20081110-1000"/>
 <unit id="org.apache.commons.lang" version="2.4.0.v201005080502"/>
 <unit id="org.apache.commons.lang.source" version="2.4.0.v201005080502"/>
-<unit id="org.apache.commons.logging" version="1.1.1.v201101211721"/>
-<unit id="org.apache.commons.logging.source" version="1.1.1.v201101211721"/>
 <unit id="org.apache.derby" version="10.5.1.1_v201108232300"/>
 <unit id="org.apache.felix.gogo.command" version="0.8.0.v201108120515"/>
 <unit id="org.apache.felix.gogo.runtime" version="0.8.0.v201108120515"/>
