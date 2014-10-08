@@ -6,7 +6,8 @@ Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Fragment-Host: org.eclipse.skalli.core
-Import-Package: org.apache.commons.io,
+Import-Package: javax.naming.spi,
+ org.apache.commons.io,
  org.apache.http.client,
  org.apache.http.client.methods,
  org.easymock,
