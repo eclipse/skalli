@@ -1,12 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde version="3.6"?>
 
-<target includeMode="feature" name="Skalli Target Platform" sequenceNumber="0">
+<target includeMode="feature" name="Skalli Target Platform" sequenceNumber="1">
 <locations>
 <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.rcp.feature.group" version="4.2.1.v20120814-120134-7IAPA8BrHQicS-rjP0GbqK780kMy"/>
-<unit id="org.eclipse.equinox.executable.feature.group" version="3.6.0.v20120522-1813-7P7OG2BFLWUl7UmbVUO9iCm"/>
-<repository location="http://download.eclipse.org/releases/juno/201209280900/"/>
+<unit id="org.eclipse.core.contenttype" version="3.4.200.v20130326-1255"/>
+<unit id="org.eclipse.core.contenttype.source" version="3.4.200.v20130326-1255"/>
+<unit id="org.eclipse.core.jobs" version="3.5.300.v20130429-1813"/>
+<unit id="org.eclipse.core.jobs.source" version="3.5.300.v20130429-1813"/>
+<unit id="org.eclipse.core.runtime" version="3.9.100.v20131218-1515"/>
+<unit id="org.eclipse.core.runtime.source" version="3.9.100.v20131218-1515"/>
+<unit id="org.eclipse.equinox.app" version="1.3.100.v20130327-1442"/>
+<unit id="org.eclipse.equinox.app.source" version="1.3.100.v20130327-1442"/>
+<unit id="org.eclipse.equinox.common" version="3.6.200.v20130402-1505"/>
+<unit id="org.eclipse.equinox.common.source" version="3.6.200.v20130402-1505"/>
+<unit id="org.eclipse.equinox.console" version="1.0.100.v20130429-0953"/>
+<unit id="org.eclipse.equinox.console.source" version="1.0.100.v20130429-0953"/>
+<unit id="org.eclipse.equinox.ds" version="1.4.101.v20130813-1853"/>
+<unit id="org.eclipse.equinox.ds.source" version="1.4.101.v20130813-1853"/>
+<unit id="org.eclipse.equinox.http.servlet" version="1.1.400.v20130418-1354"/>
+<unit id="org.eclipse.equinox.http.servlet.source" version="1.1.400.v20130418-1354"/>
+<unit id="org.eclipse.equinox.preferences" version="3.5.100.v20130422-1538"/>
+<unit id="org.eclipse.equinox.preferences.source" version="3.5.100.v20130422-1538"/>
+<unit id="org.eclipse.equinox.registry" version="3.5.301.v20130717-1549"/>
+<unit id="org.eclipse.equinox.registry.source" version="3.5.301.v20130717-1549"/>
+<unit id="org.eclipse.equinox.util" version="1.0.500.v20130404-1337"/>
+<unit id="org.eclipse.equinox.util.source" version="1.0.500.v20130404-1337"/>
+<unit id="org.eclipse.osgi" version="3.9.1.v20140110-1610"/>
+<unit id="org.eclipse.osgi.source" version="3.9.1.v20140110-1610"/>
+<unit id="org.eclipse.osgi.services" version="3.3.100.v20130513-1956"/>
+<unit id="org.eclipse.osgi.services.source" version="3.3.100.v20130513-1956"/>
+<unit id="org.eclipse.equinox.executable.feature.group" version="3.6.0.v20140117-1004"/>
+<repository location="http://download.eclipse.org/releases/kepler/201402280900"/>
 </location>
 <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="javax.persistence" version="2.0.5.v201212031355"/>
@@ -28,18 +53,30 @@
 <repository location="http://download.eclipse.org/gemini/updates/naming/1.0.1/"/>
 </location>
 <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="ch.qos.logback.core" version="1.0.7.v20121108-1250"/>
+<unit id="ch.qos.logback.core.source" version="1.0.7.v20121108-1250"/>
+<unit id="ch.qos.logback.classic" version="1.0.7.v20121108-1250"/>
+<unit id="ch.qos.logback.classic.source" version="1.0.7.v20121108-1250"/>
+<unit id="ch.qos.logback.slf4j" version="1.0.7.v20121108-1250"/>
+<unit id="ch.qos.logback.slf4j.source" version="1.0.7.v20121108-1250"/>
 <unit id="com.jcraft.jsch" version="0.1.44.v201101211721"/>
 <unit id="com.jcraft.jsch.source" version="0.1.44.v201101211721"/>
+<unit id="com.sun.el" version="2.2.0.v201303151357"/>
+<unit id="com.sun.el.source" version="2.2.0.v201303151357"/>
 <unit id="com.sun.syndication" version="0.9.0.v200803061811"/>
 <unit id="com.sun.syndication.source" version="0.9.0.v200803061811"/>
 <unit id="com.thoughtworks.xstream" version="1.3.1.v201111240924"/>
 <unit id="com.thoughtworks.xstream.source" version="1.3.1.v201111240924"/>
 <unit id="com.vaadin" version="6.5.3.v201111241034"/>
-<unit id="javax.activation" version="1.1.0.v201211130549"/>
 <unit id="javax.el" version="2.2.0.v201303151357"/>
-<unit id="javax.mail" version="1.4.0.v201005080615"/>
-<unit id="javax.servlet" version="2.5.0.v201103041518"/>
-<unit id="javax.servlet.jsp" version="2.1.0.v201105211820"/>
+<unit id="javax.el.source" version="2.2.0.v201303151357"/>
+<unit id="javax.mail.glassfish" version="1.4.1.v201108011116"/>
+<unit id="javax.mail.glassfish.source" version="1.4.1.v201108011116"/>
+<unit id="javax.servlet" version="3.0.0.v201112011016"/>
+<unit id="javax.servlet.source" version="3.0.0.v201112011016"/>
+<unit id="javax.servlet.jsp" version="2.2.0.v201112011158"/>
+<unit id="javax.servlet.jsp.source" version="2.2.0.v201112011158"/>
+<unit id="javax.servlet.jsp.jstl" version="1.2.0.v201105211821"/>
 <unit id="javax.xml" version="1.3.4.v201005080400"/>
 <unit id="javax.xml.stream" version="1.0.1.v201004272200"/>
 <unit id="org.apache.commons.codec" version="1.3.0.v201101211617"/>
@@ -50,14 +87,19 @@
 <unit id="org.apache.commons.io.source" version="1.4.0.v20081110-1000"/>
 <unit id="org.apache.commons.lang" version="2.4.0.v201005080502"/>
 <unit id="org.apache.commons.lang.source" version="2.4.0.v201005080502"/>
-<unit id="org.apache.derby" version="10.5.1.1_v201108232300"/>
+<unit id="org.apache.derby" version="10.8.2.2_v201211210650"/>
 <unit id="org.apache.felix.gogo.command" version="0.8.0.v201108120515"/>
+<unit id="org.apache.felix.gogo.command.source" version="0.8.0.v201108120515"/>
 <unit id="org.apache.felix.gogo.runtime" version="0.8.0.v201108120515"/>
+<unit id="org.apache.felix.gogo.runtime.source" version="0.8.0.v201108120515"/>
 <unit id="org.apache.felix.gogo.shell" version="0.8.0.v201110170705"/>
+<unit id="org.apache.felix.gogo.shell.source" version="0.8.0.v201110170705"/>
 <unit id="org.apache.httpcomponents.httpclient" version="4.1.0.v201103311320"/>
 <unit id="org.apache.httpcomponents.httpclient.source" version="4.1.0.v201103311320"/>
 <unit id="org.apache.httpcomponents.httpcore" version="4.1.0.v201101201700"/>
 <unit id="org.apache.httpcomponents.httpcore.source" version="4.1.0.v201101201700"/>
+<unit id="org.apache.jasper.glassfish" version="2.2.2.v201205150955"/>
+<unit id="org.apache.jasper.glassfish.source" version="2.2.2.v201205150955"/>
 <unit id="org.apache.lucene.core" version="3.5.0.v20120725-1805"/>
 <unit id="org.apache.lucene.core.source" version="3.5.0.v20120725-1805"/>
 <unit id="org.apache.lucene.highlighter" version="3.5.0.v20121015-1317"/>
@@ -66,6 +108,7 @@
 <unit id="org.apache.lucene.queries.source" version="3.5.0.v20120725-1805"/>
 <unit id="org.apache.lucene.memory" version="3.5.0.v20120725-1805"/>
 <unit id="org.apache.lucene.memory.source" version="3.5.0.v20120725-1805"/>
+<unit id="org.apache.taglibs.standard.glassfish" version="1.2.0.v201112081803"/>
 <unit id="org.apache.velocity" version="1.5.0.v200905192330"/>
 <unit id="org.custommonkey.xmlunit" version="1.3.0.v201111161502"/>
 <unit id="org.custommonkey.xmlunit.source" version="1.3.0.v201111161502"/>
@@ -78,25 +121,67 @@
 <unit id="org.hamcrest.library" version="1.1.0.v20090501071000"/>
 <unit id="org.jdom" version="1.1.1.v201101151400"/>
 <unit id="org.jdom.source" version="1.1.1.v201101151400"/>
-<unit id="org.junit" version="4.8.1.v4_8_1_v20130308-0412"/>
 <unit id="org.json" version="1.0.0.v201011060100"/>
 <unit id="org.jsoup" version="1.6.1.v201201201356"/>
 <unit id="org.jsoup.source" version="1.6.1.v201201201356"/>
+<unit id="org.junit" version="4.8.1.v4_8_1_v20130308-0412"/>
 <unit id="org.restlet" version="2.0.5.v201111161502"/>
 <unit id="org.restlet.source" version="2.0.5.v201111161502"/>
 <unit id="org.restlet.ext.servlet" version="2.0.5.v201111161502"/>
 <unit id="org.restlet.ext.servlet.source" version="2.0.5.v201111161502"/>
-<unit id="org.slf4j.api" version="1.6.4.v20120130-2120"/>
-<unit id="org.slf4j.log4j" version="1.6.4.v20120130-2120"/>
+<unit id="org.slf4j.api" version="1.7.2.v20121108-1250"/>
+<unit id="org.slf4j.api.source" version="1.7.2.v20121108-1250"/>
+<unit id="org.slf4j.jcl" version="1.7.2.v20130115-1340"/>
+<unit id="org.slf4j.jcl.source" version="1.7.2.v20130115-1340"/>
+<unit id="org.slf4j.jul" version="1.7.2.v20121108-1250"/>
+<unit id="org.slf4j.jul.source" version="1.7.2.v20121108-1250"/>
+<unit id="org.slf4j.log4j" version="1.7.2.v20130115-1340"/>
+<unit id="org.slf4j.log4j.source" version="1.7.2.v20130115-1340"/>
 <unit id="org.xmlpull" version="1.1.3.4_v201201052148"/>
 <unit id="osgi.enterprise" version="4.2.0.v201108120515"/>
 <unit id="osgi.enterprise.source" version="4.2.0.v201108120515"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20130517111416/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.jetty.all.dependencies.feature.group" version="8.1.3.201206060641"/>
-<unit id="org.eclipse.jetty.sdk.feature.group" version="8.1.3.201206060641"/>
-<repository location="http://download.eclipse.org/jetty/updates/jetty-rt-3.8milestones/S-3.8.RC3-201206060641/"/>
+<unit id="org.eclipse.jetty.client" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.client.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.continuation" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.continuation.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.deploy" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.deploy.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.http" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.http.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.io" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.io.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.jmx" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.jmx.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.jndi" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.jndi.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.osgi.boot" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.osgi.boot.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.osgi.httpservice" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.osgi.httpservice.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.osgi.boot.jsp" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.osgi.boot.jsp.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.osgi.boot.warurl" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.osgi.boot.warurl.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.security" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.security.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.server" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.server.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.servlet" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.servlet.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.servlets" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.servlets.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.rewrite" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.rewrite.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.util" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.util.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.webapp" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.webapp.source" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.xml" version="8.1.14.v20131031"/>
+<unit id="org.eclipse.jetty.xml.source" version="8.1.14.v20131031"/>
+<repository location="http://download.eclipse.org/jetty/updates/jetty-bundles-8.x/8.1.14.v20131031/"/>
 </location>
 </locations>
 <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
