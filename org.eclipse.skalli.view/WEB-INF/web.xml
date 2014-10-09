@@ -26,6 +26,12 @@
       <param-value>osgi</param-value>
     </context-param>
 
+    <!--  switch off Vaadin debug mode -->
+    <context-param>
+        <param-name>productionMode</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
     <!--
     *******************
     servlet definitions
