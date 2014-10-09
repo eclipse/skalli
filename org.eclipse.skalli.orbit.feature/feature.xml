@@ -174,21 +174,21 @@
          id="org.apache.felix.gogo.command"
          download-size="0"
          install-size="0"
-         version="0.8.0.v201108120515"
+         version="0.10.0.v201209301215"
          unpack="false"/>
 
    <plugin
          id="org.apache.felix.gogo.runtime"
          download-size="0"
          install-size="0"
-         version="0.8.0.v201108120515"
+         version="0.10.0.v201209301036"
          unpack="false"/>
 
    <plugin
          id="org.apache.felix.gogo.shell"
          download-size="0"
          install-size="0"
-         version="0.8.0.v201110170705"
+         version="0.10.0.v201212101605"
          unpack="false"/>
 
    <plugin
