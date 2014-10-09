@@ -15,5 +15,5 @@ Import-Package: javax.naming.spi,
  org.eclipse.skalli.testutil.feeds,
  org.w3c.dom
 Require-Bundle: org.hamcrest,
-  org.junit
+ org.junit
 
