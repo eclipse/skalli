@@ -46,7 +46,6 @@
         <module>org.eclipse.skalli.commands.test</module>
         <module>org.eclipse.skalli.model.ext.misc.test</module>
         <module>org.eclipse.skalli.view.test</module>
-        <module>org.eclipse.skalli.view.ext.impl.test</module>
         <module>org.eclipse.skalli.maven.test</module>
         <module>org.eclipse.skalli.nexus.test</module>
 

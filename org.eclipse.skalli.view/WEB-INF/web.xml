@@ -204,14 +204,6 @@
         <servlet-name>UnauthorizedPage</servlet-name>
         <jsp-file>/search/unauthorized.jsp</jsp-file>
     </servlet>
-
-    <!--  move functionality of the following servlets to separate bundles -->
-    <servlet>
-        <description>CreateJira</description>
-        <display-name>CreateJira</display-name>
-        <servlet-name>CreateJira</servlet-name>
-        <jsp-file>/search/jira.jsp</jsp-file>
-    </servlet>
     <servlet>
         <description>CreateGitGerrit</description>
         <display-name>CreateGitGerrit</display-name>
@@ -223,12 +215,6 @@
         <display-name>CreateGitGerritError</display-name>
         <servlet-name>CreateGitGerritError</servlet-name>
         <jsp-file>/search/gitgerrit_error.jsp</jsp-file>
-    </servlet>
-    <servlet>
-        <description>RequestP4Depot</description>
-        <display-name>RequestP4Depot</display-name>
-        <servlet-name>RequestP4Depot</servlet-name>
-        <jsp-file>/search/p4.jsp</jsp-file>
     </servlet>
 
     <!--
@@ -280,16 +266,6 @@
     <filter>
        <filter-name>ConfigFilter</filter-name>
        <filter-class>org.eclipse.skalli.view.internal.filter.ConfigFilter</filter-class>
-    </filter>
-
-    <!--  move functionality of the following filters to separate bundles -->
-    <filter>
-        <filter-name>JiraFilter</filter-name>
-        <filter-class>org.eclipse.skalli.view.internal.filter.ext.JiraFilter</filter-class>
-    </filter>
-    <filter>
-        <filter-name>P4Filter</filter-name>
-        <filter-class>org.eclipse.skalli.view.internal.filter.ext.P4Filter</filter-class>
     </filter>
     <filter>
         <filter-name>GitGerritFilter</filter-name>
@@ -391,12 +367,6 @@
         <servlet-name>UnauthorizedPage</servlet-name>
         <url-pattern>/unauthorized</url-pattern>
     </servlet-mapping>
-
-    <!-- move functionality of the following servlets to separate bundles -->
-    <servlet-mapping>
-        <servlet-name>CreateJira</servlet-name>
-        <url-pattern>/create/jira</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CreateGitGerrit</servlet-name>
         <url-pattern>/create/gitgerrit</url-pattern>
@@ -404,10 +374,6 @@
     <servlet-mapping>
         <servlet-name>CreateGitGerritError</servlet-name>
         <url-pattern>/create/gitgerriterror</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>RequestP4Depot</servlet-name>
-        <url-pattern>/create/p4</url-pattern>
     </servlet-mapping>
 
     <!--
@@ -487,20 +453,6 @@
     <filter-mapping>
        <filter-name>CssCachingFilter</filter-name>
        <url-pattern>*.css</url-pattern>
-    </filter-mapping>
-
-    <!--  move functionality of the following filters to separate bundles -->
-    <filter-mapping>
-        <filter-name>JiraFilter</filter-name>
-        <url-pattern>/create/jira</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>P4Filter</filter-name>
-        <url-pattern>/create/p4</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
     </filter-mapping>
     <filter-mapping>
         <filter-name>GitGerritFilter</filter-name>
