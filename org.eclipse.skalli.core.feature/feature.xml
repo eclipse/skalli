@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.skalli.feature"
-      label="Skalli Feature (Incubation)"
+      id="org.eclipse.skalli.core.feature"
+      label="Skalli Core Feature (Incubation)"
       version="0.2.0.qualifier"
       provider-name="Eclipse Skalli">
 
    <description url="http://www.eclipse.org/skalli">
-      A new generation project management tool accessible and usable by the Eclipse community and other open source projects.
+      A headless version of Skalli.
    </description>
 
    <copyright>
@@ -24,37 +24,60 @@
       Eclipse Public License (EPL) 1.0
    </license>
 
-   <includes
-         id="org.eclipse.skalli.core.feature"
-         version="0.0.0"/>
-
    <plugin
-         id="org.eclipse.skalli.view"
+         id="org.eclipse.skalli.api"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.skalli.view.ext"
+         id="org.eclipse.skalli.commands"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.skalli.view.ext.impl"
+         id="org.eclipse.skalli.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.skalli.view.theme"
+         id="org.eclipse.skalli.gerrit"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.skalli.jpa"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.skalli.maven"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.skalli.model.ext.misc"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.skalli.nexus"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>

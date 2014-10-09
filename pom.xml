@@ -50,6 +50,7 @@
         <module>org.eclipse.skalli.nexus.test</module>
 
         <!-- feature and p2 repository -->
+        <module>org.eclipse.skalli.core.feature</module>
         <module>org.eclipse.skalli.feature</module>
         <module>org.eclipse.skalli.source.feature</module>
         <module>org.eclipse.skalli.p2</module>
