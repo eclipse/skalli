@@ -1,0 +1,75 @@
+Contributing to Skalli
+======================
+
+Thanks for your interest in this project.
+
+Project description:
+--------------------
+
+Skalli's objective is to build an extensible portal for providing, collecting and accessing
+information about projects run by an organization.
+
+Large software companies and open source foundries like the Eclipse Foundation often struggle
+with an ever growing amount of projects to keep an eye on. Developers, users and potential
+contributors have a hard time finding information about projects, get access to development
+resources like source code, available downloads and documentation, or just get in contact
+with project members. Even worse, quite often development landscapes are heterogeneous with
+a variety of tools and services that are not at all or only loosly integrated with each other.
+
+In such a situation one needs a "spider" in the centre of the net that knows about the various
+bits and pieces and links them together: Skalli.
+
+Skalli does not aim at replacing existing tools like wikis, bug trackers or source code
+management systems. Instead it merely links to existing tools and services in order to let
+users know what a project is about and where its resources are located. Each project has a
+landing page, where all the available information is presented - and the same information is
+also accessible through REST to facilitate an ecosystem of additional, loosly coupled tools.
+
+Skalli is highly extensible by leaveraging OSGi technology. Skalli's project model, user
+interface and services can be amended easily and transparently. Clients and self services for
+additional tools not supported out-of-the box by Skalli can be added as additional bundles.
+
+- https://projects.eclipse.org/projects/technology.skalli
+
+Developer/Contributor Guide:
+----------------------------
+
+Detailed information regarding developing for and contributing to Skalli can be found in
+our Eclipse Wiki.
+
+- https://wiki.eclipse.org/Skalli/Contributor_Guide
+
+Developer Resources:
+--------------------
+
+Information regarding source code management, builds, coding standards, and more.
+
+- https://projects.eclipse.org/projects/technology.skalli/developer
+
+Contributor License Agreement:
+------------------------------
+
+Before your contribution can be accepted by the project, you need to create and electronically sign the Eclipse Foundation Contributor License Agreement (CLA).
+
+- http://www.eclipse.org/legal/CLA.php
+
+Contact:
+--------
+
+Contact the project developers via the project's "dev" list.
+
+- https://dev.eclipse.org/mailman/listinfo/skalli-dev
+
+Search for bugs:
+----------------
+
+This project uses Bugzilla to track ongoing development and issues.
+
+- https://bugs.eclipse.org/bugs/buglist.cgi?product=skalli
+
+Create a new bug:
+-----------------
+
+Be sure to search for existing bugs before you create another one. Remember that contributions are always welcome!
+
+- https://bugs.eclipse.org/bugs/enter_bug.cgi?product=skalli
