@@ -17,8 +17,11 @@
    <windowImages/>
 
    <launcher>
+      <linux useIco="false"/>
+      <macosx useIco="false"/>
       <solaris/>
-      <win useIco="false">
+      <win useIco="true">
+         <ico path="icons/skalli.ico"/>
          <bmp/>
       </win>
    </launcher>
