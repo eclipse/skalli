@@ -37,9 +37,6 @@
 
     <modules>
         <module>org.eclipse.skalli.target</module>
-        <module>org.eclipse.skalli.orbit.feature</module>
-        <module>org.eclipse.skalli.jetty.feature</module>
-        <module>org.eclipse.skalli.eclipse.feature</module>
 
         <!-- bundles -->
         <module>org.eclipse.skalli.api</module>
@@ -80,6 +77,15 @@
     </modules>
 
     <profiles>
+        <profile>
+            <id>build-product</id>
+            <modules>
+                <module>org.eclipse.skalli.orbit.feature</module>
+                <module>org.eclipse.skalli.jetty.feature</module>
+                <module>org.eclipse.skalli.eclipse.feature</module>
+                <module>org.eclipse.skalli.product</module>
+            </modules>
+        </profile>
         <profile>
             <id>run-gerrit-tests</id>
             <modules>

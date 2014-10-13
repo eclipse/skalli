@@ -19,5 +19,8 @@
    <feature url="features/org.eclipse.skalli.testing.feature_0.2.0.qualifier.jar" id="org.eclipse.skalli.testing.feature" version="0.2.0.qualifier">
       <category name="skalli"/>
    </feature>
-   <category-def name="skalli" label="Skalli Bundles Repository"/>
+   <feature url="features/org.eclipse.skalli.orbit.feature_0.2.0.qualifier.jar" id="org.eclipse.skalli.orbit.feature" version="0.2.0.qualifier">
+      <category name="skalli"/>
+   </feature>
+   <category-def name="skalli" label="Skalli"/>
 </site>
