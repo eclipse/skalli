@@ -14,10 +14,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>org.eclipse.skalli.parent</artifactId>
         <groupId>org.eclipse.skalli</groupId>
+        <artifactId>org.eclipse.skalli</artifactId>
         <version>0.2.0-SNAPSHOT</version>
-        <relativePath>../org.eclipse.skalli.parent</relativePath>
     </parent>
 
     <artifactId>org.eclipse.skalli.core</artifactId>
