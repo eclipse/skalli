@@ -436,9 +436,9 @@ public abstract class RestConverterBase<T> implements RestConverter<T> {
      */
     protected void commonAttributes(EntityBase entity, RestConverter<?> converter) throws IOException {
         apiVersion(converter);
-        String lastModified = entity.getLastModified();
-        if (StringUtils.isNotBlank(lastModified)) {
-            writer.attribute(LAST_MODIFIED, lastModified);
+        long lastModified = entity.getLastModifiedMillis();
+        if (lastModified > 0) {
+            writer.timestamp(LAST_MODIFIED, lastModified);
         }
         String modifiedBy = entity.getLastModifiedBy();
         if (StringUtils.isNotBlank(modifiedBy)) {
