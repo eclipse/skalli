@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.FormatUtils;
 import org.eclipse.skalli.commons.MapBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -299,7 +300,8 @@ public abstract class EntityBase {
      * or <code>null</code> if the entity has not yet been persisted.
      * Use for example {@link DatatypeConverter#parseDateTime(String)} to
      * convert the result into a {@link java.util.Calendar} for further
-     * processing.
+     * processing. The result is <code>null</code> if the date/time of
+     * the last modification is unknown.
      */
     public String getLastModified() {
         return lastModified;
@@ -308,7 +310,7 @@ public abstract class EntityBase {
     /**
      * Returns the date/time of the last modification of this entity
      * measured in milliseconds since midnight, January 1, 1970 UTC,
-     * or -1 if the entity has not yet been persisted.
+     * or -1 if the date/time of the last modification is unknown.
      */
     public long getLastModifiedMillis() {
         return lastModifiedMillis;
@@ -324,8 +326,8 @@ public abstract class EntityBase {
      * @param lastModified  an ISO8061-compliant date/time string following the
      * pattern <tt>[-]CCYY-MM-DDThh:mm:ss[Z|(+|-)hh:mm]</tt> as defined for
      * type <tt>xsd:dateTime</tt>) in <tt>"XML Schema Part 2: Datatypes"</tt>,
-     * or <code>null</code> to indicate that the entity has not yet been
-     * persisted or the date/time of last modification is unknown.
+     * or <code>null</code> to indicate that the date/time of the last modification
+     * is unknown.
      *
      * @throws IllegalArgumentException  if the date/time string does not conform to
      * type <tt>xsd:dateTime</tt>.
@@ -337,6 +339,27 @@ public abstract class EntityBase {
         } else {
             this.lastModifiedMillis = DatatypeConverter.parseDateTime(lastModified).getTimeInMillis();
             this.lastModified = lastModified;
+        }
+    }
+
+    /**
+     * Sets the date/time of the last modification.
+     *
+     * Note, this method should not be called directly except for
+     * testing purposes. The date/time of the last modification
+     * is determined when the entity is persisted.
+     *
+     * @param lastModifiedMillis  the time of the last modification
+     * in milliseconds since midnight, January 1, 1970 UTC, or any negative
+     * value to indicate that the date/time of the last modification is unknown.
+     */
+    public void setLastModified(long lastModifiedMillis) {
+        if (lastModifiedMillis < 0) {
+            this.lastModifiedMillis = -1L;
+            this.lastModified = null;
+        } else {
+            this.lastModifiedMillis = lastModifiedMillis;
+            this.lastModified = FormatUtils.formatUTCWithMillis(lastModifiedMillis);
         }
     }
 

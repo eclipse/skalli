@@ -68,6 +68,12 @@ public class EntityBaseTest {
         entity.setLastModified("");
         assertNull(entity.getLastModified());
         assertEquals(-1L, entity.getLastModifiedMillis());
+        entity.setLastModified(now.getTimeInMillis());
+        assertEquals(now.getTimeInMillis(), entity.getLastModifiedMillis());
+        assertEquals(lastModified, entity.getLastModified());
+        entity.setLastModified(-4711L);
+        assertEquals(-1L, entity.getLastModifiedMillis());
+        assertNull(entity.getLastModified());
     }
 
     @Test(expected = IllegalArgumentException.class)
