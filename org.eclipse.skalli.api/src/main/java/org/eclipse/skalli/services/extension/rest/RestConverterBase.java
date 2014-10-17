@@ -61,6 +61,7 @@ public abstract class RestConverterBase<T> implements RestConverter<T> {
 
     private static final String MODIFIED_BY = "modifiedBy"; //$NON-NLS-1$
     private static final String LAST_MODIFIED = "lastModified"; //$NON-NLS-1$
+    private static final String LAST_MODIFIED_MILLIS = "lastModifiedMillis"; //$NON-NLS-1$
     private static final String API_VERSION = "apiVersion"; //$NON-NLS-1$
     private static final String HREF = "href"; //$NON-NLS-1$
     private static final String REL = "rel"; //$NON-NLS-1$
@@ -436,9 +437,13 @@ public abstract class RestConverterBase<T> implements RestConverter<T> {
      */
     protected void commonAttributes(EntityBase entity, RestConverter<?> converter) throws IOException {
         apiVersion(converter);
-        long lastModified = entity.getLastModifiedMillis();
-        if (lastModified > 0) {
-            writer.timestamp(LAST_MODIFIED, lastModified);
+        long lastModifiedMillis = entity.getLastModifiedMillis();
+        if (lastModifiedMillis > 0) {
+            writer.attribute(LAST_MODIFIED_MILLIS, lastModifiedMillis);
+        }
+        String lastModified = entity.getLastModified();
+        if (StringUtils.isNotBlank(lastModified)) {
+            writer.attribute(LAST_MODIFIED, lastModified);
         }
         String modifiedBy = entity.getLastModifiedBy();
         if (StringUtils.isNotBlank(modifiedBy)) {

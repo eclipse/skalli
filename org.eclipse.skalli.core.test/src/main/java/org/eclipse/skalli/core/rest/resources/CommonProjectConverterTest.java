@@ -45,8 +45,13 @@ import org.junit.Test;
 public class CommonProjectConverterTest extends RestWriterTestBase {
 
     public static final long NOW = System.currentTimeMillis();
+    public static final long EARLIER = NOW - 1000L;
+
+    public static final String REGISTERED_MILLIS = Long.toString(NOW);
     public static final String REGISTERED = FormatUtils.formatUTC(NOW);
-    public static final String LAST_MODIFIED = FormatUtils.formatUTC(NOW-1000L);
+
+    public static final String LAST_MODIFIED_MILLIS = Long.toString(EARLIER);
+    public static final String LAST_MODIFIED = FormatUtils.formatUTCWithMillis(EARLIER);
     public static final String LAST_MODIFIER = "homer";
 
     public static final UUID[] SUBPROJECT_UUIDS = {
@@ -72,16 +77,18 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
         return omitNSAttributes?
             MessageFormat.format(
                 "apiVersion=\"{0}\""
-                + " lastModified=\"{1}\""
-                + " modifiedBy=\"{2}\"",
+                + " lastModifiedMillis=\"{1}\""
+                + " lastModified=\"{2}\""
+                + " modifiedBy=\"{3}\"",
                 CommonProjectConverter.API_VERSION,
-                LAST_MODIFIED, LAST_MODIFIER)
+                LAST_MODIFIED_MILLIS, LAST_MODIFIED, LAST_MODIFIER)
           : MessageFormat.format(
             ATTRIBUTES_PATTERN
-            + " lastModified=\"{3}\""
-            + " modifiedBy=\"{4}\"",
+            + " lastModifiedMillis=\"{3}\""
+            + " lastModified=\"{4}\""
+            + " modifiedBy=\"{5}\"",
             CommonProjectConverter.NAMESPACE, "project", CommonProjectConverter.API_VERSION,
-            LAST_MODIFIED, LAST_MODIFIER);
+            LAST_MODIFIED_MILLIS, LAST_MODIFIED, LAST_MODIFIER);
     }
 
     public static final String ROOT_XML(boolean omitNSAttributes) {
@@ -91,7 +98,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
 
     public static final String REGISTERED_XML = MessageFormat.format(
             "<registered millis=\"{0}\">{1}</registered>",
-            Long.toString(NOW), REGISTERED);
+            REGISTERED_MILLIS, REGISTERED);
 
     public static final String COMMON_SECTION_XML(UUID uuid, String id, String name, boolean omitNSAttributes) {
         return  MessageFormat.format(
@@ -138,8 +145,8 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
     }
 
     public static final String ATTRIBUTES_INFO_EXTENSION =
-            MessageFormat.format(ATTRIBUTES_PATTERN + " lastModified=\"{3}\" inherited=\"true\" derived=\"false\"",
-                    InfoConverter.NAMESPACE, "extension-info", InfoConverter.API_VERSION, LAST_MODIFIED);
+            MessageFormat.format(ATTRIBUTES_PATTERN + " lastModifiedMillis=\"{3}\" lastModified=\"{4}\" inherited=\"true\" derived=\"false\"",
+                    InfoConverter.NAMESPACE, "extension-info", InfoConverter.API_VERSION, LAST_MODIFIED_MILLIS, LAST_MODIFIED);
 
     public static final String ATTRIBUTES_TAGS_EXTENSION =
             MessageFormat.format(ATTRIBUTES_PATTERN + " modifiedBy=\"{3}\" inherited=\"false\" derived=\"false\"",
@@ -186,21 +193,22 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
 
     public static final String REGISTERED_JSON = MessageFormat.format(
             "\"registered\":'{'\"millis\":{0},\"value\":\"{1}\"}",
-            Long.toString(NOW), REGISTERED);
+            REGISTERED_MILLIS, REGISTERED);
 
     public static final String COMMON_SECTION_JSON(UUID uuid, String id, String name) {
         return MessageFormat.format(
             "'{'"
             + "\"apiVersion\":\"{0}\","
-            + "\"lastModified\":\"{1}\","
-            + "\"modifiedBy\":\"{2}\","
-            + "\"uuid\":\"{3}\","
-            + "\"id\":\"{4}\","
+            + "\"lastModifiedMillis\":{1},"
+            + "\"lastModified\":\"{2}\","
+            + "\"modifiedBy\":\"{3}\","
+            + "\"uuid\":\"{4}\","
+            + "\"id\":\"{5}\","
             + "\"nature\":\"PROJECT\","
             + "\"template\":\"default\","
-            + "\"name\":\"{5}\"",
+            + "\"name\":\"{6}\"",
             CommonProjectConverter.API_VERSION,
-            LAST_MODIFIED, LAST_MODIFIER, uuid, id, name);
+            LAST_MODIFIED_MILLIS, LAST_MODIFIED, LAST_MODIFIER, uuid, id, name);
     }
 
     public static final String LINKS_SECTION_JSON(UUID uuid, String id) {
@@ -241,11 +249,13 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
 
     public static final String EXTENSIONS_SECTION_JSON() {
         return MessageFormat.format("'{'\"extensions\":'{'"
-            + "\"info\":'{'\"apiVersion\":\"{0}\",\"lastModified\":\"{1}\",\"inherited\":true,\"derived\":false,"
+            + "\"info\":'{'\"apiVersion\":\"{0}\",\"lastModifiedMillis\":{1},\"lastModified\":\"{2}\","
+            + "\"inherited\":true,\"derived\":false,"
             + "\"homepage\":\"foobar\",\"mailingLists\":[]},"
-            + "\"tags\":'{'\"apiVersion\":\"{2}\",\"modifiedBy\":\"{3}\",\"inherited\":false,\"derived\":false,"
+            + "\"tags\":'{'\"apiVersion\":\"{3}\",\"modifiedBy\":\"{4}\",\"inherited\":false,\"derived\":false,"
             + "\"items\":[\"a\",\"b\"]}"
-            + "}}", InfoConverter.API_VERSION, LAST_MODIFIED, TagsConverter.API_VERSION, LAST_MODIFIER);
+            + "}}",
+            InfoConverter.API_VERSION, LAST_MODIFIED_MILLIS, LAST_MODIFIED, TagsConverter.API_VERSION, LAST_MODIFIER);
     }
 
     public static final String MINIMAL_PROJECT_BEGIN_JSON(UUID uuid, String id, String name) {
