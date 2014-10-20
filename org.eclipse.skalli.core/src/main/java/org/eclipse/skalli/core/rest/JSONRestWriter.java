@@ -242,6 +242,11 @@ public class JSONRestWriter extends RestWriterBase implements RestWriter {
     }
 
     @Override
+    public RestWriter value(Number n) throws IOException {
+        return value(n, false);
+    }
+
+    @Override
     public RestWriter value(boolean b) throws IOException {
         return value(b, false);
     }
@@ -287,6 +292,11 @@ public class JSONRestWriter extends RestWriterBase implements RestWriter {
     }
 
     @Override
+    public RestWriter pair(String key, Number n) throws IOException {
+        return value(key, n, false);
+    }
+
+    @Override
     public RestWriter pair(String key, boolean b) throws IOException {
         return value(key, b, false);
     }
@@ -329,6 +339,11 @@ public class JSONRestWriter extends RestWriterBase implements RestWriter {
     @Override
     public RestWriter attribute(String name, double d) throws IOException {
         return attribute(name, d, false);
+    }
+
+    @Override
+    public RestWriter attribute(String name, Number n) throws IOException {
+        return attribute(name, n, false);
     }
 
     @Override

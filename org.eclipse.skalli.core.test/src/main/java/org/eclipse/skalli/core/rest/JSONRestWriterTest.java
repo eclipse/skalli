@@ -11,6 +11,8 @@
 package org.eclipse.skalli.core.rest;
 
 import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 
 import org.eclipse.skalli.commons.FormatUtils;
@@ -43,6 +45,24 @@ public class JSONRestWriterTest {
         .end()
         .flush();
         Assert.assertEquals("[\"x\",4711,1.0,true]", writer.toString());
+    }
+
+    @Test
+    public void testArrayVariousNumbers() throws Exception {
+        restWriter
+        .array()
+          .value((byte)42)
+          .value((short)-1)
+          .value((int)4711)
+          .value(4711L)
+          .value((float)1.0)
+          .value(1.0d)
+          .value(new BigInteger("4711"))
+          .value(new BigDecimal(1.0d))
+          .value(1.0)
+        .end()
+        .flush();
+        Assert.assertEquals("[42,-1,4711,4711,1.0,1.0,4711,1,1.0]", writer.toString());
     }
 
     @Test
@@ -366,6 +386,25 @@ public class JSONRestWriterTest {
     }
 
     @Test
+    public void testObjectVariousNumbers() throws Exception {
+        restWriter
+        .object()
+          .pair("a", (byte)42)
+          .pair("b", (short)-1)
+          .pair("c", (int)4711)
+          .pair("d", 4711L)
+          .pair("e", (float)1.0)
+          .pair("f", 1.0d)
+          .pair("g", new BigInteger("4711"))
+          .pair("h", new BigDecimal(1.0d))
+          .pair("i", 1.0)
+        .end()
+        .flush();
+        Assert.assertEquals("{\"a\":42,\"b\":-1,\"c\":4711,\"d\":4711,\"e\":1.0,\"f\":1.0,\"g\":4711,\"h\":1,\"i\":1.0}",
+                writer.toString());
+    }
+
+    @Test
     public void testEmptyAnonymousObject() throws Exception {
         restWriter
         .object()
@@ -458,6 +497,27 @@ public class JSONRestWriterTest {
         .flush();
         Assert.assertEquals("\"k\":{\"a\":\"b\",\"c\":4711,\"d\":1.0,\"e\":true,\"f\":\""
                 + TestUUIDs.TEST_UUIDS[0].toString() + "\",\"value\":\"foobar\"}",
+                writer.toString());
+    }
+
+    @Test
+    public void testObjectWithNumberAttributes() throws Exception {
+        restWriter
+        .set(JSONRestWriter.NAMED_ROOT)
+        .object("k")
+          .attribute("a", (byte)42)
+          .attribute("b", (short)-1)
+          .attribute("c", (int)4711)
+          .attribute("d", 4711L)
+          .attribute("e", (float)1.0)
+          .attribute("f", 1.0d)
+          .attribute("g", new BigInteger("4711"))
+          .attribute("h", new BigDecimal(1.0d))
+          .attribute("i", 1.0)
+        .end()
+        .flush();
+        Assert.assertEquals("\"k\":{\"a\":42,\"b\":-1,\"c\":4711,\"d\":4711,\"e\":1.0,"
+                + "\"f\":1.0,\"g\":4711,\"h\":1,\"i\":1.0}",
                 writer.toString());
     }
 

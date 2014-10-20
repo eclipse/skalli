@@ -11,6 +11,8 @@
 package org.eclipse.skalli.core.rest;
 
 import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 
 import org.eclipse.skalli.commons.FormatUtils;
@@ -46,6 +48,25 @@ public class XMLRestWriterTest {
         .end()
         .flush();
         assertEquals("<item>x</item><item>4711</item><item>1.0</item>");
+    }
+
+    @Test
+    public void testArrayVariousNumbers() throws Exception {
+        restWriter
+        .array()
+          .value((byte)42)
+          .value((short)-1)
+          .value((int)4711)
+          .value(4711L)
+          .value((float)1.0)
+          .value(1.0d)
+          .value(new BigInteger("4711"))
+          .value(new BigDecimal(1.0d))
+          .value(1.0)
+        .end()
+        .flush();
+        assertEquals("<item>42</item><item>-1</item><item>4711</item><item>4711</item><item>1.0</item>"
+                + "<item>1.0</item><item>4711</item><item>1</item><item>1.0</item>");
     }
 
     @Test
@@ -417,6 +438,24 @@ public class XMLRestWriterTest {
     }
 
     @Test
+    public void testObjectVariousNumbers() throws Exception {
+        restWriter
+        .object()
+          .pair("a", (byte)42)
+          .pair("b", (short)-1)
+          .pair("c", (int)4711)
+          .pair("d", 4711L)
+          .pair("e", (float)1.0)
+          .pair("f", 1.0d)
+          .pair("g", new BigInteger("4711"))
+          .pair("h", new BigDecimal(1.0d))
+          .pair("i", 1.0)
+        .end()
+        .flush();
+        assertEquals("<a>42</a><b>-1</b><c>4711</c><d>4711</d><e>1.0</e><f>1.0</f><g>4711</g><h>1</h><i>1.0</i>");
+    }
+
+    @Test
     public void testEmptyAnonymousObject() throws Exception {
         restWriter
         .object()
@@ -493,6 +532,24 @@ public class XMLRestWriterTest {
         .end()
         .flush();
         assertEquals("<k a=\"b\">foobar</k>");
+    }
+
+    @Test
+    public void testObjectWithNumberAttributes() throws Exception {
+        restWriter
+        .object("k")
+          .attribute("a", (byte)42)
+          .attribute("b", (short)-1)
+          .attribute("c", (int)4711)
+          .attribute("d", 4711L)
+          .attribute("e", (float)1.0)
+          .attribute("f", 1.0d)
+          .attribute("g", new BigInteger("4711"))
+          .attribute("h", new BigDecimal(1.0d))
+          .attribute("i", 1.0)
+        .end()
+        .flush();
+        assertEquals("<k a=\"42\" b=\"-1\" c=\"4711\" d=\"4711\" e=\"1.0\" f=\"1.0\" g=\"4711\" h=\"1\" i=\"1.0\"/>");
     }
 
     @Test(expected=IllegalStateException.class)

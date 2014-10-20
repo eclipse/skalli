@@ -275,6 +275,11 @@ public class XMLRestWriter extends RestWriterBase implements RestWriter {
     }
 
     @Override
+    public RestWriter value(Number n) throws IOException {
+        return value(n.toString());
+    }
+
+    @Override
     public RestWriter value(boolean b) throws IOException {
         return value(Boolean.toString(b));
     }
@@ -339,6 +344,11 @@ public class XMLRestWriter extends RestWriterBase implements RestWriter {
     }
 
     @Override
+    public RestWriter pair(String key, Number n) throws IOException {
+        return pair(key, n.toString());
+    }
+
+    @Override
     public RestWriter pair(String key, boolean b) throws IOException {
         return pair(key, Boolean.toString(b));
     }
@@ -392,6 +402,11 @@ public class XMLRestWriter extends RestWriterBase implements RestWriter {
     @Override
     public RestWriter attribute(String key, double d) throws IOException {
         return attribute(key, Double.toString(d));
+    }
+
+    @Override
+    public RestWriter attribute(String key, Number n) throws IOException {
+        return attribute(key, n.toString());
     }
 
     @Override

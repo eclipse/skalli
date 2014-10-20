@@ -259,11 +259,10 @@ public interface RestWriter {
     public RestWriter link(String rel, Object... pathSegments) throws IOException;
 
     /**
-     * Appends a string as next element to an array or as text value to an object.
-     * If the media type requires a name for the text value of an object, <tt>"value"</tt>
-     * is assumed.
+     * Appends a string as next element to an array or as value to an object.
+     * If the media type requires a name for the value of an object, <tt>"value"</tt> is assumed.
      * <p>
-     * Note, once a text value has been appended to an object, no further members or attributes
+     * Note, once a value has been appended to an object, no further members or attributes
      * can be appended to that object afterwards.
      *
      * @param s  the string to append.
@@ -275,11 +274,10 @@ public interface RestWriter {
     public RestWriter value(String s) throws IOException;
 
     /**
-     * Appends the string representation of a number as next element to an array or
-     * as text value to an object. If the media type requires a name for the text value
-     * of an object, <tt>"value"</tt> is assumed.
+     * Appends a long number as next element to an array or as value to an object.
+     * If the media type requires a name for the value of an object, <tt>"value"</tt> is assumed.
      * <p>
-     * Note, once a text value has been appended to an object, no further members or attributes
+     * Note, once a value has been appended to an object, no further members or attributes
      * can be appended to that object afterwards.
      *
      * @param l  the number to append.
@@ -291,11 +289,10 @@ public interface RestWriter {
     public RestWriter value(long l) throws IOException;
 
     /**
-     * Appends the string representation of a floating point number as next element to an
-     * array or as text value to an object. If the media type requires a name for the text
-     * value of an object, <tt>"value"</tt> is assumed.
+     * Appends a floating point number as next element to an array or as value to an object.
+     * If the media type requires a name for the value of an object, <tt>"value"</tt> is assumed.
      * <p>
-     * Note, once a text value has been appended to an object, no further members or attributes
+     * Note, once a value has been appended to an object, no further members or attributes
      * can be appended to that object afterwards.
      *
      * @param d  the floating point number to append.
@@ -307,11 +304,25 @@ public interface RestWriter {
     public RestWriter value(double d) throws IOException;
 
     /**
-     * Appends the string representation of a boolean as next element to an array or as text
-     * value to an object. If the media type requires a name for the text value of an object,
-     * <tt>"value"</tt> is assumed.
+     * Appends a numerical value as next element to an array or as value to an object.
+     * If the media type requires a name for the text value of an object, <tt>"value"</tt> is assumed.
      * <p>
-     * Note, once a text value has been appended to an object, no further members or attributes
+     * Note, once a value has been appended to an object, no further members or attributes
+     * can be appended to that object afterwards.
+     *
+     * @param n  the numerical value to append.
+     *
+     * @throws IOException  if an i/o error occured when writing to the underlying writer.
+     * @throws IllegalStateException  if the method was used outside of an object or array,
+     * or the surrounding object already has a text value.
+     */
+    public RestWriter value(Number n) throws IOException;
+
+    /**
+     * Appends a boolean value as next element to an array or as value to an object.
+     * If the media type requires a name for the value of an object, <tt>"value"</tt> is assumed.
+     * <p>
+     * Note, once a value has been appended to an object, no further members or attributes
      * can be appended to that object afterwards.
      *
      * @param b  the boolean to append.
@@ -324,10 +335,10 @@ public interface RestWriter {
 
     /**
      * Appends the string representation of a universally unique identifier (UUID) as next
-     * element to an array or as text value to an object. If the media type requires a name
-     * for the text value of an object, <tt>"value"</tt> is assumed.
+     * element to an array or as value to an object. If the media type requires a name
+     * for the value of an object, <tt>"value"</tt> is assumed.
      * <p>
-     * Note, once a text value has been appended to an object, no further members or attributes
+     * Note, once a value has been appended to an object, no further members or attributes
      * can be appended to that object afterwards.
      *
      * @param uuid  the universally unique identifier (UUID) to append
@@ -339,15 +350,15 @@ public interface RestWriter {
     public RestWriter value(UUID uuid) throws IOException;
 
     /**
-     * Appends the string representation of the date given by the time in milliseconds
-     * since January 1, 1970 as next element to an array or as text value to an object.
+     * Appends the string representation of a date given by the time in milliseconds
+     * since January 1, 1970 as next element to an array or as value to an object.
      * The string representation contains the date and time as specified by ISO 8601
      * following the pattern <tt>"yyyy-MM-dd'T'HH:mm:ss'Z'"</tt>. Timezone is always UTC.
      * This is compatible with the XML Schema type <tt>xsd:dateTime</tt>.
-     * If the media type requires a name for the text value of an object, <tt>"value"</tt>
+     * If the media type requires a name for the value of an object, <tt>"value"</tt>
      * is assumed.
      * <p>
-     * Note, once a text value has been appended to an object, no further members or attributes
+     * Note, once a value has been appended to an object, no further members or attributes
      * can be appended to that object afterwards.
      *
      * @param millis  the date in milliseconds since January 1, 1970.
@@ -359,15 +370,15 @@ public interface RestWriter {
     public RestWriter datetime(long millis) throws IOException;
 
     /**
-     * Appends the string representation of the date given by the time in milliseconds
-     * since January 1, 1970 as next element to an array or as text value to an object.
+     * Appends the string representation of a date given by the time in milliseconds
+     * since January 1, 1970 as next element to an array or as value to an object.
      * The string representation contains the date without the time as specified by ISO 8601
      * following the pattern <tt>""yyyy-MM-dd""</tt>. Timezone is always UTC.
      * This is compatible with the XML Schema type <tt>xsd:date</tt>.
-     * If the media type requires a name for the text value of an object, <tt>"value"</tt>
+     * If the media type requires a name for the value of an object, <tt>"value"</tt>
      * is assumed.
      * <p>
-     * Note, once a text value has been appended to an object, no further members or attributes
+     * Note, once a value has been appended to an object, no further members or attributes
      * can be appended to that object afterwards.
      *
      * @param millis  the date in milliseconds since January 1, 1970.
@@ -379,13 +390,13 @@ public interface RestWriter {
     public RestWriter date(long millis) throws IOException;
 
     /**
-     * Appends the string representation of the time intervall given in milliseconds
-     * as next element to an array or as text value to an object.
+     * Appends the string representation of a time intervall given in milliseconds
+     * as next element to an array or as value to an object.
      * The string representation follows ISO8601 period format.
-     * If the media type requires a name for the text value of an object, <tt>"value"</tt>
+     * If the media type requires a name for the value of an object, <tt>"value"</tt>
      * is assumed.
      * <p>
-     * Note, once a text value has been appended to an object, no further members or attributes
+     * Note, once a value has been appended to an object, no further members or attributes
      * can be appended to that object afterwards.
      *
      * @param millis  the duration in milliseconds.
@@ -397,11 +408,11 @@ public interface RestWriter {
     public RestWriter duration(long millis) throws IOException;
 
     /**
-     * Append an URL as next element to an array or as text value to an object.
-     * If the media type requires a name for the text value of an object, <tt>"value"</tt>
+     * Append an URL as next element to an array or as value to an object.
+     * If the media type requires a name for the value of an object, <tt>"value"</tt>
      * is assumed.
      * <p>
-     * Note, once a text value has been appended to an object, no further members or attributes
+     * Note, once a value has been appended to an object, no further members or attributes
      * can be appended to that object afterwards.
      *
      * @param pathSegments  a list of path segments that are concatenated
@@ -450,6 +461,18 @@ public interface RestWriter {
      * or the key was <code>null</code>.
      */
     public RestWriter pair(String key, double d) throws IOException;
+
+    /**
+     * Appends an object member with a numerical value.
+     *
+     * @param key  the name the object member, never <code>null</code>.
+     * @param n  the numerical value of the object member.
+     *
+     * @throws IOException  if an i/o error occured when writing to the underlying writer.
+     * @throws IllegalStateException  if the method was used outside of an object,
+     * or the key was <code>null</code>.
+     */
+    public RestWriter pair(String key, Number n) throws IOException;
 
     /**
      * Appends an object member with a boolean value.
@@ -587,6 +610,21 @@ public interface RestWriter {
      * or the object has already members, or the key was <code>null</code>.
      */
     public RestWriter attribute(String key, double d) throws IOException;
+
+    /**
+     * Appends an object attribute with a numerical value.
+     * <p>
+     * Note, attributes must be appended to an object before any other members
+     * or text values.
+     *
+     * @param key  the name of the attribute, never <code>null</code>.
+     * @param n  the numerical value of the attribute.
+     *
+     * @throws IOException  if an i/o error occured when writing to the underlying writer.
+     * @throws IllegalStateException  if the method was used outside of an object,
+     * or the object has already members, or the key was <code>null</code>.
+     */
+    public RestWriter attribute(String name, Number n) throws IOException;
 
     /**
      * Appends an object attribute with a boolean value.
