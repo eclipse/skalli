@@ -86,12 +86,12 @@ public abstract class EntityBase {
                 .toMap();
 
     /**
-     * Cache for properties of classes derived from <code>EntityBase</code>.
+     * Cache for property accessor methods associated with the defining entity classes.
      * The inner maps are immutable, but lazily initialized when {@link #getProperty(String)}
      * is called first for a given entity class. The outter concurrent hash map guarantees
      * non-blocking read operations for maximum performance.
      */
-    private transient static ConcurrentHashMap<Class<?>, Map<String,Method>> propertyCache =
+    private transient static ConcurrentHashMap<Class<?>, Map<String,Method>> accessorsByEntityType =
             new ConcurrentHashMap<Class<?>, Map<String,Method>>();
 
     /**
@@ -401,7 +401,7 @@ public abstract class EntityBase {
      * if the entity has no properties.
      */
     public Set<String> getPropertyNames() {
-        return getProperties().keySet();
+        return getReadAccessors().keySet();
     }
 
     /**
@@ -422,7 +422,7 @@ public abstract class EntityBase {
      * has no properties or <code>entityClass</code> was <code>null</code>.
      */
     public static Set<String> getPropertyNames(Class<? extends EntityBase> entityClass) {
-        return getProperties(entityClass).keySet();
+        return getReadAccessors(entityClass).keySet();
     }
 
     /**
@@ -436,7 +436,7 @@ public abstract class EntityBase {
      * @see org.eclipse.skalli.services.projects.PropertyName
      */
     public boolean hasProperty(String propertyName) {
-        return getProperties().containsKey(propertyName);
+        return getReadAccessors().containsKey(propertyName);
     }
 
     /**
@@ -450,13 +450,13 @@ public abstract class EntityBase {
      * @see org.eclipse.skalli.services.projects.PropertyName
      */
     public Object getProperty(String propertyName) {
-        Map<String,Method> properties = getProperties();
-        if (!properties.containsKey(propertyName)) {
+        Map<String,Method> accessors = getReadAccessors();
+        if (!accessors.containsKey(propertyName)) {
             throw new NoSuchPropertyException(this, propertyName);
         }
-        Method method = properties.get(propertyName);
+        Method accessor = accessors.get(propertyName);
         try {
-            return method.invoke(this, new Object[] {});
+            return accessor.invoke(this, new Object[] {});
         } catch (Exception e) {
             throw new NoSuchPropertyException(this, propertyName, e);
         }
@@ -490,9 +490,9 @@ public abstract class EntityBase {
             Arrays.fill(argTypes, String.class);
             String propertyName = expression.getName();
             try {
-                Method m = getMethod(o.getClass(), propertyName, argTypes);
-                if (m.getAnnotation(Property.class) != null || hasProperty(propertyName)) {
-                    o = m.invoke(o, (Object[])args);
+                Method accessor = getReadAccessor(o.getClass(), propertyName, argTypes);
+                if (accessor.getAnnotation(Property.class) != null || hasProperty(propertyName)) {
+                    o = accessor.invoke(o, (Object[])args);
                     if (o == null) {
                         return null;
                     }
@@ -519,33 +519,33 @@ public abstract class EntityBase {
      */
     public void setProperty(String propertyName, Object propertyValue) {
         Class<?> propertyType = propertyValue != null? propertyValue.getClass() : null;
-        Method method = getMethod("set", propertyName, propertyType); //$NON-NLS-1$
-        if (method == null) {
+        Method accessor = getWriteAccessor(propertyName, propertyType); //$NON-NLS-1$
+        if (accessor == null) {
             throw new NoSuchPropertyException(this, propertyName);
         }
         try {
-            method.invoke(this, propertyValue);
+            accessor.invoke(this, propertyValue);
         } catch (Exception e) {
            throw new PropertyUpdateException(MessageFormat.format(
                    "Property \"{0}\" could not be updated", propertyName), e);
         }
     }
 
-    private Map<String,Method> getProperties() {
+    private Map<String,Method> getReadAccessors() {
         Class<? extends EntityBase> entityClass = getClass();
-        Map<String,Method> properties = propertyCache.get(entityClass);
-        if (properties == null) {
-            Map<String,Method> map = getProperties(entityClass);
-            properties = propertyCache.putIfAbsent(entityClass, map);
-            if (properties == null) {
-                properties = map;
+        Map<String,Method> accessors = accessorsByEntityType.get(entityClass);
+        if (accessors == null) {
+            accessors = getReadAccessors(entityClass);
+            Map<String,Method> knownAccessors = accessorsByEntityType.putIfAbsent(entityClass, accessors);
+            if (knownAccessors != null) {
+                accessors = knownAccessors;
             }
         }
-        return properties;
+        return accessors;
     }
 
-    private static Map<String,Method> getProperties(Class<? extends EntityBase> entityClass) {
-        Map<String,Method> map = new HashMap<String,Method>();
+    private static Map<String,Method> getReadAccessors(Class<? extends EntityBase> entityClass) {
+        Map<String,Method> accessors = new HashMap<String,Method>();
         if (entityClass != null) {
             for (Field field : entityClass.getFields()) {
                 if (field.getAnnotation(PropertyName.class) != null) {
@@ -555,9 +555,9 @@ public abstract class EntityBase {
                             throw new IllegalArgumentException(MessageFormat.format(
                                     "@PropertyName {0} defines a blank property name", field));
                         }
-                        Method method = getMethod(entityClass, propertyName, null);
-                        if (method != null) {
-                            map.put(propertyName, method);
+                        Method accessor = getReadAccessor(entityClass, propertyName, null);
+                        if (accessor != null) {
+                            accessors.put(propertyName, accessor);
                         }
                     } catch (Exception e) {
                         throw new IllegalArgumentException(MessageFormat.format(
@@ -566,53 +566,53 @@ public abstract class EntityBase {
                 }
             }
         }
-        return Collections.unmodifiableMap(map);
+        return Collections.unmodifiableMap(accessors);
     }
 
-    private static Method getMethod(Class<?> c, String propertyName, Class<?>[] argTypes) {
-        Method getter = getMethod(c, "get", propertyName, argTypes); //$NON-NLS-1$
-        if (getter == null) {
-            getter = getMethod(c, "is", propertyName, argTypes); //$NON-NLS-1$
+    private static Method getReadAccessor(Class<?> c, String propertyName, Class<?>[] argTypes) {
+        Method accessor = getReadAccessor(c, "get", propertyName, argTypes); //$NON-NLS-1$
+        if (accessor == null) {
+            accessor = getReadAccessor(c, "is", propertyName, argTypes); //$NON-NLS-1$
         }
-        return getter;
+        return accessor;
     }
 
-    private static Method getMethod(Class<?> c, String methodPrefix, String propertyName, Class<?>[] argTypes) {
-        String methodName = methodPrefix + StringUtils.capitalize(propertyName);
+    private static Method getReadAccessor(Class<?> c, String prefix, String propertyName, Class<?>[] argTypes) {
+        String name = prefix + StringUtils.capitalize(propertyName);
         try {
-            return c.getMethod(methodName, argTypes != null? argTypes : new Class[0]);
+            return c.getMethod(name, argTypes != null? argTypes : new Class[0]);
         } catch (NoSuchMethodException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(MessageFormat.format(
-                        "Entity of type \"{0}\" has no getter method for property \"{1}\"",
+                        "Entity of type \"{0}\" has no accessor method for property \"{1}\"",
                         c.getName(), propertyName));
             }
         }
         return null;
     }
 
-    private Method getMethod(String methodPrefix, String propertyName, Class<?> propertyType) {
+    private Method getWriteAccessor(String propertyName, Class<?> propertyType) {
+        Method accessor = null;
         Class<? extends EntityBase> entityClass = getClass();
-        String methodName = methodPrefix + StringUtils.capitalize(propertyName);
+        String name = "set" + StringUtils.capitalize(propertyName); //$NON-NLS-1$
         if (propertyType != null && PRIMITIVES_MAP.containsKey(propertyType)) {
             propertyType = PRIMITIVES_MAP.get(propertyType);
         }
         Class<?>[] argumentTypes = new Class<?>[] { propertyType };
-        Method method = null;
         try {
-            method = entityClass.getMethod(methodName, argumentTypes);
+            accessor = entityClass.getMethod(name, argumentTypes);
         } catch (NoSuchMethodException e) {
-            method = findSetterMethod(entityClass, propertyName, methodName, argumentTypes);
+            accessor = getWriteAccessor(entityClass, name, argumentTypes, propertyName);
         }
-        return method;
+        return accessor;
     }
 
-    private Method findSetterMethod(Class<? extends EntityBase> entityClass, String propertyName,
-            String methodName,  Class<?>[] argumentTypes) throws PropertyUpdateException {
-        Method method = null;
+    private Method getWriteAccessor(Class<?> c, String name, Class<?>[] argumentTypes, String propertyName)
+            throws PropertyUpdateException {
+        Method accessor = null;
         try {
-            for (Method candidate: entityClass.getMethods()) {
-                if (methodName.equals(candidate.getName())) {
+            for (Method candidate: c.getMethods()) {
+                if (name.equals(candidate.getName())) {
                     Class<?>[] parameterTypes = candidate.getParameterTypes();
                     if (parameterTypes.length == 1) {
                         if (argumentTypes[0] == null || parameterTypes[0].isAssignableFrom(argumentTypes[0])) {
@@ -623,18 +623,18 @@ public abstract class EntityBase {
                                     argumentTypes[0], propertyName, parameterTypes[0]));
                         }
                     }
-                    method = entityClass.getMethod(methodName, argumentTypes);
+                    accessor = c.getMethod(name, argumentTypes);
                     break;
                 }
             }
         } catch (NoSuchMethodException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(MessageFormat.format(
-                        "Entity of type \"{0}\" has no setter method matching the signature \"{1}({2})",
-                        entityClass.getName(), methodName, argumentTypes[0].getName()));
+                        "Entity of type \"{0}\" has no accessor method matching the signature \"{1}({2})",
+                        c.getName(), name, argumentTypes[0].getName()));
             }
         }
-        return method;
+        return accessor;
     }
 
     @Override
