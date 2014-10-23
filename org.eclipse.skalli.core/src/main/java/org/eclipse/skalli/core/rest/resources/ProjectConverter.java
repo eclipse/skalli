@@ -131,7 +131,7 @@ public class ProjectConverter extends CommonProjectConverter {
                     continue;
                 }
                 if (extensionService.getShortName().equals(field)) {
-                    RestConverter converter = extensionService.getRestConverter(getHost());
+                    RestConverter<?> converter = extensionService.getRestConverter(getHost());
                     ExtensionEntityBase extension = (ExtensionEntityBase) context.convertAnother(null,
                             extensionService.getExtensionClass(), converter);
                     extensions.add(extension);

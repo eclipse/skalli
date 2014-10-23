@@ -17,7 +17,7 @@ public class QueueMonitorResource extends MonitorResource {
     public static final String RESOURCE_NAME = "queue"; //$NON-NLS-1$
 
     @Override
-    protected RestConverter getConverter(String host) {
+    protected RestConverter<?> getConverter(String host) {
         return new QueueConverter(ValidationComponent.SERVICE_COMPONENT_NAME, RESOURCE_NAME, host);
     }
 }

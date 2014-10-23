@@ -52,7 +52,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
 
     private XStream xstream;
     private Set<Class<?>> annotatedClasses = new HashSet<Class<?>>();
-    private Set<RestConverter> converters = new HashSet<RestConverter>();
+    private Set<RestConverter<?>> converters = new HashSet<RestConverter<?>>();
     private Map<String, Class<?>> aliases = new HashMap<String, Class<?>>();
     private ClassLoader classLoader;
     private boolean compact;
@@ -90,10 +90,10 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      * conversion of certain properties or inner beans of the bean.
      */
     @Deprecated
-    public ResourceRepresentation(T object, RestConverter... converters) {
+    public ResourceRepresentation(T object, RestConverter<?>... converters) {
         this(object);
         if (converters != null) {
-            for (RestConverter converter: converters) {
+            for (RestConverter<?> converter: converters) {
                 addConverter(converter);
             }
         }
@@ -231,7 +231,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
      * @param converter  the REST converter to add.
      */
     @Deprecated
-    public void addConverter(RestConverter converter) {
+    public void addConverter(RestConverter<?> converter) {
         if (converter != null) {
             converters.add(converter);
         }
@@ -295,7 +295,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
                 return new MapperWrapperIgnoreUnknownElements(next);
             }
         };
-        for (RestConverter converter : converters) {
+        for (RestConverter<?> converter : converters) {
             result.registerConverter(converter);
             result.alias(converter.getAlias(), converter.getConversionClass());
         }

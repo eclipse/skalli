@@ -104,7 +104,7 @@ public class ExtensionServicePeople
 
     @Deprecated
     @Override
-    public RestConverter getRestConverter(String host) {
+    public RestConverter<?> getRestConverter(String host) {
         return new PeopleConverter(host);
     }
 

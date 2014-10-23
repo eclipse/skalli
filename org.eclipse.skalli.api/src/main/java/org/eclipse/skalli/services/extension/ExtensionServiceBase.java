@@ -77,7 +77,7 @@ public abstract class ExtensionServiceBase<T extends ExtensionEntityBase> implem
     }
 
     @Override
-    public RestConverter getRestConverter(String host) {
+    public RestConverter<?> getRestConverter(String host) {
         return null;
     }
 

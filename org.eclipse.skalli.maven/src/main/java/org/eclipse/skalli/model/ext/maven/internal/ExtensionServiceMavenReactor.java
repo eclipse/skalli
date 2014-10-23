@@ -63,7 +63,7 @@ public class ExtensionServiceMavenReactor
 
     @Deprecated
     @Override
-    public RestConverter getRestConverter(String host) {
+    public RestConverter<?> getRestConverter(String host) {
         return new MavenReactorConverter(host);
     }
 

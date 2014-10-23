@@ -82,7 +82,7 @@ public class ExtensionServiceInfo
 
     @Deprecated
     @Override
-    public RestConverter getRestConverter(String host) {
+    public RestConverter<?> getRestConverter(String host) {
         return new InfoConverter(host);
     }
 

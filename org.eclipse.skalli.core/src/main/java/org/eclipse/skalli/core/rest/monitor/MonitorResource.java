@@ -21,12 +21,12 @@ public abstract class MonitorResource extends ServerResource {
 
     @Get
     public Representation retrieve() {
-        RestConverter converter = getConverter(getRequest().getResourceRef().getHostIdentifier());
+        RestConverter<?> converter = getConverter(getRequest().getResourceRef().getHostIdentifier());
         if (converter == null) {
             return new EmptyRepresentation();
         }
         return new ResourceRepresentation<Object>(new Object(), converter);
     }
 
-    protected abstract RestConverter getConverter(String host);
+    protected abstract RestConverter<?> getConverter(String host);
 }

@@ -98,7 +98,7 @@ public class ExtensionServiceHelloWorld extends ExtensionServiceBase<HelloWorldP
 
     @Deprecated
     @Override
-    public RestConverter getRestConverter(String host) {
+    public RestConverter<?> getRestConverter(String host) {
         return new HelloWorldConverter(host);
     }
 

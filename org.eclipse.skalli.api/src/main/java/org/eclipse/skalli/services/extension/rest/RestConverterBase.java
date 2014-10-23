@@ -181,7 +181,7 @@ public abstract class RestConverterBase<T> implements RestConverter<T> {
      * @param writer  the writer to use for marshaling.
      */
     @Deprecated
-    protected void marshalNSAttributes(HierarchicalStreamWriter writer, RestConverter converter) {
+    protected void marshalNSAttributes(HierarchicalStreamWriter writer, RestConverter<?> converter) {
         writer.addAttribute(XMLUtils.XMLNS, converter.getNamespace());
         writer.addAttribute(XMLUtils.XMLNS_XSI, XMLUtils.XSI_INSTANCE_NS);
         if (StringUtils.isNotBlank(host) && StringUtils.isNotBlank(converter.getXsdFileName())) {
@@ -190,7 +190,7 @@ public abstract class RestConverterBase<T> implements RestConverter<T> {
     }
 
     @Deprecated
-    private String getSchemaLocationAttribute(RestConverter converter) {
+    private String getSchemaLocationAttribute(RestConverter<?> converter) {
         StringBuilder sb = new StringBuilder();
         sb.append(converter.getNamespace());
         sb.append(" "); //$NON-NLS-1$
@@ -219,7 +219,7 @@ public abstract class RestConverterBase<T> implements RestConverter<T> {
      * @param writer  the writer to use for marshaling.
      */
     @Deprecated
-    protected void marshalApiVersion(HierarchicalStreamWriter writer, RestConverter converter) {
+    protected void marshalApiVersion(HierarchicalStreamWriter writer, RestConverter<?> converter) {
         writer.addAttribute(API_VERSION, converter.getApiVersion());
     }
 
@@ -245,7 +245,7 @@ public abstract class RestConverterBase<T> implements RestConverter<T> {
      */
     @Deprecated
     protected void marshalCommonAttributes(HierarchicalStreamWriter writer,
-            EntityBase entity, RestConverter converter) {
+            EntityBase entity, RestConverter<?> converter) {
         marshalApiVersion(writer, converter);
         String lastModified = entity.getLastModified();
         if (StringUtils.isNotBlank(lastModified)) {

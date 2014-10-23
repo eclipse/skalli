@@ -83,7 +83,7 @@ public class ExtensionServiceTags extends ExtensionServiceBase<TagsExtension> {
 
     @Deprecated
     @Override
-    public RestConverter getRestConverter(String host) {
+    public RestConverter<?> getRestConverter(String host) {
         return new TagsConverter(host);
     }
 
