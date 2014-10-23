@@ -25,20 +25,22 @@ import java.util.UUID;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrBuilder;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.LimitTokenCountAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.Fieldable;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
@@ -74,7 +76,7 @@ public class LuceneIndex<T extends EntityBase> {
     private static final int NUMBER_BEST_FRAGMENTS = 3; //TODO this is a candidate for configuration
 
     private Directory directory = new RAMDirectory();
-    private Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_30);
+    private Analyzer analyzer = new LimitTokenCountAnalyzer(new StandardAnalyzer(Version.LUCENE_30), Integer.MAX_VALUE);
     private boolean initialized;
 
     private final EntityService<T> entityService;
@@ -156,9 +158,10 @@ public class LuceneIndex<T extends EntityBase> {
     }
 
     private void addEntitiesToIndex(Collection<T> entities) {
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_30, analyzer);
         IndexWriter writer = null;
         try {
-            writer = new IndexWriter(directory, analyzer, IndexWriter.MaxFieldLength.UNLIMITED);
+            writer = new IndexWriter(directory, config);
             for (T entity : entities) {
                 if (!entity.isDeleted()) {
                     addEntityToIndex(writer, entity);
@@ -190,7 +193,7 @@ public class LuceneIndex<T extends EntityBase> {
         return highlighted;
     }
 
-    private ScoreDoc getDocByUUID(Searcher searcher, UUID uuid) throws IOException {
+    private ScoreDoc getDocByUUID(IndexSearcher searcher, UUID uuid) throws IOException {
         Query query = null;
         try {
             QueryParser parser = new QueryParser(Version.LUCENE_30, FIELD_UUID, analyzer);
@@ -216,9 +219,11 @@ public class LuceneIndex<T extends EntityBase> {
         if (!initialized) {
             return;
         }
+        IndexReader reader = null;
         IndexSearcher searcher = null;
         try {
-            searcher = new IndexSearcher(directory, false);
+            reader = IndexReader.open(directory, false);
+            searcher = new IndexSearcher(reader);
             for (EntityBase entity : entities) {
                 ScoreDoc hit = getDocByUUID(searcher, entity.getUuid());
                 if (hit != null) {
@@ -231,6 +236,7 @@ public class LuceneIndex<T extends EntityBase> {
             LOG.error("Failed to remove index entries", e);
         } finally {
             closeQuietly(searcher);
+            closeQuietly(reader);
         }
     }
 
@@ -281,9 +287,11 @@ public class LuceneIndex<T extends EntityBase> {
         PagingInfo pagingInfo = new PagingInfo(0, 0);
         int totalHitCount = 0;
         if (initialized) {
+            IndexReader reader = null;
             IndexSearcher searcher = null;
             try {
-                searcher = new IndexSearcher(directory, true);
+                reader = IndexReader.open(directory);
+                searcher = new IndexSearcher(reader);
                 ScoreDoc baseDoc = getDocByUUID(searcher, entity.getUuid());
                 if (baseDoc != null) {
                     MoreLikeThis mlt = new MoreLikeThis(searcher.getIndexReader());
@@ -314,6 +322,7 @@ public class LuceneIndex<T extends EntityBase> {
                 LOG.error(MessageFormat.format("Searching for entities similiar to ''{0}'' failed", entity.getUuid()), e);
             } finally {
                 closeQuietly(searcher);
+                closeQuietly(reader);
             }
         }
 
@@ -363,9 +372,11 @@ public class LuceneIndex<T extends EntityBase> {
             totalHitCount = allEntities.size();
         } else if (initialized) {
             List<String> fieldList = Arrays.asList(fields);
+            IndexReader reader = null;
             IndexSearcher searcher = null;
             try {
-                searcher = new IndexSearcher(directory);
+                reader = IndexReader.open(directory);
+                searcher = new IndexSearcher(reader);
                 QueryParser parser = new MultiFieldQueryParser(Version.LUCENE_30, fields, analyzer);
                 Query query = getQuery(parser, queryString);
 
@@ -401,6 +412,7 @@ public class LuceneIndex<T extends EntityBase> {
                 LOG.error(MessageFormat.format("Searching with query ''{0}'' failed", queryString), e);
             } finally {
                 closeQuietly(searcher);
+                closeQuietly(reader);
             }
         }
 
