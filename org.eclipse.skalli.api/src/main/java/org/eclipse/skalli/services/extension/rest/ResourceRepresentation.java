@@ -128,7 +128,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
                 } else {
                     xstream.toXML(object, writer);
                 }
-            } else if (converter.canConvert(object.getClass())) {
+            } else if (converter.getConversionClass().isAssignableFrom(object.getClass())) {
                 RestService restService = Services.getRequiredService(RestService.class);
                 MediaType mediaType = context.getMediaType();
                 if (!restService.isSupportedMediaType(mediaType)) {

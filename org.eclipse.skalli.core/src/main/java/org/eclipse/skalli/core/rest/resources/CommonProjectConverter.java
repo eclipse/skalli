@@ -197,7 +197,7 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
         }
         ExtensionEntityBase extension = project.getExtension(extensionClass);
         RestConverter<?> converter = extensionService.getRestConverter();
-        if (extension != null && converter != null && converter.canConvert(extensionClass)) {
+        if (extension != null && converter != null && converter.getConversionClass().isAssignableFrom(extensionClass)) {
             writer.object(extensionService.getShortName());
                 namespaces(converter);
                 commonAttributes(extension, converter);
@@ -327,7 +327,7 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
             return;
         }
         ExtensionEntityBase extension = extensibleEntity.getExtension(extensionClass);
-        RestConverter converter = extensionService.getRestConverter(getHost());
+        RestConverter<?> converter = extensionService.getRestConverter(getHost());
         if (extension != null && converter != null) {
             writer.startNode(extensionService.getShortName());
             marshalNSAttributes(writer, converter);
