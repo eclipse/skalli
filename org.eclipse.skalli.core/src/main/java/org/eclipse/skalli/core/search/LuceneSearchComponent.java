@@ -42,7 +42,6 @@ public class LuceneSearchComponent implements SearchService, EventListener<Event
     private static final Logger LOG = LoggerFactory.getLogger(LuceneSearchComponent.class);
 
     private LuceneIndex<Project> luceneIndex;
-    private EventService eventService;
 
     protected void activate(ComponentContext context) {
         LOG.info(MessageFormat.format("[SearchService][Lucene] {0} : activated",
@@ -69,13 +68,11 @@ public class LuceneSearchComponent implements SearchService, EventListener<Event
 
     protected void bindEventService(EventService eventService) {
         LOG.info(MessageFormat.format("bindEventService({0})", eventService)); //$NON-NLS-1$
-        this.eventService = eventService;
         eventService.registerListener(EventEntityUpdate.class, this);
     }
 
     protected void unbindEventService(EventService eventService) {
         LOG.info(MessageFormat.format("unbindEventService({0})", eventService)); //$NON-NLS-1$
-        this.eventService = null;
     }
 
     protected void unbindProjectService(ProjectService projectService) {
