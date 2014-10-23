@@ -69,6 +69,8 @@ import org.slf4j.LoggerFactory;
 
 public class LuceneIndex<T extends EntityBase> {
 
+    private static final Version LUCENE_VERSION = Version.LUCENE_30;
+
     private static final Logger LOG = LoggerFactory.getLogger(LuceneIndex.class);
 
     private static final SimpleHTMLFormatter formatter = new SimpleHTMLFormatter("<em>", "</em>"); //$NON-NLS-1$//$NON-NLS-2$
@@ -76,7 +78,7 @@ public class LuceneIndex<T extends EntityBase> {
     private static final int NUMBER_BEST_FRAGMENTS = 3; //TODO this is a candidate for configuration
 
     private Directory directory = new RAMDirectory();
-    private Analyzer analyzer = new LimitTokenCountAnalyzer(new StandardAnalyzer(Version.LUCENE_30), Integer.MAX_VALUE);
+    private Analyzer analyzer = new LimitTokenCountAnalyzer(new StandardAnalyzer(LUCENE_VERSION), Integer.MAX_VALUE);
     private boolean initialized;
 
     private final EntityService<T> entityService;
@@ -158,7 +160,7 @@ public class LuceneIndex<T extends EntityBase> {
     }
 
     private void addEntitiesToIndex(Collection<T> entities) {
-        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_30, analyzer);
+        IndexWriterConfig config = new IndexWriterConfig(LUCENE_VERSION, analyzer);
         IndexWriter writer = null;
         try {
             writer = new IndexWriter(directory, config);
@@ -196,7 +198,7 @@ public class LuceneIndex<T extends EntityBase> {
     private ScoreDoc getDocByUUID(IndexSearcher searcher, UUID uuid) throws IOException {
         Query query = null;
         try {
-            QueryParser parser = new QueryParser(Version.LUCENE_30, FIELD_UUID, analyzer);
+            QueryParser parser = new QueryParser(LUCENE_VERSION, FIELD_UUID, analyzer);
             query = parser.parse(StringUtils.lowerCase(uuid.toString()));
         } catch (ParseException e) {
             LOG.error(MessageFormat.format("Failed to create query from UUID {0}", uuid.toString()), e);
@@ -377,7 +379,7 @@ public class LuceneIndex<T extends EntityBase> {
             try {
                 reader = IndexReader.open(directory);
                 searcher = new IndexSearcher(reader);
-                QueryParser parser = new MultiFieldQueryParser(Version.LUCENE_30, fields, analyzer);
+                QueryParser parser = new MultiFieldQueryParser(LUCENE_VERSION, fields, analyzer);
                 Query query = getQuery(parser, queryString);
 
                 // it is not possible that we have more hits than projects!
