@@ -104,14 +104,6 @@
 
     <profiles>
         <profile>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <tycho.testArgLine></tycho.testArgLine>
-            </properties>
-        </profile>
-        <profile>
             <id>build-product</id>
             <modules>
                 <module>org.eclipse.skalli.orbit.feature</module>
@@ -134,6 +126,11 @@
         </profile>
         <profile>
             <id>static-checks</id>
+            <activation>
+                <property>
+                    <name>static-checks</name>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
@@ -180,6 +177,11 @@
         </profile>
         <profile>
             <id>code-coverage</id>
+            <activation>
+                <property>
+                    <name>code-coverage</name>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
@@ -200,6 +202,17 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>skip-code-coverage</id>
+            <activation>
+                <property>
+                    <name>!code-coverage</name>
+                </property>
+            </activation>
+            <properties>
+                <tycho.testArgLine></tycho.testArgLine>
+            </properties>
         </profile>
     </profiles>
 
