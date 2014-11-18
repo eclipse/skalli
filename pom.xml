@@ -58,7 +58,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java-version>1.6</java-version>
         <target-platform>skalli</target-platform>
-        <testArgs></testArgs>
+        <testArgLine></testArgLine>
     </properties>
 
     <modules>
@@ -103,6 +103,14 @@
     </modules>
 
     <profiles>
+        <profile>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <tycho.testArgLine></tycho.testArgLine>
+            </properties>
+        </profile>
         <profile>
             <id>build-product</id>
             <modules>
@@ -163,6 +171,29 @@
                             <execution>
                                 <goals>
                                     <goal>findbugs</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>code-coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.6.4.201312101107</version>
+                        <configuration>
+                            <destFile>../target/jacoco.exec</destFile>
+                            <append>true</append>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
                                 </goals>
                             </execution>
                         </executions>
@@ -277,7 +308,7 @@
                 <configuration>
                     <useUIHarness>false</useUIHarness>
                     <useUIThread>false</useUIThread>
-                    <argLine>${testArgs} -Dworkdir=../org.eclipse.skalli.testutil</argLine>
+                    <argLine>${tycho.testArgLine} ${testArgLine} -Dworkdir=../org.eclipse.skalli.testutil</argLine>
                     <bundleStartLevel>
                         <bundle>
                             <id>org.eclipse.equinox.ds</id>
