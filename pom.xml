@@ -124,6 +124,52 @@
                 <module>org.eclipse.skalli.selenium</module>
             </modules>
         </profile>
+        <profile>
+            <id>static-checks</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <version>2.7.1</version>
+                        <configuration>
+                            <targetJdk>${java-version}</targetJdk>
+                            <failurePriority>2</failurePriority>
+                            <aggregate>true</aggregate>
+                            <linkXRef>false</linkXRef>
+                            <failOnViolation>false</failOnViolation>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>pmd</goal>
+                                </goals>
+                                <phase>verify</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>findbugs-maven-plugin</artifactId>
+                        <version>2.5.2</version>
+                        <configuration>
+                            <findbugsXmlOutput>true</findbugsXmlOutput>
+                            <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
+                            <xmlOutput>true</xmlOutput>
+                            <encoding>${project.build.sourceEncoding}</encoding>
+                            <failOnError>false</failOnError>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>findbugs</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <build>
