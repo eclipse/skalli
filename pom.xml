@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
+<!--
+    Copyright (c) 2010, 2011 SAP AG and others.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+
+    Contributors:
+        SAP AG - initial API and implementation
+ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <prerequisites>
@@ -12,6 +23,21 @@
     <packaging>pom</packaging>
 
     <name>Skalli (Incubation)</name>
+
+    <mailingLists>
+        <mailingList>
+            <name>skalli-dev Mailing List</name>
+            <post>skalli-dev@eclipse.org</post>
+            <subscribe>https://dev.eclipse.org/mailman/listinfo/skalli-dev</subscribe>
+            <unsubscribe>https://dev.eclipse.org/mailman/listinfo/skalli-dev</unsubscribe>
+            <archive>http://dev.eclipse.org/mhonarc/lists/skalli-dev</archive>
+        </mailingList>
+    </mailingLists>
+
+    <issueManagement>
+        <url>https://bugs.eclipse.org/bugs/buglist.cgi?query_format=advanced;product=Skalli;classification=Technology</url>
+        <system>Bugzilla</system>
+    </issueManagement>
 
     <licenses>
         <license>
