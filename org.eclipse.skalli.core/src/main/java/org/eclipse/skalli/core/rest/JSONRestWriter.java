@@ -118,6 +118,9 @@ public class JSONRestWriter extends RestWriterBase implements RestWriter {
         if (state == STATE_FINAL) {
             throw new IllegalStateException("Unexpeced array: Final state already reached");
         }
+        if (sequenceState == EXPECT_END_SEQUENCE) {
+            throw new IllegalStateException("Unexpected array after value");
+        }
         appendComma();
         if (nextKey != null && (state == STATE_OBJECT || (state == STATE_INITIAL && isSet(NAMED_ROOT)))) {
             appendKey(nextKey);
@@ -144,6 +147,9 @@ public class JSONRestWriter extends RestWriterBase implements RestWriter {
     @Override
 
     public RestWriter item() throws IOException {
+        if (sequenceState == EXPECT_END_SEQUENCE) {
+            throw new IllegalStateException("Unexpected item after value");
+        }
         appendComma();
         if (state != STATE_ITEM) {
             while (state != STATE_ARRAY) {
@@ -166,6 +172,9 @@ public class JSONRestWriter extends RestWriterBase implements RestWriter {
     public RestWriter object() throws IOException {
         if (state == STATE_FINAL) {
             throw new IllegalStateException("Unexpected object: Final state already reached");
+        }
+        if (sequenceState == EXPECT_END_SEQUENCE) {
+            throw new IllegalStateException("Unexpected object after value");
         }
         appendComma();
         if (nextKey != null && (state == STATE_OBJECT || (state == STATE_INITIAL && isSet(NAMED_ROOT)))) {
@@ -205,6 +214,7 @@ public class JSONRestWriter extends RestWriterBase implements RestWriter {
         if (state == STATE_INITIAL) {
             state = STATE_FINAL;
         }
+        sequenceState = IN_SEQUENCE;
         firstInSequence = false;
         return this;
     }
@@ -385,6 +395,9 @@ public class JSONRestWriter extends RestWriterBase implements RestWriter {
     }
 
     private RestWriter value(Object value, boolean quoted) throws IOException {
+        if (state == STATE_FINAL) {
+            throw new IllegalStateException("Unexpeced value: Final state already reached");
+        }
         appendComma();
         if (state == STATE_ARRAY || state == STATE_ITEM) {
             append(value.toString(), quoted);
@@ -402,6 +415,9 @@ public class JSONRestWriter extends RestWriterBase implements RestWriter {
     }
 
     private RestWriter value(String key, Object value, boolean quoted) throws IOException {
+        if (state == STATE_FINAL) {
+            throw new IllegalStateException("Unexpeced named attribute: Final state already reached");
+        }
         if (StringUtils.isBlank(key)) {
             throw new IllegalStateException("Missing key");
         }
@@ -426,9 +442,12 @@ public class JSONRestWriter extends RestWriterBase implements RestWriter {
     }
 
     private RestWriter attribute(String name, Object value, boolean quoted) throws IOException {
+        if (state == STATE_FINAL) {
+            throw new IllegalStateException("Unexpeced attribute: Final state already reached");
+        }
         String key = isSet(PREFIXED_ATTRIBUTES)? "@" + name : name; //$NON-NLS-1$
         if (sequenceState == IN_SEQUENCE) {
-            if (state == STATE_ARRAY) {
+            if (state == STATE_ARRAY || state == STATE_ITEM) {
                 object();
                 value(key, value, quoted);
                 end();

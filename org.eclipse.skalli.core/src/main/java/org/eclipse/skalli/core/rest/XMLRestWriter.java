@@ -37,12 +37,16 @@ public class XMLRestWriter extends RestWriterBase implements RestWriter {
     private static final char EXPECT_OPENING_TAG = '\u03B1';
     private static final char OPENING_TAG = '<';
     private static final char EXPECT_TEXT_NODE = '#';
+    private static final char EXPECT_CLOSING_TAG = '\u03C9';
 
     private static final String MILLIS_KEY = "millis"; //$NON-NLS-1$
     private static final String ITEM = "item"; //$NON-NLS-1$
     private static final String LINK_KEY = "link"; //$NON-NLS-1$
     private static final String HREF_KEY = "href"; //$NON-NLS-1$
     private static final String REL_KEY = "rel"; //$NON-NLS-1$
+    private static final String VALUE_KEY = "value"; //$NON-NLS-1$
+    private static final String VALUE_TAG = '<' + VALUE_KEY + '>';
+    private static final String VALUE_END_TAG = "</" + VALUE_KEY + '>'; //$NON-NLS-1$
 
     private static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"; //$NON-NLS-1$
     private static final String XMLNS_PREFIX = "xmlns:"; //$NON-NLS-1$
@@ -115,7 +119,10 @@ public class XMLRestWriter extends RestWriterBase implements RestWriter {
     @Override
     public RestWriter array(String key, String itemKey) throws IOException {
         if (state == STATE_FINAL) {
-            throw new IllegalStateException("Unexpeced object: Final state already reached");
+            throw new IllegalStateException("Unexpeced array: Final state already reached");
+        }
+        if (tagState == EXPECT_CLOSING_TAG) {
+            throw new IllegalStateException("Unexpected array after value");
         }
         if (state == STATE_INITIAL) {
             writer.append(XML_HEADER);
@@ -149,6 +156,9 @@ public class XMLRestWriter extends RestWriterBase implements RestWriter {
         if (state == STATE_INITIAL) {
             throw new IllegalStateException("Still in initial state");
         }
+        if (tagState == EXPECT_CLOSING_TAG) {
+            throw new IllegalStateException("Unexpected item after value");
+        }
         closeOpeningTag();
         if (state != STATE_ITEM) {
             while (state != STATE_ARRAY) {
@@ -177,6 +187,9 @@ public class XMLRestWriter extends RestWriterBase implements RestWriter {
     public RestWriter object(String key) throws IOException {
         if (state == STATE_FINAL) {
             throw new IllegalStateException("Unexpeced object: Final state already reached");
+        }
+        if (tagState == EXPECT_CLOSING_TAG) {
+            throw new IllegalStateException("Unexpected object after value");
         }
         if (state == STATE_INITIAL) {
             writer.append(XML_HEADER);
@@ -246,19 +259,29 @@ public class XMLRestWriter extends RestWriterBase implements RestWriter {
 
     @Override
     public RestWriter value(String value) throws IOException {
+        if (state == STATE_FINAL) {
+            throw new IllegalStateException("Unexpeced value: Final state already reached");
+        }
         boolean isItem = (state == STATE_ITEM || state == STATE_ARRAY)
                 && StringUtils.isNotBlank(nextItem);
-        if (isItem || tagState == OPENING_TAG) {
+        if (isItem) {
             closeOpeningTag();
-            if (isItem) {
-                writer.append('<').append(nextItem).append('>');
+            writer.append('<').append(nextItem).append('>');
+            escaped(value);
+            writer.append('<').append('/').append(nextItem).append('>');
+            tagState = EXPECT_OPENING_TAG;
+        } else if (state == STATE_OBJECT && tagState != EXPECT_CLOSING_TAG) {
+            closeOpeningTag();
+            if (tagState == EXPECT_OPENING_TAG) {
+                writer.append(VALUE_TAG);
                 escaped(value);
-                writer.append('<').append('/').append(nextItem).append('>');
+                writer.append(VALUE_END_TAG);
             } else {
                 escaped(value);
             }
+            tagState = EXPECT_CLOSING_TAG;
         } else {
-            throw new IllegalStateException("Unexpected value without tag");
+            throw new IllegalStateException("Unexpected value");
         }
         nextKey = null;
         return this;
@@ -311,6 +334,9 @@ public class XMLRestWriter extends RestWriterBase implements RestWriter {
 
     @Override
     public RestWriter pair(String key, String value) throws IOException {
+        if (state == STATE_FINAL) {
+            throw new IllegalStateException("Unexpeced attribute: Final state already reached");
+        }
         if (StringUtils.isBlank(key)) {
             throw new IllegalStateException("Missing tag name");
         }
@@ -380,6 +406,12 @@ public class XMLRestWriter extends RestWriterBase implements RestWriter {
 
     @Override
     public RestWriter attribute(String key, String value) throws IOException {
+        if (state == STATE_FINAL) {
+            throw new IllegalStateException("Unexpeced attribute: Final state already reached");
+        }
+        if (StringUtils.isBlank(key)) {
+            throw new IllegalStateException("Missing attribute name");
+        }
         if (tagState == OPENING_TAG && value != null) {
             writer.append(' ').append(key).append('=');
             writer.append('"');
@@ -387,6 +419,12 @@ public class XMLRestWriter extends RestWriterBase implements RestWriter {
                 escaped(value);
             }
             writer.append('"');
+        } else if (tagState == EXPECT_OPENING_TAG) {
+            if (state == STATE_OBJECT) {
+                pair(key, value);
+            } else if (state == STATE_ARRAY || state == STATE_ITEM) {
+                array().attribute(key, value).end();
+            }
         } else {
             throw new IllegalStateException("Unexpected attribute");
         }
@@ -431,6 +469,7 @@ public class XMLRestWriter extends RestWriterBase implements RestWriter {
             tagState = EXPECT_TEXT_NODE;
         }
     }
+
     private void closeTag() throws IOException {
         if (state == STATE_FINAL) {
             throw new IllegalStateException("Final state already reached");

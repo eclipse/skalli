@@ -95,9 +95,10 @@ public class JSONRestWriterTest {
           .value("x")
           .value(4711)
           .value(1.0)
+          .value(true)
         .end()
         .flush();
-        Assert.assertEquals("[\"x\",4711,1.0]",
+        Assert.assertEquals("[\"x\",4711,1.0,true]",
                 writer.toString());
     }
 
@@ -109,9 +110,10 @@ public class JSONRestWriterTest {
           .value("x")
           .value(4711)
           .value(1.0)
+          .value(true)
         .end()
         .flush();
-        Assert.assertEquals("\"k\":[\"x\",4711,1.0]", writer.toString());
+        Assert.assertEquals("\"k\":[\"x\",4711,1.0,true]", writer.toString());
     }
 
     @Test
@@ -122,9 +124,10 @@ public class JSONRestWriterTest {
           .value("x")
           .value(4711)
           .value(1.0)
+          .value(true)
         .end()
         .flush();
-        Assert.assertEquals("\"k\":[\"x\",4711,1.0]", writer.toString());
+        Assert.assertEquals("\"k\":[\"x\",4711,1.0,true]", writer.toString());
     }
 
     @Test
@@ -135,9 +138,10 @@ public class JSONRestWriterTest {
           .value("x")
           .value(4711)
           .value(1.0)
+          .value(false)
         .end()
         .flush();
-        Assert.assertEquals("\"k\":[\"x\",4711,1.0]", writer.toString());
+        Assert.assertEquals("\"k\":[\"x\",4711,1.0,false]", writer.toString());
     }
 
     @Test
@@ -147,9 +151,17 @@ public class JSONRestWriterTest {
           .value("x")
           .value(4711)
           .value(1.0)
+          .value(false)
         .end()
         .flush();
-        Assert.assertEquals("[\"x\",4711,1.0]", writer.toString());
+        Assert.assertEquals("[\"x\",4711,1.0,false]", writer.toString());
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void testArrayInvalidNamedValues() throws Exception {
+        restWriter
+        .array()
+          .pair("foo", "bar");
     }
 
     @Test
@@ -280,14 +292,39 @@ public class JSONRestWriterTest {
     public void testArrayWithInnerNamedObject() throws Exception {
         restWriter
         .array()
-          .object("inner")
+          .object("inner") // itemKeys inside and array are ignored
             .pair("x", "foo")
             .pair("y", 4711)
             .pair("z", 1.0)
           .end()
+          .key("other").object() // itemKeys inside and array are ignored
+            .pair("x", "foo")
+          .end()
+          .object()
+              .pair("y", "bar")
+          .end()
+          .array()
+              .value("1")
+              .value("2")
+          .end()
+          .array("w") // itemKeys inside and array are ignored
+              .value("1")
+              .value("2")
+          .end()
+          .array("k", "w") // itemKeys inside and array are ignored
+              .value("1")
+              .value("2")
+          .end()
         .end()
         .flush();
-        Assert.assertEquals("[{\"x\":\"foo\",\"y\":4711,\"z\":1.0}]",
+        Assert.assertEquals("["
+                + "{\"x\":\"foo\",\"y\":4711,\"z\":1.0},"
+                + "{\"x\":\"foo\"},"
+                + "{\"y\":\"bar\"},"
+                + "[\"1\",\"2\"],"
+                + "[\"1\",\"2\"],"
+                + "[\"1\",\"2\"]"
+                + "]",
                 writer.toString());
     }
 
@@ -301,9 +338,17 @@ public class JSONRestWriterTest {
             .pair("y", 4711)
             .pair("z", 1.0)
           .end()
+          .object() // itemKeys inside and array are ignored
+            .pair("x", "foo")
+            .pair("y", 4711)
+            .pair("z", 1.0)
+          .end()
         .end()
         .flush();
-        Assert.assertEquals("\"outter\":[{\"x\":\"foo\",\"y\":4711,\"z\":1.0}]",
+        Assert.assertEquals("\"outter\":["
+                + "{\"x\":\"foo\",\"y\":4711,\"z\":1.0},"
+                + "{\"x\":\"foo\",\"y\":4711,\"z\":1.0}"
+                + "]",
                 writer.toString());
     }
 
@@ -352,17 +397,93 @@ public class JSONRestWriterTest {
     }
 
     @Test
-    public void testUnnamedArrayWithAttribute() throws Exception {
+    public void testNestedArraysDifferentItemNames() throws Exception {
         restWriter
-        .array()
-          .attribute("a", "b")
+        .set(JSONRestWriter.NAMED_ROOT)
+        .array("k", "a")
+            .array("b")
+                .array()
+                   .array("c")
+                       .value("x")
+                   .end()
+                   .array("d")
+                       .value("y")
+                   .end()
+                .end()
+                .array()
+                    .value("z")
+                .end()
+            .end()
+            .array("e")
+                .value("w")
+            .end()
         .end()
         .flush();
-        Assert.assertEquals("[{\"a\":\"b\"}]", writer.toString());
+        Assert.assertEquals("\"k\":[[[[\"x\"],[\"y\"]],[\"z\"]],[\"w\"]]",
+                writer.toString());
     }
 
     @Test
-    public void testAttributeAfterItems() throws Exception {
+    public void testNestedAnyonmousInnerArray() throws Exception {
+        restWriter
+        .set(JSONRestWriter.NAMED_ROOT)
+        .object("o")
+          .attribute("a", 4711)
+          .array("p")
+            .object()
+              .pair("x", "1")
+              .array()
+                .link("rel", "href")
+              .end()
+            .end()
+            .object()
+              .pair("y", "2")
+            .end()
+          .end()
+        .end()
+        .flush();
+        Assert.assertEquals("\"o\":{\"a\":4711,[{\"x\":\"1\",[{\"rel\":\"rel\",\"href\":\"href\"}]},{\"y\":\"2\"}]}",
+                writer.toString());
+    }
+
+    @Test
+    public void testUnnamedArrayWithAttributes() throws Exception {
+        restWriter
+        .array()
+          .attribute("a", "b")
+          .attribute("x", "y")
+        .end()
+        .flush();
+        Assert.assertEquals("[{\"a\":\"b\"},{\"x\":\"y\"}]", writer.toString());
+    }
+
+    @Test
+    public void testUnnamedArrayWithItemKeyAndAttributes() throws Exception {
+        restWriter
+        .array("foo")
+          .attribute("a", "b")
+          .attribute("x", "y")
+        .end()
+        .flush();
+        Assert.assertEquals("[{\"a\":\"b\"},{\"x\":\"y\"}]", writer.toString());
+    }
+
+    @Test
+    public void testUnnamedArrayWithAttributeAndItems() throws Exception {
+        restWriter
+        .array("e")
+          .attribute("a", "b")
+          .attribute("c", "d")
+          .value("x")
+          .value(4711)
+          .value(1.0)
+        .end()
+        .flush();
+        Assert.assertEquals("[{\"a\":\"b\"},{\"c\":\"d\"},\"x\",4711,1.0]", writer.toString());
+    }
+
+    @Test
+    public void testAttributeAfterItem() throws Exception {
         restWriter
         .array()
           .value("x")
@@ -370,6 +491,30 @@ public class JSONRestWriterTest {
         .end()
         .flush();
         Assert.assertEquals("[\"x\",{\"a\":\"b\"}]", writer.toString());
+    }
+
+    @Test
+    public void testAttributeAfterNamedItem() throws Exception {
+        restWriter
+        .set(JSONRestWriter.NAMED_ROOT)
+        .array("k", "e")
+          .value("x")
+          .attribute("a", "b")
+        .end()
+        .flush();
+        Assert.assertEquals("\"k\":[\"x\",{\"a\":\"b\"}]", writer.toString());
+    }
+
+    @Test
+    public void testAttributeAfterItemOverwriteNames() throws Exception {
+        restWriter
+        .set(JSONRestWriter.NAMED_ROOT)
+        .array("k", "overwritten")
+          .item("x").value("x").end()
+          .item("y").attribute("a", "b").end()
+        .end()
+        .flush();
+        Assert.assertEquals("\"k\":[\"x\",{\"a\":\"b\"}]", writer.toString());
     }
 
     @Test
@@ -418,13 +563,13 @@ public class JSONRestWriterTest {
     public void testNamedObject() throws Exception {
         restWriter
         .set(JSONRestWriter.NAMED_ROOT)
-        .object("items")
+        .object("k")
           .pair("x", "foo")
           .pair("y", 4711)
           .pair("z", 1.0)
         .end()
         .flush();
-        Assert.assertEquals("\"items\":{\"x\":\"foo\",\"y\":4711,\"z\":1.0}",
+        Assert.assertEquals("\"k\":{\"x\":\"foo\",\"y\":4711,\"z\":1.0}",
                 writer.toString());
     }
 
@@ -442,13 +587,13 @@ public class JSONRestWriterTest {
     public void testObjectWithKey() throws Exception {
         restWriter
         .set(JSONRestWriter.NAMED_ROOT)
-        .key("items").object()
+        .key("k").object()
           .pair("x", "foo")
           .pair("y", 4711)
           .pair("z", 1.0)
         .end()
         .flush();
-        Assert.assertEquals("\"items\":{\"x\":\"foo\",\"y\":4711,\"z\":1.0}",
+        Assert.assertEquals("\"k\":{\"x\":\"foo\",\"y\":4711,\"z\":1.0}",
                 writer.toString());
     }
 
@@ -492,10 +637,17 @@ public class JSONRestWriterTest {
           .attribute("d", 1.0)
           .attribute("e", true)
           .attribute("f", TestUUIDs.TEST_UUIDS[0])
+          .pair("g", "b")
+          .pair("h", 4711)
+          .pair("i", 1.0)
+          .pair("j", true)
+          .pair("k", TestUUIDs.TEST_UUIDS[0])
           .value("foobar")
         .end()
         .flush();
         Assert.assertEquals("\"k\":{\"a\":\"b\",\"c\":4711,\"d\":1.0,\"e\":true,\"f\":\""
+                + TestUUIDs.TEST_UUIDS[0].toString() + "\","
+                + "\"g\":\"b\",\"h\":4711,\"i\":1.0,\"j\":true,\"k\":\""
                 + TestUUIDs.TEST_UUIDS[0].toString() + "\",\"value\":\"foobar\"}",
                 writer.toString());
     }
@@ -539,22 +691,63 @@ public class JSONRestWriterTest {
           .value("y");
     }
 
+    @Test(expected=IllegalStateException.class)
+    public void testNamedObjectWithSecondValue() throws Exception {
+        restWriter
+        .object("k")
+          .value("x")
+          .value("y");
+    }
+
     @Test
     public void testUnnamedObjectWithAttribute() throws Exception {
         restWriter
         .object()
           .attribute("a", "b")
+          .attribute("x", "y")
         .end()
         .flush();
-        Assert.assertEquals("{\"a\":\"b\"}", writer.toString());
+        Assert.assertEquals("{\"a\":\"b\",\"x\":\"y\"}", writer.toString());
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void testUnnamedObjectWithAttributeFollowingValue() throws Exception {
+        restWriter
+        .object()
+          .value("foobar")
+          .attribute("a", "b");
     }
 
     @Test(expected=IllegalStateException.class)
     public void testObjectWithAttributeFollowingValue() throws Exception {
         restWriter
-        .object()
+        .object("k")
           .value("foobar")
           .attribute("a", "b");
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void testObjectFollowingValue() throws Exception {
+        restWriter
+        .object()
+          .value("x")
+          .object();
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void testArrayFollowingValue() throws Exception {
+        restWriter
+        .object()
+          .value("x")
+          .array();
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void testItemFollowingValue() throws Exception {
+        restWriter
+        .object()
+          .value("x")
+          .item();
     }
 
     @Test
@@ -566,6 +759,18 @@ public class JSONRestWriterTest {
         .end()
         .flush();
         Assert.assertEquals("{\"link\":{\"rel\":\"a\",\"href\":\"b\"},\"link\":{\"rel\":\"c\",\"href\":\"d\"}}",
+                writer.toString());
+    }
+
+    @Test
+    public void testArrayWithLinks() throws Exception {
+        restWriter
+        .array()
+          .link("a", "b")
+          .link("c", "d")
+        .end()
+        .flush();
+        Assert.assertEquals("[{\"rel\":\"a\",\"href\":\"b\"},{\"rel\":\"c\",\"href\":\"d\"}]",
                 writer.toString());
     }
 
@@ -605,11 +810,53 @@ public class JSONRestWriterTest {
     }
 
     @Test
+    public void testArrayWithItemKeyInnerLinks() throws Exception {
+        restWriter
+        .set(JSONRestWriter.NAMED_ROOT)
+        .array("a")
+          .link("a", "b")
+          .link("c", "d")
+        .end()
+        .flush();
+        Assert.assertEquals("[{\"rel\":\"a\",\"href\":\"b\"},{\"rel\":\"c\",\"href\":\"d\"}]",
+                writer.toString());
+    }
+
+    @Test
+    public void testNamedArrayWithLinks() throws Exception {
+        restWriter
+        .set(JSONRestWriter.NAMED_ROOT)
+        .key("k").array()
+          .link("a", "b")
+          .link("c", "d")
+        .end()
+        .flush();
+        Assert.assertEquals("\"k\":[{\"rel\":\"a\",\"href\":\"b\"},{\"rel\":\"c\",\"href\":\"d\"}]",
+                writer.toString());
+    }
+
+    @Test
     public void testObjectWithInnerArray() throws Exception {
         restWriter
         .set(JSONRestWriter.NAMED_ROOT)
         .key("outter").object()
           .key("inner").array()
+            .value("x")
+            .value(4711)
+            .value(1.0)
+          .end()
+        .end()
+        .flush();
+        Assert.assertEquals("\"outter\":{\"inner\":[\"x\",4711,1.0]}",
+                writer.toString());
+    }
+
+    @Test
+    public void testObjectWithInnerArrayWithNamedItems() throws Exception {
+        restWriter
+        .set(JSONRestWriter.NAMED_ROOT)
+        .key("outter").object()
+          .key("inner").array("e")
             .value("x")
             .value(4711)
             .value(1.0)
@@ -633,22 +880,6 @@ public class JSONRestWriterTest {
         .end()
         .flush();
         Assert.assertEquals("\"outter\":{[\"x\",4711,1.0]}",
-                writer.toString());
-    }
-
-    @Test
-    public void testObjectWithInnerArrayIgnoreNamedItems() throws Exception {
-        restWriter
-        .set(JSONRestWriter.NAMED_ROOT)
-        .key("outter").object()
-          .key("inner").array("e")
-            .value("x")
-            .value(4711)
-            .value(1.0)
-          .end()
-        .end()
-        .flush();
-        Assert.assertEquals("\"outter\":{\"inner\":[\"x\",4711,1.0]}",
                 writer.toString());
     }
 

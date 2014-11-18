@@ -17,6 +17,7 @@ import java.util.Arrays;
 
 import org.eclipse.skalli.commons.FormatUtils;
 import org.eclipse.skalli.services.rest.RestWriter;
+import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,9 +46,10 @@ public class XMLRestWriterTest {
           .value("x")
           .value(4711)
           .value(1.0)
+          .value(true)
         .end()
         .flush();
-        assertEquals("<item>x</item><item>4711</item><item>1.0</item>");
+        assertEquals("<item>x</item><item>4711</item><item>1.0</item><item>true</item>");
     }
 
     @Test
@@ -76,9 +78,10 @@ public class XMLRestWriterTest {
           .value("x")
           .value(4711)
           .value(1.0)
+          .value(false)
         .end()
         .flush();
-        assertEquals("<k><item>x</item><item>4711</item><item>1.0</item></k>");
+        assertEquals("<k><item>x</item><item>4711</item><item>1.0</item><item>false</item></k>");
     }
 
     @Test
@@ -96,9 +99,10 @@ public class XMLRestWriterTest {
           .value("x")
           .value(4711)
           .value(1.0)
+          .value(true)
         .end()
         .flush();
-        assertEquals("<e>x</e><e>4711</e><e>1.0</e>");
+        assertEquals("<e>x</e><e>4711</e><e>1.0</e><e>true</e>");
     }
 
     @Test
@@ -108,9 +112,10 @@ public class XMLRestWriterTest {
           .value("x")
           .value(4711)
           .value(1.0)
+          .value(true)
         .end()
         .flush();
-        assertEquals("<k><e>x</e><e>4711</e><e>1.0</e></k>");
+        assertEquals("<k><e>x</e><e>4711</e><e>1.0</e><e>true</e></k>");
     }
 
     @Test
@@ -120,9 +125,10 @@ public class XMLRestWriterTest {
           .value("x")
           .value(4711)
           .value(1.0)
+          .value(true)
         .end()
         .flush();
-        assertEquals("<k><e>x</e><e>4711</e><e>1.0</e></k>");
+        assertEquals("<k><e>x</e><e>4711</e><e>1.0</e><e>true</e></k>");
     }
 
     @Test
@@ -132,9 +138,10 @@ public class XMLRestWriterTest {
           .value("x")
           .value(4711)
           .value(1.0)
+          .value(false)
         .end()
         .flush();
-        assertEquals("<k><item>x</item><item>4711</item><item>1.0</item></k>");
+        assertEquals("<k><item>x</item><item>4711</item><item>1.0</item><item>false</item></k>");
     }
 
     @Test
@@ -144,9 +151,10 @@ public class XMLRestWriterTest {
           .value("x")
           .value(4711)
           .value(1.0)
+          .value(false)
         .end()
         .flush();
-        assertEquals("<item>x</item><item>4711</item><item>1.0</item>");
+        assertEquals("<item>x</item><item>4711</item><item>1.0</item><item>false</item>");
     }
 
     @Test(expected=IllegalStateException.class)
@@ -163,9 +171,10 @@ public class XMLRestWriterTest {
           .item().value("x").end()
           .item().value(4711).end()
           .item().value(1.0).end()
+          .item().value(true).end()
         .end()
         .flush();
-        assertEquals("<item>x</item><item>4711</item><item>1.0</item>");
+        assertEquals("<item>x</item><item>4711</item><item>1.0</item><item>true</item>");
     }
 
     @Test
@@ -210,10 +219,11 @@ public class XMLRestWriterTest {
             .pair("x", "foo")
             .pair("y", 4711)
             .pair("z", 1.0)
+            .pair("b", true)
            .end()
         .end()
         .flush();
-        assertEquals("<item><x>foo</x><y>4711</y><z>1.0</z></item>");
+        assertEquals("<item><x>foo</x><y>4711</y><z>1.0</z><b>true</b></item>");
     }
 
     @Test
@@ -223,9 +233,10 @@ public class XMLRestWriterTest {
           .object().pair("x", "foo").end()
           .object().pair("y", 4711).end()
           .object().pair("z", 1.0).end()
+          .object().pair("b", false).end()
         .end()
         .flush();
-        assertEquals("<item><x>foo</x></item><item><y>4711</y></item><item><z>1.0</z></item>");
+        assertEquals("<item><x>foo</x></item><item><y>4711</y></item><item><z>1.0</z></item><item><b>false</b></item>");
     }
 
     @Test
@@ -410,19 +421,73 @@ public class XMLRestWriterTest {
         assertEquals("<o a=\"4711\"><p><x>1</x><link rel=\"rel\" href=\"href\"/></p><p><y>2</y></p></o>");
     }
 
-    @Test(expected=IllegalStateException.class)
-    public void testUnnamedArrayWithAttribute() throws Exception {
+    @Test
+    public void testUnnamedArrayWithAttributes() throws Exception {
         restWriter
         .array()
-          .attribute("a", "b");
+          .attribute("a", "b")
+          .attribute("x", "y")
+        .end()
+        .flush();
+        assertEquals("<item a=\"b\"/><item x=\"y\"/>");
     }
 
-    @Test(expected=IllegalStateException.class)
-    public void testAttributeAfterItems() throws Exception {
+    @Test
+    public void testUnnamedArrayWithItemKeyAndAttributes() throws Exception {
+        restWriter
+        .array("foo")
+          .attribute("a", "b")
+          .attribute("x", "y")
+        .end()
+        .flush();
+        assertEquals("<foo a=\"b\"/><foo x=\"y\"/>");
+    }
+
+    @Test
+    public void testUnnamedArrayWithAttributeAndItems() throws Exception {
+        restWriter
+        .array("e")
+          .attribute("a", "b")
+          .attribute("c", "d")
+          .value("x")
+          .value(4711)
+          .value(1.0)
+        .end()
+        .flush();
+        assertEquals("<e a=\"b\"/><e c=\"d\"/><e>x</e><e>4711</e><e>1.0</e>");
+    }
+
+    @Test
+    public void testAttributeAfterItem() throws Exception {
+        restWriter
+        .array()
+          .value("x")
+          .attribute("a", "b")
+        .end()
+        .flush();
+        assertEquals("<item>x</item><item a=\"b\"/>");
+    }
+
+    @Test
+    public void testAttributeAfterNamedItem() throws Exception {
         restWriter
         .array("k", "e")
           .value("x")
-          .attribute("a", "b");
+          .attribute("a", "b")
+        .end()
+        .flush();
+        assertEquals("<k><e>x</e><e a=\"b\"/></k>");
+    }
+
+    @Test
+    public void testAttributeAfterItemOverwriteNames() throws Exception {
+        restWriter
+        .array("k", "overwritten")
+          .item("x").value("x").end()
+          .item("y").attribute("a", "b").end()
+        .end()
+        .flush();
+        assertEquals("<k><x>x</x><y a=\"b\"/></k>");
     }
 
     @Test
@@ -528,10 +593,24 @@ public class XMLRestWriterTest {
         restWriter
         .object("k")
           .attribute("a", "b")
+          .attribute("c", 4711)
+          .attribute("d", 1.0)
+          .attribute("e", true)
+          .attribute("f", TestUUIDs.TEST_UUIDS[0])
+          .pair("g", "b")
+          .pair("h", 4711)
+          .pair("i", 1.0)
+          .pair("j", true)
+          .pair("k", TestUUIDs.TEST_UUIDS[0])
           .value("foobar")
         .end()
         .flush();
-        assertEquals("<k a=\"b\">foobar</k>");
+        assertEquals("<k a=\"b\" c=\"4711\" d=\"1.0\" e=\"true\" f=\""
+                + TestUUIDs.TEST_UUIDS[0].toString()
+                + "\">"
+                + "<g>b</g><h>4711</h><i>1.0</i><j>true</j><k>"
+                + TestUUIDs.TEST_UUIDS[0].toString()
+                + "</k>foobar</k>");
     }
 
     @Test
@@ -552,25 +631,47 @@ public class XMLRestWriterTest {
         assertEquals("<k a=\"42\" b=\"-1\" c=\"4711\" d=\"4711\" e=\"1.0\" f=\"1.0\" g=\"4711\" h=\"1\" i=\"1.0\"/>");
     }
 
-    @Test(expected=IllegalStateException.class)
     public void testUnnamedObjectWithValue() throws Exception {
         restWriter
         .object()
-          .value("x");
+        .value("x")
+      .end()
+      .flush();
+       assertEquals("<value>x</value>");
     }
 
     @Test(expected=IllegalStateException.class)
     public void testObjectWithSecondValue() throws Exception {
+        restWriter
+        .object()
+          .value("x")
+          .value("y");
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void testNamedObjectWithSecondValue() throws Exception {
         restWriter
         .object("k")
           .value("x")
           .value("y");
     }
 
-    @Test(expected=IllegalStateException.class)
-    public void testUnnamedObjectWithAttribute() throws Exception {
+    @Test
+    public void testUnnamedObjectWithAttributes() throws Exception {
         restWriter
         .object()
+          .attribute("a", "b")
+          .attribute("x", "y")
+        .end()
+        .flush();
+        assertEquals("<a>b</a><x>y</x>");
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void testUnnamedObjectWithAttributeFollowingValue() throws Exception {
+        restWriter
+        .object()
+          .value("foobar")
           .attribute("a", "b");
     }
 
@@ -580,6 +681,30 @@ public class XMLRestWriterTest {
         .object("k")
           .value("foobar")
           .attribute("a", "b");
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void testObjectFollowingValue() throws Exception {
+        restWriter
+        .object()
+          .value("x")
+          .object();
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void testArrayFollowingValue() throws Exception {
+        restWriter
+        .object()
+          .value("x")
+          .array();
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void testItemFollowingValue() throws Exception {
+        restWriter
+        .object()
+          .value("x")
+          .item();
     }
 
     @Test
