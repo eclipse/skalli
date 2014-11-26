@@ -34,9 +34,10 @@ public class EmbeddedRestServer {
 
     private Server server;
     private String webLocator;
+    private int port;
 
     public EmbeddedRestServer() {
-        int port = DEFAULT_PORT;
+        port = DEFAULT_PORT;
         String portParam = System.getProperty("PORT1"); //$NON-NLS-1$
         if (!StringUtils.isBlank(portParam)) {
             port = Integer.parseInt(portParam);
@@ -53,6 +54,10 @@ public class EmbeddedRestServer {
         context.setHandler(handler);
         server = new Server(port);
         server.setHandler(context);
+    }
+
+    public int getPort() {
+        return port;
     }
 
     public String getWebLocator() {

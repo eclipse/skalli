@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project xmlns="http://www.eclipse.org/skalli/2010/API" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eclipse.org/skalli/2010/API http://localhost:${PORT1}/schemas/project.xsd" apiVersion="1.4" lastModified="2011-11-17T16:03:42.861Z" modifiedBy="skalli">
+  <uuid>5856b08a-0f87-4d91-b007-ac367ced247a</uuid>
+  <id>eclipse.skalli</id>
+  <nature>PROJECT</nature>
+  <template>default</template>
+  <name>Skalli</name>
+  <shortName>skalli</shortName>
+  <link rel="project" href="http://localhost:${PORT1}/api/projects/5856b08a-0f87-4d91-b007-ac367ced247a"/>
+  <link rel="browse" href="http://localhost:${PORT1}/projects/eclipse.skalli"/>
+  <link rel="issues" href="http://localhost:${PORT1}/api/projects/5856b08a-0f87-4d91-b007-ac367ced247a/issues"/>
+  <phase>Prototype</phase>
+  <description>The goal of the project is to build an extensible system for organizing projects.</description>
+  <members>
+    <member>
+      <userId>bigboss</userId>
+      <link rel="user" href="http://localhost:${PORT1}/api/user/bigboss"/>
+      <role>projectlead</role>
+    </member>
+    <member>
+      <userId>commit1</userId>
+      <link rel="user" href="http://localhost:${PORT1}/api/user/commit1"/>
+      <role>projectmember</role>
+    </member>
+    <member>
+      <userId>commit2</userId>
+      <link rel="user" href="http://localhost:${PORT1}/api/user/commit2"/>
+      <role>projectmember</role>
+    </member>
+    <member>
+      <userId>commit3</userId>
+      <link rel="user" href="http://localhost:${PORT1}/api/user/commit3"/>
+      <role>projectmember</role>
+    </member>
+  </members>
+  <extensions>
+    <tags xmlns="http://www.eclipse.org/skalli/2010/API/Extension-Tags" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eclipse.org/skalli/2010/API/Extension-Tags http://localhost:${PORT1}/schemas/extension-tags.xsd" apiVersion="1.0" inherited="false" derived="false">
+      <tag>cool</tag>
+      <tag>stuff</tag>
+      <tag>osgi</tag>
+    </tags>
+    <info xmlns="http://www.eclipse.org/skalli/2010/API/Extension-Info" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eclipse.org/skalli/2010/API/Extension-Info http://localhost:${PORT1}/schemas/extension-info.xsd" apiVersion="1.0" inherited="false" derived="false">
+      <homepage>http://www.example.org/skalli</homepage>
+      <mailingLists>
+        <mailingList>skalli-dev@mail.example.org</mailingList>
+      </mailingLists>
+    </info>
+    <people xmlns="http://www.eclipse.org/skalli/2010/API/Extension-People" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eclipse.org/skalli/2010/API/Extension-People http://localhost:${PORT1}/schemas/extension-people.xsd" apiVersion="1.0" inherited="false" derived="false">
+      <leads>
+        <lead>
+          <userId>bigboss</userId>
+          <link rel="user" href="http://localhost:${PORT1}/api/user/bigboss"/>
+        </lead>
+      </leads>
+      <members>
+        <member>
+          <userId>commit1</userId>
+          <link rel="user" href="http://localhost:${PORT1}/api/user/commit1"/>
+        </member>
+        <member>
+          <userId>commit2</userId>
+          <link rel="user" href="http://localhost:${PORT1}/api/user/commit2"/>
+        </member>
+        <member>
+          <userId>commit3</userId>
+          <link rel="user" href="http://localhost:${PORT1}/api/user/commit3"/>
+        </member>
+      </members>
+    </people>
+  </extensions>
+</project>
