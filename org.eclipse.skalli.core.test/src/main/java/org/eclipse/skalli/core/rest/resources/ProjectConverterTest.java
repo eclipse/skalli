@@ -10,15 +10,10 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest.resources;
 
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TimeZone;
-
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.FormatUtils;
@@ -81,9 +76,6 @@ public class ProjectConverterTest {
     @Test
     public void testMarshal() throws Exception {
         for (Project project : projects) {
-            //marshal the project using ProjectConverter
-            Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ENGLISH); //$NON-NLS-1$
-            project.setLastModified(DatatypeConverter.printDateTime(now));
             StringBufferHierarchicalStreamWriter writer = new StringBufferHierarchicalStreamWriter();
             ProjectConverterWrapper converter = new ProjectConverterWrapper("https://localhost",
                     new String[] { "members" });
