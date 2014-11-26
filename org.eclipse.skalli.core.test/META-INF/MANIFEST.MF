@@ -8,9 +8,13 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Fragment-Host: org.eclipse.skalli.core
 Import-Package: javax.naming.spi,
  org.apache.commons.io,
- org.apache.http.client,
  org.apache.http.client.methods,
+ org.apache.http.util,
  org.easymock,
+ org.eclipse.jetty.server,
+ org.eclipse.jetty.server.handler,
+ org.eclipse.jetty.servlet,
+ org.eclipse.jetty.util.component,
  org.eclipse.skalli.testutil,
  org.eclipse.skalli.testutil.feeds,
  org.w3c.dom
