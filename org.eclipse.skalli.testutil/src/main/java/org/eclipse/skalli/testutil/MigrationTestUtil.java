@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.testutil;
 
+import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.services.extension.DataMigration;
 import org.junit.Assert;
 import org.w3c.dom.Document;
@@ -34,9 +35,10 @@ public class MigrationTestUtil extends XMLDiffUtil {
      */
     public static void testMigration(DataMigration migration, String filenamePrefix) throws Exception {
         String pathPrefix = "/res/migrations/" + migration.getClass().getSimpleName() + "/" + filenamePrefix;
-        Document docBefore = getAsDocument(migration, pathPrefix + ".xml.before");
+        Class<?> migrationClass = migration.getClass();
+        Document docBefore = XMLUtils.documentFromResource(migrationClass, pathPrefix + ".xml.before");
         migration.migrate(docBefore);
-        Document docAfter = getAsDocument(migration, pathPrefix + ".xml.after");
+        Document docAfter = XMLUtils.documentFromResource(migrationClass, pathPrefix + ".xml.after");
 
         Assert.assertEquals(String.valueOf(migration.getFromVersion()),
                 docBefore.getDocumentElement().getAttribute("version"));

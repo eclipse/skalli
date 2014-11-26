@@ -10,9 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.testutil;
 
-import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,7 +24,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.eclipse.skalli.services.extension.DataMigration;
 import org.junit.Assert;
 import org.w3c.dom.Document;
 
@@ -69,20 +66,6 @@ public class XMLDiffUtil {
         writer.close();
 
         return writer.toString();
-    }
-
-    protected static Document getAsDocument(DataMigration migration, String filename) throws Exception {
-        URL urlBefore = migration.getClass().getResource(filename);
-        InputStream isBefore = urlBefore.openStream();
-        try {
-            DocumentBuilder docBuilder = getDocumentBuilder();
-            Document doc = docBuilder.parse(isBefore);
-            return doc;
-        } finally {
-            if (isBefore != null) {
-                isBefore.close();
-            }
-        }
     }
 
     protected static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException {

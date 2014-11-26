@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -74,6 +75,40 @@ public class XMLUtils {
         DocumentBuilder docBuilder = getDocumentBuilder();
         Document doc = docBuilder.parse(file);
         return doc;
+    }
+
+    /**
+     * Reads and parses an XML document from a resource file loaded with
+     * the bundle classloader of the given class.
+     *
+     * @param c  the class.
+     * @param filename  the path and filename of the requested resource relative to the bundle root
+     * of the bundle containg the given class.
+     *
+     * @return  an XML document parsed from the given file, or <code>null</code> if the requested
+     * resource was not found.
+     *
+     * @throws SAXException  if a parsing error occurd.
+     * @throws IOException  if an i/o error occured.
+     * @throws ParserConfigurationException  a serious serious configuration error occured.
+     */
+    public static Document documentFromResource(Class<?> c, String filename) throws SAXException,
+            IOException, ParserConfigurationException {
+        URL urlBefore = c.getResource(filename);
+        if (urlBefore == null) {
+            return null;
+        }
+        InputStream isBefore = null;
+        try {
+            isBefore = urlBefore.openStream();
+            DocumentBuilder docBuilder = getDocumentBuilder();
+            Document doc = docBuilder.parse(isBefore);
+            return doc;
+        } finally {
+            if (isBefore != null) {
+                isBefore.close();
+            }
+        }
     }
 
     /**
