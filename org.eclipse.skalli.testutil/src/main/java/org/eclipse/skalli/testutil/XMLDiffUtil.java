@@ -33,24 +33,24 @@ public class XMLDiffUtil {
     /**
      * Asserts that the given {@link Document documents} are equal.
      */
-    public static void assertEquals(Document docLeft, Document docRight, boolean ignoreWhitespace) throws Exception {
+    public static void assertEquals(Document expected, Document actual, boolean ignoreWhitespace) throws Exception {
         XMLUnit.setIgnoreWhitespace(ignoreWhitespace);
-        Diff diff = XMLUnit.compareXML(docRight, docLeft);
-        Assert.assertTrue(detailsToString(diff, docRight, docLeft), diff.similar());
-        Assert.assertTrue(detailsToString(diff, docRight, docLeft), diff.identical());
+        Diff diff = XMLUnit.compareXML(expected, actual);
+        Assert.assertTrue(detailsToString(diff, expected, actual), diff.similar());
+        Assert.assertTrue(detailsToString(diff, expected, actual), diff.identical());
     }
 
-    protected static String detailsToString(Diff diff, Document controlDoc, Document modifiedDoc) throws Exception {
+    protected static String detailsToString(Diff diff, Document expected, Document actual) throws Exception {
         StringBuffer sb = new StringBuffer();
         diff.appendMessage(sb);
 
-        if (controlDoc != null) {
-            sb.append("\nControl document:\n");
-            sb.append(toString(controlDoc)).append("\n");
+        if (expected != null) {
+            sb.append("\nExpected:\n");
+            sb.append(toString(expected)).append("\n");
         }
-        if (modifiedDoc != null) {
-            sb.append("\nModified document:\n");
-            sb.append(toString(modifiedDoc)).append("\n");
+        if (actual != null) {
+            sb.append("\nActual:\n");
+            sb.append(toString(actual)).append("\n");
         }
 
         return sb.toString();
