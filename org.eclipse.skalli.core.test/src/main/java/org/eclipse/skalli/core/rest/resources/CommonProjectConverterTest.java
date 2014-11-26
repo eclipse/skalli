@@ -32,13 +32,9 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.commons.InfoExtension;
 import org.eclipse.skalli.model.ext.commons.TagsExtension;
 import org.eclipse.skalli.services.extension.ExtensionService;
-import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.rest.RestWriter;
-import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.RestWriterTestBase;
 import org.eclipse.skalli.testutil.TestUUIDs;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
@@ -295,18 +291,6 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
             + ",\"subprojects\":[]"
             + "," + MEMBERS_SECTION_JSON()
             + ",\"extensions\":{}}";
-    }
-
-    private List<Project> projects;
-    private ProjectService projectService;
-
-    @Override
-    @Before
-    public void setup() throws Exception {
-        super.setup();
-        projectService = BundleManager.getRequiredService(ProjectService.class);
-        projects = projectService.getAll();
-        Assert.assertTrue("projects.size() > 0", projects.size() > 0);
     }
 
     @Test
