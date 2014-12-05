@@ -13,20 +13,14 @@ package org.eclipse.skalli.testutil;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.Arrays;
-
 import javax.xml.transform.TransformerException;
 
-import org.custommonkey.xmlunit.ComparisonController;
 import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.Difference;
 import org.custommonkey.xmlunit.DifferenceConstants;
 import org.custommonkey.xmlunit.DifferenceEngine;
-import org.custommonkey.xmlunit.DifferenceListener;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.eclipse.skalli.commons.XMLUtils;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 /**
  * Utility for determining the differences between XML documents with {@link XMLUnit}.
@@ -34,64 +28,11 @@ import org.w3c.dom.Node;
 @SuppressWarnings("nls")
 public class XMLDiffUtil {
 
-    public static class DiffOptions implements ComparisonController, DifferenceListener {
-
-        private int[] list = new int[8];
-        private int size = 0;
-
-        private boolean identical = true;
-
-        public DiffOptions(int...options) {
-            append(options);
-        }
-
-        public DiffOptions(DiffOptions base, int...options) {
-            append(base.list);
-            append(options);
-        }
-
-        public void append(int... options) {
-            if (options != null && options.length > 0) {
-                if (size + options.length > list.length) {
-                    int[] grown = new int[list.length + options.length];
-                    System.arraycopy(list, 0, grown, 0, list.length);
-                    list = grown;
-                }
-                System.arraycopy(list, size, options, 0, options.length);
-                size += options.length;
-                Arrays.sort(list);
-            }
-        }
-
-        @Override
-        public int differenceFound(Difference difference) {
-            int result = RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
-            if (Arrays.binarySearch(list, difference.getId()) < 0) {
-                identical = false;
-                result = RETURN_ACCEPT_DIFFERENCE;
-            }
-            return result;
-        }
-
-        @Override
-        public void skippedComparison(Node control, Node test) {
-        }
-
-        @Override
-        public boolean haltComparison(Difference afterDifference) {
-            return !identical;
-        }
-
-        public boolean identical() {
-            return identical;
-        }
-    }
-
     /**
      * Combination of diff options for ignoring comments, processing instructions
      * and CDATA sections.
      */
-    public static final DiffOptions DEFAULT_DIFF_OPTIONS = new DiffOptions(
+    public static final XMLDiffOptions DEFAULT_DIFF_OPTIONS = new XMLDiffOptions(
             DifferenceConstants.COMMENT_VALUE_ID,
             DifferenceConstants.PROCESSING_INSTRUCTION_TARGET_ID,
             DifferenceConstants.PROCESSING_INSTRUCTION_DATA_ID,
@@ -116,11 +57,11 @@ public class XMLDiffUtil {
      * @param actual  the actual document produced by the test.
      * @param diffOptions  the diff options to apply.
      */
-    public static void assertEquals(Document expected, Document actual, DiffOptions diffOptions) {
+    public static void assertEquals(Document expected, Document actual, XMLDiffOptions diffOptions) {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreComments(true);
         XMLUnit.setIgnoreAttributeOrder(true);
-        DifferenceEngine engine = new DifferenceEngine(new DiffOptions(diffOptions));
+        DifferenceEngine engine = new DifferenceEngine(new XMLDiffOptions(diffOptions));
         Diff diff = new Diff(expected, actual, engine);
         assertSimilar(expected, actual, diff);
         assertIdentical(expected, actual, diff);
