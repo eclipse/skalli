@@ -28,6 +28,9 @@ import org.eclipse.skalli.commons.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+/**
+ * Utility for determining the differences between XML documents with {@link XMLUnit}.
+ */
 @SuppressWarnings("nls")
 public class XMLDiffUtil {
 
@@ -85,7 +88,8 @@ public class XMLDiffUtil {
     }
 
     /**
-     * Ignore comments, processing instructions and CDATA sections.
+     * Combination of diff options for ignoring comments, processing instructions
+     * and CDATA sections.
      */
     public static final DiffOptions DEFAULT_DIFF_OPTIONS = new DiffOptions(
             DifferenceConstants.COMMENT_VALUE_ID,
@@ -95,15 +99,28 @@ public class XMLDiffUtil {
 
     /**
      * Asserts that the given {@link Document documents} are {@link Diff#similar() similiar}
-     * and {@link Diff#identical() identical}.
+     * and {@link Diff#identical() identical}. Applies only {@link #DEFAULT_DIFF_OPTIONS default diff options}.
      *
      * @param expected  the expected document.
      * @param actual  the actual document produced by the test.
      */
     public static void assertEquals(Document expected, Document actual) {
+        assertEquals(expected, actual, DEFAULT_DIFF_OPTIONS);
+    }
+
+    /**
+     * Asserts that the given {@link Document documents} are {@link Diff#similar() similiar}
+     * and {@link Diff#identical() identical}. Applies the given diff options.
+     *
+     * @param expected  the expected document.
+     * @param actual  the actual document produced by the test.
+     * @param diffOptions  the diff options to apply.
+     */
+    public static void assertEquals(Document expected, Document actual, DiffOptions diffOptions) {
         XMLUnit.setIgnoreWhitespace(true);
-        DifferenceEngine engine = new DifferenceEngine(new DiffOptions(DEFAULT_DIFF_OPTIONS,
-                DifferenceConstants.CHILD_NODELIST_SEQUENCE_ID));
+        XMLUnit.setIgnoreComments(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
+        DifferenceEngine engine = new DifferenceEngine(new DiffOptions(diffOptions));
         Diff diff = new Diff(expected, actual, engine);
         assertSimilar(expected, actual, diff);
         assertIdentical(expected, actual, diff);
