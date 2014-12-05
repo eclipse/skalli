@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.skalli.commons.UUIDUtils;
+import org.eclipse.skalli.model.ByProjectIdComparator;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
@@ -71,7 +72,7 @@ public class SubprojectsResource extends ResourceBase {
             return null;
         }
 
-        Comparator<Project> comparator = new Project.CompareByProjectId();
+        Comparator<Project> comparator = new ByProjectIdComparator();
         Subprojects subprojects = new Subprojects(projectService.getSubProjects(project.getUuid(), comparator, depth));
 
         if (enforceOldStyleConverters()) {

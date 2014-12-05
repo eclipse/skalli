@@ -26,13 +26,13 @@ import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.model.ByProjectIdComparator;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.model.Project.CompareByProjectId;
 import org.eclipse.skalli.model.ProjectNature;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ValidationException;
@@ -209,7 +209,7 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
 
         SortedSet<Project> subprojects = c != null ?
                 new TreeSet<Project>(c) :
-                new TreeSet<Project>(new CompareByProjectId());
+                new TreeSet<Project>(new ByProjectIdComparator());
 
         addSubProjects(project, subprojects, 1, depth);
         return subprojects;

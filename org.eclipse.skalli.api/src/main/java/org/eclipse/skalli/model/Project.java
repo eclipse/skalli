@@ -24,34 +24,6 @@ import org.apache.commons.lang.StringUtils;
 @Historized
 public class Project extends ExtensibleEntityBase {
 
-    /**
-     * Comparator for comparing projects by their {@link Project#getProjectId() symbolic names}.
-     */
-    public static class CompareByProjectId implements Comparator<Project> {
-        @Override
-        public int compare(Project o1, Project o2) {
-            return o1.getProjectId().compareTo(o2.getProjectId());
-        }
-    }
-
-    /**
-     * Comparator for comparing projects by their {@link Project#getName() display names}.
-     * If two projects happen ton have the same display name, they arem compared by
-     * symbolic name.
-     * <p>
-     * Note, display names are compared case-insensitive.
-     */
-    public static class CompareByProjectName implements Comparator<Project> {
-        @Override
-        public int compare(Project o1, Project o2) {
-            int result = o1.getName().compareToIgnoreCase(o2.getName());
-            if (result == 0) {
-                result = o1.getProjectId().compareTo(o2.getProjectId());
-            }
-            return result;
-        }
-    }
-
     public static final String MODEL_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/Model"; //$NON-NLS-1$
 
@@ -276,7 +248,7 @@ public class Project extends ExtensibleEntityBase {
      * project has no subprojects.
      */
     public SortedSet<Project> getSubProjects() {
-        return addSubProjects(new TreeSet<Project>(new CompareByProjectId()));
+        return addSubProjects(new TreeSet<Project>(new ByProjectIdComparator()));
     }
 
     /**

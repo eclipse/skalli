@@ -110,10 +110,10 @@ public class ProjectTest {
 
         AssertUtils.assertEquals("getSubProjects(CompareByProjectId)",
                 Arrays.asList(child2, child5, child3, child4, child1),
-                parent.getSubProjects(new Project.CompareByProjectId()));
+                parent.getSubProjects(new ByProjectIdComparator()));
 
         AssertUtils.assertEquals("getSubProjects(CompareByProjectName)",
                 Arrays.asList(child5, child3, child4, child1, child2),
-                parent.getSubProjects(new Project.CompareByProjectName()));
+                parent.getSubProjects(new ByProjectNameComparator()));
     }
 }

@@ -18,7 +18,7 @@
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.eclipse.skalli.model.Issue" %>
 <%@ page import="org.eclipse.skalli.model.Project" %>
-<%@ page import="org.eclipse.skalli.model.Project.CompareByProjectName" %>
+<%@ page import="org.eclipse.skalli.model.ByProjectNameComparator" %>
 <%@ page import="org.eclipse.skalli.model.Severity" %>
 <%@ page import="org.eclipse.skalli.services.Services" %>
 <%@ page import="org.eclipse.skalli.services.group.GroupUtils" %>
@@ -92,7 +92,7 @@
             }
         }
         if (nodes.isEmpty()) {
-            nodes.addAll(projectService.getProjects(new CompareByProjectName()));
+            nodes.addAll(projectService.getProjects(new ByProjectNameComparator()));
         }
 
         out.append("<a href=\"javascript:expandAll();\">[+] expand</a>   ");
@@ -116,7 +116,7 @@
     private void traverseProject(JspWriter out, Project project, int tab,
             boolean showIssues, String userId) throws IOException {
 
-        SortedSet<Project> subprojects = project.getSubProjects(new CompareByProjectName());
+        SortedSet<Project> subprojects = project.getSubProjects(new ByProjectNameComparator());
         int sizeChildren = subprojects.size();
 
         appendTabs(out, tab);
@@ -179,5 +179,4 @@
     private void appendIssueTooltip(JspWriter out, Issues issues) throws IOException {
         String tooltip = Issue.getMessage("The following issues were found ", issues.getIssues());
         out.append(" title=\"" + StringEscapeUtils.escapeHtml(tooltip) + "\" />");
-    }
-%>
+    }%>
