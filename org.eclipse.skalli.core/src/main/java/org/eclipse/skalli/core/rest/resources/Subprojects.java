@@ -49,10 +49,6 @@ public class Subprojects {
         return subprojects;
     }
 
-    public void setSubprojects(LinkedHashSet<Project> subprojects) {
-        this.subprojects = new LinkedHashSet<Project>(subprojects);
-    }
-
     public void addAll(Collection<Project> projects) {
         getSubprojects().addAll(projects);
     }
