@@ -62,7 +62,7 @@ public class RestAPISmokeTest {
 
     @Test
     public void testGetProjects() throws Exception {
-        assertRestResponse("/projects", "allprojects.xml");
+        assertRestResponse("/projects?orderBy=projectId", "allprojects.xml");
     }
 
     @Test
