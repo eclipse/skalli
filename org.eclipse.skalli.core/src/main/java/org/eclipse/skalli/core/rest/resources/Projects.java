@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest.resources;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.eclipse.skalli.model.Project;
 
@@ -21,32 +21,28 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("projects")
 public class Projects {
 
-    private List<Project> projects;
+    private LinkedHashSet<Project> projects;
 
     // do not remove: required by xstream
     public Projects() {
     }
 
     public Projects(Collection<Project> projects) {
-        this.projects = new ArrayList<Project>(projects);
+        this.projects = new LinkedHashSet<Project>(projects);
     }
 
-    public List<Project> getProjects() {
+    public Set<Project> getProjects() {
         if (projects == null) {
-            projects = new ArrayList<Project>();
+            projects = new LinkedHashSet<Project>();
         }
         return projects;
-    }
-
-    public void setProjects(Collection<Project> projects) {
-        this.projects = new ArrayList<Project>(projects);
     }
 
     public void addProject(Project project) {
         getProjects().add(project);
     }
 
-    public void addProjects(Collection<Project> projects) {
+    public void addAll(Collection<Project> projects) {
         getProjects().addAll(projects);
     }
 

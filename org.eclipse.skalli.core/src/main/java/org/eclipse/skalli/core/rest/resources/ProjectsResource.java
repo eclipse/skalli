@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
@@ -22,6 +23,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.Statistics;
+import org.eclipse.skalli.model.ByProjectIdComparator;
+import org.eclipse.skalli.model.ByProjectNameComparator;
+import org.eclipse.skalli.model.ByUUIDComparator;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.NoSuchPropertyException;
@@ -95,7 +99,7 @@ public class ProjectsResource extends ResourceBase {
     private Projects getProjects(SearchQuery queryParams) throws QueryParseException {
         List<Project> projects = null;
         if (queryParams.isQueryAll()) {
-            projects = Services.getRequiredService(ProjectService.class).getAll();
+            projects = Services.getRequiredService(ProjectService.class).getProjects(getComparator(queryParams));
         } else {
             SearchResult<Project> searchResult = SearchUtils.searchProjects(queryParams);
             Statistics.getDefault().trackSearch(Permits.getLoggedInUser(), searchResult.getQueryString(),
@@ -111,13 +115,26 @@ public class ProjectsResource extends ResourceBase {
         if (StringUtils.isBlank(queryParams.getProperty())) {
             // if there is no property filter, just add the requested subset
             // of projects to the result and quit
-            result.addProjects(projects.subList(fromIndex, toIndex));
+            result.addAll(projects.subList(fromIndex, toIndex));
         } else {
             // if there is a property filter, add only those projects
             // to the result that match the filter
             filterProjects(result, projects, queryParams, fromIndex, toIndex);
         }
         return result;
+    }
+
+    private Comparator<Project> getComparator(SearchQuery queryParams) {
+        switch (queryParams.getOrderBy()) {
+        case UUID:
+            return new ByUUIDComparator();
+        case PROJECT_ID:
+            return new ByProjectIdComparator();
+        case PROJECT_NAME:
+            return new ByProjectNameComparator();
+        default:
+            return null;
+        }
     }
 
     private void filterProjects(Projects result, List<Project> projects,

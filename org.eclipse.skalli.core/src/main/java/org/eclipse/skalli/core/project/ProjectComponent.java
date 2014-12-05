@@ -141,7 +141,9 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
     @Override
     public List<Project> getProjects(Comparator<Project> c) {
         List<Project> projects = getAll();
-        Collections.sort(projects, c);
+        if (c != null) {
+            Collections.sort(projects, c);
+        }
         return projects;
     }
 

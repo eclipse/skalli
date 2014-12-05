@@ -56,7 +56,8 @@ public interface ProjectService extends EntityService<Project>, Issuer {
      * Returns a sorted list of all currently existing projects.
      *
      * @param c
-     *          the comparator to use to sort the result.
+     *          the comparator to use to sort the result, or <code>null</code>.
+     *          In that case the result is the same as for {@link #getAll()}.
      *
      * @return  a list of projects, or an empty list.
      */

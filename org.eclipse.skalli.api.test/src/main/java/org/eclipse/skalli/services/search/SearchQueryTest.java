@@ -34,6 +34,7 @@ public class SearchQueryTest {
         assertEquals(0, query.getStart());
         assertEquals(Integer.MAX_VALUE, query.getCount());
         assertNull(query.getPattern());
+        assertEquals(SortOrder.NONE, query.getOrderBy());
     }
 
     @Test
@@ -146,6 +147,8 @@ public class SearchQueryTest {
         query.setPagingInfo(null);
         assertEquals(0, query.getStart());
         assertEquals(Integer.MAX_VALUE, query.getCount());
+        query.setOrderBy(SortOrder.PROJECT_ID);
+        assertEquals(SortOrder.PROJECT_ID, query.getOrderBy());
     }
 
     @Test

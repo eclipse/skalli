@@ -11,7 +11,7 @@
 package org.eclipse.skalli.core.rest.resources;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
@@ -80,7 +80,7 @@ public class ProjectsConverter extends RestConverterBase<Projects> {
         marshalNSAttributes(writer);
         marshalApiVersion(writer);
 
-        List<Project> projects = ((Projects) source).getProjects();
+        Set<Project> projects = ((Projects) source).getProjects();
 
         writer.addAttribute("start", Integer.toString(start)); //$NON-NLS-1$
         writer.addAttribute("count", Integer.toString(projects.size())); //$NON-NLS-1$

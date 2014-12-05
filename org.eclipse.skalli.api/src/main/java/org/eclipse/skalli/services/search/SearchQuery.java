@@ -35,6 +35,7 @@ public class SearchQuery {
     public static final String PARAM_EXTENSIONS = "extensions"; //$NON-NLS-1$
     public static final String PARAM_START = "start"; //$NON-NLS-1$
     public static final String PARAM_COUNT = "count"; //$NON-NLS-1$
+    public static final String PARAM_ORDER_BY = "orderBy"; //$NON-NLS-1$
 
     public static final String DEFAULT_SHORTNAME = "project"; //$NON-NLS-1$
     public static final String PROJECT_PREFIX = DEFAULT_SHORTNAME + "."; //$NON-NLS-1$
@@ -63,6 +64,8 @@ public class SearchQuery {
 
     private PagingInfo pagingInfo;
 
+    private SortOrder orderBy;
+
     public SearchQuery() {
     }
 
@@ -71,6 +74,7 @@ public class SearchQuery {
         setTag(params.get(PARAM_TAG));
         setUser(params.get(PARAM_USER));
         setProperty(params.get(PARAM_PROPERTY));
+        setOrderBy(params.get(PARAM_ORDER_BY));
 
         String patternArg = params.get(PARAM_PATTERN);
         if (StringUtils.isBlank(patternArg)) {
@@ -233,6 +237,26 @@ public class SearchQuery {
 
     public int getCount() {
         return pagingInfo != null? pagingInfo.getCount() : Integer.MAX_VALUE;
+    }
+
+    public SortOrder getOrderBy() {
+        return orderBy != null? orderBy : SortOrder.NONE;
+    }
+
+    public void setOrderBy(SortOrder orderBy) {
+        this.orderBy = orderBy;
+    }
+
+    public void setOrderBy(String orderBy) {
+        if ("projectId".equalsIgnoreCase(orderBy)) { //$NON-NLS-1$
+            setOrderBy(SortOrder.PROJECT_ID);
+        } else if ("name".equalsIgnoreCase(orderBy)) { //$NON-NLS-1$
+            setOrderBy(SortOrder.PROJECT_NAME);
+        } else if ("uuid".equalsIgnoreCase(orderBy)) { //$NON-NLS-1$
+            setOrderBy(SortOrder.UUID);
+        } else {
+            setOrderBy(SortOrder.NONE);
+        }
     }
 
     StrTokenizer getTokenizer() {
