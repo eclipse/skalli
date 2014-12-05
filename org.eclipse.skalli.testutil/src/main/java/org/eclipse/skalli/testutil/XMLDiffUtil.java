@@ -100,7 +100,7 @@ public class XMLDiffUtil {
      * @param expected  the expected document.
      * @param actual  the actual document produced by the test.
      */
-    public static void assertEquals(Document expected, Document actual, boolean b) {
+    public static void assertEquals(Document expected, Document actual) {
         XMLUnit.setIgnoreWhitespace(true);
         DifferenceEngine engine = new DifferenceEngine(new DiffOptions(DEFAULT_DIFF_OPTIONS,
                 DifferenceConstants.CHILD_NODELIST_SEQUENCE_ID));

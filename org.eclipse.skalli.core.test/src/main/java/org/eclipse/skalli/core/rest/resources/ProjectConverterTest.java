@@ -88,7 +88,7 @@ public class ProjectConverterTest {
             // compare marshaled and expected output
             Document expectedDoc = XMLUtils.documentFromString(expected.toString());
             Document actualDoc = XMLUtils.documentFromString(writer.toString());
-            XMLDiffUtil.assertEquals(expectedDoc, actualDoc, true);
+            XMLDiffUtil.assertEquals(expectedDoc, actualDoc);
         }
     }
 

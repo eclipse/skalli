@@ -42,6 +42,6 @@ public class MigrationTestUtil extends XMLDiffUtil {
 
         Assert.assertEquals(String.valueOf(migration.getFromVersion()),
                 docBefore.getDocumentElement().getAttribute("version"));
-        assertEquals(docBefore, docAfter, true);
+        assertEquals(docBefore, docAfter);
     }
 }

@@ -116,7 +116,7 @@ public class RestAPISmokeTest {
         assertEquals(200, resp.getStatusLine().getStatusCode());
         Document expected = XMLUtils.documentFromString(getResource(RestAPISmokeTest.class, RESOURCE_PATH + fileName));
         Document actual = XMLUtils.documentFromString(getContent(resp));
-        XMLDiffUtil.assertEquals(expected, actual, true);
+        XMLDiffUtil.assertEquals(expected, actual);
     }
 
 }
