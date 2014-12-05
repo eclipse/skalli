@@ -189,18 +189,20 @@ public class DestinationComponent implements DestinationService {
         // allow to overwrite the system properties with configuration /api/config/proxy
         if (configService != null) {
             ProxyConfig proxyConfig = configService.readConfiguration(ProxyConfig.class);
-            String defaultConfigProxyHost = proxyConfig.getHost();
-            String defaultConfigProxyPort = proxyConfig.getPort();
-            String configProxyHost = HTTPS.equals(protocol) ? proxyConfig.getHostSSL() : defaultConfigProxyHost;
-            int configProxyPort = NumberUtils.toInt(HTTPS.equals(protocol) ?
-                    proxyConfig.getPortSSL() : defaultConfigProxyPort);
-            if (StringUtils.isNotBlank(configProxyHost) && configProxyPort > 0) {
-                proxyHost = configProxyHost;
-                proxyPort = configProxyPort;
-            }
-            String configNonProxyHosts = proxyConfig.getNonProxyHosts();
-            if (StringUtils.isNotBlank(configNonProxyHosts)) {
-                nonProxyHosts = configNonProxyHosts;
+            if (proxyConfig != null) {
+                String defaultConfigProxyHost = proxyConfig.getHost();
+                String defaultConfigProxyPort = proxyConfig.getPort();
+                String configProxyHost = HTTPS.equals(protocol) ? proxyConfig.getHostSSL() : defaultConfigProxyHost;
+                int configProxyPort = NumberUtils.toInt(HTTPS.equals(protocol) ?
+                        proxyConfig.getPortSSL() : defaultConfigProxyPort);
+                if (StringUtils.isNotBlank(configProxyHost) && configProxyPort > 0) {
+                    proxyHost = configProxyHost;
+                    proxyPort = configProxyPort;
+                }
+                String configNonProxyHosts = proxyConfig.getNonProxyHosts();
+                if (StringUtils.isNotBlank(configNonProxyHosts)) {
+                    nonProxyHosts = configNonProxyHosts;
+                }
             }
         }
 
