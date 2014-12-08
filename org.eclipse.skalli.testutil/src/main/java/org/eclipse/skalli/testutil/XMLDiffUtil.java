@@ -15,9 +15,11 @@ import static org.junit.Assert.fail;
 
 import javax.xml.transform.TransformerException;
 
+import org.custommonkey.xmlunit.ComparisonController;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.DifferenceConstants;
 import org.custommonkey.xmlunit.DifferenceEngine;
+import org.custommonkey.xmlunit.DifferenceListener;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.eclipse.skalli.commons.XMLUtils;
 import org.w3c.dom.Document;
@@ -63,6 +65,25 @@ public class XMLDiffUtil {
         XMLUnit.setIgnoreAttributeOrder(true);
         DifferenceEngine engine = new DifferenceEngine(new XMLDiffOptions(diffOptions));
         Diff diff = new Diff(expected, actual, engine);
+        diff.overrideDifferenceListener(diffOptions);
+        assertSimilar(expected, actual, diff);
+        assertIdentical(expected, actual, diff);
+    }
+
+    /**
+     * Asserts that the given {@link Document documents} are {@link Diff#similar() similiar}
+     * and {@link Diff#identical() identical}.
+     *
+     * @param expected  the expected document.
+     * @param actual  the actual document produced by the test.
+     * @param diffListener  the difference listener to apply.
+     */
+    public static void assertEquals(Document expected, Document actual, DifferenceListener diffListener) {
+        XMLUnit.setIgnoreWhitespace(true);
+        XMLUnit.setIgnoreComments(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
+        Diff diff = new Diff(expected, actual);
+        diff.overrideDifferenceListener(diffListener);
         assertSimilar(expected, actual, diff);
         assertIdentical(expected, actual, diff);
     }
