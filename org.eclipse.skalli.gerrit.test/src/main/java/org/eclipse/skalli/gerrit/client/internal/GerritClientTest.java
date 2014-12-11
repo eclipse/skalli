@@ -49,11 +49,11 @@ public class GerritClientTest {
     // DO NOT CONFIGURE A PRODUCTIVE GERRIT - the test case created a huge amount of projects and
     // groups that cannot be removed easily.
     private static String TEST_HOST = null;
-    private static String TEST_ADMIN_ACCOUNT = null;
+    private static String TEST_ACCOUNT = null;
     private static String TEST_PORT = "8080";
     private static String TEST_PRIVATEKEY = null;
     private static String TEST_PASSPHRASE = null;
-    private static String TEST_GERRIT_VERSION = null;
+    private static String TEST_VERSION = null;
     private static final String TEST_ONBEHALFOF = "userId";
 
     // DO NOT MODIFY THIS DESCRIPTION - it is used in the clean up step to figure out which projects
@@ -65,13 +65,14 @@ public class GerritClientTest {
     @BeforeClass
     public static void setUpOnce() throws Exception {
         TEST_HOST = System.getProperty("testHost");
-        TEST_ADMIN_ACCOUNT = System.getProperty("testAdminAccount");
         String port = System.getProperty("testPort");
         TEST_PORT = port != null ? port : TEST_PORT;
-        String privateKeyFile = System.getProperty("testPrivatekeyFile");
-        TEST_PASSPHRASE = System.getProperty("testPassphrase");
-        TEST_GERRIT_VERSION = System.getProperty("testGerritVersion");
+        TEST_VERSION = System.getProperty("testVersion");
+        TEST_ACCOUNT = System.getProperty("testAccount");
+        TEST_PRIVATEKEY = System.getProperty("testPrivateKey");
+        String privateKeyFile = System.getProperty("testPrivateKeyFile");
         TEST_PRIVATEKEY = FileUtils.readFileToString(new File(privateKeyFile));
+        TEST_PASSPHRASE = System.getProperty("testPassphrase");
     }
 
     @AfterClass
@@ -142,7 +143,7 @@ public class GerritClientTest {
         GerritServerConfig gerritConfig = new GerritServerConfig();
         gerritConfig.setHost(TEST_HOST);
         gerritConfig.setPort(TEST_PORT);
-        gerritConfig.setUser(TEST_ADMIN_ACCOUNT);
+        gerritConfig.setUser(TEST_ACCOUNT);
         gerritConfig.setPrivateKey(TEST_PRIVATEKEY);
         gerritConfig.setPassphrase(TEST_PASSPHRASE);
         return gerritConfig;
@@ -150,7 +151,7 @@ public class GerritClientTest {
 
     @Test
     public void testGetVersion() throws Exception {
-        Assert.assertEquals(GerritVersion.asGerritVersion(TEST_GERRIT_VERSION), client.getVersion());
+        Assert.assertEquals(GerritVersion.asGerritVersion(TEST_VERSION), client.getVersion());
     }
 
     @Test
@@ -306,17 +307,17 @@ public class GerritClientTest {
     @Test
     public void testGetKnownAccounts() throws Exception {
         String unknownAccount = System.currentTimeMillis() + "";
-        Set<String> variousAccounts = new HashSet<String>(Arrays.asList(TEST_ADMIN_ACCOUNT, "", null, unknownAccount));
+        Set<String> variousAccounts = new HashSet<String>(Arrays.asList(TEST_ACCOUNT, "", null, unknownAccount));
         Set<String> knownAccounts = client.getKnownAccounts(variousAccounts);
 
-        GerritVersion version = GerritVersion.asGerritVersion(TEST_GERRIT_VERSION);
+        GerritVersion version = GerritVersion.asGerritVersion(TEST_VERSION);
         if (version.supports(GerritFeature.ACCOUNT_CHECK_OBSOLETE)) {
             Assert.assertEquals(2, knownAccounts.size());
-            Assert.assertTrue(knownAccounts.contains(TEST_ADMIN_ACCOUNT));
+            Assert.assertTrue(knownAccounts.contains(TEST_ACCOUNT));
             Assert.assertTrue(knownAccounts.contains(unknownAccount));
         } else {
             Assert.assertEquals(1, knownAccounts.size());
-            Assert.assertTrue(knownAccounts.contains(TEST_ADMIN_ACCOUNT));
+            Assert.assertTrue(knownAccounts.contains(TEST_ACCOUNT));
             Assert.assertFalse(knownAccounts.contains(unknownAccount));
         }
     }
@@ -335,10 +336,10 @@ public class GerritClientTest {
             String unknownAccount = System.currentTimeMillis() + "_" + i;
             variousAccounts.add(unknownAccount);
         }
-        variousAccounts.add(TEST_ADMIN_ACCOUNT);
+        variousAccounts.add(TEST_ACCOUNT);
 
         Set<String> knownAccounts = client.getKnownAccounts(variousAccounts);
-        GerritVersion version = GerritVersion.asGerritVersion(TEST_GERRIT_VERSION);
+        GerritVersion version = GerritVersion.asGerritVersion(TEST_VERSION);
         if (version.supports(GerritFeature.ACCOUNT_CHECK_OBSOLETE)) {
             Assert.assertEquals(variousAccounts.size(), knownAccounts.size());
         } else {

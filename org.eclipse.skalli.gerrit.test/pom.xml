@@ -29,12 +29,12 @@
                 <artifactId>tycho-surefire-plugin</artifactId>
                 <configuration>
                     <systemProperties>
-                        <testHost><!-- enter the host--></testHost>
-                        <testAdminAccount><!-- enter the account--></testAdminAccount>
-                        <testPort><!-- enter the port--></testPort>
-                        <testPrivatekeyFile><!-- enter privatekey file location url--></testPrivatekeyFile>
-                        <testPassphrase><!-- enter the passphrase--></testPassphrase>
-                        <testGerritVersion><!-- enter the Gerrit version--></testGerritVersion>
+                        <testHost>${gerrit.testHost}</testHost>
+                        <testPort>${gerrit.testPort}</testPort>
+                        <testVersion>${gerrit.testVersion}</testVersion>
+                        <testAccount>${gerrit.testAccount}</testAccount>
+                        <testPrivateKeyFile>${gerrit.testPrivateKeyFile}</testPrivateKeyFile>
+                        <testPassphrase>${gerrit.testPassphrase}</testPassphrase>
                     </systemProperties>
                 </configuration>
             </plugin>
