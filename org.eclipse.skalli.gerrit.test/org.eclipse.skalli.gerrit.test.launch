@@ -34,7 +34,7 @@
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl}"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="org.eclipse.skalli.gerrit.test"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dworkdir=${workspace_loc:org.eclipse.skalli.testutil}&#13;&#10;-DtestHost=&#13;&#10;-DtestAdminAccount=&#13;&#10;-DtestPort=&#13;&#10;-DtestPrivatekeyFile=src/main/java/org/eclipse/skalli/gerrit/client/internal/id_rsa&#13;&#10;-DtestPassphrase=&#13;&#10;-DtestGerritVersion="/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dworkdir=${workspace_loc:org.eclipse.skalli.testutil}&#13;&#10;-Dgerrit.testHost=&#13;&#10;-Dgerrit.testPort=&#13;&#10;-Dgerrit.testVersion=&#13;&#10;-Dgerrit.testAccount=&#13;&#10;-Dgerrit.testPrivateKeyFile=&#13;&#10;-Dgerrit.testPassphrase="/>
 <stringAttribute key="pde.version" value="3.3"/>
 <stringAttribute key="product" value="org.eclipse.equinox.p2.director.app.product"/>
 <booleanAttribute key="run_in_ui_thread" value="true"/>
