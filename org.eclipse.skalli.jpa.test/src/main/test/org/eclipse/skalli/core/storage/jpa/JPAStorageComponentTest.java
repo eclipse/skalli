@@ -20,6 +20,7 @@ import org.eclipse.skalli.testutil.BundleManager;
 import org.eclipse.skalli.testutil.StorageServiceTestBase;
 import org.junit.Test;
 
+@SuppressWarnings("nls")
 public class JPAStorageComponentTest extends StorageServiceTestBase {
 
     @Override
@@ -53,7 +54,7 @@ public class JPAStorageComponentTest extends StorageServiceTestBase {
         assertTrue(items.isEmpty());
 
         // create item
-        ByteArrayInputStream is = new ByteArrayInputStream(TEST_CONTENT.getBytes());
+        ByteArrayInputStream is = new ByteArrayInputStream(TEST_CONTENT.getBytes("UTF-8"));
         pdb.write(TEST_CATEGORY, TEST_ID, is);
 
         // first archive step
