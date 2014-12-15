@@ -98,7 +98,7 @@ public class RelatedProjectsConverter extends RestConverterBase<RelatedProjectsE
         RelatedProjectsExt ext = (RelatedProjectsExt)source;
         UUIDList relatedProjects = new UUIDList();
         if (ext.getCalculated()) {
-            writeNode(writer, "calculated"); //$NON-NLS-1$
+            writeNode(writer, "calculated", true); //$NON-NLS-1$
             SearchService searchService = Services.getService(SearchService.class);
             if (searchService != null) {
                 SearchResult<Project> hits = searchService.getRelatedProjects((Project)ext.getExtensibleEntity(), 3);
@@ -109,7 +109,7 @@ public class RelatedProjectsConverter extends RestConverterBase<RelatedProjectsE
         } else  {
             relatedProjects = ext.getRelatedProjects();
         }
-        for (UUID uuid: ext.getRelatedProjects()) {
+        for (UUID uuid: relatedProjects) {
             writeProjectLink(writer, PROJECT_RELATION, uuid);
         }
     }
