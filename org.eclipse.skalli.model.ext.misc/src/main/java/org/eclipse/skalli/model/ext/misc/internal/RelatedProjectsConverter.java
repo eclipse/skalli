@@ -109,8 +109,12 @@ public class RelatedProjectsConverter extends RestConverterBase<RelatedProjectsE
         } else  {
             relatedProjects = ext.getRelatedProjects();
         }
+        ProjectService projectService = Services.getRequiredService(ProjectService.class);
         for (UUID uuid: relatedProjects) {
-            writeProjectLink(writer, PROJECT_RELATION, uuid);
+            Project project = projectService.getByUUID(uuid);
+            if (project != null) {
+                writeProjectLink(writer, PROJECT_RELATION, uuid);
+            }
         }
     }
 
