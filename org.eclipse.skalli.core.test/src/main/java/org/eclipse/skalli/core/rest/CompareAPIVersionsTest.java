@@ -11,10 +11,12 @@
 package org.eclipse.skalli.core.rest;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.text.MessageFormat;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -27,11 +29,13 @@ import org.eclipse.skalli.services.destination.Destinations;
 import org.eclipse.skalli.testutil.XMLDiffUtil;
 import org.junit.Test;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 @SuppressWarnings("nls")
 public class CompareAPIVersionsTest {
 
-    private static final String SKALLI_ITEST_HOST = System.getProperty("skalli.itest.host");
+    private static final String SKALLI_ITEST_HOST = StringUtils.removeEnd(System.getProperty("skalli.itest.host"), "/");
 
     @Test
     public void testCompareAllProjects() throws Exception {
@@ -48,10 +52,41 @@ public class CompareAPIVersionsTest {
                 assertEquals(200, respV2.getStatusLine().getStatusCode());
                 Document expected = XMLUtils.documentFromString(getContent(respV1));
                 Document actual = XMLUtils.documentFromString(getContent(respV2));
-                ProjectsV1V2Diff projectsDiff = new ProjectsV1V2Diff();
+                ProjectsV1V2Diff projectsDiff = new ProjectsV1V2Diff(SKALLI_ITEST_HOST);
                 XMLDiffUtil.assertEquals(expected, actual, projectsDiff);
-                start += count;
+                NodeList projectNodes = expected.getDocumentElement().getElementsByTagName("project");
                 count = NumberUtils.toInt(expected.getDocumentElement().getAttribute("count"), 0);
+                assertEquals(count, projectNodes.getLength());
+                assertProjectDetails(client,projectNodes);
+                start += count;
+            }
+        }
+    }
+
+    private void assertProjectDetails(HttpClient client, NodeList projectNodes) throws Exception {
+        for (int i = 0; i < projectNodes.getLength(); ++i) {
+            Element projectNode = (Element)projectNodes.item(i);
+            boolean hasLinkNode = false;
+            NodeList linkNodes = projectNode.getElementsByTagName("link");
+            for (int j = 0; j < linkNodes.getLength(); ++j) {
+                Element linkNode = (Element)linkNodes.item(j);
+                if ("project".equals(linkNode.getAttribute("rel"))) {
+                    hasLinkNode = true;
+                    String href = linkNode.getAttribute("href");
+                    HttpGet reqV1 = new HttpGet(href + "?rest=v1");
+                    HttpResponse respV1 = client.execute(reqV1);
+                    assertEquals(200, respV1.getStatusLine().getStatusCode());
+                    HttpGet reqV2 = new HttpGet(href + "?rest=v2");
+                    HttpResponse respV2 = client.execute(reqV2);
+                    assertEquals(200, respV2.getStatusLine().getStatusCode());
+                    Document expected = XMLUtils.documentFromString(getContent(respV1));
+                    Document actual = XMLUtils.documentFromString(getContent(respV2));
+                    ProjectDetailsV1V2Diff projectDetailsDiff = new ProjectDetailsV1V2Diff(SKALLI_ITEST_HOST);
+                    XMLDiffUtil.assertEquals(expected, actual, projectDetailsDiff);
+                }
+            }
+            if (!hasLinkNode) {
+                fail("project has no detail link");
             }
         }
     }

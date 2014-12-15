@@ -13,6 +13,7 @@ package org.eclipse.skalli.core.rest;
 import static org.junit.Assert.fail;
 
 import java.text.MessageFormat;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
@@ -27,38 +28,44 @@ import org.w3c.dom.Node;
 @SuppressWarnings("nls")
 public class ProjectsV1V2Diff implements DifferenceListener {
 
-    private static final Pattern PROJECT_XPATH_PATTERN = getPattern("");
-    private static final Pattern LINK_XPATH_PATTERN = getPattern("/link\\[\\d+\\]");
-    private static final Pattern LINK_HREF_XPATH_PATTERN = getPattern("/link\\[\\d+\\]/@href");
-    private static final Pattern LINK_REL_XPATH_PATTERN = getPattern("/link\\[\\d+\\]/@rel");
-    private static final Pattern PHASE_XPATH_PATTERN = getPattern("/phase\\[1\\]");
-    private static final Pattern REGISTERED_XPATH_PATTERN = getPattern("/registered\\[1\\]");
-    private static final Pattern DESCRIPTION_XPATH_PATTERN = getPattern("/description\\[1\\]");
-    private static final Pattern DESCRIPTION_TEXT_XPATH_PATTERN = getPattern("/description\\[1\\]/text\\(\\)\\[1\\]");
-    private static final Pattern SUBPROJECTS_XPATH_PATTERN = getPattern("/subprojects\\[1\\]");
-    private static final Pattern EXTENSIONS_XPATH_PATTERN = getPattern("/extensions\\[1\\]");
-    private static final Pattern MEMBERS_XPATH_PATTERN = getPattern("/members\\[1\\]");
+    protected final Pattern ROOT_XPATH_PATTERN = getPattern("");
+    protected final Pattern EXTENSION_XPATH_PATTERN = getPattern("/extensions\\[1\\]/.+\\[1\\]");
+    protected final Pattern LINK_XPATH_PATTERN = getPattern("/link\\[\\d+\\]");
+    protected final Pattern LINK_HREF_XPATH_PATTERN = getPattern("/link\\[\\d+\\]/@href");
+    protected final Pattern LINK_REL_XPATH_PATTERN = getPattern("/link\\[\\d+\\]/@rel");
+    protected final Pattern PHASE_XPATH_PATTERN = getPattern("/phase\\[1\\]");
+    protected final Pattern REGISTERED_XPATH_PATTERN = getPattern("/registered\\[1\\]");
+    protected final Pattern DESCRIPTION_XPATH_PATTERN = getPattern("/description\\[1\\]");
+    protected final Pattern DESCRIPTION_TEXT_XPATH_PATTERN = getPattern("/description\\[1\\]/text\\(\\)\\[1\\]");
+    protected final Pattern SUBPROJECTS_XPATH_PATTERN = getPattern("/subprojects\\[1\\]");
+    protected final Pattern EXTENSIONS_XPATH_PATTERN = getPattern("/extensions\\[1\\]");
+    protected final Pattern MEMBERS_XPATH_PATTERN = getPattern("/members\\[1\\]");
+
+    protected final String webLocator;
+
+    public ProjectsV1V2Diff(String webLocator) {
+        this.webLocator = webLocator;
+    }
 
     @Override
     public int differenceFound(Difference difference) {
-        boolean identical = false;
+        int result = RETURN_ACCEPT_DIFFERENCE;
         NodeDetail expected = difference.getControlNodeDetail();
         NodeDetail actual = difference.getTestNodeDetail();
         switch (difference.getId()) {
         case DifferenceConstants.ELEMENT_NUM_ATTRIBUTES_ID:
             // <project> tag has an additional "lastModifiedMillis" attribute in the new API
-            if (equalsAndMatchesXPath(expected, actual, PROJECT_XPATH_PATTERN)
-                    && equalsValueInt(expected, 3)
-                    && equalsValueInt(actual, 4)) {
-                identical = true;
+            if (equalsAndMatchesAnyXPath(expected, actual, ROOT_XPATH_PATTERN, EXTENSION_XPATH_PATTERN)
+                    && (valueToInt(actual) == valueToInt(expected) + 1)) {
+                result = RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
             }
             break;
         case DifferenceConstants.ATTR_NAME_NOT_FOUND_ID:
             // <project> tag has an additional "lastModifiedMillis" attribute in the new API
-            if (equalsAndMatchesXPath(expected, actual, PROJECT_XPATH_PATTERN)
+            if (equalsAndMatchesAnyXPath(expected, actual, ROOT_XPATH_PATTERN, EXTENSION_XPATH_PATTERN)
                     && equalsValueNull(expected)
                     && "lastModifiedMillis".equals(actual.getValue())) {
-                identical = true;
+                result = RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
             };
             break;
         case DifferenceConstants.CHILD_NODELIST_LENGTH_ID:
@@ -70,55 +77,50 @@ public class ProjectsV1V2Diff implements DifferenceListener {
             // <project> tag has always a <subprojects> tag in the new API (even if empty),
             // but only if it was non-empty in the old API;
             // therefore, we have at least 2 additional tags, but never more than 4
-            if (equalsAndMatchesXPath(expected, actual, PROJECT_XPATH_PATTERN)
+            if (equalsAndMatchesAnyXPath(expected, actual, ROOT_XPATH_PATTERN)
                     && (valueToInt(actual) >= valueToInt(expected) + 2)
                     && (valueToInt(actual) <= valueToInt(expected) + 4)) {
-                identical = true;
+                result = RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
             }
             break;
         case DifferenceConstants.CHILD_NODELIST_SEQUENCE_ID:
             // some tags have changed their position in the new API compared to the old API, e.g.
             // all <link> tags are now grouped together, and the <phase>, <registered> and <description>
             // tags are now  rendered before the links.
-            if (equalsAndMatchesXPath(expected, actual, LINK_XPATH_PATTERN)
-                    || equalsAndMatchesXPath(expected, actual, PHASE_XPATH_PATTERN)
-                    || equalsAndMatchesXPath(expected, actual, REGISTERED_XPATH_PATTERN)
-                    || equalsAndMatchesXPath(expected, actual, DESCRIPTION_XPATH_PATTERN)
-                    || equalsAndMatchesXPath(expected, actual, MEMBERS_XPATH_PATTERN)
-                    || equalsAndMatchesXPath(expected, actual, SUBPROJECTS_XPATH_PATTERN)
-                    || equalsAndMatchesXPath(expected, actual, EXTENSIONS_XPATH_PATTERN)) {
-                identical = true;
+            if (equalsAndMatchesAnyXPath(expected, actual, LINK_XPATH_PATTERN, PHASE_XPATH_PATTERN,
+                    REGISTERED_XPATH_PATTERN, DESCRIPTION_XPATH_PATTERN, MEMBERS_XPATH_PATTERN,
+                    SUBPROJECTS_XPATH_PATTERN, EXTENSIONS_XPATH_PATTERN)) {
+                result = RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
             }
             break;
         case DifferenceConstants.ATTR_VALUE_ID:
             // The <link> tags have different ordering and position within the <project> tag
-            if (equalsAndMatchesXPath(expected, actual, LINK_HREF_XPATH_PATTERN)
-                    || equalsAndMatchesXPath(expected, actual, LINK_REL_XPATH_PATTERN)) {
-                identical = true;
+            if (equalsAndMatchesAnyXPath(expected, actual, LINK_HREF_XPATH_PATTERN,LINK_REL_XPATH_PATTERN)) {
+                result = RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
             }
             break;
         case DifferenceConstants.CHILD_NODE_NOT_FOUND_ID:
             // in the new API we may have additional <link>, <subprojects> and <members> tags,
             // which may no be there in the old API
             if (equalsValueNull(expected) && (
-                    matchesXPath(actual, LINK_XPATH_PATTERN) && "link".equals(actual.getValue())
-                 || matchesXPath(actual, SUBPROJECTS_XPATH_PATTERN) && "subprojects".equals(actual.getValue())
-                 || matchesXPath(actual, MEMBERS_XPATH_PATTERN) && "members".equals(actual.getValue()))) {
-                identical = true;
+                    matchesAnyXPath(actual, LINK_XPATH_PATTERN) && "link".equals(actual.getValue())
+                 || matchesAnyXPath(actual, SUBPROJECTS_XPATH_PATTERN) && "subprojects".equals(actual.getValue())
+                 || matchesAnyXPath(actual, MEMBERS_XPATH_PATTERN) && "members".equals(actual.getValue()))) {
+                result = RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
             }
             break;
         case DifferenceConstants.TEXT_VALUE_ID:
             // old and new API render different file endings: the new API renders a single \n #xA),
             // while the old API preferred \r\n (#xD #xA)
-            if (equalsAndMatchesXPath(expected, actual, DESCRIPTION_TEXT_XPATH_PATTERN)
+            if (equalsAndMatchesAnyXPath(expected, actual, DESCRIPTION_TEXT_XPATH_PATTERN)
                     && equalsValueIgnoreLineEndings(expected, actual)) {
-                identical = true;
+                result = RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
             };
             break;
         default:
-            identical = false;
+            result = RETURN_ACCEPT_DIFFERENCE;
         }
-        return identical? RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL : RETURN_ACCEPT_DIFFERENCE;
+        return result;
     }
 
     @Override
@@ -128,45 +130,96 @@ public class ProjectsV1V2Diff implements DifferenceListener {
                 expected.getNodeName(), expected.getNodeType(), actual.getNodeName(), actual.getNodeType()));
     }
 
-    private static Pattern getPattern(String relPath) {
-        return Pattern.compile(MessageFormat.format("^/projects\\[1\\]/project\\[\\d+\\]{0}$", relPath));
+    protected String getRootPath() {
+        return "/projects\\[1\\]";
     }
 
-    private boolean equalsXPath(NodeDetail expected, NodeDetail actual) {
+    protected Pattern getPattern(String relPath) {
+        return Pattern.compile(MessageFormat.format("^{0}/project\\[\\d+\\]{1}$", getRootPath(), relPath));
+    }
+
+    protected Pattern getExtPattern(String relPath) {
+        return Pattern.compile(MessageFormat.format("^{0}/project\\[\\d+\\]/extensions\\[1\\]{1}$", getRootPath(), relPath));
+    }
+
+    protected boolean equalsXPath(NodeDetail expected, NodeDetail actual) {
         return ComparatorUtils.equals(expected.getXpathLocation(), actual.getXpathLocation());
     }
 
-    private boolean matchesXPath(NodeDetail node, Pattern xPathPattern) {
-        return xPathPattern.matcher(node.getXpathLocation()).matches();
+    protected boolean matchesAnyXPath(NodeDetail node, Pattern... xPathPatterns) {
+        for (Pattern xPathPattern: xPathPatterns) {
+            if (xPathPattern.matcher(node.getXpathLocation()).matches()) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    private boolean equalsAndMatchesXPath(NodeDetail expected, NodeDetail actual, Pattern xPathPattern) {
-        return equalsXPath(expected, actual)
-                && matchesXPath(expected, xPathPattern)
-                && matchesXPath(actual, xPathPattern);
+    protected boolean equalsAndMatchesAnyXPath(NodeDetail expected, NodeDetail actual, Pattern... xPathPatterns) {
+        for (Pattern xPathPattern : xPathPatterns) {
+            if (equalsXPath(expected, actual)
+                    && matchesAnyXPath(expected, xPathPattern)
+                    && matchesAnyXPath(actual, xPathPattern)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    private boolean equalsValueInt(NodeDetail node, int value) {
+    protected boolean equalsValueInt(NodeDetail node, int value) {
         return isValueInt(node) && valueToInt(node) == value;
     }
 
-    private boolean isValueInt(NodeDetail node) {
+    protected boolean isValueInt(NodeDetail node) {
         return NumberUtils.isNumber(node.getValue());
     }
 
-    private int valueToInt(NodeDetail node) {
+    protected int valueToInt(NodeDetail node) {
          return NumberUtils.toInt(node.getValue());
     }
 
-    private boolean equalsValueNull(NodeDetail node) {
+    protected boolean equalsValueNull(NodeDetail node) {
         return "null".equals(node.getValue());
     }
 
-    private boolean equalsValueIgnoreLineEndings(NodeDetail expected, NodeDetail actual) {
+    protected boolean equalsValueIgnoreLineEndings(NodeDetail expected, NodeDetail actual) {
         return normalized(expected).equals(normalized(actual));
     }
 
-    private String normalized(NodeDetail node) {
+    protected String normalized(NodeDetail node) {
         return StringUtils.replace(node.getValue(), "\r\n", "\n");
+    }
+
+    protected boolean hasEmptyChildNode(NodeDetail nodeDetails, String name) {
+        Node node = nodeDetails.getNode().getFirstChild();
+        while (node != null) {
+            if (name.equals(node.getNodeName())) {
+                return !node.hasChildNodes();
+            }
+            node = node.getNextSibling();
+        }
+        return false;
+    }
+
+    protected boolean hasBooleanChildNode(NodeDetail nodeDetails, String name) {
+        Node node = nodeDetails.getNode().getFirstChild();
+        while (node != null) {
+            if (name.equals(node.getNodeName())) {
+                return "true".equals(node.getTextContent()) || "false".equals(node.getTextContent());
+            }
+            node = node.getNextSibling();
+        }
+        return false;
+    }
+
+    protected boolean hasAnyChildNode(NodeDetail nodeDetails, Set<String> names) {
+        Node node = nodeDetails.getNode().getFirstChild();
+        while (node != null) {
+            if (names.contains(node.getNodeName())) {
+                return true;
+            }
+            node = node.getNextSibling();
+        }
+        return false;
     }
 }
