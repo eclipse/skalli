@@ -9,31 +9,10 @@
     Contributors:
         SAP AG - initial API and implementation
  -->
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.rest" immediate="true">
-    <implementation class="org.eclipse.skalli.core.rest.RestApplication"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.skalli.core.component.rest" immediate="true">
+    <implementation class="org.eclipse.skalli.core.rest.RestComponent"/>
     <service>
         <provide interface="org.eclipse.skalli.services.rest.RestService"/>
     </service>
-    <reference
-        name="ConfigSection"
-        interface="org.eclipse.skalli.services.configuration.ConfigSection"
-        bind="bindConfigSection"
-        unbind="unbindConfigSection"
-        cardinality="0..n"
-        policy="dynamic" />
-    <reference
-        name="Monitorable"
-        interface="org.eclipse.skalli.core.rest.monitor.Monitorable"
-        bind="bindMonitorable"
-        unbind="unbindMonitorable"
-        cardinality="0..n"
-        policy="dynamic" />
-     <reference
-        name="RestExtension"
-        interface="org.eclipse.skalli.services.extension.rest.RestExtension"
-        bind="bindRestExtension"
-        unbind="unbindRestExtension"
-        cardinality="0..n"
-        policy="dynamic" />
 </scr:component>
 
