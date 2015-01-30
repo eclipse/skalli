@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde version="3.6"?>
 
-<target includeMode="feature" name="Skalli Target Platform" sequenceNumber="3">
+<target includeMode="feature" name="Skalli Target Platform" sequenceNumber="4">
 <locations>
 <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.core.contenttype" version="3.4.200.v20130326-1255"/>
@@ -141,6 +141,11 @@
 <unit id="osgi.enterprise" version="4.2.0.v201108120515"/>
 <unit id="osgi.enterprise.source" version="4.2.0.v201108120515"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20140114142710/repository/"/>
+</location>
+<location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
+<unit id="com.google.gson" version="2.2.4.v201311231704"/>
+<unit id="com.google.gson.source" version="2.2.4.v201311231704"/>
+<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20140525021250/repository/"/>
 </location>
 <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.jetty.client" version="8.1.14.v20131031"/>
