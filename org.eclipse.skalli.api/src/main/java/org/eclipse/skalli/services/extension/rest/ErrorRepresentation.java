@@ -78,7 +78,7 @@ public class ErrorRepresentation extends WriterRepresentation {
     public void write(Writer writer) throws IOException {
         RestService restService = Services.getRequiredService(RestService.class);
         MediaType mediaType = context.getMediaType();
-        if (!restService.isSupportedMediaType(mediaType)) {
+        if (!restService.isSupported(context)) {
             throw new IOException(MessageFormat.format("Unsupported media type ''{0}''", mediaType));
         }
         RestWriter restWriter = restService.getRestWriter(writer, context);

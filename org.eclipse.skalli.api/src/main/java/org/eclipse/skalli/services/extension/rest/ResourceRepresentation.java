@@ -131,7 +131,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
             } else if (converter.getConversionClass().isAssignableFrom(object.getClass())) {
                 RestService restService = Services.getRequiredService(RestService.class);
                 MediaType mediaType = context.getMediaType();
-                if (!restService.isSupportedMediaType(mediaType)) {
+                if (!restService.isSupported(context)) {
                     throw new IOException(MessageFormat.format("Unsupported media type ''{0}''", mediaType));
                 }
                 RestWriter restWriter = restService.getRestWriter(writer, context);

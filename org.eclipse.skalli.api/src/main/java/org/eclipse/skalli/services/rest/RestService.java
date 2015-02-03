@@ -12,8 +12,6 @@ package org.eclipse.skalli.services.rest;
 
 import java.io.Writer;
 
-import org.restlet.data.MediaType;
-
 /**
  * Interface for a service that provides writers for REST resources.
  */
@@ -21,11 +19,12 @@ public interface RestService {
 
     /**
      * Returns <code>true</code>, if there is a suitable REST writer available
-     * for the given media type.
+     * based on the HTTP action and media type found in the given request context.
      *
-     * @param mediaType  the media type, for which to retrieve a REST writer
+     * @param context  the request context providing the source/target media type,
+     * HTTP action and additional request parameters.
      */
-    public boolean isSupportedMediaType(MediaType mediaType);
+    public boolean isSupported(RequestContext context);
 
     /**
      * Retrieves a REST writer for the given media type.

@@ -24,7 +24,8 @@ import org.restlet.data.MediaType;
 public class RestComponent implements RestService {
 
     @Override
-    public boolean isSupportedMediaType(MediaType mediaType) {
+    public boolean isSupported(RequestContext context) {
+        MediaType mediaType = context.getMediaType();
         return  MediaType.TEXT_XML.equals(mediaType) ||  MediaType.APPLICATION_JSON.equals(mediaType);
     }
 
