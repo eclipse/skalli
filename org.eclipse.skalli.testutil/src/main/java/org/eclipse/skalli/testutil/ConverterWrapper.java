@@ -13,6 +13,7 @@ package org.eclipse.skalli.testutil;
 import java.io.IOException;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.model.Derived;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
@@ -50,8 +51,11 @@ public class ConverterWrapper implements RestConverter {
     }
 
     @Override
-    public void marshal(Object obj, RestWriter writer) throws IOException {
+    public void marshal(Object ext, RestWriter writer) throws IOException {
         writer.object(nodeName);
+        namespaces(writer);
+        commonAttributes((ExtensionEntityBase)ext, writer);
+        converter.marshal(ext, writer);
         writer.end();
     }
 
@@ -60,25 +64,23 @@ public class ConverterWrapper implements RestConverter {
         writer.startNode(nodeName);
         marshalNSAttributes(writer);
         marshalCommonAttributes((ExtensionEntityBase) source, writer);
-        if (!omitInheritedAttribute) {
-            writer.addAttribute("inherited", Boolean.toString(isInherited)); //$NON-NLS-1$
-        }
         converter.marshal(source, writer, context);
         writer.endNode();
     }
 
-    @SuppressWarnings("nls")
     private void marshalNSAttributes(HierarchicalStreamWriter writer) {
-        writer.addAttribute("xmlns", getNamespace());
-        writer.addAttribute("xmlns:xsi", XSI_INSTANCE_NS);
-        writer.addAttribute("xsi:schemaLocation", converter.getNamespace() + " " +
-                host + URL_SCHEMAS + converter.getXsdFileName());
+        writer.addAttribute(XMLUtils.XMLNS, getNamespace());
+        writer.addAttribute(XMLUtils.XMLNS_XSI, XSI_INSTANCE_NS);
+        writer.addAttribute(XMLUtils.XSI_SCHEMA_LOCATION, getSchemaLocation());
     }
 
     @SuppressWarnings("nls")
     private void marshalCommonAttributes(ExtensionEntityBase ext, HierarchicalStreamWriter writer) {
+        if (!omitInheritedAttribute) {
+            writer.addAttribute("inherited", Boolean.toString(isInherited)); //$NON-NLS-1$
+        }
         writer.addAttribute("derived", Boolean.toString(ext.getClass().isAnnotationPresent(Derived.class)));
-        writer.addAttribute("apiVersion", converter.getApiVersion());
+        writer.addAttribute("apiVersion", getApiVersion());
         String lastModified = ext.getLastModified();
         if (StringUtils.isNotBlank(lastModified)) {
             writer.addAttribute("lastModified", lastModified);
@@ -86,6 +88,33 @@ public class ConverterWrapper implements RestConverter {
         String modifiedBy = ext.getLastModifiedBy();
         if (StringUtils.isNotBlank(lastModified)) {
             writer.addAttribute("modifiedBy", modifiedBy);
+        }
+    }
+
+    protected void namespaces(RestWriter writer) throws IOException {
+        writer.namespace(XMLUtils.XMLNS, getNamespace());
+        writer.namespace(XMLUtils.XMLNS_XSI, XMLUtils.XSI_INSTANCE_NS);
+        writer.namespace(XMLUtils.XSI_SCHEMA_LOCATION, getSchemaLocation());
+    }
+
+    @SuppressWarnings("nls")
+    protected void commonAttributes(ExtensionEntityBase ext, RestWriter writer) throws IOException {
+        if (!omitInheritedAttribute) {
+            writer.attribute("inherited", Boolean.toString(isInherited)); //$NON-NLS-1$
+        }
+        writer.attribute("derived", Boolean.toString(ext.getClass().isAnnotationPresent(Derived.class)));
+        writer.attribute("apiVersion", getApiVersion());
+        long lastModifiedMillis = ext.getLastModifiedMillis();
+        if (lastModifiedMillis > 0) {
+            writer.attribute("lastModifiedMillis", lastModifiedMillis);
+        }
+        String lastModified = ext.getLastModified();
+        if (StringUtils.isNotBlank(lastModified)) {
+            writer.attribute("lastModified", lastModified);
+        }
+        String modifiedBy = ext.getLastModifiedBy();
+        if (StringUtils.isNotBlank(modifiedBy)) {
+            writer.attribute("modifiedBy", modifiedBy);
         }
     }
 
@@ -123,4 +152,9 @@ public class ConverterWrapper implements RestConverter {
     public String getXsdFileName() {
         return converter.getXsdFileName();
     }
+
+    private String getSchemaLocation() {
+        return converter.getNamespace() + " " + host + URL_SCHEMAS + converter.getXsdFileName();
+    }
+
 }
