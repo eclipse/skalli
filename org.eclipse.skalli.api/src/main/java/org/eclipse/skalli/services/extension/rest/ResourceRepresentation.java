@@ -102,21 +102,31 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
     }
 
     /**
-     * Creates a resource representation for converting a given object to
-     * a specific media type, e.g. to XML or JSON format.
-     * <p>
-     * Allows to specify additional converters for the conversion of
-     * certain properties of the object.
+     * Creates a resource representation for unmarshalling an input stream to
+     * an object using the given REST converter. The REST converter must implement
+     * {@link RestConverter#unmarshal(RestReader)}.
+     *
+     * @param context
+     * @param converter
+     */
+    public ResourceRepresentation(RequestContext context, RestConverter<T> converter) {
+        super(context.getMediaType());
+        this.context = context;
+        this.converter = converter;
+    }
+
+    /**
+     * Creates a resource representation for marshalling a given object to
+     * an output stream using the given REST converter. The REST converter must implement
+     * {@link RestConverter#marshal(Object, RestWriter)}.
      *
      * @param context the request context.
-     * @param @param object the object to convert.
+     * @param object the object to convert.
      * @param converter the converter to use.
      */
     public ResourceRepresentation(RequestContext context, T object, RestConverter<T> converter) {
-        super(context.getMediaType());
+        this(context, converter);
         this.object = object;
-        this.context = context;
-        this.converter = converter;
     }
 
     @Override
