@@ -14,6 +14,7 @@ import java.io.IOException;
 
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.services.extension.ExtensionService;
+import org.eclipse.skalli.services.rest.RestReader;
 import org.eclipse.skalli.services.rest.RestWriter;
 
 import com.thoughtworks.xstream.converters.Converter;
@@ -32,10 +33,21 @@ public interface RestConverter<T> extends Converter {
      * @param obj  the object instance to marshal.
      * @param writer  the writer to use for marshalling.
      *
-     * @throws RestException  if the marshalling failed.
      * @throws IOException  if an i/o error occured.
      */
     public void marshal(Object obj, RestWriter writer) throws IOException;
+
+    /**
+     * Unmarshals an object instance from the specified reader.
+     *
+     * @param reader  the reader to use for unmarshaling,
+     * @return an object instance, or <code>null</code> if this
+     * converter does not support this operation.
+     *
+     * @throws RestException  if the input could not be parsed successfully.
+     * @throws IOException  if an i/o error occured.
+     */
+    public T unmarshal(RestReader reader) throws RestException, IOException;
 
     /**
      * Defines the alias that should be used to represent an entity or extension

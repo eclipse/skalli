@@ -17,6 +17,8 @@ import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.model.Derived;
 import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
+import org.eclipse.skalli.services.extension.rest.RestException;
+import org.eclipse.skalli.services.rest.RestReader;
 import org.eclipse.skalli.services.rest.RestWriter;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -35,6 +37,10 @@ public class ConverterWrapper implements RestConverter {
     private boolean isInherited;
     private boolean omitInheritedAttribute;
     private String host;
+
+    public ConverterWrapper(RestConverter<?> converter) {
+        this.converter = converter;
+    }
 
     public ConverterWrapper(String host, RestConverter<?> converter, String nodeName) {
         this.host = host;
@@ -57,6 +63,11 @@ public class ConverterWrapper implements RestConverter {
         commonAttributes((ExtensionEntityBase)ext, writer);
         converter.marshal(ext, writer);
         writer.end();
+    }
+
+    @Override
+    public Object unmarshal(RestReader reader) throws RestException, IOException {
+        return converter.unmarshal(reader);
     }
 
     @Override

@@ -14,6 +14,8 @@ import java.io.IOException;
 
 import org.eclipse.skalli.services.extension.ExtensionServiceBase;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
+import org.eclipse.skalli.services.extension.rest.RestException;
+import org.eclipse.skalli.services.rest.RestReader;
 import org.eclipse.skalli.services.rest.RestWriter;
 import org.eclipse.skalli.testutil.TestExtension;
 
@@ -29,6 +31,11 @@ class TestExtensionService extends ExtensionServiceBase<TestExtension> {
 
         @Override
         public void marshal(Object obj, RestWriter writer) throws IOException {
+        }
+
+        @Override
+        public TestExtension unmarshal(RestReader reader) throws RestException, IOException {
+            return null;
         }
 
         @Override

@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.FormatUtils;
 import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.model.EntityBase;
+import org.eclipse.skalli.services.rest.RestReader;
 import org.eclipse.skalli.services.rest.RestWriter;
 
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
@@ -71,8 +72,11 @@ public abstract class RestConverterBase<T> implements RestConverter<T> {
     private final String alias;
     private final Class<T> clazz;
 
-    /** The Rest writer to use for marshalling. */
+    /** The writer to use for marshalling. */
     protected RestWriter writer;
+
+    /** The reader to use for unmarshalling. */
+    protected RestReader reader;
 
     /**
      * Constructs a REST converter for the given class.
@@ -152,8 +156,14 @@ public abstract class RestConverterBase<T> implements RestConverter<T> {
         }
     }
 
+    @Override
+    public T unmarshal(RestReader reader) throws RestException, IOException {
+        this.reader = reader;
+        return unmarshal();
+    }
+
     /**
-     * Marshals the given object.
+     * Marshals the given object to the underlying {@link RestWriter}.
      *
      * @param obj  the object instance to marshal.
      *
@@ -161,6 +171,21 @@ public abstract class RestConverterBase<T> implements RestConverter<T> {
      */
     protected void marshal(T obj) throws IOException {
     }
+
+    /**
+     * Unmarshals an object from the underlying {@link RestReader}.
+     *
+     * @return an object instance, or <code>null</code> if this
+     * converter does not support unmarshalling. This default
+     * implementation always returns <code>null</code>.
+     *
+     * @throws RestException  if the input could not be parsed successfully.
+     * @throws IOException if an i/o error occured.
+     */
+    protected T unmarshal() throws RestException, IOException {
+        return null;
+    }
+
 
     /**
      * Marshals the namespace attributes provided by this converter to the

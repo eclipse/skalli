@@ -12,6 +12,7 @@ package org.eclipse.skalli.services.extension.rest;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.Writer;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.rest.RequestContext;
+import org.eclipse.skalli.services.rest.RestReader;
 import org.eclipse.skalli.services.rest.RestService;
 import org.eclipse.skalli.services.rest.RestWriter;
 import org.restlet.data.MediaType;
@@ -147,7 +149,7 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
                     converter.marshal(object, restWriter);
                 } catch (RuntimeException e) {
                     // don't trust the integrity of plugins!
-                    throw new IOException(MessageFormat.format("Failed to render response for {0}",
+                    throw new IOException(MessageFormat.format("Failed to write response for {0}",
                             context.getPath()), e);
                 } finally {
                     restWriter.flush();
@@ -155,6 +157,21 @@ public class ResourceRepresentation<T> extends WriterRepresentation {
             } else {
                 throw new IOException("Failed to create resource representation");
             }
+        }
+    }
+
+    public T read(Reader reader) throws IOException, RestException {
+        RestService restService = Services.getRequiredService(RestService.class);
+        if (!restService.isSupported(context)) {
+            throw new IOException(MessageFormat.format("Unsupported media type ''{0}''", context.getMediaType()));
+        }
+        RestReader restReader = restService.getRestReader(reader, context);
+        try {
+            return converter.unmarshal(restReader);
+        } catch (RuntimeException e) {
+            // don't trust the integrity of plugins!
+            throw new RestException(MessageFormat.format("Failed to read request {0} {1}",
+                    context.getAction(), context.getPath()), e);
         }
     }
 
