@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.rest;
 
+import java.io.Reader;
 import java.io.Writer;
 
 /**
@@ -18,13 +19,24 @@ import java.io.Writer;
 public interface RestService {
 
     /**
-     * Returns <code>true</code>, if there is a suitable REST writer available
+     * Returns <code>true</code>, if there is a suitable REST reader/writer available
      * based on the HTTP action and media type found in the given request context.
      *
      * @param context  the request context providing the source/target media type,
      * HTTP action and additional request parameters.
      */
     public boolean isSupported(RequestContext context);
+
+    /**
+     * Retrives a REST reader for the given request context.
+     *
+     * @param reader  the reader to wrap with a REST reader.
+     * @param context  the request context providing the source media type, HTTP action
+     * and additional request parameters.
+     *
+     * @return  a preconfigured REST reader, never <code>null</code>.
+     */
+    public RestReader getRestReader(Reader reader, RequestContext context);
 
     /**
      * Retrieves a REST writer for the given media type.
@@ -38,5 +50,4 @@ public interface RestService {
      * @throws IllegalArgumentException  if the given media type is not supported.
      */
     public RestWriter getRestWriter(Writer writer, RequestContext context);
-
 }

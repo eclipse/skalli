@@ -209,24 +209,29 @@ public class RequestContext {
     }
 
     private MediaType getMediaType(Request request) {
-        String accept = getQueryAttribute(ACCEPT_QUERY_PARAM);
-        if (StringUtils.isBlank(accept)) {
-            accept = getMaxQualityAccept(request);
-        }
         MediaType mediaType = null;
-        if (StringUtils.isNotBlank(accept)) {
-            if  (FORMAT_XML.contains(accept)) {
-                mediaType = MediaType.TEXT_XML;
-            } else if (FORMAT_JSON.contains(accept)) {
-                mediaType = MediaType.APPLICATION_JSON;
-            } else if (ACCEPT_ALL.equals(accept)) { //$NON-NLS-1$
-                mediaType = MediaType.TEXT_XML;
-            } else {
-                mediaType = MediaType.valueOf(accept);
-            }
+        if (request.isEntityAvailable()) {
+            mediaType = request.getEntity().getMediaType();
         }
         if (mediaType == null) {
-            mediaType = MediaType.TEXT_XML;
+            String accept = getQueryAttribute(ACCEPT_QUERY_PARAM);
+            if (StringUtils.isBlank(accept)) {
+                accept = getMaxQualityAccept(request);
+            }
+            if (StringUtils.isNotBlank(accept)) {
+                if  (FORMAT_XML.contains(accept)) {
+                    mediaType = MediaType.TEXT_XML;
+                } else if (FORMAT_JSON.contains(accept)) {
+                    mediaType = MediaType.APPLICATION_JSON;
+                } else if (ACCEPT_ALL.equals(accept)) {
+                    mediaType = MediaType.TEXT_XML;
+                } else {
+                    mediaType = MediaType.valueOf(accept);
+                }
+            }
+            if (mediaType == null) {
+                mediaType = MediaType.TEXT_XML;
+            }
         }
         return mediaType;
     }

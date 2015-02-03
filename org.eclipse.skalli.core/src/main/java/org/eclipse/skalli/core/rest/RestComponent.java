@@ -10,13 +10,14 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest;
 
+import java.io.Reader;
 import java.io.Writer;
 import java.text.MessageFormat;
 
 import org.eclipse.skalli.services.rest.RequestContext;
+import org.eclipse.skalli.services.rest.RestReader;
 import org.eclipse.skalli.services.rest.RestService;
 import org.eclipse.skalli.services.rest.RestWriter;
-import org.restlet.data.MediaType;
 
 /**
  * Service providing REST writers for various media types.
@@ -25,20 +26,32 @@ public class RestComponent implements RestService {
 
     @Override
     public boolean isSupported(RequestContext context) {
-        MediaType mediaType = context.getMediaType();
-        return  MediaType.TEXT_XML.equals(mediaType) ||  MediaType.APPLICATION_JSON.equals(mediaType);
+        String action = context.getAction();
+        if ("GET".equalsIgnoreCase(action)) { //$NON-NLS-1$
+            return context.isXML() || context.isJSON();
+        } else {
+            return context.isJSON();
+        }
+    }
+
+    @Override
+    public RestReader getRestReader(Reader reader, RequestContext context) {
+        if (context.isJSON()) {
+            return new JSONRestReader(reader);
+        } else {
+            throw new IllegalArgumentException(MessageFormat.format("Unsupported media type ''{0}''", context.getMediaType()));
+        }
     }
 
     @Override
     public RestWriter getRestWriter(Writer writer, RequestContext context) {
-        MediaType mediaType = context.getMediaType();
         String host = context.getHost();
-        if (MediaType.TEXT_XML.equals(mediaType)) {
+        if (context.isXML()) {
             return new XMLRestWriter(writer, host);
-        } else if (MediaType.APPLICATION_JSON.equals(mediaType)) {
+        } else if (context.isJSON()) {
             return new JSONRestWriter(writer, host);
         } else {
-            throw new IllegalArgumentException(MessageFormat.format("Unsupported media type ''{0}''", mediaType));
+            throw new IllegalArgumentException(MessageFormat.format("Unsupported media type ''{0}''", context.getMediaType()));
         }
     }
 }
