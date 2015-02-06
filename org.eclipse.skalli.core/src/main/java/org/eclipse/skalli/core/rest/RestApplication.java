@@ -20,6 +20,8 @@ import org.eclipse.skalli.core.rest.admin.StatisticsBackupResource;
 import org.eclipse.skalli.core.rest.admin.StatisticsResource;
 import org.eclipse.skalli.core.rest.admin.StatusResource;
 import org.eclipse.skalli.core.rest.monitor.Monitorable;
+import org.eclipse.skalli.core.rest.resources.InheritableExtensionResource;
+import org.eclipse.skalli.core.rest.resources.InheritableExtensionsResource;
 import org.eclipse.skalli.core.rest.resources.IssuesResource;
 import org.eclipse.skalli.core.rest.resources.ProjectResource;
 import org.eclipse.skalli.core.rest.resources.ProjectsResource;
@@ -70,6 +72,8 @@ public class RestApplication extends Application {
         router.attach("/projects/{id}/issues", IssuesResource.class); //$NON-NLS-1$
         router.attach("/projects/{id}/subprojects", SubprojectsResource.class); //$NON-NLS-1$
         router.attach("/projects/{id}/timeline", TimelineResource.class); //$NON-NLS-1$
+        router.attach("/projects/{id}/extensions", InheritableExtensionsResource.class); //$NON-NLS-1$
+        router.attach("/projects/{id}/extensions/{shortName}", InheritableExtensionResource.class); //$NON-NLS-1$
 
         router.attach("/user/{userId}", UserResource.class); //$NON-NLS-1$
         router.attach("/users/{userId}", UserResource.class); //$NON-NLS-1$
