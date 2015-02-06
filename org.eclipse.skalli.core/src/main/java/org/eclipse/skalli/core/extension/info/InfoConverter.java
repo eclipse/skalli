@@ -37,6 +37,23 @@ public class InfoConverter extends RestConverterBase<InfoExtension> {
           .collection("mailingLists", "mailingList", extension.getMailingLists());
     }
 
+    @Override
+    protected InfoExtension unmarshal() throws IOException {
+        return unmarshal(new InfoExtension());
+    }
+
+    @SuppressWarnings("nls")
+    private InfoExtension unmarshal(InfoExtension ext) throws IOException {
+        while (reader.hasMore()) {
+            if (reader.isKey("homepage")) {
+                ext.setPageUrl(reader.valueString());
+            } else if (reader.isKey("mailingLists")) {
+                ext.setMailingLists(reader.collection("mailingList"));
+            }
+        }
+        return ext;
+    }
+
     @Deprecated
     public InfoConverter(String host) {
         super(InfoExtension.class, "info", host); //$NON-NLS-1$
