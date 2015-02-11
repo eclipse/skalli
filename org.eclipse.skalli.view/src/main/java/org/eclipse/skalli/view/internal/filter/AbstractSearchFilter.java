@@ -36,6 +36,7 @@ import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.favorites.Favorites;
 import org.eclipse.skalli.services.favorites.FavoritesService;
 import org.eclipse.skalli.services.project.ProjectService;
@@ -167,7 +168,7 @@ public abstract class AbstractSearchFilter implements Filter {
     }
 
     protected ProjectService getProjectService() {
-        return Services.getRequiredService(ProjectService.class);
+        return ((ProjectService)EntityServices.getByEntityClass(Project.class));
     }
 
     protected ProjectTemplateService getProjectTemplateService() {

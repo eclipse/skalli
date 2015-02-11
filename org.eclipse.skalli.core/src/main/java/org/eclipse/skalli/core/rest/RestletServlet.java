@@ -24,6 +24,7 @@ import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.permit.PermitService;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.user.UserServices;
@@ -73,7 +74,7 @@ public class RestletServlet extends ServerServlet {
 
         // determine the project from the pathInfo, if available
         Project project = null;
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
 
         String pathInfo = request.getPathInfo();
         if (StringUtils.isNotBlank(pathInfo)) {

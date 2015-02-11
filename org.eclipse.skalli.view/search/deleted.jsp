@@ -17,9 +17,10 @@
 <%@ page import="org.eclipse.skalli.model.Project" %>
 <%@ page import="org.eclipse.skalli.view.Consts" %>
 <%@ page import="org.eclipse.skalli.view.LoginUtils" %>
+<%@ page import="org.eclipse.skalli.services.entity.EntityServices" %>
 <%@ page import="org.eclipse.skalli.services.group.GroupUtils" %>
 <%@ page import="org.eclipse.skalli.services.project.ProjectService" %>
-<%@ page import="org.eclipse.skalli.services.Services" %>
+
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -44,7 +45,7 @@
     LoginUtils util = new LoginUtils(request);
     User user = util.getLoggedInUser();
     if (GroupUtils.isAdministrator(user)) {
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         List<Project> deletedProjects = projectService.getDeletedProjects(new Comparator<Project>() {
             public int compare(Project p1, Project p2) {
                 return p1.getProjectId().compareTo(p2.getProjectId());

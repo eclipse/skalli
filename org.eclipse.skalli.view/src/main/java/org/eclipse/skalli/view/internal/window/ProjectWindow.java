@@ -11,7 +11,7 @@
 package org.eclipse.skalli.view.internal.window;
 
 import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.view.ext.Navigator;
 import org.eclipse.skalli.view.ext.ProjectEditMode;
@@ -98,7 +98,7 @@ public class ProjectWindow extends Window {
     }
 
     private Project getLastKnownVersion(Project project) {
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         Project lastKnown = projectService.getByUUID(project.getUuid());
         return lastKnown != null ? lastKnown : project;
     }

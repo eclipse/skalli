@@ -31,6 +31,7 @@ import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.group.GroupUtils;
@@ -146,8 +147,8 @@ public class ProjectEditPanel extends Panel implements ProjectPanel {
         if (ProjectEditMode.NEW_PROJECT.equals(mode)) {
             modifiedProject = project;
         } else {
-            ProjectService service = Services.getRequiredService(ProjectService.class);
-            modifiedProject = service.loadEntity(Project.class, project.getUuid());
+            ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
+            modifiedProject = projectService.loadEntity(Project.class, project.getUuid());
         }
 
         ProjectTemplateService templateService = Services.getRequiredService(ProjectTemplateService.class);
@@ -450,7 +451,7 @@ public class ProjectEditPanel extends Panel implements ProjectPanel {
 
         @Override
         public void run() {
-            ProjectService projectService = Services.getRequiredService(ProjectService.class);
+            ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
             startTime = System.currentTimeMillis();
             SortedSet<Issue> issues = projectService.validate(modifiedProject, Severity.INFO);
             synchronized (getApplication()) {
@@ -582,7 +583,7 @@ public class ProjectEditPanel extends Panel implements ProjectPanel {
     }
 
     private void commitModifiedProject() throws ValidationException {
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         projectService.persist(modifiedProject, application.getLoggedInUser());
     }
 

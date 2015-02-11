@@ -30,6 +30,7 @@ import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.group.GroupUtils;
 import org.eclipse.skalli.services.permit.Permit;
 import org.eclipse.skalli.services.permit.PermitService;
@@ -123,7 +124,7 @@ public class LoginFilter implements Filter {
 
         // determine the project from the URL
         Project project = null;
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
 
         // first check if project can be deduced from pathInfo
         if (StringUtils.isNotBlank(pathInfo)) {

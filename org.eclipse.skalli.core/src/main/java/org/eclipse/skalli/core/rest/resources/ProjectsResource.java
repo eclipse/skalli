@@ -32,7 +32,7 @@ import org.eclipse.skalli.model.NoSuchPropertyException;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.ValidationException;
-import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.PropertyMapper;
@@ -99,7 +99,8 @@ public class ProjectsResource extends ResourceBase {
     private Projects getProjects(SearchQuery queryParams) throws QueryParseException {
         List<Project> projects = null;
         if (queryParams.isQueryAll()) {
-            projects = Services.getRequiredService(ProjectService.class).getProjects(getComparator(queryParams));
+            ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
+            projects = projectService.getProjects(getComparator(queryParams));
         } else {
             SearchResult<Project> searchResult = SearchUtils.searchProjects(queryParams);
             Statistics.getDefault().trackSearch(Permits.getLoggedInUser(), searchResult.getQueryString(),
@@ -241,7 +242,7 @@ public class ProjectsResource extends ResourceBase {
                     "Invalid query \"?{0}\": {1}", form.getQueryString(), e.getMessage()); //$NON-NLS-1$
         }
 
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         Projects updatedProjects = new Projects();
 
         Representation representation = updateProperties(projects, updatedProjects, queryParams, projectService);

@@ -21,6 +21,7 @@
 <%@ page import="org.eclipse.skalli.model.ByProjectNameComparator" %>
 <%@ page import="org.eclipse.skalli.model.Severity" %>
 <%@ page import="org.eclipse.skalli.services.Services" %>
+<%@ page import="org.eclipse.skalli.services.entity.EntityServices" %>
 <%@ page import="org.eclipse.skalli.services.group.GroupUtils" %>
 <%@ page import="org.eclipse.skalli.services.issues.Issues" %>
 <%@ page import="org.eclipse.skalli.services.issues.IssuesService" %>
@@ -80,7 +81,7 @@
 </body>
 </html>
 <%!
-    private ProjectService projectService = Services.getRequiredService(ProjectService.class);
+    ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
     private IssuesService issuesService = Services.getService(IssuesService.class);
 
     private void renderHierarchy(JspWriter out, String projectId, String userId) throws IOException {

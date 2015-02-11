@@ -21,6 +21,7 @@ import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.ServiceFilter;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.group.GroupUtils;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.project.ProjectUtils;
@@ -183,7 +184,7 @@ public class ProjectDetailsPanel extends CssLayout implements ProjectPanel {
 
         @Override
         public void persist(Project project) {
-            ProjectService projectService = Services.getRequiredService(ProjectService.class);
+            ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
             try {
                 projectService.persist(project, getLoggedInUser().getUserId());
             } catch (ValidationException e) {

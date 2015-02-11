@@ -16,6 +16,7 @@ import org.eclipse.skalli.commons.UUIDList;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.misc.RelatedProjectsExt;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.search.SearchHit;
 import org.eclipse.skalli.services.search.SearchResult;
@@ -63,7 +64,7 @@ public class RelatedProjectsInfoBox extends InfoBoxBase implements InfoBox {
                 addCalculatedContent(project, layout);
             } else {
                 UUIDList ids = ext.getRelatedProjects();
-                ProjectService projectService = Services.getRequiredService(ProjectService.class);
+                ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
                 for (UUID uuid : ids) {
                     Project relatedProject = projectService.getByUUID(uuid);
                     if (relatedProject != null) {

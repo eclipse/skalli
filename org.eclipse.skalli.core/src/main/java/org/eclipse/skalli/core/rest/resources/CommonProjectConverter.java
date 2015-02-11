@@ -27,7 +27,7 @@ import org.eclipse.skalli.model.ExtensionEntityBase;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
-import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
@@ -87,7 +87,7 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
         }
         commonAttributes(project);
 
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         UUID parent = project.getParentProject();
         writer.pair("uuid", uuid);
         writer.pair("id", project.getProjectId());
@@ -244,7 +244,7 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
         }
         marshalCommonAttributes(writer, project);
 
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         writeNode(writer, "uuid", uuid.toString()); //$NON-NLS-1$
         writeNode(writer, "id", project.getProjectId()); //$NON-NLS-1$
         writeNode(writer, "nature", projectService.getProjectNature(uuid)); //$NON-NLS-1$

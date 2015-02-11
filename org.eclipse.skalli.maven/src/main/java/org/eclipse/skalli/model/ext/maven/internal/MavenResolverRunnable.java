@@ -35,6 +35,7 @@ import org.eclipse.skalli.model.ext.maven.MavenReactorProjectExt;
 import org.eclipse.skalli.model.ext.maven.internal.config.MavenResolverConfig;
 import org.eclipse.skalli.nexus.NexusClient;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.scheduler.RunnableSchedule;
 import org.eclipse.skalli.services.scheduler.Schedule;
@@ -361,7 +362,7 @@ public class MavenResolverRunnable extends RunnableSchedule implements Issuer {
 
     // package protected for testing purposes
     ProjectService getProjectService() {
-        return Services.getRequiredService(ProjectService.class);
+        return ((ProjectService)EntityServices.getByEntityClass(Project.class));
     }
 
     // package protected for testing purposes

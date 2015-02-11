@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.permit.PermitService;
@@ -64,7 +65,7 @@ public class UserPermitsResource extends ResourceBase {
         String projectId = (String) getRequestAttributes().get(PARAM_PROJECTID);
         List<Project> projects = new ArrayList<Project>();
         if (projectId != null) {
-            ProjectService projectService = Services.getRequiredService(ProjectService.class);
+            ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
             Project project = projectService.getProject(projectId);
             if (project == null) {
                 setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("Project \"{0}\" not found", projectId)); //$NON-NLS-1$

@@ -18,7 +18,7 @@ import org.eclipse.skalli.model.Issue;
 import org.eclipse.skalli.model.Issuer;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.Severity;
-import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.PropertyValidator;
 import org.eclipse.skalli.services.project.ProjectService;
 
@@ -27,7 +27,7 @@ class NoSubprojectsValidator implements PropertyValidator, Issuer {
     public SortedSet<Issue> validate(UUID entity, Object value, Severity minSeverity) {
         TreeSet<Issue> issues = new TreeSet<Issue>();
         Boolean deleted = (Boolean)value;
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         if (deleted && projectService.getSubProjects(entity).size() > 0) {
             issues.add(new Issue(Severity.FATAL, getClass(), entity, Project.class, Project.PROPERTY_DELETED,
                 "Projects with subprojects cannot be deleted - first delete all subprojects " +

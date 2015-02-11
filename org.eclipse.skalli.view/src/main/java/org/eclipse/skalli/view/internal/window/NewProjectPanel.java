@@ -15,6 +15,7 @@ import java.util.TreeSet;
 
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.permit.PermitService;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.template.ProjectTemplate;
@@ -123,7 +124,7 @@ public class NewProjectPanel extends Panel implements ProjectPanel {
 
         @Override
         public void buttonClick(ClickEvent event) {
-            ProjectService projectService = Services.getRequiredService(ProjectService.class);
+            ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
             Project newProject = projectService.createProject(select.getSelected(), application.getLoggedInUser());
 
             PermitService permitService = Services.getRequiredService(PermitService.class);

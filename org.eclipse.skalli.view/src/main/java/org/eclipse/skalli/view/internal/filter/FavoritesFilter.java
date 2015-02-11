@@ -23,6 +23,7 @@ import javax.servlet.ServletResponse;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.search.SearchHit;
 import org.eclipse.skalli.services.search.SearchResult;
@@ -42,7 +43,7 @@ public class FavoritesFilter extends AbstractSearchFilter {
         int resultCount = 0;
         List<Project> projects = new ArrayList<Project>();
         if (user != null) {
-            ProjectService projectService = Services.getRequiredService(ProjectService.class);
+            ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
             List<UUID> uuids = getFavorites(user).getProjects();
             resultCount = uuids.size();
             if (start < uuids.size()) {

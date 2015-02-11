@@ -21,6 +21,7 @@ import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.permit.PermitService;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.view.Consts;
@@ -65,7 +66,7 @@ public class ProjectApplication extends com.vaadin.Application implements HttpSe
     public Window getWindow(String name) {
         Window window = super.getWindow(name);
         if (window == null) {
-            ProjectService projectService = Services.getRequiredService(ProjectService.class);
+            ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
             Project project = projectService.getProjectByProjectId(name);
             if (project == null) {
                 UUID uuid = UUIDUtils.asUUID(name);

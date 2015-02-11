@@ -16,7 +16,7 @@ import java.text.MessageFormat;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ValidationException;
-import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
@@ -48,7 +48,7 @@ public class ProjectResource extends ResourceBase {
         }
 
         String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         Project project = projectService.getProject(id);
         if (project == null) {
             setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("Project {0} not found", id)); //$NON-NLS-1$
@@ -91,7 +91,7 @@ public class ProjectResource extends ResourceBase {
         }
 
         try {
-            ProjectService projectService = Services.getRequiredService(ProjectService.class);
+            ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
             projectService.persist(project, Permits.getLoggedInUser());
         } catch (ValidationException e) {
             String errorId = MessageFormat.format(ERROR_VALIDATION_FAILED, project.getProjectId());

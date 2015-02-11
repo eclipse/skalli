@@ -19,6 +19,7 @@ import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.ext.misc.RelatedProjectsExt;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.project.ProjectService;
@@ -58,7 +59,8 @@ public class RelatedProjectsConverter extends RestConverterBase<RelatedProjectsE
         } else  {
             relatedProjects = extension.getRelatedProjects();
         }
-        marshalLinksSection(relatedProjects, Services.getRequiredService(ProjectService.class));
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
+        marshalLinksSection(relatedProjects, projectService);
     }
 
     void marshalLinksSection(UUIDList relatedProjects, ProjectService projectService) throws IOException {
@@ -109,7 +111,7 @@ public class RelatedProjectsConverter extends RestConverterBase<RelatedProjectsE
         } else  {
             relatedProjects = ext.getRelatedProjects();
         }
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         for (UUID uuid: relatedProjects) {
             Project project = projectService.getByUUID(uuid);
             if (project != null) {

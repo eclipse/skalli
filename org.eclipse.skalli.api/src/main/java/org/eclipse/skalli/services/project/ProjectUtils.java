@@ -14,7 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
-import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 
 public class ProjectUtils {
 
@@ -41,7 +41,8 @@ public class ProjectUtils {
         if (StringUtils.isBlank(userId) || project == null) {
             return false;
         }
-        for (Member member : Services.getRequiredService(ProjectService.class).getMembers(project.getUuid())) {
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
+        for (Member member : projectService.getMembers(project.getUuid())) {
             if (StringUtils.equalsIgnoreCase(member.getUserID(), userId)) {
                 return true;
             }
@@ -89,7 +90,8 @@ public class ProjectUtils {
         if (StringUtils.isBlank(userId) && project == null) {
             return false;
         }
-        for (Project parent : Services.getRequiredService(ProjectService.class).getParentChain(project.getUuid())) {
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
+        for (Project parent : projectService.getParentChain(project.getUuid())) {
             if (isProjectAdmin(userId, parent)) {
                 return true;
             }

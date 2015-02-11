@@ -49,6 +49,7 @@ import org.eclipse.skalli.model.ext.commons.PeopleExtension;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.PropertyLookup;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.view.Consts;
@@ -317,7 +318,8 @@ public class GitGerritFilter implements Filter {
                         String scmLocation = getScmLocation(gerritServer, repository, project, user);
                         if (!devInf.hasScmLocation(scmLocation)) {
                             devInf.addScmLocation(scmLocation);
-                            Services.getRequiredService(ProjectService.class).persist(project, user.getUserId());
+                            ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
+                            projectService.persist(project, user.getUserId());
                         }
                     }
                     request.setAttribute(ATTRIBUTE_DATA_SAVED, proceed);
@@ -356,7 +358,8 @@ public class GitGerritFilter implements Filter {
      */
     String generateName(Project project, String delimiter, String suffix) {
         StringBuffer sb = new StringBuffer();
-        for (Project parent : Services.getRequiredService(ProjectService.class).getParentChain(project.getUuid())) {
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
+        for (Project parent : projectService.getParentChain(project.getUuid())) {
             if (parent.getProjectId() == project.getProjectId()) {
                 sb.insert(0, parent.getProjectId());
             } else {
@@ -393,7 +396,7 @@ public class GitGerritFilter implements Filter {
         // the repository name from a matching SCM location with Matcher.group(int).
         Pattern scmPattern = Pattern.compile(getScmLocation(gerritConfig, "(.*)", project, user)); //$NON-NLS-1$
 
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
 
         // first, add all my parents: inheriting a group from a parent is
         // likely the most common use case

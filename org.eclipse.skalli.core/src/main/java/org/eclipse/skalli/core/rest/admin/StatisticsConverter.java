@@ -30,7 +30,7 @@ import org.eclipse.skalli.commons.Statistics.UsageInfo;
 import org.eclipse.skalli.commons.Statistics.UserInfo;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
-import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.project.ProjectService;
@@ -69,7 +69,7 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         .pair("to", FormatUtils.formatUTCWithMillis(to))
         .pair("period", DurationFormatUtils.formatPeriodISO(from, to));
 
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         List<UUID> uuids = new ArrayList<UUID>(projectService.keySet());
 
         if (query.showSection("projects")) {
@@ -453,7 +453,7 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         writeNode(writer, "to", FormatUtils.formatUTCWithMillis(to));
         writeNode(writer, "period", DurationFormatUtils.formatPeriodISO(from, to));
 
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         List<UUID> uuids = new ArrayList<UUID>(projectService.keySet());
 
         if (query.showSection("projects")) {

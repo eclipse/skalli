@@ -24,6 +24,7 @@ import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.feed.Entry;
@@ -94,7 +95,7 @@ public class TimelineResource extends ResourceBase {
         int count = NumberUtils.toInt(getQueryAttribute(PARAM_COUNT), DEFAULT_COUNT);
         String[] sources = StringUtils.split(getQueryAttribute(PARAM_SOURCES), ',');
 
-        ProjectService projectService = Services.getRequiredService(ProjectService.class);
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         Project project = projectService.getProject(id);
         if (project == null) {
             setStatus(Status.CLIENT_ERROR_NOT_FOUND);

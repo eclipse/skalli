@@ -17,6 +17,7 @@ import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.PropertyName;
 import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.template.NoSuchTemplateException;
 import org.eclipse.skalli.services.template.ProjectTemplate;
@@ -171,7 +172,7 @@ public class ProjectBasicsEditForm extends AbstractExtensionFormService<Project>
                 throw new NoSuchTemplateException(thisProject.getUuid(), thisProject.getProjectTemplateId());
             }
 
-            ProjectService projectService = Services.getRequiredService(ProjectService.class);
+            ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
             List<Project> projects = projectService.getAll();
             for (Project project : projects) {
                 // skip all projects that thisProject cannot be assigned to

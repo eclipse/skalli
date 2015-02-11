@@ -20,7 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.UUIDList;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.PropertyName;
-import org.eclipse.skalli.services.Services;
+import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.project.ProjectService;
 
 import com.vaadin.data.Item;
@@ -132,7 +132,7 @@ public class MultiComboBox extends CustomField {
             comboBox.setInputPrompt(inputPrompt);
         }
         if (uuid != null) {
-            ProjectService projectService = Services.getRequiredService(ProjectService.class);
+            ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
             Project project = projectService.getByUUID(uuid);
             comboBox.select(project);
         }
@@ -254,7 +254,7 @@ public class MultiComboBox extends CustomField {
             addContainerProperty(Project.PROPERTY_PROJECTID, String.class, null);
             addContainerProperty(PROPERTY_DISPLAYNAME, String.class, null);
 
-            ProjectService projectService = Services.getRequiredService(ProjectService.class);
+            ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
             List<Project> projects = projectService.getAll();
             for (Project project : projects) {
                 addItem(project);
