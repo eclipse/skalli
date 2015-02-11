@@ -49,6 +49,7 @@ public class RequestContext {
     private String path;
     private Reference resourceRef;
     private Form form;
+    private Form headers;
     private Map<String,String> queryParams;
     private MediaType mediaType;
 
@@ -72,6 +73,7 @@ public class RequestContext {
             queryParams = Collections.emptyMap();
         }
         mediaType = getMediaType(request);
+        headers = (Form) request.getAttributes().get("org.restlet.http.headers"); //$NON-NLS-1$
     }
 
     /**
@@ -167,6 +169,20 @@ public class RequestContext {
      */
     public Map<String,String> getQueryAttributes() {
         return queryParams;
+    }
+
+    /**
+     * Returns the value of the header matching the given name
+     * (ignoring the case). If there are multiple headers with
+     * the same name, only the first one is matched. If there
+     * is no matching header, the given default value is returned.
+     *
+     * @param name  the header name.
+     * @param defaultValue  the default value to return in case
+     * there is no matching header.
+     */
+    public String getHeader(String name, String defaultValue) {
+        return headers.getFirstValue(name, true, defaultValue);
     }
 
     /**

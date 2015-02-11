@@ -147,6 +147,20 @@ public abstract class ResourceBase extends ServerResource {
     }
 
     /**
+     * Returns the value of the header matching the given name
+     * (ignoring the case). If there are multiple headers with
+     * the same name, only the first one is matched. If there
+     * is no matching header, the given default value is returned.
+     *
+     * @param name  the header name.
+     * @param defaultValue  the default value to return in case
+     * there is no matching header.
+     */
+    protected String getHeader(String name, String defaultValue) {
+        return context.getHeader(name, defaultValue);
+    }
+
+    /**
      * Returns the requested media type.
      */
     protected MediaType getMediaType() {
