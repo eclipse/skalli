@@ -11,7 +11,6 @@
 package org.eclipse.skalli.core.rest.resources;
 
 import java.text.MessageFormat;
-import java.util.UUID;
 
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
@@ -44,13 +43,7 @@ public class IssuesResource extends ResourceBase {
         String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
 
         ProjectService projectService = Services.getRequiredService(ProjectService.class);
-        Project project = null;
-        try {
-            UUID uuid = UUID.fromString(id);
-            project = projectService.getByUUID(uuid);
-        } catch (IllegalArgumentException e) {
-            project = projectService.getProjectByProjectId(id);
-        }
+        Project project = projectService.getProject(id);
         if (project == null) {
             setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("Project \"{0}\" not found", id));
             return null;

@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.model.ByProjectIdComparator;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
@@ -126,6 +127,11 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
             return null;
         }
         return projectTemplateService.getProjectTemplateById(project.getProjectTemplateId());
+    }
+
+    @Override
+    public Project getProject(String id) {
+        return UUIDUtils.isUUID(id)? getByUUID(UUID.fromString(id)) : getProjectByProjectId(id);
     }
 
     @Override

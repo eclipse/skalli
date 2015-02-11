@@ -180,6 +180,19 @@ public interface ProjectService extends EntityService<Project>, Issuer {
     public Project getNearestParent(UUID uuid, ProjectNature nature);
 
     /**
+     * Returns the project with the given identifier, which may either be the
+     * project's {@link Project#getUuid() UUID} or its {@link Project#getProjectId() symbolic name}.
+     *
+     * @param id
+     *          a project's {@link Project#getUuid() UUID} or
+     *          {@link Project#getProjectId() symbolic name}.
+     *
+     * @return  the project matching the given identifier, or
+     *          <code>null</code> if no such project exists.
+     */
+    public Project getProject(String id);
+
+    /**
      * Returns the project with the given project identifier.
      *
      * @param projectId

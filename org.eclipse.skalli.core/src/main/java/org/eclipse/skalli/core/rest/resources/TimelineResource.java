@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -96,13 +95,7 @@ public class TimelineResource extends ResourceBase {
         String[] sources = StringUtils.split(getQueryAttribute(PARAM_SOURCES), ',');
 
         ProjectService projectService = Services.getRequiredService(ProjectService.class);
-        Project project = null;
-        try {
-            UUID uuid = UUID.fromString(id);
-            project = projectService.getByUUID(uuid);
-        } catch (IllegalArgumentException e) {
-            project = projectService.getProjectByProjectId(id);
-        }
+        Project project = projectService.getProject(id);
         if (project == null) {
             setStatus(Status.CLIENT_ERROR_NOT_FOUND);
             return null;

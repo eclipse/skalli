@@ -12,10 +12,8 @@ package org.eclipse.skalli.core.rest.resources;
 
 import java.text.MessageFormat;
 import java.util.Comparator;
-import java.util.UUID;
 
 import org.apache.commons.lang.math.NumberUtils;
-import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.model.ByProjectIdComparator;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.services.Services;
@@ -60,13 +58,7 @@ public class SubprojectsResource extends ResourceBase {
         }
 
         ProjectService projectService = Services.getRequiredService(ProjectService.class);
-        Project project = null;
-        if (UUIDUtils.isUUID(id)) {
-            UUID uuid = UUID.fromString(id);
-            project = projectService.getByUUID(uuid);
-        } else {
-            project = projectService.getProjectByProjectId(id);
-        }
+        Project project = projectService.getProject(id);
         if (project == null) {
             setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("Project {0} not found", id));
             return null;

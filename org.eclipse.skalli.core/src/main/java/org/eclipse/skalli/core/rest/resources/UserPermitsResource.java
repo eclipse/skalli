@@ -13,7 +13,6 @@ package org.eclipse.skalli.core.rest.resources;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
@@ -65,14 +64,8 @@ public class UserPermitsResource extends ResourceBase {
         String projectId = (String) getRequestAttributes().get(PARAM_PROJECTID);
         List<Project> projects = new ArrayList<Project>();
         if (projectId != null) {
-            Project project = null;
             ProjectService projectService = Services.getRequiredService(ProjectService.class);
-            try {
-                UUID uuid = UUID.fromString(projectId);
-                project = projectService.getByUUID(uuid);
-            } catch (IllegalArgumentException e) {
-                project = projectService.getProjectByProjectId(projectId);
-            }
+            Project project = projectService.getProject(projectId);
             if (project == null) {
                 setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("Project \"{0}\" not found", projectId)); //$NON-NLS-1$
                 return null;
