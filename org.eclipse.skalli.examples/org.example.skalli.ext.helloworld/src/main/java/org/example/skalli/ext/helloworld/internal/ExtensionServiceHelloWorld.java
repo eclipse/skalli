@@ -35,6 +35,11 @@ public class ExtensionServiceHelloWorld extends ExtensionServiceBase<HelloWorldP
     }
 
     @Override
+    public HelloWorldProjectExt newExtension() {
+        return new HelloWorldProjectExt();
+    }
+
+    @Override
     public String getModelVersion() {
         return HelloWorldProjectExt.MODEL_VERSION;
     }

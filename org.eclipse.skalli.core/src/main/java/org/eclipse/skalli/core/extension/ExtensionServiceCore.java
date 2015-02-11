@@ -94,6 +94,11 @@ public class ExtensionServiceCore
         return Project.class;
     }
 
+    @Override
+    public Project newExtension() {
+        return new Project();
+    }
+
     protected void activate(ComponentContext context) {
         LOG.info("activated core model"); //$NON-NLS-1$
     }

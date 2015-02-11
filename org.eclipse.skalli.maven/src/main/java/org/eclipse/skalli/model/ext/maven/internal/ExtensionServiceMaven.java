@@ -59,6 +59,11 @@ public class ExtensionServiceMaven
         return MavenProjectExt.class;
     }
 
+    @Override
+    public MavenProjectExt newExtension() {
+        return new MavenProjectExt();
+    }
+
     protected void activate(ComponentContext context) {
         LOG.info("activated model extension: " + getShortName()); //$NON-NLS-1$
     }

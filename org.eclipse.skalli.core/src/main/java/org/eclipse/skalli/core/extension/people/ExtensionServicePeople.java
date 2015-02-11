@@ -57,6 +57,11 @@ public class ExtensionServicePeople
         return PeopleExtension.class;
     }
 
+    @Override
+    public PeopleExtension newExtension() {
+        return new PeopleExtension();
+    }
+
     protected void activate(ComponentContext context) {
         LOG.info("activated model extension: " + getShortName()); //$NON-NLS-1$
     }

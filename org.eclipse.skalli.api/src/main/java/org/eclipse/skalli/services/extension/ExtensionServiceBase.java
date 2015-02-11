@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.extension;
 
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,6 +61,16 @@ public abstract class ExtensionServiceBase<T extends ExtensionEntityBase> implem
      * Input prompt for URL-like form fields, i.e. <tt>{@value}</tt>.
      */
     protected static final String URL_INPUT_PROMPT = "http://<host>:<port>/<path>";
+
+    @Override
+    public T newExtension() {
+        try {
+            return getExtensionClass().newInstance();
+        } catch (Exception e) {
+            throw new IllegalStateException(MessageFormat.format("Failed to instantiate extension ''{0}''",
+                    getShortName()), e);
+        }
+    }
 
     @Override
     public Map<String, Class<?>> getAliases() {

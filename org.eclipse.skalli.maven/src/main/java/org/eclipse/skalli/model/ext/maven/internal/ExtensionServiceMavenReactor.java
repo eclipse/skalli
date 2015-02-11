@@ -33,17 +33,22 @@ public class ExtensionServiceMavenReactor
     private static final String CAPTION = "Maven Reactor";
     private static final String DESCRIPTION = "Information related to a Maven reactor project and its modules";
 
-    @Override
-    public Class<MavenReactorProjectExt> getExtensionClass() {
-        return MavenReactorProjectExt.class;
-    }
-
     protected void activate(ComponentContext context) {
         LOG.info("activated model extension: " + getShortName()); //$NON-NLS-1$
     }
 
     protected void deactivate(ComponentContext context) {
         LOG.info("deactivated model extension: " + getShortName()); //$NON-NLS-1$
+    }
+
+    @Override
+    public Class<MavenReactorProjectExt> getExtensionClass() {
+        return MavenReactorProjectExt.class;
+    }
+
+    @Override
+    public MavenReactorProjectExt newExtension() {
+        return new MavenReactorProjectExt();
     }
 
     @Override

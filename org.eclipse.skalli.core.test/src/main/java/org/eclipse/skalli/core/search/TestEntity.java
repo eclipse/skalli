@@ -18,6 +18,9 @@ class TestEntity extends ExtensionEntityBase {
     private String value;
     private String facet;
 
+    public TestEntity() {
+    }
+
     public TestEntity(String value, String facet) {
         this.value = value;
         this.facet = facet;

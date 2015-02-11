@@ -42,6 +42,11 @@ public class ExtensionServiceLinkGroups
         return LinkGroupsProjectExt.class;
     }
 
+    @Override
+    public LinkGroupsProjectExt newExtension() {
+        return new LinkGroupsProjectExt();
+    }
+
     protected void activate(ComponentContext context) {
         LOG.info("activated model extension: " + getShortName()); //$NON-NLS-1$
     }

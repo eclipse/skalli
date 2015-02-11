@@ -97,6 +97,11 @@ public class ExtensionServiceDevInf
         return DevInfProjectExt.class;
     }
 
+    @Override
+    public DevInfProjectExt newExtension() {
+        return new DevInfProjectExt();
+    }
+
     protected void activate(ComponentContext context) {
         LOG.info("activated model extension: " + getShortName()); //$NON-NLS-1$
     }

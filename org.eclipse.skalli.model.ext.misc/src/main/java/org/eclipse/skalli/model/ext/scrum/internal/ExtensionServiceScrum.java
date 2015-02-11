@@ -63,6 +63,11 @@ public class ExtensionServiceScrum
         return ScrumProjectExt.class;
     }
 
+    @Override
+    public ScrumProjectExt newExtension() {
+        return new ScrumProjectExt();
+    }
+
     protected void activate(ComponentContext context) {
         LOG.info("activated model extension: " + getShortName()); //$NON-NLS-1$
     }

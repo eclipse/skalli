@@ -46,6 +46,11 @@ public interface ExtensionService<T extends ExtensionEntityBase> {
     public Class<T> getExtensionClass();
 
     /**
+     * Returns a new model extension instance with default attributes.
+     */
+    public T newExtension();
+
+    /**
      * Returns the current version of the model extension.
      */
     public String getModelVersion();

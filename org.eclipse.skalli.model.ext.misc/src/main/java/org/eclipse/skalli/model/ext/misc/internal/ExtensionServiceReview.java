@@ -48,6 +48,11 @@ public class ExtensionServiceReview
         return ReviewProjectExt.class;
     }
 
+    @Override
+    public ReviewProjectExt newExtension() {
+        return new ReviewProjectExt();
+    }
+
     protected void activate(ComponentContext context) {
         LOG.info("activated model extension: " + getShortName()); //$NON-NLS-1$
     }

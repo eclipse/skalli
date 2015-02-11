@@ -57,6 +57,11 @@ public class ExtensionServiceInfo
         return InfoExtension.class;
     }
 
+    @Override
+    public InfoExtension newExtension() {
+        return new InfoExtension();
+    }
+
     protected void activate(ComponentContext context) {
         LOG.info("activated model extension: " + getShortName()); //$NON-NLS-1$
     }

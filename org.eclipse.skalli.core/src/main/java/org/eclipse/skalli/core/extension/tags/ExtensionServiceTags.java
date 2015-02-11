@@ -43,6 +43,11 @@ public class ExtensionServiceTags extends ExtensionServiceBase<TagsExtension> {
         return TagsExtension.class;
     }
 
+    @Override
+    public TagsExtension newExtension() {
+        return new TagsExtension();
+    }
+
     protected void activate(ComponentContext context) {
         LOG.info("activated model extension: " + getShortName()); //$NON-NLS-1$
     }

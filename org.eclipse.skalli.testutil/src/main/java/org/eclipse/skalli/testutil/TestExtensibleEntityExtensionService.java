@@ -20,6 +20,11 @@ public class TestExtensibleEntityExtensionService extends ExtensionServiceBase<T
     }
 
     @Override
+    public TestExtensibleEntityBase newExtension() {
+        return new TestExtensibleEntityBase();
+    }
+
+    @Override
     public String getShortName() {
         return "foobar"; //$NON-NLS-1$
     }

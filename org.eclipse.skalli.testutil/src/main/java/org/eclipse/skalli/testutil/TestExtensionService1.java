@@ -21,6 +21,11 @@ public class TestExtensionService1 extends ExtensionServiceBase<TestExtension1> 
     }
 
     @Override
+    public TestExtension1 newExtension() {
+        return new TestExtension1();
+    }
+
+    @Override
     public String getModelVersion() {
         return "0.8.16";
     }

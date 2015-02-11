@@ -37,6 +37,11 @@ public class ExtensionServiceRelatedProjects extends ExtensionServiceBase<Relate
     }
 
     @Override
+    public RelatedProjectsExt newExtension() {
+        return new RelatedProjectsExt();
+    }
+
+    @Override
     public String getModelVersion() {
         return RelatedProjectsExt.MODEL_VERSION;
     }

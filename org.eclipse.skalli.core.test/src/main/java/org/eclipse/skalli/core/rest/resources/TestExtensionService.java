@@ -79,6 +79,11 @@ class TestExtensionService extends ExtensionServiceBase<TestExtension> {
     }
 
     @Override
+    public TestExtension newExtension() {
+        return new TestExtension();
+    }
+
+    @Override
     public String getShortName() {
         return "testExtension";
     }
