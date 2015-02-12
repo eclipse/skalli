@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -30,7 +31,7 @@ import org.eclipse.skalli.view.Consts;
 public class SearchFilter extends AbstractSearchFilter {
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, javax.servlet.FilterChain chain)
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
         String view = request.getParameter(Consts.PARAM_VIEW);
@@ -61,6 +62,7 @@ public class SearchFilter extends AbstractSearchFilter {
             result = SearchUtils.searchProjects(searchQuery);
         } catch (Exception e) {
             FilterUtil.handleException(request, response, e);
+            return new SearchResult<Project>("*"); //$NON-NLS-1$
         }
         Statistics.getDefault().trackSearch(user.getUserId(), result.getQueryString(),
                 result.getResultCount(), result.getDuration());

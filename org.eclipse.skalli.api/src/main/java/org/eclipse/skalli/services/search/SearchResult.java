@@ -11,6 +11,7 @@
 package org.eclipse.skalli.services.search;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.skalli.model.EntityBase;
@@ -22,6 +23,17 @@ public class SearchResult<T extends EntityBase> {
     private List<SearchHit<T>> result;
     private int resultCount;
     private PagingInfo pagingInfo;
+
+    public SearchResult() {
+    }
+
+    public SearchResult(String queryString) {
+        this.queryString = queryString;
+        this.duration = 0;
+        this.result = Collections.emptyList();
+        this.resultCount = 0;
+        this.pagingInfo = new PagingInfo(0, 0);
+    }
 
     public String getQueryString() {
         return queryString;

@@ -158,6 +158,7 @@ public class LoginFilter implements Filter {
                 FilterUtil.handleException(request, response,
                         new FilterException(String.format("Invalid project identifier '%s' specified in query '%s'",
                                 paramProjectId, Consts.PARAM_ID)));
+                return;
             }
         }
 
@@ -178,6 +179,7 @@ public class LoginFilter implements Filter {
         if (isAnonymousUser && rejectAnonymousUsers) {
             FilterUtil.handleACException(httpRequest, response,
                     new AccessControlException("Forbidden for anonymous users"));
+            return;
         }
         if (!isAnonymousUser) {
             request.setAttribute(Consts.ATTRIBUTE_USERID, userId);
