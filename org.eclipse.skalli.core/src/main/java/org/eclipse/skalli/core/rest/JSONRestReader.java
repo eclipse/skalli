@@ -111,26 +111,25 @@ public class JSONRestReader implements RestReader {
 
     @Override
     public boolean isKey() throws IOException {
-        if (state == STATE_FINAL || sequenceState != EXPECT_KEY) {
+        if (state == STATE_FINAL) {
             return false;
         }
-        return json.peek() == JsonToken.NAME;
+        return nextKey != null || json.peek() == JsonToken.NAME;
     }
 
     @Override
     public boolean isKeyAnyOf(String... keys) throws IOException {
-        if (state == STATE_FINAL || sequenceState != EXPECT_KEY) {
+        if (state == STATE_FINAL) {
             return false;
         }
         if (keys == null) {
             return false;
         }
         if (nextKey == null) {
-            if (isKey()) {
-                nextKey = key();
-            } else {
+            if (json.peek() != JsonToken.NAME) {
                 return false;
             }
+            nextKey = key();
         }
         for (String key: keys) {
             if (key.equals(nextKey)) {
@@ -363,7 +362,7 @@ public class JSONRestReader implements RestReader {
     }
 
     private void skipKey() throws IOException {
-        if (state == STATE_OBJECT && sequenceState == EXPECT_KEY) {
+        if (isKey()) {
             key();
         }
     }

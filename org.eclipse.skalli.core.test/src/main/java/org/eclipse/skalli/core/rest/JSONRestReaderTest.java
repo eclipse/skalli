@@ -314,9 +314,74 @@ public class JSONRestReaderTest {
         json.end();
     }
 
+    @Test
+    public void testSkipKeySequence() throws Exception {
+        JSONRestReader json = getRestReader("{\"a\":\"b\",\"c\":\"d\"}");
+        json.object();
+            assertTrue(json.isKey());
+            assertTrue(json.isKeyAnyOf("a"));
+            assertEquals("b", json.attributeString());
+            assertTrue(json.isKey());
+            assertTrue(json.isKeyAnyOf("c"));
+            assertEquals("d", json.attributeString());
+        json.end();
+    }
+
     @Test(expected=IllegalStateException.class)
-    public void testExpectKeyTwice() throws Exception {
-        JSONRestReader json = getRestReader("{\"a\":{}");
+    public void testImplicitSkipValue() throws Exception {
+        JSONRestReader json = getRestReader("{\"a\":\"b\",\"c\":\"d\"}");
+        json.object();
+            assertEquals("a", json.key());
+            assertEquals("c", json.key());
+    }
+
+    @Test
+    public void testExplicitSkipValue() throws Exception {
+        JSONRestReader json = getRestReader("{\"a\":\"b\",\"c\":\"d\"}");
+        json.object();
+            assertEquals("a", json.key());
+            json.skip();
+            assertEquals("c", json.key());
+            json.skip();
+        json.end();
+    }
+
+    @Test
+    public void testSkipSequence() throws Exception {
+        JSONRestReader json = getRestReader("{\"a\":\"b\",\"c\":\"d\",\"e\":\"f\",\"g\":\"h\"}");
+        json.object();
+            assertTrue(json.isKey());
+            assertTrue(json.isKeyAnyOf("a"));
+            assertEquals("b", json.attributeString()); // skip the key
+            assertTrue(json.isKey());
+            assertTrue(json.isKeyAnyOf("c"));
+            json.skip(); // skip key and value
+            assertTrue(json.isKey());
+            assertTrue(json.isKeyAnyOf("e"));
+            assertEquals("e", json.key());
+            json.skip(); // skip the value
+            assertTrue(json.isKey());
+            assertTrue(json.isKeyAnyOf("g"));
+            assertEquals("g", json.key());
+            assertEquals("h", json.valueString());
+        json.end();
+    }
+
+    @Test
+    public void testCheckSameKeyTwice() throws Exception {
+        JSONRestReader json = getRestReader("{\"a\":{}}");
+        json.object();
+            assertTrue(json.isKey());
+            assertTrue(json.isKey());
+            assertEquals("a", json.key());
+            assertFalse(json.isKey());
+            json.skip(); // skip the array value
+        json.end();
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void testReadSameKeyTwice() throws Exception {
+        JSONRestReader json = getRestReader("{\"a\":{}}");
         json.object();
             assertTrue(json.isKey());
             assertTrue(json.isKeyAnyOf("a"));
