@@ -61,7 +61,7 @@ public class JSONRestReader implements RestReader {
     private char sequenceState;
 
     // look-ahead for attribute keys
-    private String nextKey;
+    private String lookAhead;
 
     public JSONRestReader(Reader reader) {
         this(reader, 0);
@@ -114,7 +114,7 @@ public class JSONRestReader implements RestReader {
         if (state == STATE_FINAL) {
             return false;
         }
-        return nextKey != null || json.peek() == JsonToken.NAME;
+        return lookAhead != null || json.peek() == JsonToken.NAME;
     }
 
     @Override
@@ -125,14 +125,14 @@ public class JSONRestReader implements RestReader {
         if (keys == null) {
             return false;
         }
-        if (nextKey == null) {
+        if (lookAhead == null) {
             if (json.peek() != JsonToken.NAME) {
                 return false;
             }
-            nextKey = key();
+            lookAhead = key();
         }
         for (String key: keys) {
-            if (key.equals(nextKey)) {
+            if (key.equals(lookAhead)) {
                 return true;
             }
         }
@@ -142,12 +142,12 @@ public class JSONRestReader implements RestReader {
     @Override
     public String key() throws IOException {
         assertNotFinal();
-        if (nextKey == null && sequenceState != EXPECT_KEY) {
+        if (lookAhead == null && sequenceState != EXPECT_KEY) {
             throw new IllegalStateException("Key expected");
         }
-        String key = nextKey;
+        String key = lookAhead;
         if (key != null) {
-            nextKey = null;
+            lookAhead = null;
             return key;
         }
         key = json.nextName();
