@@ -86,6 +86,17 @@ public interface RestReader {
 
     /**
      * Returns <code>true</code> if the current token in the input stream
+     * is the key of an object attribute, and the value of that key equals
+     * the given key.
+     *
+     * @param key the key to compare the current token with.
+     *
+     * @throws IOException if an i/o error occured.
+     */
+    public boolean isKey(String key) throws IOException;
+
+    /**
+     * Returns <code>true</code> if the current token in the input stream
      * is the key of an object attribute, and the value of that key equals any
      * of the given keys.
      *

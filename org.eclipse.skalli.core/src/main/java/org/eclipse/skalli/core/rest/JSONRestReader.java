@@ -118,6 +118,11 @@ public class JSONRestReader implements RestReader {
     }
 
     @Override
+    public boolean isKey(String key) throws IOException {
+        return isKeyAnyOf(key);
+    }
+
+    @Override
     public boolean isKeyAnyOf(String... keys) throws IOException {
         if (state == STATE_FINAL) {
             return false;
