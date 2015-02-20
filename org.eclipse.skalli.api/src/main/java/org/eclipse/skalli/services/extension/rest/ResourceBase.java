@@ -42,10 +42,6 @@ public abstract class ResourceBase extends ServerResource {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceBase.class);
 
     private static final String ERROR_ID_MISSING_AUTHORIZATION = "rest:permit({0}):00"; //$NON-NLS-1$
-    private static final String ERROR_ID_UNSUPPORTED_MEDIA_TYPE = "rest:mediaType({0}):00"; //$NON-NLS-1$
-
-    private static final String ERROS_MSG_UNSUPPORTED_MEDIA_TYPE =
-            "Unsupported media type {0}. Supported media types are 'text/xml' and 'application/json'."; //$NON-NLS-1$
 
     private RequestContext request;
 
