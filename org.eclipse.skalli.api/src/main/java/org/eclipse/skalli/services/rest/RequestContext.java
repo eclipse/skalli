@@ -59,7 +59,7 @@ public class RequestContext {
      * Extracts request parameters like {@link #getPath() path} and
      * {@link #getQueryAttributes() query attributes}.
      *
-     * @param request  the request to evaluate.
+     * @param request  the REST request to evaluate.
      */
     public RequestContext(Request request) {
         action = request.getMethod().getName();
@@ -82,7 +82,7 @@ public class RequestContext {
      * This is a convenience method equivalent to
      * {@link #RequestContext(Request) RequestContext(serverResource.getRequest())}.
      *
-     * @param request  the request to evaluate.
+     * @param serverResource  the server resource to evaluate.
      */
     public RequestContext(ServerResource serverResource) {
         this(serverResource.getRequest());
