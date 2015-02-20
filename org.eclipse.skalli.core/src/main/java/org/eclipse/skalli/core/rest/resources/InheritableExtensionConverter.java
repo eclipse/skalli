@@ -71,19 +71,21 @@ public class InheritableExtensionConverter extends RestConverterBase<Inheritable
         }
     }
 
-    @SuppressWarnings("nls")
     @Override
     protected InheritableExtension unmarshal() throws IOException, RestException {
         InheritableExtension inheritable = new InheritableExtension();
         reader.object();
+        unmarshallCommonAttributes(inheritable);
+        inheritable.setExtension(extensionConverter.unmarshal(reader));
+        reader.end();
+        return inheritable;
+    }
+
+    @SuppressWarnings("nls")
+    private void unmarshallCommonAttributes(InheritableExtension inheritable) throws IOException, RestException {
         while (reader.hasMore()) {
             if (reader.isKeyAnyOf("inherited")) {
-                boolean inherited = reader.attributeBoolean();
-                if (inherited) {
-                    // if the extension is inherited, we are done!
-                    inheritable.setInherited(true);
-                    break;
-                }
+                inheritable.setInherited(reader.attributeBoolean());
             } else if (reader.isKeyAnyOf("apiVersion")) {
                 String apiVersion = reader.attributeString();
                 if (!getApiVersion().equals(apiVersion)) {
@@ -103,20 +105,10 @@ public class InheritableExtensionConverter extends RestConverterBase<Inheritable
                 // ignore these attributes
                 reader.skip();
             } else {
-                // first unknown attribute indicates begin of extension
+                // first unknown attribute indicates begin of extension attributes
                 break;
             }
         }
-
-        // if no "inherited" attribute was present, or its value was "false",
-        // employ the extension converter for unmarshalling all further attributes
-        Boolean inherited = inheritable.isInherited();
-        if (inherited != Boolean.TRUE) {
-            inheritable.setExtension(extensionConverter.unmarshal(reader));
-        }
-
-        reader.end();
-        return inheritable;
     }
 
     @Override
