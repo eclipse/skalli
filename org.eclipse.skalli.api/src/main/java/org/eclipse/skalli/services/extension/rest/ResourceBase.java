@@ -47,12 +47,12 @@ public abstract class ResourceBase extends ServerResource {
     private static final String ERROS_MSG_UNSUPPORTED_MEDIA_TYPE =
             "Unsupported media type {0}. Supported media types are 'text/xml' and 'application/json'."; //$NON-NLS-1$
 
-    private RequestContext context;
+    private RequestContext request;
 
     @Override
     protected void doInit() {
         super.doInit();
-        context = new RequestContext(this);
+        request = new RequestContext(this);
     }
 
     /**
@@ -60,7 +60,7 @@ public abstract class ResourceBase extends ServerResource {
      * about the request like query attributes and request path.
      */
     protected RequestContext getResourceContext() {
-        return context;
+        return request;
     }
 
     /**
@@ -68,14 +68,14 @@ public abstract class ResourceBase extends ServerResource {
      * prefix <code>/api</code>.
      */
     protected String getPath() {
-        return context.getPath();
+        return request.getPath();
     }
 
     /**
      * Returns the action of this request.
      */
     protected String getAction() {
-        return context.getAction();
+        return request.getAction();
     }
 
     /**
@@ -85,7 +85,7 @@ public abstract class ResourceBase extends ServerResource {
      * @see org.restlet.Request#getResourceRef().
      */
     protected Reference getResourceRef() {
-        return context.getResourceRef();
+        return request.getResourceRef();
     }
 
     /**
@@ -94,7 +94,7 @@ public abstract class ResourceBase extends ServerResource {
      * could not be determined.
      */
     protected String getHost() {
-        return context.getHost();
+        return request.getHost();
     }
 
     /**
@@ -102,7 +102,7 @@ public abstract class ResourceBase extends ServerResource {
      * if there is no query.
      */
     protected Form getQueryAsForm() {
-        return context.getQueryAsForm();
+        return request.getQueryAsForm();
     }
 
     /**
@@ -110,7 +110,7 @@ public abstract class ResourceBase extends ServerResource {
      * if there is no query.
      */
     protected String getQueryString() {
-        return context.getQueryString();
+        return request.getQueryString();
     }
 
     /**
@@ -124,7 +124,7 @@ public abstract class ResourceBase extends ServerResource {
      * attribute.
      */
     protected String getQueryAttribute(String name) {
-        return context.getQueryAttribute(name);
+        return request.getQueryAttribute(name);
     }
 
     /**
@@ -134,7 +134,7 @@ public abstract class ResourceBase extends ServerResource {
      * @param name  the name of the attribute.
      */
     protected boolean hasQueryAttribute(String name) {
-        return context.hasQueryAttribute(name);
+        return request.hasQueryAttribute(name);
     }
 
     /**
@@ -143,7 +143,7 @@ public abstract class ResourceBase extends ServerResource {
      * or an empty map if there is no query.
      */
     protected Map<String,String> getQueryAttributes() {
-        return context.getQueryAttributes();
+        return request.getQueryAttributes();
     }
 
     /**
@@ -157,14 +157,14 @@ public abstract class ResourceBase extends ServerResource {
      * there is no matching header.
      */
     protected String getHeader(String name, String defaultValue) {
-        return context.getHeader(name, defaultValue);
+        return request.getHeader(name, defaultValue);
     }
 
     /**
      * Returns the requested media type.
      */
     protected MediaType getMediaType() {
-        return context.getMediaType();
+        return request.getMediaType();
     }
 
     /**
@@ -172,7 +172,7 @@ public abstract class ResourceBase extends ServerResource {
      * <tt>text/xml</tt> or <tt>application/json</tt>.
      */
     protected boolean isSupportedMediaType() {
-        return context.isXML() || context.isJSON();
+        return request.isXML() || request.isJSON();
     }
 
     /**
@@ -196,7 +196,7 @@ public abstract class ResourceBase extends ServerResource {
      */
     @SuppressWarnings("nls")
     protected boolean enforceOldStyleConverters() {
-        if (!context.isXML()) {
+        if (!request.isXML()) {
             return false;
         }
         String restVersion = getQueryAttribute("rest");
@@ -219,8 +219,8 @@ public abstract class ResourceBase extends ServerResource {
      */
     protected Representation createUnauthorizedRepresentation() {
         String loggedInUser = Permits.getLoggedInUser();
-        String action = context.getAction();
-        String path = context.getPath();
+        String action = request.getAction();
+        String path = request.getPath();
         String message = StringUtils.isBlank(loggedInUser)?
                 MessageFormat.format("{0} {1}: Forbidden for anonymous users", action, path) :
                 MessageFormat.format("{0} {1}: Forbidden for user ''{2}''", action, path, loggedInUser);
@@ -340,7 +340,7 @@ public abstract class ResourceBase extends ServerResource {
      * @param message  the error message.
      */
     protected Representation createErrorRepresentation(Status status, String errorId, String message) {
-        ErrorRepresentation representation = new ErrorRepresentation(context, status, errorId, message);
+        ErrorRepresentation representation = new ErrorRepresentation(request, status, errorId, message);
         setStatus(status);
         return representation;
     }
