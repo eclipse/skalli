@@ -327,6 +327,31 @@ public class JSONRestReaderTest {
         json.end();
     }
 
+    @Test
+    public void testSkipKeyArray() throws Exception {
+        JSONRestReader json = getRestReader("{\"a\":[\"x\"]}");
+        json.object();
+            assertTrue(json.isKey());
+            assertTrue(json.isKeyAnyOf("a"));
+            json.array();
+              assertEquals("x", json.valueString());
+            json.end();
+        json.end();
+    }
+
+    @Test
+    public void testSkipKeyObject() throws Exception {
+        JSONRestReader json = getRestReader("{\"a\":{\"x\":\"y\"}}");
+        json.object();
+            assertTrue(json.isKey());
+            assertTrue(json.isKeyAnyOf("a"));
+            json.object();
+            assertEquals("x", json.key());
+            assertEquals("y", json.valueString());
+            json.end();
+        json.end();
+    }
+
     @Test(expected=IllegalStateException.class)
     public void testImplicitSkipValue() throws Exception {
         JSONRestReader json = getRestReader("{\"a\":\"b\",\"c\":\"d\"}");

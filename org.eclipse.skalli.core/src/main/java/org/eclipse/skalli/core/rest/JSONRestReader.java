@@ -307,6 +307,7 @@ public class JSONRestReader implements RestReader {
     @Override
     public void array(String itemKey) throws IOException {
         assertNotFinal();
+        skipKey();
         json.beginArray();
         states.push(state = STATE_ARRAY);
         sequenceState = EXPECT_VALUE;
@@ -323,6 +324,7 @@ public class JSONRestReader implements RestReader {
     @Override
     public void object() throws IOException {
         assertNotFinal();
+        skipKey();
         json.beginObject();
         states.push(state = STATE_OBJECT);
         sequenceState = EXPECT_KEY;
