@@ -10,11 +10,13 @@
  *******************************************************************************/
 package org.eclipse.skalli.testutil;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.eclipse.skalli.services.rest.RequestContext;
+import org.eclipse.skalli.services.rest.RestReader;
 import org.eclipse.skalli.services.rest.RestService;
 import org.eclipse.skalli.services.rest.RestWriter;
 import org.json.JSONException;
@@ -66,6 +68,10 @@ public class RestWriterTestBase {
 
     protected RestWriter getRestWriterJSON() {
         return restService.getRestWriter(writer, getRequestContext(MediaType.APPLICATION_JSON));
+    }
+
+    protected RestReader getRestReaderJSON(String json) {
+        return restService.getRestReader(new StringReader(json), getRequestContext(MediaType.APPLICATION_JSON));
     }
 
     protected RequestContext getRequestContext(MediaType mediaType) {
