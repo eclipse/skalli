@@ -10,20 +10,29 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.extension.tags;
 
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.skalli.model.ext.commons.TagsExtension;
+import org.eclipse.skalli.services.rest.RestReader;
 import org.eclipse.skalli.services.rest.RestWriter;
+import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.RestWriterTestBase;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
 public class TagsConverterTest extends RestWriterTestBase {
 
+    private static final String INITIAL_TAGS_EXTENSION_XML = "<tags></tags>";
+    private static final String TAGS_EXTENSION_XML = "<tags><tag>a</tag><tag>b</tag><tag>c</tag></tags>";
+    private static final String INITIAL_TAGS_EXTENSION_JSON = "{\"items\":[]}";
+    private static final String TAGS_EXTENSION_JSON = "{\"items\":[\"a\",\"b\",\"c\"]}";
+
     @Test
     public void testMarshalBlankExtensionXML() throws Exception {
         TagsExtension tags = new TagsExtension();
         RestWriter restWriter = getRestWriterXML();
         marshalTagsExtension(tags, restWriter);
-        assertEqualsXML("<tags></tags>");
+        assertEqualsXML(INITIAL_TAGS_EXTENSION_XML);
     }
 
     @Test
@@ -31,7 +40,7 @@ public class TagsConverterTest extends RestWriterTestBase {
         TagsExtension tags = newTagsExtension();
         RestWriter restWriter = getRestWriterXML();
         marshalTagsExtension(tags, restWriter);
-        assertEqualsXML("<tags><tag>a</tag><tag>b</tag><tag>c</tag></tags>");
+        assertEqualsXML(TAGS_EXTENSION_XML);
     }
 
     @Test
@@ -39,7 +48,7 @@ public class TagsConverterTest extends RestWriterTestBase {
         TagsExtension tags = new TagsExtension();
         RestWriter restWriter = getRestWriterJSON();
         marshalTagsExtension(tags, restWriter);
-        assertEqualsJSON("{\"items\":[]}");
+        assertEqualsJSON(INITIAL_TAGS_EXTENSION_JSON);
     }
 
     @Test
@@ -47,7 +56,21 @@ public class TagsConverterTest extends RestWriterTestBase {
         TagsExtension tags = newTagsExtension();
         RestWriter restWriter = getRestWriterJSON();
         marshalTagsExtension(tags, restWriter);
-        assertEqualsJSON("{\"items\":[\"a\",\"b\",\"c\"]}");
+        assertEqualsJSON(TAGS_EXTENSION_JSON);
+    }
+
+    @Test
+    public void testUnmarshallInitialJSON() throws Exception {
+        RestReader restReader = getRestReaderJSON(INITIAL_TAGS_EXTENSION_JSON);
+        TagsExtension tags = unmarshalTagsExtension(restReader);
+        assertTrue(tags.getTags().isEmpty());
+    }
+
+    @Test
+    public void testUnmarshallJSON() throws Exception {
+        RestReader restReader = getRestReaderJSON(TAGS_EXTENSION_JSON);
+        TagsExtension tags = unmarshalTagsExtension(restReader);
+        AssertUtils.assertEquals("getTags", tags.getTags(), "a", "b", "c");
     }
 
     private TagsExtension newTagsExtension() {
@@ -64,5 +87,13 @@ public class TagsConverterTest extends RestWriterTestBase {
         converter.marshal(tags, restWriter);
         restWriter.end();
         restWriter.flush();
+    }
+
+    private TagsExtension unmarshalTagsExtension(RestReader restReader) throws Exception {
+        TagsConverter converter = new TagsConverter();
+        restReader.object();
+        TagsExtension tags = converter.unmarshal(restReader);
+        restReader.end();
+        return tags;
     }
 }

@@ -14,6 +14,7 @@ import java.io.IOException;
 
 import org.eclipse.skalli.model.ext.commons.TagsExtension;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.eclipse.skalli.services.extension.rest.RestException;
 import org.restlet.data.MediaType;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -41,6 +42,32 @@ public class TagsConverter extends RestConverterBase<TagsExtension> {
             writer.value(tag);
         }
         writer.end();
+    }
+
+    @Override
+    public TagsExtension unmarshal() throws RestException, IOException {
+        return unmarshal(new TagsExtension());
+    }
+
+    @SuppressWarnings("nls")
+    private TagsExtension unmarshal(TagsExtension ext) throws IOException {
+        while (reader.hasMore()) {
+            if (reader.isKey("items")) {
+                unmarshalTags(ext);
+            } else if (reader.isArray()) {
+                unmarshalTags(ext);
+            }
+        }
+        return ext;
+    }
+
+    @SuppressWarnings("nls")
+    private void unmarshalTags(TagsExtension ext) throws IOException {
+        reader.array("tag");
+        while (reader.hasMore()) {
+            ext.addTag(reader.valueString());
+        }
+        reader.end();
     }
 
     @Deprecated
