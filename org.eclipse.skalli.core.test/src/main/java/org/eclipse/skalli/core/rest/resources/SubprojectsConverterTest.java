@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.rest.resources;
 
+import static org.eclipse.skalli.core.rest.resources.ConverterTestUtils.newMinimalProject;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -85,9 +87,9 @@ public class SubprojectsConverterTest extends RestWriterTestBase {
 
     private Subprojects newSubprojects() {
         List<Project> projects = new ArrayList<Project>();
-        projects.add(CommonProjectConverterTest.newMinimalProject(TestUUIDs.TEST_UUIDS[3], "id1", "name1"));
-        projects.add(CommonProjectConverterTest.newMinimalProject(TestUUIDs.TEST_UUIDS[4], "id2", "name2"));
-        projects.add(CommonProjectConverterTest.newMinimalProject(TestUUIDs.TEST_UUIDS[5], "id2", "name2"));
+        projects.add(newMinimalProject(TestUUIDs.TEST_UUIDS[3], "id1", "name1"));
+        projects.add(newMinimalProject(TestUUIDs.TEST_UUIDS[4], "id2", "name2"));
+        projects.add(newMinimalProject(TestUUIDs.TEST_UUIDS[5], "id2", "name2"));
         Subprojects subprojects = new Subprojects(TestUUIDs.TEST_UUIDS[0], projects);
         return subprojects;
     }
