@@ -11,10 +11,13 @@
 package org.eclipse.skalli.core.extension.people;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.ext.commons.PeopleExtension;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.eclipse.skalli.services.extension.rest.RestException;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -54,6 +57,50 @@ public class PeopleConverter extends RestConverterBase<PeopleExtension> {
                 .end();
         }
         writer.end();
+    }
+
+    @Override
+    protected PeopleExtension unmarshal() throws RestException, IOException {
+        return unmarshal(new PeopleExtension());
+    }
+
+    @SuppressWarnings("nls")
+    private PeopleExtension unmarshal(PeopleExtension ext) throws RestException, IOException {
+        while (reader.hasMore()) {
+            if (reader.isKey("leads")) {
+                ext.getLeads().addAll(readMembers("lead"));
+            } else if (reader.isKey("members")) {
+                ext.getMembers().addAll(readMembers("member"));
+            }
+        }
+        return ext;
+    }
+
+    private List<Member> readMembers(String itemKey) throws RestException, IOException {
+        List<Member> members = new ArrayList<Member>();
+        reader.array(itemKey);
+        while (reader.hasMore()) {
+            Member member = readMember();
+            if (member != null) {
+                members.add(member);
+            }
+        }
+        reader.end();
+        return members;
+    }
+
+    private Member readMember() throws RestException, IOException {
+        Member member = null;
+        reader.object();
+        while (reader.hasMore()) {
+            if (reader.isKey("userId")) { //$NON-NLS-1$
+                member = new Member(reader.valueString());
+            } else {
+                reader.skip();
+            }
+        }
+        reader.end();
+        return member;
     }
 
     @Deprecated

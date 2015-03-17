@@ -10,21 +10,41 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.extension.people;
 
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.ext.commons.PeopleExtension;
+import org.eclipse.skalli.services.rest.RestReader;
 import org.eclipse.skalli.services.rest.RestWriter;
+import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.RestWriterTestBase;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
 public class PeopleConverterTest extends RestWriterTestBase {
 
+    private static final String INITIAL_PEOPLE_EXTENSION_XML = "<people><leads/><members/></people>";
+    private static final String PEOPLE_EXTENSION_XML = "<people>"
+            + "<leads>"
+            + "<lead><userId>a</userId><link rel=\"user\" href=\"http://example.org:8080/api/users/a\"/></lead>"
+            + "<lead><userId>b</userId><link rel=\"user\" href=\"http://example.org:8080/api/users/b\"/></lead>"
+            + "</leads>"
+            + "<members>"
+            + "<member><userId>c</userId><link rel=\"user\" href=\"http://example.org:8080/api/users/c\"/></member>"
+            + "</members></people>";
+    private static final String INITIAL_PEOPLE_EXTENSION_JSON = "{\"leads\":[],\"members\":[]}";
+    private static final String PEOPLE_EXTENSION_JSON = "{\"leads\":["
+            + "{\"userId\":\"a\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/a\"}},"
+            + "{\"userId\":\"b\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/b\"}}],"
+            + "\"members\":["
+            + "{\"userId\":\"c\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/c\"}}]}";
+
     @Test
     public void testMarshalBlankExtensionXML() throws Exception {
         PeopleExtension people = new PeopleExtension();
         RestWriter restWriter = getRestWriterXML();
         marshalPeopleExtension(people, restWriter);
-        assertEqualsXML("<people><leads/><members/></people>");
+        assertEqualsXML(INITIAL_PEOPLE_EXTENSION_XML);
     }
 
     @Test
@@ -32,14 +52,7 @@ public class PeopleConverterTest extends RestWriterTestBase {
         PeopleExtension people = newPeopleExtension();
         RestWriter restWriter = getRestWriterXML();
         marshalPeopleExtension(people, restWriter);
-        assertEqualsXML("<people>"
-                + "<leads>"
-                + "<lead><userId>a</userId><link rel=\"user\" href=\"http://example.org:8080/api/users/a\"/></lead>"
-                + "<lead><userId>b</userId><link rel=\"user\" href=\"http://example.org:8080/api/users/b\"/></lead>"
-                + "</leads>"
-                + "<members>"
-                + "<member><userId>c</userId><link rel=\"user\" href=\"http://example.org:8080/api/users/c\"/></member>"
-                + "</members></people>");
+        assertEqualsXML(PEOPLE_EXTENSION_XML);
     }
 
     @Test
@@ -47,7 +60,7 @@ public class PeopleConverterTest extends RestWriterTestBase {
         PeopleExtension people = new PeopleExtension();
         RestWriter restWriter = getRestWriterJSON();
         marshalPeopleExtension(people, restWriter);
-        assertEqualsJSON("{\"leads\":[],\"members\":[]}");
+        assertEqualsJSON(INITIAL_PEOPLE_EXTENSION_JSON);
     }
 
     @Test
@@ -55,11 +68,23 @@ public class PeopleConverterTest extends RestWriterTestBase {
         PeopleExtension people = newPeopleExtension();
         RestWriter restWriter = getRestWriterJSON();
         marshalPeopleExtension(people, restWriter);
-        assertEqualsJSON("{\"leads\":["
-                + "{\"userId\":\"a\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/a\"}},"
-                + "{\"userId\":\"b\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/b\"}}],"
-                + "\"members\":["
-                + "{\"userId\":\"c\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/c\"}}]}");
+        assertEqualsJSON(PEOPLE_EXTENSION_JSON);
+    }
+
+    @Test
+    public void testUnmarshallInitialJSON() throws Exception {
+        RestReader restReader = getRestReaderJSON(INITIAL_PEOPLE_EXTENSION_JSON);
+        PeopleExtension people = unmarshalPeopleExtension(restReader);
+        assertTrue(people.getLeads().isEmpty());
+        assertTrue(people.getMembers().isEmpty());
+    }
+
+    @Test
+    public void testUnmarshallJSON() throws Exception {
+        RestReader restReader = getRestReaderJSON(PEOPLE_EXTENSION_JSON);
+        PeopleExtension people = unmarshalPeopleExtension(restReader);
+        AssertUtils.assertEquals("getLeads", people.getLeads(), new Member("a"), new Member("b"));
+        AssertUtils.assertEquals("getMembers", people.getMembers(), new Member("c"));
     }
 
     private PeopleExtension newPeopleExtension() {
@@ -76,5 +101,13 @@ public class PeopleConverterTest extends RestWriterTestBase {
         converter.marshal(people, restWriter);
         restWriter.end();
         restWriter.flush();
+    }
+
+    private PeopleExtension unmarshalPeopleExtension(RestReader restReader) throws Exception {
+        PeopleConverter converter = new PeopleConverter();
+        restReader.object();
+        PeopleExtension people = converter.unmarshal(restReader);
+        restReader.end();
+        return people;
     }
 }
