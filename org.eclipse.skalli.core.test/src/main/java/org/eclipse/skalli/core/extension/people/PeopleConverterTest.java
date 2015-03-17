@@ -38,6 +38,13 @@ public class PeopleConverterTest extends RestWriterTestBase {
             + "{\"userId\":\"b\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/b\"}}],"
             + "\"members\":["
             + "{\"userId\":\"c\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/c\"}}]}";
+    private static final String PEOPLE_EXTENSION_UNKNOWN_ATTR_JSON = "{"
+            + "\"ignore\":true,"
+            + "\"members\":[{\"userId\":\"c\",\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/c\"}}],"
+            + "\"unknown\":\"yes\","
+            + "\"leads\":[{\"userId\":\"a\","
+            + "\"ignore\":true,"
+            + "\"link\":{\"rel\":\"user\",\"href\":\"http://example.org:8080/api/users/b\",\"userId\":\"b\"}}]}";
 
     @Test
     public void testMarshalBlankExtensionXML() throws Exception {
@@ -84,6 +91,14 @@ public class PeopleConverterTest extends RestWriterTestBase {
         RestReader restReader = getRestReaderJSON(PEOPLE_EXTENSION_JSON);
         PeopleExtension people = unmarshalPeopleExtension(restReader);
         AssertUtils.assertEquals("getLeads", people.getLeads(), new Member("a"), new Member("b"));
+        AssertUtils.assertEquals("getMembers", people.getMembers(), new Member("c"));
+    }
+
+    @Test
+    public void testUnmarshallIgnoreUnknownAttributesJSON() throws Exception {
+        RestReader restReader = getRestReaderJSON(PEOPLE_EXTENSION_UNKNOWN_ATTR_JSON);
+        PeopleExtension people = unmarshalPeopleExtension(restReader);
+        AssertUtils.assertEquals("getLeads", people.getLeads(), new Member("a"));
         AssertUtils.assertEquals("getMembers", people.getMembers(), new Member("c"));
     }
 

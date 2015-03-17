@@ -49,6 +49,8 @@ public class InfoConverter extends RestConverterBase<InfoExtension> {
                 ext.setPageUrl(reader.valueString());
             } else if (reader.isKey("mailingLists")) {
                 ext.setMailingLists(reader.collection("mailingList"));
+            } else {
+                reader.skip();
             }
         }
         return ext;

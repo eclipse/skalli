@@ -28,6 +28,8 @@ public class InfoConverterTest extends RestWriterTestBase {
             + "<mailingLists><mailingList>a</mailingList><mailingList>b</mailingList></mailingLists></info>";
     private static final String INITIAL_INFO_EXTENSION_JSON = "{\"mailingLists\":[]}";
     private static final String INFO_EXTENSION_JSON = "{\"homepage\":\"foobar\",\"mailingLists\":[\"a\",\"b\"]}";
+    private static final String INFO_EXTENSION_UNKNOWN_ATTR_JSON =
+            "{\"ignore\":true,\"mailingLists\":[\"a\",\"b\"],\"unknown\":\"yes\",\"homepage\":\"foobar\",\"whatever\":4711}";
 
     @Test
     public void testMarshalBlankExtensionXML() throws Exception {
@@ -72,6 +74,14 @@ public class InfoConverterTest extends RestWriterTestBase {
     @Test
     public void testUnmarshallJSON() throws Exception {
         RestReader restReader = getRestReaderJSON(INFO_EXTENSION_JSON);
+        InfoExtension info = unmarshalInfoExtension(restReader);
+        assertEquals("foobar", info.getPageUrl());
+        AssertUtils.assertEquals("getMailingLists", info.getMailingLists(), "a", "b");
+    }
+
+    @Test
+    public void testUnmarshallIgnoreUnknownAttributesJSON() throws Exception {
+        RestReader restReader = getRestReaderJSON(INFO_EXTENSION_UNKNOWN_ATTR_JSON);
         InfoExtension info = unmarshalInfoExtension(restReader);
         assertEquals("foobar", info.getPageUrl());
         AssertUtils.assertEquals("getMailingLists", info.getMailingLists(), "a", "b");

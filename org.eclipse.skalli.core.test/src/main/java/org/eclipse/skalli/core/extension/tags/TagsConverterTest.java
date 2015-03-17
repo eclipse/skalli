@@ -26,6 +26,8 @@ public class TagsConverterTest extends RestWriterTestBase {
     private static final String TAGS_EXTENSION_XML = "<tags><tag>a</tag><tag>b</tag><tag>c</tag></tags>";
     private static final String INITIAL_TAGS_EXTENSION_JSON = "{\"items\":[]}";
     private static final String TAGS_EXTENSION_JSON = "{\"items\":[\"a\",\"b\",\"c\"]}";
+    private static final String TAGS_EXTENSION_UNKNOWN_ATTR_JSON =
+            "{\"ignore\":[],\"items\":[\"a\",\"b\",\"c\"],\"unknown\":\"yes\"}";
 
     @Test
     public void testMarshalBlankExtensionXML() throws Exception {
@@ -69,6 +71,13 @@ public class TagsConverterTest extends RestWriterTestBase {
     @Test
     public void testUnmarshallJSON() throws Exception {
         RestReader restReader = getRestReaderJSON(TAGS_EXTENSION_JSON);
+        TagsExtension tags = unmarshalTagsExtension(restReader);
+        AssertUtils.assertEquals("getTags", tags.getTags(), "a", "b", "c");
+    }
+
+    @Test
+    public void testUnmarshallIgnoreUnknownAttributesJSON() throws Exception {
+        RestReader restReader = getRestReaderJSON(TAGS_EXTENSION_UNKNOWN_ATTR_JSON);
         TagsExtension tags = unmarshalTagsExtension(restReader);
         AssertUtils.assertEquals("getTags", tags.getTags(), "a", "b", "c");
     }

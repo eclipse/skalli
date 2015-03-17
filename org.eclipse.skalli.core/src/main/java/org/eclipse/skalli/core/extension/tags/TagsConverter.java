@@ -56,6 +56,8 @@ public class TagsConverter extends RestConverterBase<TagsExtension> {
                 unmarshalTags(ext);
             } else if (reader.isArray()) {
                 unmarshalTags(ext);
+            } else {
+                reader.skip();
             }
         }
         return ext;

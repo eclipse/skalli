@@ -71,6 +71,8 @@ public class PeopleConverter extends RestConverterBase<PeopleExtension> {
                 ext.getLeads().addAll(readMembers("lead"));
             } else if (reader.isKey("members")) {
                 ext.getMembers().addAll(readMembers("member"));
+            } else {
+                reader.skip();
             }
         }
         return ext;
