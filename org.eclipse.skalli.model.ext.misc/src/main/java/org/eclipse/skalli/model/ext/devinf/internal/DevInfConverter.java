@@ -41,6 +41,33 @@ class DevInfConverter extends RestConverterBase<DevInfProjectExt> {
         .collection("javadocs", "javadoc", extension.getJavadocs());
     }
 
+    @Override
+    protected DevInfProjectExt unmarshal() throws IOException {
+        return unmarshal(new DevInfProjectExt());
+    }
+
+    @SuppressWarnings("nls")
+    private DevInfProjectExt unmarshal(DevInfProjectExt ext) throws IOException {
+        while (reader.hasMore()) {
+            if (reader.isKey("bugtrackerUrl")) {
+                ext.setBugtrackerUrl(reader.valueString());
+            } else if (reader.isKey("ciUrl")) {
+                ext.setCiUrl(reader.valueString());
+            } else if (reader.isKey("metricsUrl")) {
+                ext.setMetricsUrl(reader.valueString());
+            } else if (reader.isKey("scmUrl")) {
+                ext.setScmUrl(reader.valueString());
+            } else if (reader.isKey("scmLocations")) {
+                ext.setScmLocations(reader.collection("scmLocation"));
+            } else if (reader.isKey("javadocs")) {
+                ext.setJavadocs(reader.collection("javadoc"));
+            } else {
+                reader.skip();
+            }
+        }
+        return ext;
+    }
+
     @Deprecated
     public DevInfConverter(String host) {
         super(DevInfProjectExt.class, "devInf", host); //$NON-NLS-1$

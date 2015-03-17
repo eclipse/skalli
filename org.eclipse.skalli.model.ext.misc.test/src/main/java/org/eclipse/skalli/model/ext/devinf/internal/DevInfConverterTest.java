@@ -10,20 +10,57 @@
  *******************************************************************************/
 package org.eclipse.skalli.model.ext.devinf.internal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
+import org.eclipse.skalli.services.rest.RestReader;
 import org.eclipse.skalli.services.rest.RestWriter;
+import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.RestWriterTestBase;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
 public class DevInfConverterTest extends RestWriterTestBase {
 
+    private static final String INITIAL_DEVINF_EXTENSION_XML = "<devInf><scmLocations/><javadocs/></devInf>";
+    private static final String DEVINF_EXTENSION_XML = "<devInf>"
+            + "<bugtrackerUrl>bugs</bugtrackerUrl>"
+            + "<ciUrl>ci</ciUrl>"
+            + "<metricsUrl>m</metricsUrl>"
+            + "<scmUrl>scm</scmUrl>"
+            + "<scmLocations>"
+            + "<scmLocation>loc1</scmLocation>"
+            + "<scmLocation>loc2</scmLocation>"
+            + "</scmLocations>"
+            + "<javadocs>"
+            + "<javadoc>j1</javadoc>"
+            + "<javadoc>j2</javadoc>"
+            + "</javadocs>"
+            + "</devInf>";
+    private static final String INITIAL_DEVINF_EXTENSION_JSON = "{\"scmLocations\":[],\"javadocs\":[]}";
+    private static final String DEVINF_EXTENSION_JSON = "{"
+            + "\"bugtrackerUrl\":\"bugs\""
+            + ",\"ciUrl\":\"ci\""
+            + ",\"metricsUrl\":\"m\""
+            + ",\"scmUrl\":\"scm\""
+            + ",\"scmLocations\":[\"loc1\",\"loc2\"]"
+            + ",\"javadocs\":[\"j1\",\"j2\"]}";
+    private static final String DEVINF_EXTENSION_UNKNOWN_ATTR_JSON = "{"
+            + "\"ignore\":true,"
+            + "\"bugtrackerUrl\":\"bugs\","
+            + "\"scmLocations\":[\"loc1\",\"loc2\"],"
+            + "\"scmUrl\":\"scm\","
+            + "\"unknown\":\"yes\","
+            + "\"javadocs\":[],"
+            + "\"whatever\":4711}";
+
     @Test
     public void testMarshalBlankExtensionXML() throws Exception {
         DevInfProjectExt devInf = new DevInfProjectExt();
         RestWriter restWriter = getRestWriterXML();
         marshalDevInfExtension(devInf, restWriter);
-        assertEqualsXML("<devInf><scmLocations/><javadocs/></devInf>");
+        assertEqualsXML(INITIAL_DEVINF_EXTENSION_XML);
     }
 
     @Test
@@ -31,20 +68,7 @@ public class DevInfConverterTest extends RestWriterTestBase {
         DevInfProjectExt devInf = newDevInfExtension();
         RestWriter restWriter = getRestWriterXML();
         marshalDevInfExtension(devInf, restWriter);
-        assertEqualsXML("<devInf>"
-                + "<bugtrackerUrl>bugs</bugtrackerUrl>"
-                + "<ciUrl>ci</ciUrl>"
-                + "<metricsUrl>m</metricsUrl>"
-                + "<scmUrl>scm</scmUrl>"
-                + "<scmLocations>"
-                + "<scmLocation>loc1</scmLocation>"
-                + "<scmLocation>loc2</scmLocation>"
-                + "</scmLocations>"
-                + "<javadocs>"
-                + "<javadoc>j1</javadoc>"
-                + "<javadoc>j2</javadoc>"
-                + "</javadocs>"
-                + "</devInf>");
+        assertEqualsXML(DEVINF_EXTENSION_XML);
     }
 
     @Test
@@ -52,7 +76,7 @@ public class DevInfConverterTest extends RestWriterTestBase {
         DevInfProjectExt devInf = new DevInfProjectExt();
         RestWriter restWriter = getRestWriterJSON();
         marshalDevInfExtension(devInf, restWriter);
-        assertEqualsJSON("{\"scmLocations\":[],\"javadocs\":[]}");
+        assertEqualsJSON(INITIAL_DEVINF_EXTENSION_JSON);
     }
 
     @Test
@@ -60,15 +84,44 @@ public class DevInfConverterTest extends RestWriterTestBase {
         DevInfProjectExt devInf = newDevInfExtension();
         RestWriter restWriter = getRestWriterJSON();
         marshalDevInfExtension(devInf, restWriter);
-        assertEqualsJSON("{"
-                + "\"bugtrackerUrl\":\"bugs\""
-                + ",\"ciUrl\":\"ci\""
-                + ",\"metricsUrl\":\"m\""
-                + ",\"scmUrl\":\"scm\""
-                + ",\"scmLocations\":[\"loc1\",\"loc2\"]"
-                + ",\"javadocs\":[\"j1\",\"j2\"]}");
+        assertEqualsJSON(DEVINF_EXTENSION_JSON);
     }
 
+    @Test
+    public void testUnmarshallInitialJSON() throws Exception {
+        RestReader restReader = getRestReaderJSON(INITIAL_DEVINF_EXTENSION_JSON);
+        DevInfProjectExt devinf = unmarshalDevInfExtension(restReader);
+        assertEquals("", devinf.getBugtrackerUrl());
+        assertEquals("", devinf.getCiUrl());
+        assertEquals("", devinf.getMetricsUrl());
+        assertEquals("", devinf.getScmUrl());
+        assertTrue(devinf.getScmLocations().isEmpty());
+        assertTrue(devinf.getJavadocs().isEmpty());
+    }
+
+    @Test
+    public void testUnmarshallJSON() throws Exception {
+        RestReader restReader = getRestReaderJSON(DEVINF_EXTENSION_JSON);
+        DevInfProjectExt devinf = unmarshalDevInfExtension(restReader);
+        assertEquals("bugs", devinf.getBugtrackerUrl());
+        assertEquals("ci", devinf.getCiUrl());
+        assertEquals("m", devinf.getMetricsUrl());
+        assertEquals("scm", devinf.getScmUrl());
+        AssertUtils.assertEquals("getScmLocations", devinf.getScmLocations(), "loc1", "loc2");
+        AssertUtils.assertEquals("getJavadocs", devinf.getJavadocs(), "j1", "j2");
+    }
+
+    @Test
+    public void testUnmarshallIgnoreUnknownAttributesJSON() throws Exception {
+        RestReader restReader = getRestReaderJSON(DEVINF_EXTENSION_UNKNOWN_ATTR_JSON);
+        DevInfProjectExt devinf = unmarshalDevInfExtension(restReader);
+        assertEquals("bugs", devinf.getBugtrackerUrl());
+        assertEquals("", devinf.getCiUrl());
+        assertEquals("", devinf.getMetricsUrl());
+        assertEquals("scm", devinf.getScmUrl());
+        AssertUtils.assertEquals("getScmLocations", devinf.getScmLocations(), "loc1", "loc2");
+        assertTrue(devinf.getJavadocs().isEmpty());
+    }
 
     private DevInfProjectExt newDevInfExtension() {
         DevInfProjectExt devInf = new DevInfProjectExt();
@@ -89,5 +142,13 @@ public class DevInfConverterTest extends RestWriterTestBase {
         converter.marshal(devInf, restWriter);
         restWriter.end();
         restWriter.flush();
+    }
+
+    private DevInfProjectExt unmarshalDevInfExtension(RestReader restReader) throws Exception {
+        DevInfConverter converter = new DevInfConverter();
+        restReader.object();
+        DevInfProjectExt devinf = converter.unmarshal(restReader);
+        restReader.end();
+        return devinf;
     }
 }
