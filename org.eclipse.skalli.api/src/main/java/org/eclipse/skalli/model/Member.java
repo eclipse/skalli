@@ -25,8 +25,8 @@ public class Member implements Comparable<Member> {
     public Member() {
     }
 
-    public Member(String userId) {
-        this.userID = userId;
+    public Member(String userID) {
+        this.userID = StringUtils.lowerCase(userID);
     }
 
     public String getUserID() {
@@ -34,7 +34,7 @@ public class Member implements Comparable<Member> {
     }
 
     public void setUserID(String userID) {
-        this.userID = userID;
+        this.userID = StringUtils.lowerCase(userID);
     }
 
     @Override
@@ -47,10 +47,7 @@ public class Member implements Comparable<Member> {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((userID == null) ? 0 : userID.hashCode());
-        return result;
+        return 31 + ((userID == null) ? 0 : userID.hashCode());
     }
 
     @Override
@@ -58,7 +55,7 @@ public class Member implements Comparable<Member> {
         if (this == o) {
             return true;
         }
-        if (!super.equals(o)) {
+        if (o == null) {
             return false;
         }
         if (getClass() != o.getClass()) {
@@ -69,7 +66,7 @@ public class Member implements Comparable<Member> {
             if (other.userID != null) {
                 return false;
             }
-        } else if (!StringUtils.lowerCase(userID).equals(StringUtils.lowerCase(other.userID))) {
+        } else if (!userID.equals(other.userID)) {
             return false;
         }
         return true;
@@ -77,10 +74,14 @@ public class Member implements Comparable<Member> {
 
     @Override
     public int compareTo(Member o) {
-        if (o instanceof Member && userID != null && ((Member) o).getUserID() != null) {
-            return StringUtils.lowerCase(userID).compareTo(StringUtils.lowerCase(((Member) o).getUserID()));
+        int result = 0;
+        boolean thisDefined = userID != null;
+        boolean otherDefined = o.userID != null;
+        if (thisDefined) {
+            result = otherDefined ? userID.compareTo(o.userID) : 1;
         } else {
-            return 0;
+            result = otherDefined ? -1 : 0;
         }
+        return result;
     }
 }
