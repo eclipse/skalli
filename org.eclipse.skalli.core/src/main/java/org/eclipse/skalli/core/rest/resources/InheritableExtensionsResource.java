@@ -61,6 +61,7 @@ public class InheritableExtensionsResource extends ResourceBase {
         ExtensionService<?> extensionService = ExtensionServices.getByShortName(shortName);
         if (extensionService == null) {
             setStatus(Status.CLIENT_ERROR_BAD_REQUEST, MessageFormat.format("Unknown extension {0}", shortName));
+            return null;
         }
 
         Class<? extends ExtensionEntityBase> extensionClass = extensionService.getExtensionClass();
