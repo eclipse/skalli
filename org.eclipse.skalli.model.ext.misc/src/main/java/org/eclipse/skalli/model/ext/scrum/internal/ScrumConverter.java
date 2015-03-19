@@ -11,10 +11,13 @@
 package org.eclipse.skalli.model.ext.scrum.internal;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.ext.scrum.ScrumProjectExt;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.eclipse.skalli.services.extension.rest.RestException;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -53,6 +56,54 @@ class ScrumConverter extends RestConverterBase<ScrumProjectExt> {
                 .end();
         }
         writer.end();
+    }
+
+    @Override
+    protected ScrumProjectExt unmarshal() throws RestException, IOException {
+        return unmarshal(new ScrumProjectExt());
+    }
+
+    @SuppressWarnings("nls")
+    private ScrumProjectExt unmarshal(ScrumProjectExt ext) throws RestException, IOException {
+        while (reader.hasMore()) {
+            if (reader.isKey("backlogUrl")) {
+                ext.setBacklogUrl(reader.valueString());
+            } else if (reader.isKey("scrumMasters")) {
+                ext.getScrumMasters().addAll(readMembers("scrumMaster"));
+            } else if (reader.isKey("productOwners")) {
+                ext.getProductOwners().addAll(readMembers("productOwner"));
+            } else {
+                reader.skip();
+            }
+        }
+        return ext;
+    }
+
+    private List<Member> readMembers(String itemKey) throws RestException, IOException {
+        List<Member> members = new ArrayList<Member>();
+        reader.array(itemKey);
+        while (reader.hasMore()) {
+            Member member = readMember();
+            if (member != null) {
+                members.add(member);
+            }
+        }
+        reader.end();
+        return members;
+    }
+
+    private Member readMember() throws RestException, IOException {
+        Member member = null;
+        reader.object();
+        while (reader.hasMore()) {
+            if (reader.isKey("userId")) { //$NON-NLS-1$
+                member = new Member(reader.valueString());
+            } else {
+                reader.skip();
+            }
+        }
+        reader.end();
+        return member;
     }
 
     public ScrumConverter(String host) {
