@@ -169,6 +169,19 @@ public class JSONRestReader implements RestReader {
     }
 
     @Override
+    public boolean isValue() throws IOException {
+        if (state == STATE_FINAL) {
+            return false;
+        }
+        if (isKey("value")) { //$NON-NLS-1$
+            return true;
+        }
+        JsonToken next = json.peek();
+        return lookAhead == null && (next == JsonToken.STRING || next == JsonToken.NUMBER || next == JsonToken.BOOLEAN
+                || next == JsonToken.BEGIN_ARRAY || next == JsonToken.BEGIN_OBJECT || next == JsonToken.NULL);
+    }
+
+    @Override
     public String valueString() throws IOException {
         assertNotFinal();
         skipKey();

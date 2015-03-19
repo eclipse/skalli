@@ -87,6 +87,31 @@ public class JSONRestReaderTest {
     }
 
     @Test
+    public void testIsKeyIsValue() throws Exception {
+        JSONRestReader json = getRestReader("{\"a\":\"string\",\"value\":\"b\",\"c\":4711}");
+        json.object();
+        assertTrue(json.isKey());
+        assertTrue(json.isKey("a"));
+        assertFalse(json.isValue());
+        assertEquals("a", json.key());
+        assertFalse(json.isKey());
+        assertTrue(json.isValue());
+        assertEquals("string", json.valueString());
+        assertTrue(json.isKey());
+        assertTrue(json.isKey("value"));
+        assertTrue(json.isValue()); // attribute with the special name "value"!
+        assertEquals("b", json.valueString());
+        assertTrue(json.isKey());
+        assertTrue(json.isKey("c"));
+        assertFalse(json.isValue());
+        assertEquals("c", json.key());
+        assertFalse(json.isKey());
+        assertTrue(json.isValue());
+        assertEquals(4711L, json.valueLong());
+        json.end();
+    }
+
+    @Test
     public void testStringValue() throws Exception {
         JSONRestReader json = getRestReader("{\"a\":\"string\",\"b\":4711,\"c\":3.14,\"d\":true,\"e\":null}");
         json.object();

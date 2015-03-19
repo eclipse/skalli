@@ -116,6 +116,27 @@ public interface RestReader {
     public String key() throws IOException;
 
     /**
+     * Returns <code>true</code> if the current token in the input stream
+     * is the value of an object.
+     * <p>
+     * Note that it depends on the media type if an object can have a value.
+     * For XML the following would denote an object with an attribute and the
+     * value <tt>"bar"</tt>.
+     * <pre>
+     *   &lt;object attr="foo"&gt;bar&lt;/object&gt;
+     * </pre>
+     * For JSON an attribute with the reserved key <tt>"value"</tt> is interpreted
+     * as the value of an object. The JSON notation equivalent to the above
+     * example would therefore be:
+     * <pre>
+     *   "object":{"attr":"foo,"value":"bar"}
+     * </pre>
+     *
+     * @throws IOException if an i/o error occured.
+     */
+    public boolean isValue() throws IOException;
+
+    /**
      * Returns the value of the current object attribute or array element as string.
      * If the value is a numerical literal, the string representation of the
      * numerical value is returned. If the value is a boolean literal, either
