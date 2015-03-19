@@ -11,13 +11,17 @@
 package org.eclipse.skalli.model.ext.linkgroups.internal;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.commons.Link;
 import org.eclipse.skalli.model.ext.linkgroups.LinkGroup;
 import org.eclipse.skalli.model.ext.linkgroups.LinkGroupsProjectExt;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.eclipse.skalli.services.extension.rest.RestException;
 import org.restlet.data.MediaType;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -65,6 +69,85 @@ class LinkGroupsConverter extends RestConverterBase<LinkGroupsProjectExt> {
             writer.end();
         }
     }
+
+    @Override
+    protected LinkGroupsProjectExt unmarshal() throws RestException, IOException {
+        return unmarshal(new LinkGroupsProjectExt());
+    }
+
+    @SuppressWarnings("nls")
+    private LinkGroupsProjectExt unmarshal(LinkGroupsProjectExt ext) throws RestException, IOException {
+        while (reader.hasMore()) {
+            if (reader.isKey("items")) {
+                ext.setLinkGroups(readLinkGroups(null));
+            } else if (reader.isKey("linkGroups")) {
+                ext.setLinkGroups(readLinkGroups("linkGroup"));
+            } else {
+                reader.skip();
+            }
+        }
+        return ext;
+    }
+
+    private List<LinkGroup> readLinkGroups(String itemKey) throws RestException, IOException {
+        List<LinkGroup> linkGroups = new ArrayList<LinkGroup>();
+        reader.array(itemKey);
+        while (reader.hasMore()) {
+            LinkGroup linkGroup = readLinkGroup();
+            if (StringUtils.isNotBlank(linkGroup.getCaption())) {
+                linkGroups.add(linkGroup);
+            }
+        }
+        reader.end();
+        return linkGroups;
+    }
+
+    @SuppressWarnings("nls")
+    private LinkGroup readLinkGroup() throws RestException, IOException {
+        LinkGroup linkGroup = new LinkGroup();
+        reader.object();
+        while (reader.hasMore()) {
+            if (reader.isKey("caption")) { //$NON-NLS-1$
+                linkGroup.setCaption(reader.attributeString());
+            } else if (reader.isKey("links") || reader.isArray()) {
+                readLinks(linkGroup);
+            } else {
+                reader.skip();
+            }
+        }
+        reader.end();
+        return linkGroup;
+    }
+
+    @SuppressWarnings("nls")
+    private void readLinks(LinkGroup linkGroup) throws RestException, IOException {
+        reader.array("link");
+        while (reader.hasMore()) {
+            Link link = readLink();
+            if (StringUtils.isNotBlank(link.getLabel()) && StringUtils.isNotBlank(link.getUrl())) {
+                linkGroup.add(link);
+            }
+        }
+        reader.end();
+    }
+
+    @SuppressWarnings("nls")
+    private Link readLink() throws RestException, IOException {
+        Link link = new Link();
+        reader.object();
+        while (reader.hasMore()) {
+            if (reader.isKey("ref")) {
+                link.setUrl(reader.attributeString());
+            } else if (reader.isValue()) {
+                link.setLabel(reader.valueString());
+            } else {
+                reader.skip();
+            }
+        }
+        reader.end();
+        return link;
+    }
+
 
     @Deprecated
     public LinkGroupsConverter(String host) {
