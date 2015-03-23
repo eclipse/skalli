@@ -24,39 +24,60 @@ import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.eclipse.skalli.services.role.RoleProvider;
 
+import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 public class ProjectConverter extends CommonProjectConverter {
 
+    /**
+     * Create a <code>ProjectConverter</code> for rendering of
+     * projects without any extensions.
+     */
     public ProjectConverter() {
-        super(true);
+        super();
     }
 
-    public ProjectConverter(boolean omitNSAttributes) {
-        super(omitNSAttributes);
-    }
-
-    public ProjectConverter(String[] extensions, boolean omitNSAttributes) {
-        super(extensions, omitNSAttributes);
+    /**
+     * Create a <code>ProjectConverter</code> for rendering of
+     * projects with selected extensions.
+     *
+     * @param extensions the extensions to render, or <code>null</code>
+     * if no extensions should be rendered. If the array contains the
+     * entry <tt>"*"</tt> or {@link CommonProjectConverter#ALL_EXTENSIONS}
+     * is passed as argument, all extensions will be rendered.
+     */
+    public ProjectConverter(String[] extensions) {
+        super(extensions);
     }
 
     @SuppressWarnings("nls")
     @Override
     public void marshal(Project project) throws IOException {
         writer.object("project");
+        namespaces();
+        commonAttributes(project);
         super.marshal(project);
         writer.end();
     }
 
     @Deprecated
-    public ProjectConverter(String host, boolean omitNSAttributes) {
-        super(host, omitNSAttributes);
+    public ProjectConverter(String host) {
+        super(host);
     }
 
     @Deprecated
-    public ProjectConverter(String host, String[] extensions, boolean omitNSAttributes) {
-        super(host, extensions, omitNSAttributes);
+    public ProjectConverter(String host, String[] extensions) {
+        super(host, extensions);
+    }
+
+    @Override
+    @Deprecated
+    public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+        marshalNSAttributes(writer);
+        marshalCommonAttributes(writer, (Project)source);
+        super.marshal(source, writer, context);
     }
 
     @Override

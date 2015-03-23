@@ -55,7 +55,8 @@ public class ProjectsConverter extends RestConverterBase<Projects> {
             writer.array("project");
             for (Project project : projects.getProjects()) {
                 writer.object();
-                    new CommonProjectConverter(extensions, true).marshal(project, writer);
+                commonAttributes(project);
+                    new CommonProjectConverter(extensions).marshal(project, writer);
                 writer.end();
             }
             writer.end();
@@ -87,7 +88,8 @@ public class ProjectsConverter extends RestConverterBase<Projects> {
 
         for (Project project : projects) {
             writer.startNode("project"); //$NON-NLS-1$
-            new ProjectConverter(getHost(), extensions, true).marshal(project, writer, context);
+            marshalCommonAttributes(writer, project);
+            new CommonProjectConverter(getHost(), extensions).marshal(project, writer, context);
             writer.endNode();
         }
     }

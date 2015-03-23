@@ -71,8 +71,8 @@ public class InheritanceTest {
     }
 
     @Test
-    public void test() throws IOException {
-        ProjectConverter projectConverter = new ProjectConverter("localhost", false);
+    public void testInheritedExtensions() throws IOException {
+        ProjectConverter projectConverter = new ProjectConverter("localhost", ProjectConverter.ALL_EXTENSIONS);
 
         // Verify that the parent has the extension, but not inherited
         ResourceRepresentation<Project> rep1 = new ResourceRepresentation<Project>(

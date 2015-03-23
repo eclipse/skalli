@@ -58,34 +58,27 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
         EXTENSION_SERVICES.add(new ExtensionServiceTags());
     }
 
-    public static final String PROJECT_ATTRIBUTES(boolean omitNSAttributes) {
-        return omitNSAttributes?
+    public static final String PROJECT_ATTRIBUTES_XML(boolean omitAttributes) {
+        return omitAttributes? "" :
             MessageFormat.format(
-                "apiVersion=\"{0}\""
+                " apiVersion=\"{0}\""
                 + " lastModifiedMillis=\"{1}\""
                 + " lastModified=\"{2}\""
                 + " modifiedBy=\"{3}\"",
                 CommonProjectConverter.API_VERSION,
-                LAST_MODIFIED_MILLIS, LAST_MODIFIED, LAST_MODIFIER)
-          : MessageFormat.format(
-            ATTRIBUTES_PATTERN
-            + " lastModifiedMillis=\"{3}\""
-            + " lastModified=\"{4}\""
-            + " modifiedBy=\"{5}\"",
-            CommonProjectConverter.NAMESPACE, "project", CommonProjectConverter.API_VERSION,
-            LAST_MODIFIED_MILLIS, LAST_MODIFIED, LAST_MODIFIER);
+                LAST_MODIFIED_MILLIS, LAST_MODIFIED, LAST_MODIFIER);
     }
 
-    public static final String ROOT_XML(boolean omitNSAttributes) {
+    public static final String ROOT_XML(boolean omitAttributes) {
         return MessageFormat.format(
-            "<project {0}>", PROJECT_ATTRIBUTES(omitNSAttributes));
+            "<project{0}>", PROJECT_ATTRIBUTES_XML(omitAttributes));
     }
 
     public static final String REGISTERED_XML = MessageFormat.format(
             "<registered millis=\"{0}\">{1}</registered>",
             REGISTERED_MILLIS, REGISTERED);
 
-    public static final String COMMON_SECTION_XML(UUID uuid, String id, String name, boolean omitNSAttributes) {
+    public static final String COMMON_SECTION_XML(UUID uuid, String id, String name, boolean omitAttributes) {
         return  MessageFormat.format(
             "{0}"
             + "<uuid>{1}</uuid>"
@@ -93,7 +86,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
             + "<nature>PROJECT</nature>"
             + "<template>default</template>"
             + "<name>{3}</name>",
-            ROOT_XML(omitNSAttributes), uuid, id, name);
+            ROOT_XML(omitAttributes), uuid, id, name);
     }
 
     public static final String LINKS_SECTION_XML(UUID uuid, String id) {
@@ -144,19 +137,19 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
             + "</extensions>", ATTRIBUTES_INFO_EXTENSION, ATTRIBUTES_TAGS_EXTENSION);
     }
 
-    public static final String MINIMAL_PROJECT_BEGIN_XML(UUID uuid, String id, String name, boolean omitNSAttributes) {
-            return COMMON_SECTION_XML(uuid, id, name, omitNSAttributes)
+    public static final String MINIMAL_PROJECT_BEGIN_XML(UUID uuid, String id, String name, boolean omitAttributes) {
+            return COMMON_SECTION_XML(uuid, id, name, omitAttributes)
             + "<phase>initial</phase>"
             + LINKS_SECTION_XML(uuid, id);
     }
 
-    public static final String MINIMAL_PROJECT_XML(UUID uuid, String id, String name, boolean omitNSAttributes) {
-        return  MINIMAL_PROJECT_BEGIN_XML(uuid, id, name, omitNSAttributes)
+    public static final String MINIMAL_PROJECT_XML(UUID uuid, String id, String name, boolean omitAttributes) {
+        return  MINIMAL_PROJECT_BEGIN_XML(uuid, id, name, omitAttributes)
         + "<subprojects/><members/><extensions/></project>";
     }
 
-    public static final String BASE_PROJECT_BEGIN_XML(UUID uuid, UUID parent, boolean omitNSAttributes) {
-            return COMMON_SECTION_XML(uuid, "foo", "bar", omitNSAttributes)
+    public static final String BASE_PROJECT_BEGIN_XML(UUID uuid, UUID parent, boolean omitAttributes) {
+            return COMMON_SECTION_XML(uuid, "foo", "bar", omitAttributes)
             + "<shortName>sh1</shortName>"
             + "<phase>initial</phase>"
             + REGISTERED_XML
@@ -165,13 +158,13 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
             + "<link rel=\"parent\" href=\"http://example.org/api/projects/" + parent + "\"/>";
     }
 
-    public static final String BASE_PROJECT_XML(UUID uuid, UUID parent, boolean omitNSAttributes) {
-        return BASE_PROJECT_BEGIN_XML(uuid, parent, omitNSAttributes)
+    public static final String BASE_PROJECT_XML(UUID uuid, UUID parent, boolean omitAttributes) {
+        return BASE_PROJECT_BEGIN_XML(uuid, parent, omitAttributes)
             + "<subprojects/><members/><extensions/></project>";
     }
 
-    public static final String PROJECT_WITH_SUBPROJECTS_XML(UUID uuid, boolean omitNSAttributes, UUID...subprojects) {
-        return MINIMAL_PROJECT_BEGIN_XML(uuid, "foo", "bar", omitNSAttributes)
+    public static final String PROJECT_WITH_SUBPROJECTS_XML(UUID uuid, boolean omitAttributes, UUID...subprojects) {
+        return MINIMAL_PROJECT_BEGIN_XML(uuid, "foo", "bar", omitAttributes)
                 + SUBPROJECTLINKS_SECTION_XML(subprojects)
                 + "<members/><extensions/></project>";
     }
@@ -180,20 +173,31 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
             "\"registered\":'{'\"millis\":{0},\"value\":\"{1}\"}",
             REGISTERED_MILLIS, REGISTERED);
 
-    public static final String COMMON_SECTION_JSON(UUID uuid, String id, String name) {
+    public static final String PROJECT_ATTRIBUTES_JSON(boolean omitAttributes) {
+        return omitAttributes? "" :
+                MessageFormat.format(
+                "\"apiVersion\":\"{0}\","
+                + "\"lastModifiedMillis\":{1},"
+                + "\"lastModified\":\"{2}\","
+                + "\"modifiedBy\":\"{3}\",",
+                CommonProjectConverter.API_VERSION,
+                LAST_MODIFIED_MILLIS, LAST_MODIFIED, LAST_MODIFIER);
+    }
+
+    public static final String ROOT_JSON(boolean omitAttributes) {
         return MessageFormat.format(
-            "'{'"
-            + "\"apiVersion\":\"{0}\","
-            + "\"lastModifiedMillis\":{1},"
-            + "\"lastModified\":\"{2}\","
-            + "\"modifiedBy\":\"{3}\","
-            + "\"uuid\":\"{4}\","
-            + "\"id\":\"{5}\","
+            "'{'{0}", PROJECT_ATTRIBUTES_JSON(omitAttributes));
+    }
+
+    public static final String COMMON_SECTION_JSON(UUID uuid, String id, String name, boolean omitAttributes) {
+        return MessageFormat.format(
+            "{0}"
+            +"\"uuid\":\"{1}\","
+            + "\"id\":\"{2}\","
             + "\"nature\":\"PROJECT\","
             + "\"template\":\"default\","
-            + "\"name\":\"{6}\"",
-            CommonProjectConverter.API_VERSION,
-            LAST_MODIFIED_MILLIS, LAST_MODIFIED, LAST_MODIFIER, uuid, id, name);
+            + "\"name\":\"{3}\"",
+            ROOT_JSON(omitAttributes), uuid, id, name);
     }
 
     public static final String LINKS_SECTION_JSON(UUID uuid, String id) {
@@ -243,19 +247,19 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
             InfoConverter.API_VERSION, LAST_MODIFIED_MILLIS, LAST_MODIFIED, TagsConverter.API_VERSION, LAST_MODIFIER);
     }
 
-    public static final String MINIMAL_PROJECT_BEGIN_JSON(UUID uuid, String id, String name) {
-        return COMMON_SECTION_JSON(uuid, id, name)
+    public static final String MINIMAL_PROJECT_BEGIN_JSON(UUID uuid, String id, String name, boolean omitAttributes) {
+        return COMMON_SECTION_JSON(uuid, id, name, omitAttributes)
             + ",\"phase\":\"initial\","
             + "\"links\":[" + LINKS_SECTION_JSON(uuid, id) + "]";
     }
 
-    public static final String MINIMAL_PROJECT_JSON(UUID uuid, String id, String name) {
-        return MINIMAL_PROJECT_BEGIN_JSON(uuid, id, name)
+    public static final String MINIMAL_PROJECT_JSON(UUID uuid, String id, String name, boolean omitAttributes) {
+        return MINIMAL_PROJECT_BEGIN_JSON(uuid, id, name, omitAttributes)
             + ",\"subprojects\":[],\"members\":[],\"extensions\":{}}";
 }
 
-    public static final String BASE_PROJECT_BEGIN_JSON(UUID uuid, UUID parent) {
-            return COMMON_SECTION_JSON(uuid, "foo", "bar")
+    public static final String BASE_PROJECT_BEGIN_JSON(UUID uuid, UUID parent, boolean omitAttributes) {
+            return COMMON_SECTION_JSON(uuid, "foo", "bar", omitAttributes)
             + ",\"shortName\":\"sh1\","
             + "\"phase\":\"initial\","
             + REGISTERED_JSON
@@ -264,19 +268,19 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
             + ",{\"rel\":\"parent\",\"href\":\"http://example.org/api/projects/" + parent + "\"}]";
     }
 
-    public static final String BASE_PROJECT_JSON(UUID uuid, UUID parent) {
-        return BASE_PROJECT_BEGIN_JSON(uuid, parent)
+    public static final String BASE_PROJECT_JSON(UUID uuid, UUID parent, boolean omitAttributes) {
+        return BASE_PROJECT_BEGIN_JSON(uuid, parent, omitAttributes)
             + ",\"subprojects\":[],\"members\":[],\"extensions\":{}}";
     }
 
-    public static final String PROJECT_WITH_SUBPROJECTS_JSON(UUID uuid, UUID...subprojects) {
-        return MINIMAL_PROJECT_BEGIN_JSON(uuid, "foo", "bar")
+    public static final String PROJECT_WITH_SUBPROJECTS_JSON(UUID uuid, boolean omitAttributes, UUID...subprojects) {
+        return MINIMAL_PROJECT_BEGIN_JSON(uuid, "foo", "bar", omitAttributes)
             + "," + SUBPROJECTLINKS_SECTION_JSON(subprojects)
             +",\"members\":[],\"extensions\":{}}";
     }
 
-    public static final String PROJECT_WITH_MEMBERS_JSON(UUID uuid) {
-        return MINIMAL_PROJECT_BEGIN_JSON(uuid, "foo", "bar")
+    public static final String PROJECT_WITH_MEMBERS_JSON(UUID uuid, boolean omitAttributes) {
+        return MINIMAL_PROJECT_BEGIN_JSON(uuid, "foo", "bar", omitAttributes)
             + ",\"subprojects\":[]"
             + "," + MEMBERS_SECTION_JSON()
             + ",\"extensions\":{}}";
@@ -287,7 +291,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
         Project project = newMinimalProject();
         XMLRestWriter restWriter = new XMLRestWriter(writer, "http://example.org");
         marshalProject(project, restWriter);
-        assertEqualsXML(MINIMAL_PROJECT_XML(TestUUIDs.TEST_UUIDS[0], "foo", "bar", false));
+        assertEqualsXML(MINIMAL_PROJECT_XML(TestUUIDs.TEST_UUIDS[0], "foo", "bar", true));
     }
 
     @Test
@@ -295,7 +299,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
         Project project = newMinimalProject();
         JSONRestWriter restWriter = new JSONRestWriter(writer, "http://example.org");
         marshalProject(project, restWriter);
-        assertEqualsJSON(MINIMAL_PROJECT_JSON(TestUUIDs.TEST_UUIDS[0], "foo", "bar"));
+        assertEqualsJSON(MINIMAL_PROJECT_JSON(TestUUIDs.TEST_UUIDS[0], "foo", "bar", true));
     }
 
     @Test
@@ -303,7 +307,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
         Project project = newBaseProject();
         XMLRestWriter restWriter = new XMLRestWriter(writer, "http://example.org");
         marshalProject(project, restWriter);
-        assertEqualsXML(BASE_PROJECT_XML(TestUUIDs.TEST_UUIDS[0], TestUUIDs.TEST_UUIDS[1], false));
+        assertEqualsXML(BASE_PROJECT_XML(TestUUIDs.TEST_UUIDS[0], TestUUIDs.TEST_UUIDS[1], true));
     }
 
     @Test
@@ -311,7 +315,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
         Project project = newBaseProject();
         JSONRestWriter restWriter = new JSONRestWriter(writer, "http://example.org");
         marshalProject(project, restWriter);
-        assertEqualsJSON(BASE_PROJECT_JSON(TestUUIDs.TEST_UUIDS[0], TestUUIDs.TEST_UUIDS[1]));
+        assertEqualsJSON(BASE_PROJECT_JSON(TestUUIDs.TEST_UUIDS[0], TestUUIDs.TEST_UUIDS[1], true));
     }
 
     @Test
@@ -319,7 +323,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
         Project project = newMinimalProjectWithSubProjects();
         XMLRestWriter restWriter = new XMLRestWriter(writer, "http://example.org");
         marshalProject(project, restWriter);
-        assertEqualsXML(PROJECT_WITH_SUBPROJECTS_XML(TestUUIDs.TEST_UUIDS[0], false, SUBPROJECT_UUIDS));
+        assertEqualsXML(PROJECT_WITH_SUBPROJECTS_XML(TestUUIDs.TEST_UUIDS[0], true, SUBPROJECT_UUIDS));
     }
 
     @Test
@@ -327,7 +331,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
         Project project = newMinimalProjectWithSubProjects();
         JSONRestWriter restWriter = new JSONRestWriter(writer, "http://example.org");
         marshalProject(project, restWriter);
-        assertEqualsJSON(PROJECT_WITH_SUBPROJECTS_JSON(TestUUIDs.TEST_UUIDS[0], SUBPROJECT_UUIDS));
+        assertEqualsJSON(PROJECT_WITH_SUBPROJECTS_JSON(TestUUIDs.TEST_UUIDS[0], true, SUBPROJECT_UUIDS));
     }
 
     @Test
@@ -362,7 +366,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
     }
 
     private void marshalProject(Project project, RestWriter restWriter) throws Exception {
-        CommonProjectConverter converter = new CommonProjectConverter(false);
+        CommonProjectConverter converter = new CommonProjectConverter(CommonProjectConverter.ALL_EXTENSIONS);
         restWriter.object("project");
         converter.marshal(project, restWriter);
         restWriter.end();
@@ -371,7 +375,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
 
     private void marshalMembers(SortedSet<Member> members,
             Map<String,SortedSet<Member>> membersByRole, RestWriter restWriter) throws Exception {
-        CommonProjectConverter converter = new CommonProjectConverter(false);
+        CommonProjectConverter converter = new CommonProjectConverter(CommonProjectConverter.ALL_EXTENSIONS);
         restWriter.object();
         converter.setRestWriter(restWriter);
         converter.marshalMembers(TestUUIDs.TEST_UUIDS[0], members, membersByRole);
@@ -381,7 +385,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
 
     private void marshalExtensions(Project project, Collection<ExtensionService<?>> extensionServices,
             RestWriter restWriter) throws Exception {
-        CommonProjectConverter converter = new CommonProjectConverter(false);
+        CommonProjectConverter converter = new CommonProjectConverter(CommonProjectConverter.ALL_EXTENSIONS);
         restWriter.object();
         converter.setRestWriter(restWriter);
         converter.marshalExtensions(project, extensionServices);

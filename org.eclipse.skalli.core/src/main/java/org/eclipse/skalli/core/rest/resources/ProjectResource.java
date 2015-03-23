@@ -55,19 +55,15 @@ public class ProjectResource extends ResourceBase {
             return null;
         }
 
-        String[] extensions = null;
+        String[] extensions = ProjectConverter.ALL_EXTENSIONS;
         String extensionParam = getQueryAttribute("extensions"); //$NON-NLS-1$
         if (extensionParam != null) {
             extensions = StringUtils.split(extensionParam, ',');
         }
         if (enforceOldStyleConverters()) {
-            return extensions != null ?
-                new ResourceRepresentation<Project>(project, new ProjectConverter(getHost(), extensions, false)) :
-                new ResourceRepresentation<Project>(project, new ProjectConverter(getHost(), false));
+            return new ResourceRepresentation<Project>(project, new ProjectConverter(getHost(), extensions));
         }
-        return extensions != null ?
-            new ResourceRepresentation<Project>(getResourceContext(), project, new ProjectConverter(extensions, false)) :
-            new ResourceRepresentation<Project>(getResourceContext(), project, new ProjectConverter(false));
+        return new ResourceRepresentation<Project>(getResourceContext(), project, new ProjectConverter(extensions));
     }
 
     @Put

@@ -39,7 +39,7 @@ public class ProjectConverterTest {
 
     private static class ProjectConverterWrapper extends ProjectConverter {
         public ProjectConverterWrapper(String host, String[] extensions) {
-            super(host, extensions, false);
+            super(host, extensions);
         }
 
         @Override

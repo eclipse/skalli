@@ -64,9 +64,9 @@ public class ProjectsConverterTest extends RestWriterTestBase {
         XMLRestWriter restWriter = new XMLRestWriter(writer, "http://example.org");
         marshalProjects(projects, restWriter);
         assertEqualsXML(COMMON_PART_XML(0,3)
-                + CommonProjectConverterTest.MINIMAL_PROJECT_XML(TestUUIDs.TEST_UUIDS[3], "id1", "name1", true)
-                + CommonProjectConverterTest.MINIMAL_PROJECT_XML(TestUUIDs.TEST_UUIDS[4], "id2", "name2", true)
-                + CommonProjectConverterTest.MINIMAL_PROJECT_XML(TestUUIDs.TEST_UUIDS[5], "id2", "name2", true)
+                + CommonProjectConverterTest.MINIMAL_PROJECT_XML(TestUUIDs.TEST_UUIDS[3], "id1", "name1", false)
+                + CommonProjectConverterTest.MINIMAL_PROJECT_XML(TestUUIDs.TEST_UUIDS[4], "id2", "name2", false)
+                + CommonProjectConverterTest.MINIMAL_PROJECT_XML(TestUUIDs.TEST_UUIDS[5], "id2", "name2", false)
                 + "</projects>");
     }
 
@@ -77,9 +77,9 @@ public class ProjectsConverterTest extends RestWriterTestBase {
         marshalProjects(projects, restWriter);
         assertEqualsJSON(COMMON_PART_JSON(0,3)
                 + ",\"items\":["
-                + CommonProjectConverterTest.MINIMAL_PROJECT_JSON(TestUUIDs.TEST_UUIDS[3], "id1", "name1")
-                + "," + CommonProjectConverterTest.MINIMAL_PROJECT_JSON(TestUUIDs.TEST_UUIDS[4], "id2", "name2")
-                + "," + CommonProjectConverterTest.MINIMAL_PROJECT_JSON(TestUUIDs.TEST_UUIDS[5], "id2", "name2")
+                + CommonProjectConverterTest.MINIMAL_PROJECT_JSON(TestUUIDs.TEST_UUIDS[3], "id1", "name1", false)
+                + "," + CommonProjectConverterTest.MINIMAL_PROJECT_JSON(TestUUIDs.TEST_UUIDS[4], "id2", "name2", false)
+                + "," + CommonProjectConverterTest.MINIMAL_PROJECT_JSON(TestUUIDs.TEST_UUIDS[5], "id2", "name2", false)
                 + "]}");
     }
 

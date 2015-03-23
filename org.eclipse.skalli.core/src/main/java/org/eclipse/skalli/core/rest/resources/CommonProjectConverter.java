@@ -48,29 +48,37 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 public class CommonProjectConverter extends RestConverterBase<Project> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CommonProjectConverter.class);
+
     public static final String API_VERSION = "1.4"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API"; //$NON-NLS-1$
 
-    private static final Logger LOG = LoggerFactory.getLogger(CommonProjectConverter.class);
+    public static final String[] ALL_EXTENSIONS = new String[] { "*" }; //$NON-NLS-1$
 
-    private Set<String> extensions;
-    private boolean allExtensions;
-    private boolean omitNSAttributes;
+    private Set<String> extensions = Collections.emptySet();;
 
-    public CommonProjectConverter(boolean omitNSAttributes) {
-        this((String[])null, omitNSAttributes);
-        this.allExtensions = true;
+    /**
+     * Create a <code>CommonProjectConverter</code> for rendering of
+     * projects without any extensions.
+     */
+    public CommonProjectConverter() {
+        super(Project.class);
     }
 
-    public CommonProjectConverter(String[] extensions, boolean omitNSAttributes) {
+    /**
+     * Create a <code>ProjectConverter</code> for rendering of
+     * projects with selected extensions.
+     *
+     * @param extensions the extensions to render, or <code>null</code>
+     * if no extensions should be rendered. If the array contains the
+     * entry <tt>"*"</tt> or {@link CommonProjectConverter#ALL_EXTENSIONS}
+     * is passed as argument, all extensions will be rendered.
+     */
+    public CommonProjectConverter(String[] extensions) {
         super(Project.class);
         if (extensions != null) {
             this.extensions = CollectionUtils.asSet(extensions);
-        } else {
-            this.extensions = Collections.emptySet();
         }
-        this.allExtensions = this.extensions.contains("*"); //$NON-NLS-1$
-        this.omitNSAttributes = omitNSAttributes;
     }
 
     // for testing purposes
@@ -81,13 +89,8 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
     @SuppressWarnings("nls")
     @Override
     protected void marshal(Project project) throws IOException {
-        UUID uuid = project.getUuid();
-        if (!omitNSAttributes) {
-            namespaces();
-        }
-        commonAttributes(project);
-
         ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
+        UUID uuid = project.getUuid();
         UUID parent = project.getParentProject();
         writer.pair("uuid", uuid);
         writer.pair("id", project.getProjectId());
@@ -143,7 +146,7 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
     void marshalMembers(UUID uuid, SortedSet<Member> members, Map<String, SortedSet<Member>> membersByRole)
             throws IOException {
         writer.array("members", "member");
-        if (allExtensions || extensions.contains("members")) {
+        if (extensions.contains("*") || extensions.contains("members")) {
             UserService userService = UserServices.getUserService();
             for (Member member : members) {
                 String userId = member.getUserID();
@@ -182,7 +185,7 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
             throws IOException {
         writer.object("extensions");
         for (ExtensionService<?> extensionService : extensionServices) {
-            if (allExtensions || extensions.contains(extensionService.getShortName())) {
+            if (extensions.contains("*") || extensions.contains(extensionService.getShortName())) {
                 marshalExtension(project, extensionService);
             }
         }
@@ -215,21 +218,16 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
     }
 
     @Deprecated
-    public CommonProjectConverter(String host, boolean omitNSAttributes) {
-        this(host, null, omitNSAttributes);
-        this.allExtensions = true;
+    public CommonProjectConverter(String host) {
+        super(Project.class, "project", host); //$NON-NLS-1$
     }
 
     @Deprecated
-    public CommonProjectConverter(String host, String[] extensions, boolean omitNSAttributes) {
+    public CommonProjectConverter(String host, String[] extensions) {
         super(Project.class, "project", host); //$NON-NLS-1$
         if (extensions != null) {
             this.extensions = CollectionUtils.asSet(extensions);
-        } else {
-            this.extensions = Collections.emptySet();
         }
-        this.allExtensions = false;
-        this.omitNSAttributes = omitNSAttributes;
     }
 
     @Deprecated
@@ -237,13 +235,7 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
     public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
         Project project = (Project) source;
         UUID uuid = project.getUuid();
-
         String host = getHost();
-        if (!omitNSAttributes) {
-            marshalNSAttributes(writer);
-        }
-        marshalCommonAttributes(writer, project);
-
         ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         writeNode(writer, "uuid", uuid.toString()); //$NON-NLS-1$
         writeNode(writer, "id", project.getProjectId()); //$NON-NLS-1$
@@ -279,7 +271,7 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
 
     @Deprecated
     private void marshalMembers(UUID uuid, ProjectService projectService, HierarchicalStreamWriter writer) {
-        if (allExtensions || extensions.contains("members")) { //$NON-NLS-1$
+        if (extensions.contains("*") || extensions.contains("members")) { //$NON-NLS-1$ //$NON-NLS-2$
             writer.startNode("members"); //$NON-NLS-1$
             UserService userService = UserServices.getUserService();
             for (Member member : projectService.getMembers(uuid)) {
@@ -312,7 +304,7 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
             MarshallingContext context) {
         writer.startNode("extensions"); //$NON-NLS-1$
         for (ExtensionService<?> extensionService : ExtensionServices.getAll()) {
-            if (allExtensions || extensions.contains(extensionService.getShortName())) {
+            if (extensions.contains("*") || extensions.contains(extensionService.getShortName())) { //$NON-NLS-1$
                 marshalExtension(extensibleEntity, extensionService, writer, context);
             }
         }

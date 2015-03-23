@@ -26,7 +26,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
 public class SubprojectsConverter extends RestConverterBase<Subprojects> {
 
-    public static final String API_VERSION = "1.0"; //$NON-NLS-1$
+    public static final String API_VERSION = "1.4"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API"; //$NON-NLS-1$
 
     private String[] extensions;
@@ -57,7 +57,8 @@ public class SubprojectsConverter extends RestConverterBase<Subprojects> {
             writer.array("project");
             for (Project subproject : subprojects.getSubprojects()) {
                 writer.object();
-                    new CommonProjectConverter(extensions, true).marshal(subproject, writer);
+                    commonAttributes(subproject);
+                    new CommonProjectConverter(extensions).marshal(subproject, writer);
                 writer.end();
             }
             writer.end();
@@ -100,7 +101,8 @@ public class SubprojectsConverter extends RestConverterBase<Subprojects> {
         if (subprojects != null && subprojects.size() > 0) {
             for (Project subproject : subprojects) {
                 writer.startNode("project"); //$NON-NLS-1$
-                new ProjectConverter(getHost(), extensions, true).marshal(subproject, writer, context);
+                marshalCommonAttributes(writer, subproject);
+                new ProjectConverter(getHost(), extensions).marshal(subproject, writer, context);
                 writer.endNode();
             }
         }
