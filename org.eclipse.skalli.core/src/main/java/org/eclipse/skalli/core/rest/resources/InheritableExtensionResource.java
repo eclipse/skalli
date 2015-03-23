@@ -35,6 +35,7 @@ import org.restlet.resource.Put;
 public class InheritableExtensionResource extends ResourceBase {
 
     private static final String ID_PREFIX = "rest:api/projects/{0}/extensions/{1}";  //$NON-NLS-1$
+    private static final String ERROR_ID_IO_ERROR = ID_PREFIX +":00"; //$NON-NLS-1$
     private static final String ERROR_ID_PARSING_ERROR = ID_PREFIX + ":10"; //$NON-NLS-1$
     private static final String ERROR_ID_VALIDATION_FAILED = ID_PREFIX + ":20"; //$NON-NLS-1$
 
@@ -77,7 +78,7 @@ public class InheritableExtensionResource extends ResourceBase {
     }
 
     @Put
-    public Representation store(Representation entity) throws IOException {
+    public Representation store(Representation entity) {
         if (!Permits.isAllowed(getAction(), getPath())) {
             return createUnauthorizedRepresentation();
         }
@@ -113,20 +114,24 @@ public class InheritableExtensionResource extends ResourceBase {
             setStatus(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
             return null;
         }
-        Reader entityReader = entity.getReader();
-        if (entityReader == null) {
-            setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "Request entity required");
-            return null;
-        }
 
         InheritableExtension inheritable;
         try {
+            Reader entityReader = entity.getReader();
+            if (entityReader == null) {
+                setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "Request entity required");
+                return null;
+            }
             inheritable = new ResourceRepresentation<InheritableExtension>(getResourceContext(),
                     new InheritableExtensionConverter(extensionService)).read(entityReader);
         } catch (RestException e) {
             String errorId = MessageFormat.format(ERROR_ID_PARSING_ERROR, id, shortName);
             return createParseErrorRepresentation(errorId, e);
+        } catch (IOException e) {
+            String errorId = MessageFormat.format(ERROR_ID_IO_ERROR, id);
+            return createIOErrorRepresentation(errorId, e);
         }
+
         if (inheritable == null) {
             setStatus(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED,
                     MessageFormat.format("Extension {0} does not support PUT operations", shortName));
