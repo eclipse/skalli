@@ -102,6 +102,7 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
         if (project.getRegistered() > 0) {
             writer.timestamp("registered", project.getRegistered());
         }
+        writer.pair("descriptionFormat", project.getDescriptionFormat());
         writer.pair("description", project.getDescription());
         writer.links();
             writer.link(PROJECT_RELATION, RestUtils.URL_PROJECTS, uuid);

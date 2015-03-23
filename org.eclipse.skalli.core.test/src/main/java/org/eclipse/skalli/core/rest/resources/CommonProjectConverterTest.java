@@ -140,6 +140,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
     public static final String MINIMAL_PROJECT_BEGIN_XML(UUID uuid, String id, String name, boolean omitAttributes) {
             return COMMON_SECTION_XML(uuid, id, name, omitAttributes)
             + "<phase>initial</phase>"
+            + "<descriptionFormat>text</descriptionFormat>"
             + LINKS_SECTION_XML(uuid, id);
     }
 
@@ -153,6 +154,7 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
             + "<shortName>sh1</shortName>"
             + "<phase>initial</phase>"
             + REGISTERED_XML
+            + "<descriptionFormat>text</descriptionFormat>"
             + "<description>descr1</description>"
             + LINKS_SECTION_XML(uuid, "foo")
             + "<link rel=\"parent\" href=\"http://example.org/api/projects/" + parent + "\"/>";
@@ -249,8 +251,9 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
 
     public static final String MINIMAL_PROJECT_BEGIN_JSON(UUID uuid, String id, String name, boolean omitAttributes) {
         return COMMON_SECTION_JSON(uuid, id, name, omitAttributes)
-            + ",\"phase\":\"initial\","
-            + "\"links\":[" + LINKS_SECTION_JSON(uuid, id) + "]";
+            + ",\"phase\":\"initial\""
+            + ",\"descriptionFormat\":\"text\""
+            + ",\"links\":[" + LINKS_SECTION_JSON(uuid, id) + "]";
     }
 
     public static final String MINIMAL_PROJECT_JSON(UUID uuid, String id, String name, boolean omitAttributes) {
@@ -263,8 +266,9 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
             + ",\"shortName\":\"sh1\","
             + "\"phase\":\"initial\","
             + REGISTERED_JSON
-            + ",\"description\":\"descr1\","
-            + "\"links\":[" + LINKS_SECTION_JSON(uuid, "foo")
+            + ",\"descriptionFormat\":\"text\""
+            + ",\"description\":\"descr1\""
+            + ",\"links\":[" + LINKS_SECTION_JSON(uuid, "foo")
             + ",{\"rel\":\"parent\",\"href\":\"http://example.org/api/projects/" + parent + "\"}]";
     }
 
