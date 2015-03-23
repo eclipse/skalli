@@ -21,6 +21,7 @@ import java.util.SortedSet;
 import java.util.UUID;
 
 import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.model.Derived;
 import org.eclipse.skalli.model.ExtensibleEntityBase;
 import org.eclipse.skalli.model.ExtensionEntityBase;
@@ -32,6 +33,7 @@ import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.eclipse.skalli.services.extension.rest.RestConverterBase;
+import org.eclipse.skalli.services.extension.rest.RestException;
 import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.rest.RestWriter;
@@ -219,6 +221,72 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
                 }
             writer.end();
         }
+    }
+
+    @Override
+    protected Project unmarshal() throws RestException, IOException {
+        return unmarshal(new Project());
+    }
+
+    @SuppressWarnings("nls")
+    private Project unmarshal(Project project) throws RestException, IOException {
+        reader.object();
+        while (reader.hasMore()) {
+            if (reader.isKeyAnyOf("apiVersion")) {
+                String apiVersion = reader.attributeString();
+                if (!getApiVersion().equals(apiVersion)) {
+                    throw new RestException(MessageFormat.format(
+                            "Unsupported API version (requested: ''{0}'', expected: ''{1}'')",
+                            apiVersion, getApiVersion()));
+                }
+            } else if (reader.isKeyAnyOf(XMLUtils.XMLNS)) {
+                String namespace = reader.attributeString();
+                if (!getNamespace().equals(namespace)) {
+                    throw new RestException(MessageFormat.format(
+                            "Unsupported namespace (requested: ''{0}'', expected: ''{1}'')",
+                            namespace, getNamespace()));
+                }
+            } else if (reader.isKey("id")) {
+                project.setProjectId(reader.valueString());
+            } else if (reader.isKey("name")) {
+                project.setName(reader.valueString());
+            } else if (reader.isKey("shortName")) {
+                project.setShortName(reader.valueString());
+            } else if (reader.isKey("descriptionFormat")) {
+                project.setDescriptionFormat(reader.valueString());
+            } else if (reader.isKey("description")) {
+                project.setDescription(reader.valueString());
+            } else if (reader.isKey("template")) {
+                project.setProjectTemplateId(reader.valueString());
+            } else if (reader.isKey("phase")) {
+                project.setPhase(reader.valueString());
+            } else if (reader.isKey("extensions")) {
+                readExtensions(project);
+            } else {
+                reader.skip();
+            }
+        }
+        reader.end();
+        return project;
+    }
+
+    private void readExtensions(Project project) throws RestException, IOException {
+        reader.object();
+        while (reader.hasMore()) {
+            String shortName = reader.key();
+            ExtensionService<? extends ExtensionEntityBase> extensionService = ExtensionServices.getByShortName(shortName);
+            if (extensionService != null) {
+                InheritableExtensionConverter inhertableExtensionConverter =
+                        new InheritableExtensionConverter(extensionService);
+                InheritableExtension inheritable = inhertableExtensionConverter.unmarshal(reader);
+                if (inheritable.isInherited() == Boolean.TRUE) {
+                    project.setInherited(extensionService.getExtensionClass(), true);
+                } else {
+                    project.addExtension(inheritable.getExtension());
+                }
+            }
+        }
+        reader.end();
     }
 
     @Deprecated

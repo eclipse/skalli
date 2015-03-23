@@ -22,6 +22,7 @@ import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.ExtensionService;
 import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
+import org.eclipse.skalli.services.extension.rest.RestException;
 import org.eclipse.skalli.services.role.RoleProvider;
 
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -60,6 +61,11 @@ public class ProjectConverter extends CommonProjectConverter {
         commonAttributes(project);
         super.marshal(project);
         writer.end();
+    }
+
+    @Override
+    protected Project unmarshal() throws RestException, IOException {
+        return super.unmarshal();
     }
 
     @Deprecated
