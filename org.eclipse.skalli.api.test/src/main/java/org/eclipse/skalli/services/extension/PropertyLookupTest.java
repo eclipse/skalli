@@ -70,7 +70,7 @@ public class PropertyLookupTest {
                 EntityBase.PROPERTY_NEXT_SIBLING,
                 Project.PROPERTY_PROJECTID, Project.PROPERTY_NAME, Project.PROPERTY_SHORT_NAME,
                 Project.PROPERTY_DESCRIPTION_FORMAT, Project.PROPERTY_DESCRIPTION, Project.PROPERTY_TEMPLATEID,
-                Project.PROPERTY_LOGO_URL, Project.PROPERTY_PHASE,
+                Project.PROPERTY_PARENT_PROJECT, Project.PROPERTY_LOGO_URL, Project.PROPERTY_PHASE,
                 Project.PROPERTY_REGISTERED,
                 PREFIX + EntityBase.PROPERTY_UUID, PREFIX + EntityBase.PROPERTY_DELETED,
                 PREFIX + EntityBase.PROPERTY_PARENT_ENTITY, PREFIX + EntityBase.PROPERTY_PARENT_ENTITY_ID,

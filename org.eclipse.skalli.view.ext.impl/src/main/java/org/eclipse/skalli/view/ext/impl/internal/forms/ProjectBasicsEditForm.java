@@ -224,9 +224,8 @@ public class ProjectBasicsEditForm extends AbstractExtensionFormService<Project>
 
             // retrieve the template of the parent project (if any)
             ProjectTemplate parentProjectTemplate = null;
-            EntityBase parentEntity = thisProject.getParentEntity();
-            if (parentEntity instanceof Project) {
-                Project parentProject = (Project) parentEntity;
+            Project parentProject = thisProject.getParentProject();
+            if (parentProject != null) {
                 ProjectTemplateService templateService = Services.getRequiredService(ProjectTemplateService.class);
                 parentProjectTemplate = templateService.getProjectTemplateById(parentProject.getProjectTemplateId());
                 if (parentProjectTemplate == null) {

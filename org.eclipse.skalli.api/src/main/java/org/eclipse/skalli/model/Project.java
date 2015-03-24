@@ -44,6 +44,10 @@ public class Project extends ExtensibleEntityBase {
     @PropertyName(position = 5)
     public static final String PROPERTY_TEMPLATEID = "projectTemplateId"; //$NON-NLS-1$
 
+    @Derived
+    @PropertyName(position = 6)
+    public static final String PROPERTY_PARENT_PROJECT = "parentProject"; //$NON-NLS-1$
+
     @PropertyName
     public static final String PROPERTY_LOGO_URL = "logoUrl"; //$NON-NLS-1$
 
@@ -229,6 +233,19 @@ public class Project extends ExtensibleEntityBase {
             phase = INITIAL_PHASE;
         }
         this.phase = phase;
+    }
+
+    /**
+     * Returns the parent project of this project.
+     *
+     * @return the parent project, or <code>null</code> if this
+     * project has no parent.
+     *
+     * @throws ClassCastException if the parent entity is not
+     * assignable to the type <code>Project</code>.
+     */
+    public Project getParentProject() {
+        return Project.class.cast(getParentEntity());
     }
 
     /**

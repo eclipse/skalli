@@ -403,7 +403,7 @@ public class GitGerritFilter implements Filter {
         List<Project> relatedProjects = projectService.getParentChain(project.getUuid());
 
         // second, add my siblings unless I'm a top-level project
-        Project parent = (Project)project.getParentEntity();
+        Project parent = project.getParentProject();
         if (parent != null) {
             relatedProjects.addAll(parent.getSubProjects());
         }

@@ -643,8 +643,8 @@ public class ProjectEditPanel extends Panel implements ProjectPanel {
             try {
                 commit();
                 application.refresh(modifiedProject);
-                application.refresh((Project) project.getParentEntity());
-                application.refresh((Project) modifiedProject.getParentEntity());
+                application.refresh(project.getParentProject());
+                application.refresh(modifiedProject.getParentProject());
                 if (!modifiedProject.isDeleted()) {
                     refreshSubProjects(modifiedProject);
                     navigator.navigateProjectView(modifiedProject);

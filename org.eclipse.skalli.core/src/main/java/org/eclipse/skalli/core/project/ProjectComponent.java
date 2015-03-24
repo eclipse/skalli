@@ -175,7 +175,7 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
             if (project == null) {
                 continue;
             }
-            Project parent = (Project) project.getParentEntity();
+            Project parent = project.getParentProject();
             if (parent == null) {
                continue;
             }
