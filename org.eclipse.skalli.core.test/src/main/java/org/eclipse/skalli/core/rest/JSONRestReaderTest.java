@@ -267,6 +267,23 @@ public class JSONRestReaderTest {
         json.end();
     }
 
+    @Test
+    public void testSkipUnreadObjectAttributesAtEnd() throws Exception {
+        JSONRestReader json = getRestReader("{\"a\":\"string\",\"b\":\"string\"}");
+        json.object();
+            assertEquals("a", json.key());
+            assertEquals("string", json.valueString());
+        json.end(); // must not fail!
+    }
+
+    @Test
+    public void testSkipUnreadArrayEntriesAtEnd() throws Exception {
+        JSONRestReader json = getRestReader("[\"a\",\"b\"]");
+        json.array();
+            assertEquals("a", json.valueString());
+        json.end(); // must not fail!
+    }
+
     @Test(expected=IllegalStateException.class)
     public void testUnexpectedEnd() throws Exception {
         JSONRestReader json = getRestReader("{\"a\":\"string\"}");

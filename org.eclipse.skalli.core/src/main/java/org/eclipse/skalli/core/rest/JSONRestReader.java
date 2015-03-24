@@ -351,8 +351,10 @@ public class JSONRestReader implements RestReader {
         }
         state = states.pop();
         if (state == STATE_ARRAY) {
+            skipMore();
             json.endArray();
         } else if (state == STATE_OBJECT) {
+            skipMore();
             json.endObject();
         } else if (state == STATE_INITIAL) {
             throw new IllegalStateException("Still in initial state");
@@ -390,6 +392,12 @@ public class JSONRestReader implements RestReader {
     private void skipValue() throws IOException {
         if (isValue()) {
             json.skipValue();
+        }
+    }
+
+    private void skipMore() throws IOException {
+        while (hasMore()) {
+            skip();
         }
     }
 }
