@@ -123,9 +123,9 @@ public class ProjectConverterTest {
         if (StringUtils.isNotBlank(enc(project.getDescription()))) {
             expected.append("  <description>").append(enc(project.getDescription())).append("</description>");
         }
-        if (project.getParentProject() != null) {
+        if (project.getParentEntityId() != null) {
             expected.append("  <link rel=\"parent\" href=\"https://localhost/api/projects/");
-            expected.append(enc(project.getParentProject().toString())).append("\"/>");
+            expected.append(enc(project.getParentEntityId().toString())).append("\"/>");
         }
         SortedSet<Project> subprojects = project.getSubProjects();
         if (subprojects.size() > 0) {

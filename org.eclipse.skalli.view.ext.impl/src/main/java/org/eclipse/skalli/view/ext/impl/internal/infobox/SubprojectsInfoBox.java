@@ -148,6 +148,6 @@ public class SubprojectsInfoBox extends InfoBoxBase implements InfoBox {
 
     @Override
     public boolean isVisible(Project project, String loggedInUserId) {
-        return project.getParentProject() != null || project.getFirstChild() != null;
+        return project.getParentEntityId() != null || project.getFirstChild() != null;
     }
 }

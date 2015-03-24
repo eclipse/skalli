@@ -266,7 +266,7 @@ public abstract class AbstractSearchFilter implements Filter {
         for (SearchHit<Project> searchHit : searchHits) {
             Project project = searchHit.getEntity();
             String uuid = project.getUuid().toString();
-            Project parent = projectService.getByUUID(project.getParentProject());
+            Project parent = projectService.getByUUID(project.getParentEntityId());
             if (parent != null) {
                 parents.put(uuid, parent);
             }

@@ -16,7 +16,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.UUID;
 
 import org.apache.commons.lang.CharUtils;
 import org.apache.commons.lang.StringUtils;
@@ -44,10 +43,6 @@ public class Project extends ExtensibleEntityBase {
 
     @PropertyName(position = 5)
     public static final String PROPERTY_TEMPLATEID = "projectTemplateId"; //$NON-NLS-1$
-
-    @Derived
-    @PropertyName(position = 6)
-    public static final String PROPERTY_PARENT_PROJECT = "parentProject"; //$NON-NLS-1$
 
     @PropertyName
     public static final String PROPERTY_LOGO_URL = "logoUrl"; //$NON-NLS-1$
@@ -234,10 +229,6 @@ public class Project extends ExtensibleEntityBase {
             phase = INITIAL_PHASE;
         }
         this.phase = phase;
-    }
-
-    public UUID getParentProject() {
-        return getParentEntityId();
     }
 
     /**

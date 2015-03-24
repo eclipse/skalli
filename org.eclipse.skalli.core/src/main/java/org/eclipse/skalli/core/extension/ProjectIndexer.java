@@ -40,8 +40,8 @@ public class ProjectIndexer extends IndexerBase<Project> {
         addField(Project.PROPERTY_NAME, project.getName(), true, true);
         addField(Project.PROPERTY_DESCRIPTION, project.getDescription(), true, true);
         addField(ALL_MEMBERS, members, true, true);
-        if (project.getParentProject() != null) {
-            addField(Project.PROPERTY_PARENT_PROJECT, project.getParentProject().toString(), true, true);
+        if (project.getParentEntityId() != null) {
+            addField(Project.PROPERTY_PARENT_PROJECT, project.getParentEntityId().toString(), true, true);
         }
         addField(Project.PROPERTY_TEMPLATEID, project.getProjectTemplateId(), true, true);
 

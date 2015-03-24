@@ -250,7 +250,7 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
     private List<Project> getParentChain(Project project) {
         List<Project> result = new LinkedList<Project>();
         result.add(project);
-        UUID parentUUID = project.getParentProject();
+        UUID parentUUID = project.getParentEntityId();
         while (parentUUID != null) {
             Project parent = getByUUID(parentUUID);
             if (parent == null) {
@@ -260,7 +260,7 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
                 }
             }
             result.add(parent);
-            parentUUID = parent.getParentProject();
+            parentUUID = parent.getParentEntityId();
         }
         return result;
     }
@@ -320,7 +320,7 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
             if (project == null) {
                 continue;
             }
-            if (project.getParentProject() == null) {
+            if (project.getParentEntityId() == null) {
                 rootProjects.add(project);
             }
         }

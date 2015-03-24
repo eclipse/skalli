@@ -91,7 +91,7 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
     protected void marshal(Project project) throws IOException {
         ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         UUID uuid = project.getUuid();
-        UUID parent = project.getParentProject();
+        UUID parent = project.getParentEntityId();
         writer.pair("uuid", uuid);
         writer.pair("id", project.getProjectId());
         writer.pair("nature", projectService.getProjectNature(uuid).toString());
@@ -252,7 +252,7 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
             writeDateTime(writer, "registered", project.getRegistered()); //$NON-NLS-1$
         }
         writeNode(writer, "description", project.getDescription()); //$NON-NLS-1$
-        UUID parent = project.getParentProject();
+        UUID parent = project.getParentEntityId();
         if (parent != null) {
             writeProjectLink(writer, PARENT_RELATION, parent);
         }
