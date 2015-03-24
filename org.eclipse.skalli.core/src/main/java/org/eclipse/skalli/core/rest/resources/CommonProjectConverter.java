@@ -91,7 +91,6 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
     protected void marshal(Project project) throws IOException {
         ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
         UUID uuid = project.getUuid();
-        UUID parent = project.getParentEntityId();
         writer.pair("uuid", uuid);
         writer.pair("id", project.getProjectId());
         writer.pair("nature", projectService.getProjectNature(uuid).toString());
@@ -110,8 +109,9 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
             writer.link(BROWSE_RELATION, RestUtils.URL_BROWSE, project.getProjectId());
             writer.link(ISSUES_RELATION, RestUtils.URL_PROJECTS, uuid, RestUtils.URL_ISSUES);
             writer.link(SUBPROJECTS_RELATION, RestUtils.URL_PROJECTS, uuid, RestUtils.URL_SUBPROJECTS);
+            Project parent = project.getParentProject();
             if (parent != null) {
-                writer.link(PARENT_RELATION, RestUtils.URL_PROJECTS, parent);
+                marshalProjectLink(parent, PARENT_RELATION);
             }
         writer.end();
         marshalSubprojects(project);
@@ -124,23 +124,26 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
         writer.key("subprojects").array();
         SortedSet<Project> subprojectList = project.getSubProjects();
         if (subprojectList.size() > 0) {
-            if (writer.isMediaType(MediaType.TEXT_XML)) {
-                for (Project subproject : subprojectList) {
-                    writer.link(SUBPROJECT_RELATION, RestUtils.URL_PROJECTS, subproject.getUuid());
-                }
-            } else {
-                for (Project subproject : subprojectList) {
-                    writer.object();
-                    writer.attribute("rel", SUBPROJECT_RELATION);
-                    writer.attribute("href", writer.hrefOf(RestUtils.URL_PROJECTS, subproject.getUuid()));
-                    writer.attribute("uuid", subproject.getUuid());
-                    writer.attribute("id", subproject.getProjectId());
-                    writer.attribute("name", subproject.getName());
-                    writer.end();
-                }
+            for (Project subproject : subprojectList) {
+                marshalProjectLink(subproject, SUBPROJECT_RELATION);
             }
         }
         writer.end();
+    }
+
+    @SuppressWarnings("nls")
+    void marshalProjectLink(Project project, String relation) throws IOException {
+        if (writer.isMediaType(MediaType.TEXT_XML)) {
+            writer.link(relation, RestUtils.URL_PROJECTS, project.getUuid());
+        } else {
+            writer.object();
+            writer.attribute("rel", relation);
+            writer.attribute("href", writer.hrefOf(RestUtils.URL_PROJECTS, project.getUuid()));
+            writer.attribute("uuid", project.getUuid());
+            writer.attribute("id", project.getProjectId());
+            writer.attribute("name", project.getName());
+            writer.end();
+        }
     }
 
     @SuppressWarnings("nls")

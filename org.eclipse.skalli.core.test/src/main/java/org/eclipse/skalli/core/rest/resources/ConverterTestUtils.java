@@ -45,10 +45,11 @@ public class ConverterTestUtils {
 
     public static Project newBaseProject() {
         Project project = newMinimalProject();
+        Project parent = newMinimalProject(TestUUIDs.TEST_UUIDS[1], "parent", "Parent");
         project.setDescription("descr1");
         project.setShortName("sh1");
         project.setRegistered(NOW);
-        project.setParentEntityId(TestUUIDs.TEST_UUIDS[1]);
+        project.setParentEntity(parent);
         return project;
     }
 

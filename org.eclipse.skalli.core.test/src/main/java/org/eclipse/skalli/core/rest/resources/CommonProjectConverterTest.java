@@ -269,7 +269,8 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
             + ",\"descriptionFormat\":\"text\""
             + ",\"description\":\"descr1\""
             + ",\"links\":[" + LINKS_SECTION_JSON(uuid, "foo")
-            + ",{\"rel\":\"parent\",\"href\":\"http://example.org/api/projects/" + parent + "\"}]";
+            + ",{\"rel\":\"parent\",\"href\":\"http://example.org/api/projects/" + parent + "\""
+            + ",\"uuid\":\"" + parent + "\",\"id\":\"parent\",\"name\":\"Parent\"}]";
     }
 
     public static final String BASE_PROJECT_JSON(UUID uuid, UUID parent, boolean omitAttributes) {
