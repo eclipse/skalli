@@ -235,6 +235,38 @@ public class JSONRestReaderTest {
         assertAttributes(json, uuid, url, now);
     }
 
+    @Test
+    public void testSkipObject() throws Exception {
+        JSONRestReader json = getRestReader("{\"a\":\"string\",\"b\":\"string\"}");
+        json.object();
+        assertTrue(json.hasMore());
+        assertTrue(json.isKey("a"));
+        assertFalse(json.isValue());
+        json.skip();
+        assertTrue(json.hasMore());
+        assertTrue(json.isKey("b"));
+        assertFalse(json.isValue());
+        json.skip();
+        assertFalse(json.hasMore());
+        json.end();
+    }
+
+    @Test
+    public void testSkipArray() throws Exception {
+        JSONRestReader json = getRestReader("[\"a\",\"b\"]");
+        json.array();
+        assertTrue(json.hasMore());
+        assertFalse(json.isKey());
+        assertTrue(json.isValue());
+        json.skip();
+        assertTrue(json.hasMore());
+        assertFalse(json.isKey());
+        assertTrue(json.isValue());
+        json.skip();
+        assertFalse(json.hasMore());
+        json.end();
+    }
+
     @Test(expected=IllegalStateException.class)
     public void testUnexpectedEnd() throws Exception {
         JSONRestReader json = getRestReader("{\"a\":\"string\"}");

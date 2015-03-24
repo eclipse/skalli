@@ -388,7 +388,7 @@ public class JSONRestReader implements RestReader {
     }
 
     private void skipValue() throws IOException {
-        if (sequenceState == EXPECT_VALUE) {
+        if (isValue()) {
             json.skipValue();
         }
     }
