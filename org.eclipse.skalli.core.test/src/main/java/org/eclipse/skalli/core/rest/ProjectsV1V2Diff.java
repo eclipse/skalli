@@ -36,6 +36,7 @@ public class ProjectsV1V2Diff implements DifferenceListener {
     protected final Pattern PHASE_XPATH_PATTERN = getPattern("/phase\\[1\\]");
     protected final Pattern REGISTERED_XPATH_PATTERN = getPattern("/registered\\[1\\]");
     protected final Pattern DESCRIPTION_XPATH_PATTERN = getPattern("/description\\[1\\]");
+    protected final Pattern DESCRIPTION_FORMAT_XPATH_PATTERN = getPattern("/descriptionFormat\\[1\\]");
     protected final Pattern DESCRIPTION_TEXT_XPATH_PATTERN = getPattern("/description\\[1\\]/text\\(\\)\\[1\\]");
     protected final Pattern SUBPROJECTS_XPATH_PATTERN = getPattern("/subprojects\\[1\\]");
     protected final Pattern EXTENSIONS_XPATH_PATTERN = getPattern("/extensions\\[1\\]");
@@ -69,6 +70,7 @@ public class ProjectsV1V2Diff implements DifferenceListener {
             };
             break;
         case DifferenceConstants.CHILD_NODELIST_LENGTH_ID:
+            // <project> tag has always an additional <descriptionFormnat> tag in the new API, but never in the old API;
             // <project> tag has always an additional <link rel=permalink> in the new API, but never in the old API;
             // <project> tag has always a <link rel=subprojects> in the new API,
             // but only if it has also a <subprojects> tag in the old API;
@@ -78,8 +80,8 @@ public class ProjectsV1V2Diff implements DifferenceListener {
             // but only if it was non-empty in the old API;
             // therefore, we have at least 2 additional tags, but never more than 4
             if (equalsAndMatchesAnyXPath(expected, actual, ROOT_XPATH_PATTERN)
-                    && (valueToInt(actual) >= valueToInt(expected) + 2)
-                    && (valueToInt(actual) <= valueToInt(expected) + 4)) {
+                    && (valueToInt(actual) >= valueToInt(expected) + 3)
+                    && (valueToInt(actual) <= valueToInt(expected) + 5)) {
                 result = RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
             }
             break;
@@ -100,10 +102,11 @@ public class ProjectsV1V2Diff implements DifferenceListener {
             }
             break;
         case DifferenceConstants.CHILD_NODE_NOT_FOUND_ID:
-            // in the new API we may have additional <link>, <subprojects> and <members> tags,
+            // in the new API we may have additional <descriptionFormat>, <link>, <subprojects> and <members> tags,
             // which may no be there in the old API
             if (equalsValueNull(expected) && (
-                    matchesAnyXPath(actual, LINK_XPATH_PATTERN) && "link".equals(actual.getValue())
+                    matchesAnyXPath(actual, DESCRIPTION_FORMAT_XPATH_PATTERN) && "descriptionFormat".equals(actual.getValue())
+                 || matchesAnyXPath(actual, LINK_XPATH_PATTERN) && "link".equals(actual.getValue())
                  || matchesAnyXPath(actual, SUBPROJECTS_XPATH_PATTERN) && "subprojects".equals(actual.getValue())
                  || matchesAnyXPath(actual, MEMBERS_XPATH_PATTERN) && "members".equals(actual.getValue()))) {
                 result = RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
