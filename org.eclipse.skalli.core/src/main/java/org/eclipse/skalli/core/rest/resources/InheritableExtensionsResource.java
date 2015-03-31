@@ -72,7 +72,7 @@ public class InheritableExtensionsResource extends ResourceBase {
             return null;
         }
 
-        if (entity.isAvailable()) {
+        if (entity != null && entity.isAvailable()) {
             if (!isSupportedMediaType()) {
                 setStatus(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
                 return null;

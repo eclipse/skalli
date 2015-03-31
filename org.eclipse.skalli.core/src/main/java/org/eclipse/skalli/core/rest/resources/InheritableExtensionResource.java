@@ -106,7 +106,7 @@ public class InheritableExtensionResource extends ResourceBase {
             return null;
         }
 
-        if (!entity.isAvailable()) {
+        if (entity == null || !entity.isAvailable()) {
             setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "Request entity required");
             return null;
         }
