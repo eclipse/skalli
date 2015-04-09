@@ -11,6 +11,7 @@
 package org.eclipse.skalli.core.rest.resources;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +39,8 @@ import org.eclipse.skalli.services.extension.ExtensionServices;
 import org.eclipse.skalli.services.extension.PropertyMapper;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.extension.rest.ResourceRepresentation;
+import org.eclipse.skalli.services.extension.rest.RestException;
+import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.services.search.QueryParseException;
@@ -49,8 +52,8 @@ import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
+import org.restlet.resource.Post;
 import org.restlet.resource.Put;
-import org.restlet.resource.ResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +67,7 @@ public class ProjectsResource extends ResourceBase {
     private static final String ERROR_ID_INVALID_QUERY = ID_PREFIX + "20"; //$NON-NLS-1$
     private static final String ERROR_ID_VALIDATION_FAILED = ID_PREFIX + "/{0}:30"; //$NON-NLS-1$
     private static final String ERROR_ID_UNSUPPORTED_PROPERTY_TYPE = ID_PREFIX + ":40"; //$NON-NLS-1$
+    private static final String ERROR_ID_PARSING_ERROR = ID_PREFIX + ":50"; //$NON-NLS-1$
 
     @Get
     public Representation retrieve() {
@@ -216,8 +220,70 @@ public class ProjectsResource extends ResourceBase {
         return false;
     }
 
+    @Post
+    public Representation create(Representation entity) {
+        if (!Permits.isAllowed(getAction(), getPath())) {
+            return createUnauthorizedRepresentation();
+        }
+
+        String id = getHeader("Slug", null); //$NON-NLS-1$
+        if (StringUtils.isBlank(id)) {
+            setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "Slug header missing");
+            return null;
+        }
+
+        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
+        Project project = projectService.getProject(id);
+        if (project != null) {
+            setStatus(Status.CLIENT_ERROR_FORBIDDEN,
+                    MessageFormat.format("Project {0} already exists", id));
+            return null;
+        }
+
+        // start with an initial project
+        project = new Project();
+
+        if (entity != null && entity.isAvailable()) {
+            if (!isSupportedMediaType()) {
+                setStatus(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE);
+                return null;
+            }
+            try {
+                Reader entityReader = entity.getReader();
+                if (entityReader == null) {
+                    setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "Request entity required");
+                    return null;
+                }
+                project = new ResourceRepresentation<Project>(getResourceContext(),
+                        new ProjectConverter()).read(entityReader);
+            } catch (RestException e) {
+                String errorId = MessageFormat.format(ERROR_ID_PARSING_ERROR, id);
+                return createParseErrorRepresentation(errorId, e);
+            } catch (IOException e) {
+                String errorId = MessageFormat.format(ERROR_ID_IO_ERROR, id);
+                return createIOErrorRepresentation(errorId, e);
+            }
+        }
+
+        // always use the symbolic name from the Slug header and
+        // ignore the id attribute from the request body
+        project.setProjectId(id);
+
+        try {
+            projectService.persist(project, Permits.getLoggedInUser());
+        } catch (ValidationException e) {
+            String errorId = MessageFormat.format(ERROR_ID_VALIDATION_FAILED, id);
+            return createValidationFailedRepresentation(errorId, id, e);
+        }
+
+        getResponse().setLocationRef(MessageFormat.format(
+                "{0}{1}{2}", getHost(), RestUtils.URL_PROJECTS, project.getUuid().toString()));
+        setStatus(Status.SUCCESS_CREATED);
+        return null;
+    }
+
     @Put
-    public Representation update(Representation entity) throws ResourceException {
+    public Representation update(Representation entity) {
         if (!Permits.isAllowed(getAction(), getPath())) {
             return createUnauthorizedRepresentation();
         }
