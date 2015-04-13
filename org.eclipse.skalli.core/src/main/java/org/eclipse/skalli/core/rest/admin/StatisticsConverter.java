@@ -59,6 +59,7 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
                 query.getFrom() > 0? query.getFrom() : statistics.getStartupTime());
         long to = query.getTo() > 0 ? query.getTo() : System.currentTimeMillis();
 
+        writer.object();
         namespaces();
         apiVersion();
         writer
@@ -102,6 +103,7 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
         if (query.showSection("tracks")) {
             marshalTracksSection(statistics, from, to);
         }
+        writer.end();
     }
 
     @SuppressWarnings("nls")
@@ -372,7 +374,7 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
             UsageInfo usageInfo = (UsageInfo)info;
             writer
             .item("request")
-            .object()
+              .object()
                 .attribute("type", "usage")
                 .attribute("date", FormatUtils.formatUTCWithMillis(usageInfo.getTimestamp()))
                 .attribute("timestamp", usageInfo.getTimestamp())
@@ -381,35 +383,38 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
                     writer.attribute("referer", usageInfo.getReferer());
                 }
                 writer.value(usageInfo.getPath())
+              .end()
             .end();
         } else if (info instanceof SearchInfo) {
             SearchInfo searchInfo = (SearchInfo)info;
             writer
             .item("search")
-            .object()
-              .attribute("type", "search")
-              .attribute("date", FormatUtils.formatUTCWithMillis(searchInfo.getTimestamp()))
-              .attribute("timestamp", searchInfo.getTimestamp())
-              .attribute("user", searchInfo.getUserHash())
-              .attribute("resultCount", searchInfo.getResultCount())
-              .attribute("duration", searchInfo.getDuration())
-              .value(searchInfo.getQueryString())
+              .object()
+                .attribute("type", "search")
+                .attribute("date", FormatUtils.formatUTCWithMillis(searchInfo.getTimestamp()))
+                .attribute("timestamp", searchInfo.getTimestamp())
+                .attribute("user", searchInfo.getUserHash())
+                .attribute("resultCount", searchInfo.getResultCount())
+                .attribute("duration", searchInfo.getDuration())
+                .value(searchInfo.getQueryString())
+              .end()
             .end();
         } else if (info instanceof UserInfo) {
             UserInfo userInfo = (UserInfo)info;
             writer
             .item("user")
-            .object()
-              .attribute("type", "user")
-              .attribute("date", FormatUtils.formatUTCWithMillis(userInfo.getTimestamp()))
-              .attribute("timestamp", userInfo.getTimestamp());
-              if (userInfo.getDepartment() != null) {
-                  writer.attribute("department", userInfo.getDepartment());
-              }
-              if (userInfo.getLocation() != null) {
-                  writer.attribute("location", userInfo.getLocation());
-              }
-              writer.value(userInfo.getUserHash())
+              .object()
+                .attribute("type", "user")
+                .attribute("date", FormatUtils.formatUTCWithMillis(userInfo.getTimestamp()))
+                .attribute("timestamp", userInfo.getTimestamp());
+                if (userInfo.getDepartment() != null) {
+                    writer.attribute("department", userInfo.getDepartment());
+                }
+                if (userInfo.getLocation() != null) {
+                    writer.attribute("location", userInfo.getLocation());
+                }
+                writer.value(userInfo.getUserHash())
+              .end()
             .end();
         }
     }
