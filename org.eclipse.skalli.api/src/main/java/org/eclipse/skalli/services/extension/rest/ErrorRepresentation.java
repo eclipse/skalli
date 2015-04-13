@@ -21,7 +21,6 @@ import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.rest.RequestContext;
 import org.eclipse.skalli.services.rest.RestService;
 import org.eclipse.skalli.services.rest.RestWriter;
-import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.WriterRepresentation;
 
@@ -77,10 +76,6 @@ public class ErrorRepresentation extends WriterRepresentation {
     @Override
     public void write(Writer writer) throws IOException {
         RestService restService = Services.getRequiredService(RestService.class);
-        MediaType mediaType = context.getMediaType();
-        if (!restService.isSupported(context)) {
-            throw new IOException(MessageFormat.format("Unsupported media type ''{0}''", mediaType));
-        }
         RestWriter restWriter = restService.getRestWriter(writer, context);
         restWriter.object("error"); //$NON-NLS-1$
         restWriter.namespace(XMLUtils.XMLNS, RestUtils.API_NAMESPACE);
