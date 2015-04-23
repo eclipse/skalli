@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.skalli.gerrit.client;
 
+/**
+ * Enumeration representing the various submit types that can
+ * be assigned to a Gerrit project. The default is <code>MERGE_IF_NECESSARY</code>.
+ */
 public enum SubmitType {
-    FAST_FORWARD_ONLY, MERGE_IF_NECESSARY, MERGE_ALWAYS, CHERRY_PICK
+    MERGE_IF_NECESSARY, REBASE_IF_NECESSARY, FAST_FORWARD_ONLY, MERGE_ALWAYS, CHERRY_PICK
 }
