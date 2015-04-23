@@ -236,9 +236,9 @@ public class GerritClientImpl implements GerritClient {
     @Override
     public List<String> getProjects(String type) throws ConnectionException, CommandException {
         GerritVersion version = getVersion();
-        final StringBuffer sb = new StringBuffer("gerrit ls-projects");
+        StringBuilder sb = new StringBuilder("gerrit ls-projects");
         if (version.supports(GerritFeature.LS_PROJECTS_TYPE_ATTR)) {
-            appendArgument(sb, "type", type);
+            appendOption(sb, "type", type);
         }
         return sshCommand(sb.toString());
     }
@@ -264,11 +264,11 @@ public class GerritClientImpl implements GerritClient {
             throw andDisconnect(new IllegalArgumentException(checkFailedMsg));
         }
 
-        final StringBuffer sb = new StringBuffer("gerrit create-group");
-        appendArgument(sb, "owner", owner);
-        appendArgument(sb, "description", description);
-        appendArgument(sb, "member", getKnownAccounts(members).toArray(new String[0]));
-        appendArgument(sb, "visible-to-all", true);
+        StringBuilder sb = new StringBuilder("gerrit create-group");
+        appendOption(sb, "owner", owner);
+        appendOption(sb, "description", description);
+        appendOption(sb, "member", getKnownAccounts(members));
+        appendOption(sb, "visible-to-all", true);
         appendArgument(sb, name);
 
         sshCommand(sb.toString());
@@ -279,9 +279,9 @@ public class GerritClientImpl implements GerritClient {
         List<String> result = Collections.emptyList();
         GerritVersion version = getVersion();
         if (version.supports(GerritFeature.LS_GROUPS)) {
-            StringBuffer sb = new StringBuffer("gerrit ls-groups");
+            StringBuilder sb = new StringBuilder("gerrit ls-groups");
             if (version.supports(GerritFeature.LS_GROUPS_VISIBLE_TO_ALL_ATTR)) {
-                appendArgument(sb, "visible-to-all", true);
+                appendOption(sb, "visible-to-all", true);
             }
             result = sshCommand(sb.toString());
         } else {
@@ -311,19 +311,19 @@ public class GerritClientImpl implements GerritClient {
 
         GerritVersion version = getVersion();
         if (version.supports(GerritFeature.LS_GROUPS_PROJECT_ATTR)) {
-            StringBuffer sb = new StringBuffer("gerrit ls-groups");
+            StringBuilder sb = new StringBuilder("gerrit ls-groups");
             if (version.supports(GerritFeature.LS_GROUPS_VISIBLE_TO_ALL_ATTR)) {
-                appendArgument(sb, "visible-to-all", true);
+                appendOption(sb, "visible-to-all", true);
             }
             for (String projectName : projectNames) {
                 if (allProjects.contains(projectName)) {
-                    appendArgument(sb, "project", projectName);
+                    appendOption(sb, "project", projectName);
                 }
             }
             result = sshCommand(sb.toString());
         } else if (version.supports(GerritFeature.REF_RIGHTS_TABLE)) {
             result = new ArrayList<String>();
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("SELECT name FROM ").append(GSQL.Tables.ACCOUNT_GROUP_NAMES)
                     .append(" WHERE group_id IN (SELECT group_id FROM ").append(GSQL.Tables.REF_RIGHTS).append(" WHERE");
             for (String projectName : projectNames) {
@@ -465,7 +465,7 @@ public class GerritClientImpl implements GerritClient {
             CommandException {
         final List<String> result = new ArrayList<String>();
 
-        final StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("SELECT external_id FROM ").append(GSQL.Tables.ACCOUNT_EXTERNAL_IDS)
                 .append(" WHERE external_id IN (");
 
@@ -525,7 +525,7 @@ public class GerritClientImpl implements GerritClient {
                     String.format("Your command contains unsupported GSQL: '%s'", query));
         }
 
-        final StringBuffer sb = new StringBuffer("gerrit gsql");
+        StringBuilder sb = new StringBuilder("gerrit gsql");
 
         sb.append(" --format ").append(format.name());
         sb.append(" -c \"").append(query).append("\"");
@@ -586,7 +586,7 @@ public class GerritClientImpl implements GerritClient {
             if (baosErr.size() > 0) {
                 InputStreamReader errISR = new InputStreamReader(new ByteArrayInputStream(baosErr.toByteArray()), "ISO-8859-1");
                 BufferedReader errBR = new BufferedReader(errISR);
-                StringBuffer errSB = new StringBuffer("Gerrit CLI returned with an error:");
+                StringBuilder errSB = new StringBuilder("Gerrit CLI returned with an error:");
                 String errLine;
                 while ((errLine = errBR.readLine()) != null) {
                     errSB.append("\n").append(errLine);
@@ -641,51 +641,15 @@ public class GerritClientImpl implements GerritClient {
     }
 
     /**
-     * Helper for constructing SSH commands (name arguments)
+     * Appends an argument to the string buffer, if the given <code>value</code>
+     * is not null or blank. The value is enclosed in double quotes.
      *
-     * @param sb
-     *            the buffer that is worked on
-     * @param argument
-     *            the name of the argument
-     * @param value
-     *            display it or not
+     * @param sb  the buffer that is worked on.
+     * @param value  the argument value.
      */
-    private void appendArgument(final StringBuffer sb, final String argument, final boolean value) {
-        if (value) {
-            sb.append(" --").append(argument);
-        }
-    }
-
-    /**
-     * Helper for constructing SSH commands (value arguments)
-     *
-     * @param sb
-     *            the buffer that is worked on
-     * @param value
-     *            the value to append
-     */
-    private void appendArgument(final StringBuffer sb, final String value) {
+    private void appendArgument(StringBuilder sb, String value) {
         if (!StringUtils.isBlank(value)) {
             sb.append(" \"").append(value).append("\"");
-        }
-    }
-
-    /**
-     * Helper for constructing SSH commands (named value arguments)
-     *
-     * @param sb
-     *            the buffer that is worked on
-     * @param argument
-     *            the name of the argument(s)
-     * @param values
-     *            the values to append
-     */
-    private void appendArgument(final StringBuffer sb, final String argument, final String... values) {
-        for (final String value : values) {
-            if (!StringUtils.isBlank(value)) {
-                appendArgument(sb, argument, true);
-                appendArgument(sb, value);
-            }
         }
     }
 
