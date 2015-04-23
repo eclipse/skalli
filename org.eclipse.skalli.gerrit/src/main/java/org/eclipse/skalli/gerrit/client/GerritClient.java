@@ -92,9 +92,22 @@ public interface GerritClient {
      *
      * @see <tt>gerrit create-project</tt>
      */
+    @Deprecated
     public void createProject(String name, String branch, Set<String> ownerList, String parent,
             boolean permissionsOnly, String description, SubmitType submitType,
             boolean useContributorAgreements, boolean useSignedOffBy, boolean emptyCommit)
+                    throws ConnectionException, CommandException;
+
+    /**
+     * Creates a Gerrit project with a given set of parameters.
+     *
+     * @param options the parameters of the Gerrit project to be created.
+     *
+     * @throws ConnectionException      in case of connection / communication problems
+     * @throws CommandException         in case of unsuccessful commands
+     * @throws IllegalArgumentException in case an invalid name is passed
+     */
+    public void createProject(ProjectOptions options)
                     throws ConnectionException, CommandException;
 
     /**

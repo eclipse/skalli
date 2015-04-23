@@ -34,9 +34,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
-import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritService;
+import org.eclipse.skalli.gerrit.client.InheritableBoolean;
+import org.eclipse.skalli.gerrit.client.ProjectOptions;
 import org.eclipse.skalli.gerrit.client.config.GerritServerConfig;
 import org.eclipse.skalli.gerrit.client.config.GerritServersConfig;
 import org.eclipse.skalli.gerrit.client.exception.CommandException;
@@ -296,16 +297,22 @@ public class GitGerritFilter implements Filter {
                             if (createRepo) {
                                 String projectDescription = getDescription(gerritServer.getProjectDescription(),
                                         baseUrl, project, user, Collections.singletonMap("repository", repository)); //$NON-NLS-1$
-                                client.createProject(repository,
-                                        gerritServer.getBranch(),
-                                        CollectionUtils.asSet(group),
-                                        StringUtils.isNotBlank(parent)? parent : gerritServer.getParent(),
-                                        permitsOnly,
-                                        projectDescription,
-                                        gerritServer.getSubmitType(),
-                                        gerritServer.isUseContributorAgreement(),
-                                        gerritServer.isUseSignedOffBy(),
-                                        emptyCommit);
+                                ProjectOptions options = new ProjectOptions();
+                                options.setName(repository);
+                                options.setBranch(gerritServer.getBranch());
+                                options.setOwner(group);
+                                options.setParent(StringUtils.isNotBlank(parent)? parent : gerritServer.getParent());
+                                options.setPermissionsOnly(permitsOnly);
+                                options.setDescription(projectDescription);
+                                options.setSubmitType(gerritServer.getSubmitType());
+                                options.setUseContributorAgreements(
+                                        InheritableBoolean.valueOf(gerritServer.isUseContributorAgreement()));
+                                options.setUseSignedOffBy(
+                                        InheritableBoolean.valueOf(gerritServer.isUseSignedOffBy()));
+                                options.setRequiredChangeId(InheritableBoolean.TRUE);
+                                options.setUseContentMerge(InheritableBoolean.TRUE);
+                                options.setCreateEmptyCommit(emptyCommit);
+                                client.createProject(options);
                             }
                         }
 

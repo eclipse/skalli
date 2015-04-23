@@ -7,5 +7,6 @@ Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Fragment-Host: org.eclipse.skalli.gerrit
 Import-Package: org.easymock,
+ org.eclipse.skalli.testutil,
  org.slf4j
 Require-Bundle: org.junit

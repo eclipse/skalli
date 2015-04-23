@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.gerrit.client.internal;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
@@ -26,6 +28,9 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritFeature;
 import org.eclipse.skalli.gerrit.client.GerritVersion;
+import org.eclipse.skalli.gerrit.client.InheritableBoolean;
+import org.eclipse.skalli.gerrit.client.ProjectOptions;
+import org.eclipse.skalli.gerrit.client.SubmitType;
 import org.eclipse.skalli.gerrit.client.config.GerritServerConfig;
 import org.eclipse.skalli.gerrit.client.exception.CommandException;
 import org.eclipse.skalli.gerrit.client.exception.ConnectionException;
@@ -195,6 +200,47 @@ public class GerritClientTest {
         Assert.assertFalse(client.projectExists(name));
         client.createProject(name, null, null, null, false, DESCRIPTION, null, false, false, true);
         Assert.assertTrue(client.projectExists(name));
+    }
+
+    @Test
+    public void testSshCreateProject() throws Exception {
+        final String name = generateName("p");
+        ProjectOptions options = new ProjectOptions();
+        options.setName(name);
+        options.setBranches(Arrays.asList("foo", "bar"));
+        options.setOwners(Arrays.asList("c", "a", "b"));
+        options.setParent("foo bar");
+        options.setPermissionsOnly(true);
+        options.setDescription("test project");
+        options.setSubmitType(SubmitType.REBASE_IF_NECESSARY);
+        options.setUseContributorAgreements(InheritableBoolean.TRUE);
+        options.setUseSignedOffBy(InheritableBoolean.TRUE);
+        options.setRequiredChangeId(InheritableBoolean.TRUE);
+        options.setUseContentMerge(InheritableBoolean.TRUE);
+        options.setCreateEmptyCommit(true);
+        options.setMaxObjectSizeLimit("1m");
+        options.putPluginConfig("x", "c", "d");
+        options.putPluginConfig("y", "a", "d");
+        options.putPluginConfig("x", "a", "b");
+        assertEquals(
+                "gerrit create-project"
+                + " --name \"" + name + "\""
+                + " --branch \"bar\" --branch \"foo\"" //sorted!
+                + " --owner \"a\" --owner \"b\" --owner \"c\"" //sorted!
+                + " --parent \"foo bar\""
+                + " --permissions-only"
+                + " --description \"test project\""
+                + " --submit-type \"REBASE_IF_NECESSARY\""
+                + " --use-contributor-agreements"
+                + " --use-signed-off-by"
+                + " --require-change-id"
+                + " --use-content-merge"
+                + " --empty-commit"
+                + " --max-object-size-limit \"1m\""
+                + " --plugin-config \"x.a=b\"" //sorted by plugin name and property names
+                + " --plugin-config \"x.c=d\""
+                + " --plugin-config \"y.a=d\"",
+                client.sshCreateProject(options));
     }
 
     @Test(expected = CommandException.class)

@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -36,6 +37,8 @@ import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritFeature;
 import org.eclipse.skalli.gerrit.client.GerritVersion;
+import org.eclipse.skalli.gerrit.client.InheritableBoolean;
+import org.eclipse.skalli.gerrit.client.ProjectOptions;
 import org.eclipse.skalli.gerrit.client.SubmitType;
 import org.eclipse.skalli.gerrit.client.config.GerritServerConfig;
 import org.eclipse.skalli.gerrit.client.exception.CommandException;
@@ -171,8 +174,27 @@ public class GerritClientImpl implements GerritClient {
             boolean permissionsOnly, String description, SubmitType submitType,
             boolean useContributorAgreements, boolean useSignedOffBy, boolean emptyCommit)
                     throws ConnectionException, CommandException {
-        final StringBuffer sb = new StringBuffer("gerrit create-project");
 
+        ProjectOptions options = new ProjectOptions();
+        options.setName(name);
+        options.setBranch(branch);
+        options.setOwners(ownerList);
+        options.setParent(parent);
+        options.setPermissionsOnly(permissionsOnly);
+        options.setDescription(description);
+        options.setSubmitType(submitType);
+        options.setUseContributorAgreements(InheritableBoolean.valueOf(useContributorAgreements));
+        options.setUseSignedOffBy(InheritableBoolean.valueOf(useSignedOffBy));
+        options.setRequiredChangeId(InheritableBoolean.TRUE);
+        options.setUseContentMerge(InheritableBoolean.TRUE);
+        options.setCreateEmptyCommit(emptyCommit);
+
+        createProject(options);
+    }
+
+    @Override
+    public void createProject(ProjectOptions options) throws ConnectionException, CommandException {
+        String name = options.getName();
         if (name == null) {
             throw andDisconnect(new IllegalArgumentException("'name' is required"));
         }
@@ -180,23 +202,30 @@ public class GerritClientImpl implements GerritClient {
         if (checkFailedMsg != null) {
             throw andDisconnect(new IllegalArgumentException(checkFailedMsg));
         }
+        sshCommand(sshCreateProject(options));
+    }
 
-        appendArgument(sb, "name", name);
-        appendArgument(sb, "branch", branch);
-        appendArgument(sb, "owner", ownerList != null ? ownerList.toArray(new String[0]) : new String[0]);
-        appendArgument(sb, "parent", parent);
-        appendArgument(sb, "permissions-only", permissionsOnly);
-        appendArgument(sb, "description", description);
-        appendArgument(sb, "submit-type", submitType != null ? submitType.name() : null);
-        appendArgument(sb, "use-contributor-agreements", useContributorAgreements);
-        appendArgument(sb, "use-signed-off-by", useSignedOffBy);
-        appendArgument(sb, "require-change-id", true);
-        appendArgument(sb, "use-content-merge", true);
-
-        // available since 2.1.6-rc1 & needed so that Hudson does not struggle with empty projects.
-        appendArgument(sb, "empty-commit", emptyCommit);
-
-        sshCommand(sb.toString());
+    String sshCreateProject(ProjectOptions options) {
+        StringBuilder sb = new StringBuilder("gerrit create-project");
+        appendOption(sb, "name", options.getName());
+        appendOption(sb, "branch", options.getBranches());
+        appendOption(sb, "owner", options.getOwners());
+        appendOption(sb, "parent", options.getParent());
+        appendOption(sb, "permissions-only", options.isPermissionsOnly());
+        appendOption(sb, "description", options.getDescription());
+        appendOption(sb, "submit-type", options.getSubmitType() != null ? options.getSubmitType().name() : null);
+        appendOption(sb, "use-contributor-agreements", options.getUseContributorAgreements());
+        appendOption(sb, "use-signed-off-by", options.getUseSignedOffBy());
+        appendOption(sb, "require-change-id", options.getRequiredChangeId());
+        appendOption(sb, "use-content-merge", options.getUseContentMerge());
+        appendOption(sb, "empty-commit", options.isCreateEmptyCommit());
+        appendOption(sb, "max-object-size-limit", options.getMaxObjectSizeLimit());
+        for (String pluginName: options.getPluginConfigKeys()) {
+            for (Entry<String,String> pluginConfig: options.getPluginConfig(pluginName).entrySet()) {
+                appendOption(sb, "plugin-config", pluginName + "." + pluginConfig.getKey() + "=" + pluginConfig.getValue());
+            }
+        }
+        return sb.toString();
     }
 
     @Override
@@ -656,6 +685,67 @@ public class GerritClientImpl implements GerritClient {
             if (!StringUtils.isBlank(value)) {
                 appendArgument(sb, argument, true);
                 appendArgument(sb, value);
+            }
+        }
+    }
+
+    /**
+     * Appends a boolean option to the string buffer, e.g. <tt>"--permissionsOnly"</tt>.
+     * Note that the value is not rendered. If the given <code>value</code> evaluated
+     * to <code>false</code> the option is not rendered at all.
+     *
+     * @param sb  the buffer that is worked on.
+     * @param name  the name of the option.
+     * @param value  the value of the option.
+     */
+    private void appendOption(StringBuilder sb, String name, boolean value) {
+        if (StringUtils.isNotBlank(name) && value == true) {
+            sb.append(" --").append(name);
+        }
+    }
+
+    /**
+     * Appends a boolean option with the possible values <code>TRUE</code>, <code>FALSE</code>
+     * or <code>INHERITED</code> to the string buffer.
+     * Note that the value is not rendered. If the given <code>value</code> does not evaluate
+     * to {@link InheritableBoolean#TRUE} the option is not rendered at all.
+     *
+     * @param sb  the buffer that is worked on.
+     * @param name  the name of the option.
+     * @param value  the value of the option.
+     */
+    private void appendOption(StringBuilder sb, String name, InheritableBoolean value) {
+        if (StringUtils.isNotBlank(name) && InheritableBoolean.TRUE == value) {
+            sb.append(" --").append(name);
+        }
+    }
+
+    /**
+     * Appends a string option to the string buffer, if the given <code>value</code>
+     * is not null or blank. The value is enclosed in double quotes.
+     *
+     * @param sb  the buffer that is worked on.
+     * @param name  the name of the option.
+     * @param value  the value of the option.
+     */
+    private void appendOption(StringBuilder sb, String name, String value) {
+        if (StringUtils.isNotBlank(name) && StringUtils.isNotBlank(value)) {
+            sb.append(" --").append(name).append(" \"").append(value).append("\"");
+        }
+    }
+
+    /**
+     * Appends a multi-valued option to the string buffer, if the given <code>values</code>
+     * is not null or empty. This method renders multiple options of the form <tt>--name=value</tt>.
+     *
+     * @param sb  the buffer that is worked on.
+     * @param name  the name of the option.
+     * @param value  the collection of values.
+     */
+    private void appendOption(StringBuilder sb, String name, Collection<String> values) {
+        if (CollectionUtils.isNotBlank(values)) {
+            for (String value : values) {
+                appendOption(sb, name, value);
             }
         }
     }
