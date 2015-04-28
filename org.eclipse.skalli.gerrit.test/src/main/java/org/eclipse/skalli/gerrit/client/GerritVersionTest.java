@@ -53,5 +53,9 @@ public class GerritVersionTest {
         Assert.assertTrue(GerritVersion.GERRIT_2_4_X.supports(GerritFeature.LS_PROJECTS_ALL_ATTR));
         Assert.assertFalse(GerritVersion.GERRIT_2_5_X.supports(GerritFeature.SUPPORTS_REST));
         Assert.assertTrue(GerritVersion.GERRIT_2_6_X.supports(GerritFeature.SUPPORTS_REST));
+        Assert.assertFalse(GerritVersion.GERRIT_2_7_X.supports(GerritFeature.CREATE_PROJECT_MAX_SIZE));
+        Assert.assertTrue(GerritVersion.GERRIT_2_8_X.supports(GerritFeature.CREATE_PROJECT_MAX_SIZE));
+        Assert.assertFalse(GerritVersion.GERRIT_2_8_X.supports(GerritFeature.CREATE_PROJECT_PLUGIN_CONFIG));
+        Assert.assertTrue(GerritVersion.GERRIT_2_9_X.supports(GerritFeature.CREATE_PROJECT_PLUGIN_CONFIG));
     }
 }

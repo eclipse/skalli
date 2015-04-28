@@ -59,6 +59,10 @@ public enum GerritVersion {
             return compareTo(GERRIT_2_1_7) >= 0 ;
         case SUPPORTS_REST:
             return compareTo(GERRIT_2_6_X) >= 0 ;
+        case CREATE_PROJECT_MAX_SIZE:
+            return compareTo(GERRIT_2_8_X) >= 0;
+        case CREATE_PROJECT_PLUGIN_CONFIG:
+            return compareTo(GERRIT_2_9_X) >= 0;
         default:
             return false;
         }

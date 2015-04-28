@@ -23,5 +23,7 @@ public enum GerritFeature {
     RENAME_GROUP,                       // rename-group command available
     CREATE_PROJECT_SUGGEST_PARENT,      // create-project --suggest-parents attribute available
     ACCOUNT_CHECK_OBSOLETE,             // account check for --member options of create-group obsolete
-    SUPPORTS_REST                       // supports new HTTP-based REST API
+    SUPPORTS_REST,                      // supports new HTTP-based REST API
+    CREATE_PROJECT_MAX_SIZE,            // create-project supports --max-object-size-limit
+    CREATE_PROJECT_PLUGIN_CONFIG        // create-project supports --plugin-config
 }
