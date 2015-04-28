@@ -202,10 +202,11 @@ public class GerritClientImpl implements GerritClient {
         if (checkFailedMsg != null) {
             throw andDisconnect(new IllegalArgumentException(checkFailedMsg));
         }
-        sshCommand(sshCreateProject(options));
+        GerritVersion version = getVersion();
+        sshCommand(sshCreateProject(options, version));
     }
 
-    String sshCreateProject(ProjectOptions options) {
+    String sshCreateProject(ProjectOptions options, GerritVersion version) {
         StringBuilder sb = new StringBuilder("gerrit create-project");
         appendOption(sb, "name", options.getName());
         appendOption(sb, "branch", options.getBranches());
@@ -219,10 +220,14 @@ public class GerritClientImpl implements GerritClient {
         appendOption(sb, "require-change-id", options.getRequiredChangeId());
         appendOption(sb, "use-content-merge", options.getUseContentMerge());
         appendOption(sb, "empty-commit", options.isCreateEmptyCommit());
-        appendOption(sb, "max-object-size-limit", options.getMaxObjectSizeLimit());
-        for (String pluginName: options.getPluginConfigKeys()) {
-            for (Entry<String,String> pluginConfig: options.getPluginConfig(pluginName).entrySet()) {
-                appendOption(sb, "plugin-config", pluginName + "." + pluginConfig.getKey() + "=" + pluginConfig.getValue());
+        if (version.supports(GerritFeature.CREATE_PROJECT_MAX_SIZE)) {
+            appendOption(sb, "max-object-size-limit", options.getMaxObjectSizeLimit());
+        }
+        if (version.supports(GerritFeature.CREATE_PROJECT_PLUGIN_CONFIG)) {
+            for (String pluginName: options.getPluginConfigKeys()) {
+                for (Entry<String,String> pluginConfig: options.getPluginConfig(pluginName).entrySet()) {
+                    appendOption(sb, "plugin-config", pluginName + "." + pluginConfig.getKey() + "=" + pluginConfig.getValue());
+                }
             }
         }
         return sb.toString();

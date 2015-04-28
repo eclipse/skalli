@@ -222,7 +222,16 @@ public class GerritClientTest {
         options.putPluginConfig("x", "c", "d");
         options.putPluginConfig("y", "a", "d");
         options.putPluginConfig("x", "a", "b");
-        assertEquals(
+        assertEquals(getExpectedSshCreateProject(name, GerritVersion.GERRIT_2_7_X),
+                client.sshCreateProject(options, GerritVersion.GERRIT_2_7_X));
+        assertEquals(getExpectedSshCreateProject(name, GerritVersion.GERRIT_2_8_X),
+                client.sshCreateProject(options, GerritVersion.GERRIT_2_8_X));
+        assertEquals(getExpectedSshCreateProject(name, GerritVersion.GERRIT_2_9_X),
+                client.sshCreateProject(options, GerritVersion.GERRIT_2_9_X));
+    }
+
+    private String getExpectedSshCreateProject(String name, GerritVersion version) {
+        StringBuilder sb = new StringBuilder(
                 "gerrit create-project"
                 + " --name \"" + name + "\""
                 + " --branch \"bar\" --branch \"foo\"" //sorted!
@@ -235,12 +244,17 @@ public class GerritClientTest {
                 + " --use-signed-off-by"
                 + " --require-change-id"
                 + " --use-content-merge"
-                + " --empty-commit"
-                + " --max-object-size-limit \"1m\""
-                + " --plugin-config \"x.a=b\"" //sorted by plugin name and property names
-                + " --plugin-config \"x.c=d\""
-                + " --plugin-config \"y.a=d\"",
-                client.sshCreateProject(options));
+                + " --empty-commit");
+        if (version.compareTo(GerritVersion.GERRIT_2_8_X) >=0 ) {
+            sb.append(" --max-object-size-limit \"1m\"");
+        }
+        if (version.compareTo(GerritVersion.GERRIT_2_9_X) >= 0) {
+            sb.append(
+                    " --plugin-config \"x.a=b\"" //sorted by plugin name and property names
+                    + " --plugin-config \"x.c=d\""
+                    + " --plugin-config \"y.a=d\"");
+        }
+        return sb.toString();
     }
 
     @Test(expected = CommandException.class)
