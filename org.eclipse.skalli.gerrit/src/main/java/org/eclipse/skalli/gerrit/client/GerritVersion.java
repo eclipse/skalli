@@ -17,7 +17,7 @@ public enum GerritVersion {
     GERRIT_UNKNOWN_VERSION(""),
     GERRIT_2_0_X("2.0"), GERRIT_2_1_7("2.1.7"), GERRIT_2_1_8("2.1.8"), GERRIT_2_1_X("2.1"), GERRIT_2_2_2("2.2.2"),
     GERRIT_2_2_X("2.2"), GERRIT_2_3_X("2.3"), GERRIT_2_4_X("2.4"), GERRIT_2_5_X("2.5"), GERRIT_2_6_X("2.6"),
-    GERRIT_2_7_X("2.7");
+    GERRIT_2_7_X("2.7"), GERRIT_2_8_X("2.8"), GERRIT_2_9_X("2.9"), GERRIT_2_10_X("2.10"), GERRIT_2_11_X("2.11");
 
     private String versionString;
 
