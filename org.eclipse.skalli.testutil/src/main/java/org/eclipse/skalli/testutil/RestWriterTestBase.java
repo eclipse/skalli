@@ -13,14 +13,13 @@ package org.eclipse.skalli.testutil;
 import java.io.StringReader;
 import java.io.StringWriter;
 
+import org.eclipse.skalli.commons.JSONUtils;
 import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.services.extension.rest.RestConverter;
 import org.eclipse.skalli.services.rest.RequestContext;
 import org.eclipse.skalli.services.rest.RestReader;
 import org.eclipse.skalli.services.rest.RestService;
 import org.eclipse.skalli.services.rest.RestWriter;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.restlet.Request;
@@ -28,6 +27,8 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.xml.sax.SAXException;
+
+import com.google.gson.JsonParseException;
 
 /**
  * Base class for {@link RestConverter} tests.
@@ -99,8 +100,8 @@ public class RestWriterTestBase {
     protected void assertEqualsJSON(String expected) throws Exception {
         String actual = writer.toString();
         try {
-            new JSONObject(actual);
-        } catch (JSONException e) {
+            JSONUtils.jsonObjectFromString(actual);
+        } catch (JsonParseException e) {
             Assert.fail("Invalid JSON: " + e.getMessage());
         }
         Assert.assertEquals(expected, writer.toString());

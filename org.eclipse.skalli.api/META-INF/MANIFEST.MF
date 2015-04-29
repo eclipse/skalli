@@ -6,7 +6,8 @@ Bundle-Version: 0.2.0.qualifier
 Bundle-Vendor: Eclipse Skalli
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Import-Package: com.sun.syndication.feed.synd,
+Import-Package: com.google.gson,
+ com.sun.syndication.feed.synd,
  com.sun.syndication.io,
  com.thoughtworks.xstream,
  com.thoughtworks.xstream.annotations,

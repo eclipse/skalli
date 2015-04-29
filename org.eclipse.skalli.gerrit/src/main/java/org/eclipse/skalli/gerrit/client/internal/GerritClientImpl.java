@@ -36,6 +36,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.commons.HtmlUtils;
+import org.eclipse.skalli.commons.JSONUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritFeature;
 import org.eclipse.skalli.gerrit.client.GerritPlugin;
@@ -329,7 +330,7 @@ public class GerritClientImpl implements GerritClient {
             List<String> gsqlResult = gsql("SELECT name FROM " + GSQL.Tables.ACCOUNT_GROUPS, ResultFormat.JSON);
             for (final String entry : gsqlResult) {
                 if (isRow(entry)) {
-                    result.add(JSONUtil.getString(entry, "columns.name"));
+                    result.add(JSONUtils.getString(entry, "columns.name"));
                 }
             }
         }
@@ -377,7 +378,7 @@ public class GerritClientImpl implements GerritClient {
             List<String> gsqlResult = gsql(sb.toString(), ResultFormat.JSON);
             for (String entry : gsqlResult) {
                 if (isRow(entry)) {
-                    result.add(JSONUtil.getString(entry, "columns.name"));
+                    result.add(JSONUtils.getString(entry, "columns.name"));
                 }
             }
         }
@@ -525,7 +526,7 @@ public class GerritClientImpl implements GerritClient {
         final List<String> gsqlResult = gsql(sb.toString(), ResultFormat.JSON);
         for (final String entry : gsqlResult) {
             if (isRow(entry)) {
-                result.add(StringUtils.removeStart(JSONUtil.getString(entry, "columns.external_id"), ACCOUNTS_PREFIX));
+                result.add(StringUtils.removeStart(JSONUtils.getString(entry, "columns.external_id"), ACCOUNTS_PREFIX));
             }
         }
 
@@ -676,7 +677,7 @@ public class GerritClientImpl implements GerritClient {
 
         if (firstLine.startsWith("{\"type\":\"error\"")) {
             throw andDisconnect(new CommandException(String.format("Command returned with error: '%s'",
-                    JSONUtil.getString(firstLine, "message"))));
+                    JSONUtils.getString(firstLine, "message"))));
         }
     }
 

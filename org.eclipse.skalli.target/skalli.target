@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde version="3.6"?>
 
-<target includeMode="feature" name="Skalli Target Platform" sequenceNumber="4">
+<target includeMode="feature" name="Skalli Target Platform" sequenceNumber="5">
 <locations>
 <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.core.contenttype" version="3.4.200.v20130326-1255"/>
@@ -121,7 +121,6 @@
 <unit id="org.hamcrest.library" version="1.1.0.v20090501071000"/>
 <unit id="org.jdom" version="1.1.1.v201101151400"/>
 <unit id="org.jdom.source" version="1.1.1.v201101151400"/>
-<unit id="org.json" version="1.0.0.v201011060100"/>
 <unit id="org.jsoup" version="1.6.1.v201201201356"/>
 <unit id="org.jsoup.source" version="1.6.1.v201201201356"/>
 <unit id="org.junit" version="4.8.1.v4_8_1_v20130308-0412"/>
