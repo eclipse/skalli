@@ -63,6 +63,8 @@ public enum GerritVersion {
             return compareTo(GERRIT_2_8_X) >= 0;
         case CREATE_PROJECT_PLUGIN_CONFIG:
             return compareTo(GERRIT_2_9_X) >= 0;
+        case LS_PLUGINS:
+            return compareTo(GERRIT_2_5_X) >= 0;
         default:
             return false;
         }

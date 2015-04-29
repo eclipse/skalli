@@ -11,6 +11,7 @@
 package org.eclipse.skalli.gerrit.client;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.skalli.gerrit.client.exception.CommandException;
@@ -58,6 +59,21 @@ public interface GerritClient {
      * @throws CommandException         in case of unsuccessful commands
      */
     public GerritVersion getVersion() throws ConnectionException, CommandException;
+
+    /**
+     * Returns the plugins installed in the Gerrit server.
+     *
+     * Gerrit before version 2.5 did not support plugins. In that case always an
+     * empty result will be returned.
+     *
+     * @return  a map of plugins associated with their names, or an empty map.
+     *
+     * @throws ConnectionException      in case of connection / communication problems
+     * @throws CommandException         in case of unsuccessful commands
+     *
+     * @since Gerrit 2.5
+     */
+    public Map<String,GerritPlugin> getPlugins() throws ConnectionException, CommandException;
 
     /**
      * Creates a project with a given name and assigns an initial set of members to it.

@@ -20,9 +20,11 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
@@ -36,6 +38,7 @@ import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.commons.HtmlUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritFeature;
+import org.eclipse.skalli.gerrit.client.GerritPlugin;
 import org.eclipse.skalli.gerrit.client.GerritVersion;
 import org.eclipse.skalli.gerrit.client.InheritableBoolean;
 import org.eclipse.skalli.gerrit.client.ProjectOptions;
@@ -81,7 +84,9 @@ public class GerritClientImpl implements GerritClient {
     JSch client = null;
     Session session = null;
     ChannelExec channel = null;
+
     GerritVersion serverVersion = null;
+    HashMap<String,GerritPlugin> plugins = null;
 
     GerritClientImpl(GerritServerConfig gerritConfig, String onBehalfOf) {
         this.gerritConfig = gerritConfig;
@@ -142,6 +147,36 @@ public class GerritClientImpl implements GerritClient {
             serverVersion = GerritVersion.asGerritVersion(versionString.substring(GERRIT_VERSION_PREFIX.length()));
         }
         return serverVersion;
+    }
+
+    @Override
+    public Map<String,GerritPlugin> getPlugins() throws ConnectionException, CommandException {
+        if (plugins == null) {
+            plugins = new HashMap<String,GerritPlugin>();
+            if (getVersion().supports(GerritFeature.LS_PLUGINS)) {
+                List<String> sshResponse = null;
+                try {
+                    sshResponse = sshCommand("gerrit plugin ls --all");
+                    if (sshResponse.size() > 2) {
+                        // skip the first two lines; they contain just a table header
+                        for (int i = 2; i < sshResponse.size(); ++i) {
+                            GerritPlugin plugin = GerritPlugin.valueOf(sshResponse.get(i));
+                            if (plugin != null) {
+                                plugins.put(plugin.getName(), plugin);
+                                if (LOG.isInfoEnabled()) {
+                                    LOG.info(MessageFormat.format("plugin: ''{0}''", plugin));
+                                }
+                            }
+                        }
+                    }
+                } catch (CommandException e) {
+                    // fail gracefully and assume that there are no plugins available
+                    LOG.error("Failed to retrieve Gerrit plugins", e);
+                    disconnect();
+                }
+            }
+        }
+        return plugins;
     }
 
     private File getPrivateKeyFile(String privateKey) {
