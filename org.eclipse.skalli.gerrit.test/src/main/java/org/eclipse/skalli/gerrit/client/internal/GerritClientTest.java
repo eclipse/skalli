@@ -19,14 +19,17 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.skalli.gerrit.client.GerritClient;
 import org.eclipse.skalli.gerrit.client.GerritFeature;
+import org.eclipse.skalli.gerrit.client.GerritPlugin;
 import org.eclipse.skalli.gerrit.client.GerritVersion;
 import org.eclipse.skalli.gerrit.client.InheritableBoolean;
 import org.eclipse.skalli.gerrit.client.ProjectOptions;
@@ -132,9 +135,25 @@ public class GerritClientTest {
         evilClient.disconnect();
     }
 
+    private static class TestGerritClient extends GerritClientImpl implements GerritClient {
+        TestGerritClient(GerritServerConfig gerritConfig, String onBehalfOf) {
+            super(gerritConfig, onBehalfOf);
+        }
+
+        @Override
+        public Map<String, GerritPlugin> getPlugins() throws ConnectionException, CommandException {
+            // simulate the availability of certain plugins
+            HashMap<String,GerritPlugin> plugins = new HashMap<String,GerritPlugin>();
+            plugins.put("x", new GerritPlugin("x", "1.0", true));
+            plugins.put("y", new GerritPlugin("y", "1.0", true));
+            plugins.put("z", new GerritPlugin("z", "1.0", false));
+            return plugins;
+        }
+    }
+
     @Before
     public void setup() throws Exception {
-        client = new GerritClientImpl(getGerritConfig(), TEST_ONBEHALFOF);
+        client = new TestGerritClient(getGerritConfig(), TEST_ONBEHALFOF);
     }
 
     @After
@@ -151,6 +170,10 @@ public class GerritClientTest {
         gerritConfig.setUser(TEST_ACCOUNT);
         gerritConfig.setPrivateKey(TEST_PRIVATEKEY);
         gerritConfig.setPassphrase(TEST_PASSPHRASE);
+        gerritConfig.addEnabledPlugin("x");
+        gerritConfig.addEnabledPlugin("y");
+        gerritConfig.addEnabledPlugin("z");
+        gerritConfig.addDisabledPlugin("z");
         return gerritConfig;
     }
 
@@ -222,6 +245,8 @@ public class GerritClientTest {
         options.putPluginConfig("x", "c", "d");
         options.putPluginConfig("y", "a", "d");
         options.putPluginConfig("x", "a", "b");
+        options.putPluginConfig("z", "a", "b"); // z is disabled!
+        options.putPluginConfig("foo", "a", "b"); // foo is not enabled!
         assertEquals(getExpectedSshCreateProject(name, GerritVersion.GERRIT_2_7_X),
                 client.sshCreateProject(options, GerritVersion.GERRIT_2_7_X));
         assertEquals(getExpectedSshCreateProject(name, GerritVersion.GERRIT_2_8_X),

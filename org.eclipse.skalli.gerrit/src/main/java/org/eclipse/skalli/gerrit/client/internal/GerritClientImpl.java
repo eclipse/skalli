@@ -242,7 +242,7 @@ public class GerritClientImpl implements GerritClient {
         sshCommand(sshCreateProject(options, version));
     }
 
-    String sshCreateProject(ProjectOptions options, GerritVersion version) {
+    String sshCreateProject(ProjectOptions options, GerritVersion version) throws ConnectionException, CommandException {
         StringBuilder sb = new StringBuilder("gerrit create-project");
         appendOption(sb, "name", options.getName());
         appendOption(sb, "branch", options.getBranches());
@@ -261,8 +261,11 @@ public class GerritClientImpl implements GerritClient {
         }
         if (version.supports(GerritFeature.CREATE_PROJECT_PLUGIN_CONFIG)) {
             for (String pluginName: options.getPluginConfigKeys()) {
-                for (Entry<String,String> pluginConfig: options.getPluginConfig(pluginName).entrySet()) {
-                    appendOption(sb, "plugin-config", pluginName + "." + pluginConfig.getKey() + "=" + pluginConfig.getValue());
+                GerritPlugin plugin = getPlugins().get(pluginName);
+                if (plugin != null && plugin.isEnabled() && gerritConfig.isEnabled(pluginName)) {
+                    for (Entry<String,String> pluginConfig: options.getPluginConfig(pluginName).entrySet()) {
+                        appendOption(sb, "plugin-config", pluginName + "." + pluginConfig.getKey() + "=" + pluginConfig.getValue());
+                    }
                 }
             }
         }

@@ -10,6 +10,11 @@
  *******************************************************************************/
 package org.eclipse.skalli.gerrit.client.config;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.gerrit.client.SubmitType;
 import org.eclipse.skalli.services.configuration.Protect;
 
@@ -45,6 +50,10 @@ public class GerritServerConfig {
     private boolean useContributorAgreement;
     private boolean useSignedOffBy;
     private boolean subprojectsOnly;
+
+    private ArrayList<String> enabledPlugins;
+    private ArrayList<String> disabledPlugins;
+
 
     // do not remove: required by xstream
     public GerritServerConfig() {
@@ -356,5 +365,68 @@ public class GerritServerConfig {
      */
     public void setSubprojectsOnly(boolean subprojectsOnly) {
         this.subprojectsOnly = subprojectsOnly;
+    }
+
+    /**
+     * Returns the list of enabled plugins, or <code>null</code> if the corresponding
+     * attribute was not defined.
+     */
+    public List<String> getEnabledPlugins() {
+        return enabledPlugins != null? Collections.unmodifiableList(enabledPlugins) : null;
+    }
+
+    /**
+     * Returns <code>true</code>, if the given plugin is not {@link #isDisabled(String) diabled}
+     * and the <tt>&lt;enabledPlugins&gt;</tt> list is either not specified or explicitly
+     * contains the given plugin.
+     *
+     * @param pluginName  the plugin to check for.
+     */
+    public boolean isEnabled(String pluginName) {
+        return !isDisabled(pluginName) && (enabledPlugins == null || enabledPlugins.contains(pluginName));
+    }
+
+    /**
+     * Adds the given plugin to the list of enabled plugins.
+     * @param pluginName  the name of the plugin to add.
+     */
+    public void addEnabledPlugin(String pluginName) {
+        if (StringUtils.isNotBlank(pluginName)) {
+            if (enabledPlugins == null) {
+                enabledPlugins = new ArrayList<String>();
+            }
+            enabledPlugins.add(pluginName);
+        }
+    }
+
+    /**
+     * Returns the list of disabled plugins, or <code>null</code> if the corresponding
+     * attribute was not defined.
+     */
+    public List<String> getDisabledPlugins() {
+        return disabledPlugins != null? Collections.unmodifiableList(disabledPlugins) : null;
+    }
+
+    /**
+     * Returns <code>true</code>, if the given plugin is contained in the
+     * <tt>&lt;disabledPlugins&gt;</tt> list.
+     *
+     * @param pluginName the plugin to check for.
+     */
+    public boolean isDisabled(String pluginName) {
+        return disabledPlugins != null && disabledPlugins.contains(pluginName);
+    }
+
+    /**
+     * Adds the given plugin to the list of disabled plugins.
+     * @param pluginName  the name of the plugin to add.
+     */
+    public void addDisabledPlugin(String pluginName) {
+        if (StringUtils.isNotBlank(pluginName)) {
+            if (disabledPlugins == null) {
+                disabledPlugins = new ArrayList<String>();
+            }
+            disabledPlugins.add(pluginName);
+        }
     }
 }
