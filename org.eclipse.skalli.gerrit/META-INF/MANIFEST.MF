@@ -24,9 +24,7 @@ Import-Package: com.jcraft.jsch,
  org.restlet.resource,
  org.slf4j,
  org.slf4j.impl
-Export-Package: org.eclipse.skalli.gerrit.client,
- org.eclipse.skalli.gerrit.client.config,
- org.eclipse.skalli.gerrit.client.exception
+Export-Package: org.eclipse.skalli.services.gerrit
 Service-Component: OSGI-INF/GerritServersConfigSection.xml,
- OSGI-INF/GerritService.xml
+ OSGI-INF/GerritComponent.xml
 Bundle-ActivationPolicy: lazy

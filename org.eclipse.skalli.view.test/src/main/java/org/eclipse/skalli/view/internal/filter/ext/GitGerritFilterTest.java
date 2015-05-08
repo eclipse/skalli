@@ -21,12 +21,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import org.eclipse.skalli.gerrit.client.GerritClient;
-import org.eclipse.skalli.gerrit.client.config.GerritServerConfig;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ext.commons.InfoExtension;
 import org.eclipse.skalli.model.ext.devinf.DevInfProjectExt;
+import org.eclipse.skalli.services.gerrit.GerritServerConfig;
 import org.eclipse.skalli.testutil.AssertUtils;
 import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;
@@ -126,7 +125,7 @@ public class GitGerritFilterTest {
         GerritServerConfig gerritConfig = new GerritServerConfig();
         gerritConfig.setProtocol("ssh");
         gerritConfig.setHost("example.org");
-        gerritConfig.setPort(Integer.toString(GerritClient.DEFAULT_PORT));
+        gerritConfig.setPort("29418");
         gerritConfig.setParent("foo/bar");
         gerritConfig.setBranch("branch");
         gerritConfig.setScmTemplate(scmPattern);

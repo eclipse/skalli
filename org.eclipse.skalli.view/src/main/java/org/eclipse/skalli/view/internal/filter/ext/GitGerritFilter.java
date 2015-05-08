@@ -34,15 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
-import org.eclipse.skalli.gerrit.client.GerritClient;
-import org.eclipse.skalli.gerrit.client.GerritService;
-import org.eclipse.skalli.gerrit.client.InheritableBoolean;
-import org.eclipse.skalli.gerrit.client.ProjectOptions;
-import org.eclipse.skalli.gerrit.client.config.GerritServerConfig;
-import org.eclipse.skalli.gerrit.client.config.GerritServersConfig;
-import org.eclipse.skalli.gerrit.client.exception.CommandException;
-import org.eclipse.skalli.gerrit.client.exception.ConnectionException;
-import org.eclipse.skalli.gerrit.client.exception.GerritClientException;
 import org.eclipse.skalli.model.Member;
 import org.eclipse.skalli.model.Project;
 import org.eclipse.skalli.model.User;
@@ -52,6 +43,15 @@ import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.PropertyLookup;
+import org.eclipse.skalli.services.gerrit.CommandException;
+import org.eclipse.skalli.services.gerrit.ConnectionException;
+import org.eclipse.skalli.services.gerrit.GerritClient;
+import org.eclipse.skalli.services.gerrit.GerritClientException;
+import org.eclipse.skalli.services.gerrit.GerritServerConfig;
+import org.eclipse.skalli.services.gerrit.GerritServersConfig;
+import org.eclipse.skalli.services.gerrit.GerritService;
+import org.eclipse.skalli.services.gerrit.InheritableBoolean;
+import org.eclipse.skalli.services.gerrit.ProjectOptions;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.eclipse.skalli.view.Consts;
 import org.eclipse.skalli.view.internal.filter.FilterException;
@@ -481,17 +481,13 @@ public class GitGerritFilter implements Filter {
     @SuppressWarnings("nls")
     String getScmLocation(GerritServerConfig gerritConfig, String repository, Project project, User user) {
         Map<String, String> parameters = new HashMap<String, String>();
-        String protocol = gerritConfig.getProtocol();
-        if (StringUtils.isBlank(protocol)) {
-            protocol = "git";
+        if (StringUtils.isNotBlank(gerritConfig.getProtocol())) {
+            parameters.put("protocol", gerritConfig.getProtocol());
         }
-        parameters.put("protocol", protocol);
         parameters.put("host", gerritConfig.getHost());
-        String port = gerritConfig.getPort();
-        if (StringUtils.isBlank(port)) {
-            port = Integer.toString(GerritClient.DEFAULT_PORT);
+        if (StringUtils.isNotBlank(gerritConfig.getPort())) {
+            parameters.put("port", gerritConfig.getPort());
         }
-        parameters.put("port", port);
         parameters.put("repository", repository);
         if (StringUtils.isNotBlank(gerritConfig.getParent())) {
             parameters.put("parent", gerritConfig.getParent());
