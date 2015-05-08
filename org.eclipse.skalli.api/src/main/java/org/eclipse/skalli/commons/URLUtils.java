@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +44,82 @@ public class URLUtils {
         return ret;
     }
 
+    /**
+     * Composes a {@link URI} from a given web locator and path.
+     * <p>
+     * This method is equivalent to {@link #asURI(String, String, String)
+     * asURI(webLocator, resourcePath, null)}.
+     *
+     * @param webLocator  the web locator, e.g. <tt>http://localhost:8080</tt>. May be
+     * <code>null</code> or blank.
+     * @param resourcePath  the absolute path of a resource, may be <code>null</code> or blank.
+     * A blank path will be interpreted as root path "/". If the path is not beginning with
+     * a slash it will be added on the fly.
+     *
+     * @return  a URI, or <code>null</code> if the given resource path was <code>null</code>.
+     */
+    public static URI asURI(String webLocator, String resourcePath) {
+        return asURI(webLocator, resourcePath, null);
+    }
+
+    /**
+     * Composes a {@link URI} from a given web locator, resource path and an optional query.
+     * <p>
+     * If the web locator is not specified, a <tt>file://</tt> URI will be returned.
+     * Otherwise web locator, path and query are concatenated and converted to
+     * an URI with {@link URI#URI(String)}. If that fails, the concatenated string is
+     * first converted to an {@link URL} with {@link URL#URL(String)} and then to an
+     * URI with {@link URI#URI(String, String, String, int, String, String, String)}.
+     * This sanitizes some otherwise broken URIs and properly encodes the path segments.
+     *
+     * @param webLocator  the web locator, e.g. <tt>http://localhost:8080</tt>. May be
+     * <code>null</code> or blank.
+     * @param resourcePath  the absolute path of a resource, may be <code>null</code> or blank.
+     * A blank path will be interpreted as root path "/". If the path is not beginning with
+     * a slash it will be added on the fly.
+     * @param query  a query string, may be <code>null</code> or blank.
+     *
+     * @return  a URI, or <code>null</code> if the given resource path was <code>null</code>.
+     */
+    public static URI asURI(String webLocator, String resourcePath, String query) {
+        String absolutePath = addSlashBegin(resourcePath);
+        if (absolutePath == null) {
+            return null;
+        }
+
+        if (StringUtils.isBlank(webLocator)) {
+            try {
+                return new URI("file", null, absolutePath, query, null); //$NON-NLS-1$
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException(
+                        MessageFormat.format("Not a valid file URI: ''{0}''", absolutePath), e);
+            }
+        }
+
+        String uri = StringUtils.removeEnd(webLocator, "/") + absolutePath; //$NON-NLS-1$
+        if (StringUtils.isNotBlank(query)) {
+            uri = uri + "?" + query; //$NON-NLS-1$
+        }
+
+        try {
+            return new URI(uri);
+        } catch (URISyntaxException e) {
+            URL url;
+            try {
+                url = new URL(uri);
+            } catch (MalformedURLException ex) {
+                throw new IllegalArgumentException(
+                        MessageFormat.format("Not a valid URL: ''{0}''", uri), ex);
+            }
+            try {
+                return new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(),
+                        url.getPath(), url.getQuery(), url.getRef());
+            } catch (URISyntaxException ex) {
+                throw new IllegalArgumentException(
+                        MessageFormat.format("Not a valid URI: ''{0}''", uri), ex);
+            }
+        }
+    }
 
     /**
      * Converts a given string into a corresponding URL.
@@ -79,12 +156,42 @@ public class URLUtils {
     }
 
     /**
-     * Removes trailing and leading slashes and whitespace from a given
-     * URL path string.
+     * Ensures that the given string begins with a slash and removes
+     * whitespace from both ends of the string.
+     *
+     * @param s  the string, may be <code>null</code>.
+     *
+     * @return  the string beginning with a slash, or <code>null</code>
+     * if the string was <code>null</code>.
+     */
+    @SuppressWarnings("nls")
+    public static String addSlashBegin(String s) {
+        String ret = StringUtils.trim(s);
+        return ret.startsWith("/") ? ret : "/" + ret;
+    }
+
+    /**
+     * Ensures that the given string ends with a slash and removes
+     * whitespace from both ends of the string.
+     *
+     * @param s  the string, may be <code>null</code>.
+     *
+     * @return  the string ending with a slash, or <code>null</code>
+     * if the string was <code>null</code>.
+     */
+    @SuppressWarnings("nls")
+    public static String addSlashEnd(String s) {
+        String ret = StringUtils.trim(s);
+        return ret == null || ret.endsWith("/") ? ret : ret + "/";
+    }
+
+    /**
+     * Removes trailing and leading slashes and whitespace from the given string.
      *
      * @param s the string to transform, may be <code>null</code>.
      *
-     * @return  the string without leading and trailing slashes and whitespace.
+     * @return  the string without leading and trailing slashes and whitespace,
+     * or <code>null</code> if the string was <code>null</code>.
      */
     public static String removeSlashStartEnd(String s) {
         String ret = StringUtils.trim(s);
