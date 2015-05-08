@@ -145,14 +145,14 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
         } else if (value instanceof Link) {
             Link link = (Link) value;
             try {
-                url = URLUtils.stringToURL(link.getUrl());
+                url = URLUtils.asURL(link.getUrl());
                 label = link.getLabel();
             } catch (MalformedURLException e) {
                 CollectionUtils.addSafe(issues, getIssueByReachableHost(minSeverity, entityId, item, link.getUrl()));
             }
         } else {
             try {
-                url = URLUtils.stringToURL(value.toString());
+                url = URLUtils.asURL(value.toString());
                 label = url != null ? url.toExternalForm() : value.toString();
             } catch (MalformedURLException e) {
                 CollectionUtils.addSafe(issues, getIssueByReachableHost(minSeverity, entityId, item, value.toString()));

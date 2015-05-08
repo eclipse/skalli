@@ -241,7 +241,7 @@ public class JSONRestReader implements RestReader {
     public URL valueURL() throws IOException {
         assertNotFinal();
         skipKey();
-        URL value = json.peek() != JsonToken.NULL ? URLUtils.stringToURL(valueString()) : null;
+        URL value = json.peek() != JsonToken.NULL ? URLUtils.asURL(valueString()) : null;
         sequenceState = EXPECT_KEY;
         return value;
     }

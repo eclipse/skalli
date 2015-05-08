@@ -86,7 +86,7 @@ class NexusResponseParser {
             return null;
         }
         try {
-            return URLUtils.stringToURL(textContent).toURI();
+            return URLUtils.asURL(textContent).toURI();
         } catch (Exception e) {
             throw new NexusClientException(MessageFormat.format("''{0}'' is not a valid URL", textContent), e);
         }

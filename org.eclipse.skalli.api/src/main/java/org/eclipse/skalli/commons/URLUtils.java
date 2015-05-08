@@ -134,7 +134,7 @@ public class URLUtils {
      * @throws MalformedURLException  if the given string is not a valid URL and cannot be
      * "sanitized" to yield a valid URL even after proper encoding of its parts.
      */
-    public static URL stringToURL(String s) throws MalformedURLException {
+    public static URL asURL(String s) throws MalformedURLException {
         if (StringUtils.isBlank(s)) {
             return null;
         }

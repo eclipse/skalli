@@ -60,7 +60,7 @@ public class ScmMappingFeedProvider implements FeedProvider {
                             mappingConfig.getTemplate(), project, ""); //$NON-NLS-1$
                     if (StringUtils.isNotBlank(urlStr)) {
                         try {
-                            URLFeedUpdater feedUpdater = new URLFeedUpdater(URLUtils.stringToURL(urlStr),
+                            URLFeedUpdater feedUpdater = new URLFeedUpdater(URLUtils.asURL(urlStr),
                                     mappingConfig.getProvider(), mappingConfig.getName(),
                                     project.getUuid());
                             result.add(feedUpdater);

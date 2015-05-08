@@ -42,7 +42,7 @@ public class JenkinsFeedProvider implements FeedProvider {
                 String url = null;
                 try {
                     url = StringUtils.removeEnd(ciServer, "/") + JENKINS_RSS_ALL; //$NON-NLS-1$
-                    URLFeedUpdater feedUpdater = new URLFeedUpdater(URLUtils.stringToURL(url),
+                    URLFeedUpdater feedUpdater = new URLFeedUpdater(URLUtils.asURL(url),
                             "jenkins", "Jenkins", project.getUuid()); //$NON-NLS-1$
                     result.add(feedUpdater);
                 } catch (MalformedURLException e) {

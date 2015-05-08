@@ -28,7 +28,7 @@ public class JSONRestReaderTest {
     @Test
     public void testObjectVariousValues() throws Exception {
         UUID uuid = UUID.randomUUID();
-        URL url = URLUtils.stringToURL("http://localhost:8080/path");
+        URL url = URLUtils.asURL("http://localhost:8080/path");
         long now  = (System.currentTimeMillis() / 1000) * 1000; // cut off milliseconds
         JSONRestReader json = getRestReader("{\"a\":\"string\",\"b\":4711,\"c\":3.14,\"d\":true,"
                 + "\"e\":[\"x\",\"y\"],\"f\":\"\",\"g\":{\"x\":\"string\"},\"h\":\"" + uuid.toString()  + "\","
@@ -213,7 +213,7 @@ public class JSONRestReaderTest {
     @Test
     public void testAttributes() throws Exception {
         UUID uuid = UUID.randomUUID();
-        URL url = URLUtils.stringToURL("http://localhost:8080/path");
+        URL url = URLUtils.asURL("http://localhost:8080/path");
         long now  = (System.currentTimeMillis() / 1000) * 1000; // cut off milliseconds
         JSONRestReader json = getRestReader("{\"a\":\"string\",\"b\":4711,\"c\":3.14,\"d\":true,"
                 + "\"e\":\"" + uuid.toString()  + "\","
@@ -225,7 +225,7 @@ public class JSONRestReaderTest {
     @Test
     public void testPrefixedAttributes() throws Exception {
         UUID uuid = UUID.randomUUID();
-        URL url = URLUtils.stringToURL("http://localhost:8080/path");
+        URL url = URLUtils.asURL("http://localhost:8080/path");
         long now  = (System.currentTimeMillis() / 1000) * 1000; // cut off milliseconds
         JSONRestReader json = getRestReader("{\"@a\":\"string\",\"@b\":4711,\"@c\":3.14,\"@d\":true,"
                 + "\"@e\":\"" + uuid.toString()  + "\","

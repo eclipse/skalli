@@ -19,29 +19,29 @@ public class URLUtilsTest {
     @Test
     public void testStringToURL() throws Exception {
         Assert.assertEquals("http://host:8080/firstsecond",
-                URLUtils.stringToURL("http://host:8080/firstsecond").toExternalForm());
+                URLUtils.asURL("http://host:8080/firstsecond").toExternalForm());
         Assert.assertEquals("http://host:8080/first%20second",
-                URLUtils.stringToURL("http://host:8080/first%20second").toExternalForm());
+                URLUtils.asURL("http://host:8080/first%20second").toExternalForm());
         Assert.assertEquals("http://host:8080/first+second",
-                URLUtils.stringToURL("http://host:8080/first+second").toExternalForm());
+                URLUtils.asURL("http://host:8080/first+second").toExternalForm());
         Assert.assertEquals("http://host:8080/first%20second",
-                URLUtils.stringToURL("http://host:8080/first second").toExternalForm());
+                URLUtils.asURL("http://host:8080/first second").toExternalForm());
         Assert.assertEquals("http://host:8080/first%20second/third",
-                URLUtils.stringToURL("http://host:8080/first second/third").toExternalForm());
+                URLUtils.asURL("http://host:8080/first second/third").toExternalForm());
         Assert.assertEquals("http://host:8080/=$%20%25:%C3%A4",
-                URLUtils.stringToURL("http://host:8080/=$ %:ä").toExternalForm());
+                URLUtils.asURL("http://host:8080/=$ %:ä").toExternalForm());
         Assert.assertEquals("http://host:8080/=$%20%25%2520:%C3%A4",
-                URLUtils.stringToURL("http://host:8080/=$ %%20:ä").toExternalForm());
+                URLUtils.asURL("http://host:8080/=$ %%20:ä").toExternalForm());
         Assert.assertEquals("http://host:8080/path?query",
-                URLUtils.stringToURL("http://host:8080/path?query").toExternalForm());
+                URLUtils.asURL("http://host:8080/path?query").toExternalForm());
         Assert.assertEquals("http://host:8080/path?a&b&c",
-                URLUtils.stringToURL("http://host:8080/path?a&b&c").toExternalForm());
+                URLUtils.asURL("http://host:8080/path?a&b&c").toExternalForm());
         Assert.assertEquals("http://host:8080/path?ab%20c",
-                URLUtils.stringToURL("http://host:8080/path?ab c").toExternalForm());
+                URLUtils.asURL("http://host:8080/path?ab c").toExternalForm());
         Assert.assertEquals("http://host:8080/path?ab%C3%A4c",
-                URLUtils.stringToURL("http://host:8080/path?abäc").toExternalForm());
-        Assert.assertNull(URLUtils.stringToURL(null));
-        Assert.assertNull(URLUtils.stringToURL(""));
+                URLUtils.asURL("http://host:8080/path?abäc").toExternalForm());
+        Assert.assertNull(URLUtils.asURL(null));
+        Assert.assertNull(URLUtils.asURL(""));
     }
 
     @Test

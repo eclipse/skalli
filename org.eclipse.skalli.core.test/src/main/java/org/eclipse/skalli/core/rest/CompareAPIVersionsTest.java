@@ -40,7 +40,7 @@ public class CompareAPIVersionsTest {
     @Test
     public void testCompareAllProjects() throws Exception {
         if (SKALLI_ITEST_HOST != null) {
-            HttpClient client = Destinations.getClient(URLUtils.stringToURL(SKALLI_ITEST_HOST));
+            HttpClient client = Destinations.getClient(URLUtils.asURL(SKALLI_ITEST_HOST));
             int start = 0;
             int count = 10;
             while (count > 0) {
