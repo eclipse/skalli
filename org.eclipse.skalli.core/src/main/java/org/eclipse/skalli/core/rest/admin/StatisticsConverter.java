@@ -59,7 +59,7 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
                 query.getFrom() > 0? query.getFrom() : statistics.getStartupTime());
         long to = query.getTo() > 0 ? query.getTo() : System.currentTimeMillis();
 
-        writer.object();
+        writer.object("statistics");
         namespaces();
         apiVersion();
         writer
