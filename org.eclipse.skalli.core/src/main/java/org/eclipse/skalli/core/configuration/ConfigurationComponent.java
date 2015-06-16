@@ -131,7 +131,7 @@ public class ConfigurationComponent implements ConfigurationService {
     }
 
     @Override
-    public synchronized <T> void writeConfiguration(T configuration) {
+    public <T> void writeConfiguration(T configuration) {
         if (storageService == null) {
             LOG.error("Cannot store configurations: StorageService not available");
             return;
@@ -175,7 +175,7 @@ public class ConfigurationComponent implements ConfigurationService {
     };
 
     @Override
-    public synchronized <T> T readConfiguration(Class<T> configurationClass) {
+    public <T> T readConfiguration(Class<T> configurationClass) {
         if (storageService == null) {
             LOG.warn("Cannot load configurations: StorageService not available");
             return null;
