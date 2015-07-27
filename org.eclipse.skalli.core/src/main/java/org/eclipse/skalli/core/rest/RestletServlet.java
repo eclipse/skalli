@@ -36,6 +36,8 @@ public class RestletServlet extends ServerServlet {
     private static final long serialVersionUID = -7953560055729006206L;
     private static final Logger LOG = LoggerFactory.getLogger(RestletServlet.class);
 
+    private static final String PROJECTS_PREFIX = "/projects/"; //$NON-NLS-1$
+
     @Override
     protected Class<?> loadClass(String className) throws ClassNotFoundException {
         Class<?> ret = null;
@@ -69,33 +71,10 @@ public class RestletServlet extends ServerServlet {
 
     @Override
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
         long timeBeginnProcessing = System.currentTimeMillis();
 
-        // determine the project from the pathInfo, if available
-        Project project = null;
-        ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
-
-        String pathInfo = request.getPathInfo();
-        if (StringUtils.isNotBlank(pathInfo)) {
-            if (pathInfo.startsWith("/")) { //$NON-NLS-1$
-                pathInfo = pathInfo.replaceFirst("/", StringUtils.EMPTY); //$NON-NLS-1$
-            }
-            if (pathInfo.contains("/")) { //$NON-NLS-1$
-                pathInfo = pathInfo.substring(0, pathInfo.indexOf("/")); //$NON-NLS-1$
-            }
-            project = projectService.getProjectByProjectId(pathInfo);
-
-            // project not found by name, search by UUID
-            if (project == null && UUIDUtils.isUUID(pathInfo)) {
-                UUID uuid = UUIDUtils.asUUID(pathInfo);
-                project = projectService.getByUUID(uuid);
-                // project not found by UUID, search for deleted project by UUID
-                if (project == null) {
-                    project = projectService.getDeletedProject(uuid);
-                }
-            }
-        }
+        // extract the project from the request URL
+        Project project = getProject(request.getPathInfo());
 
         // determine the user and login
         PermitService permitService = Services.getRequiredService(PermitService.class);
@@ -143,7 +122,31 @@ public class RestletServlet extends ServerServlet {
         long responseTime = System.currentTimeMillis() - timeBeginnProcessing;
         statistics.trackResponseTime(userId, requestLine, responseTime);
         LOG.info(MessageFormat.format("{0}: responseTime={1} milliseconds)", requestLine, Long.toString(responseTime)));
-
     }
 
+    private Project getProject(String pathInfo) {
+        Project project = null;
+        if (StringUtils.isNotBlank(pathInfo) && pathInfo.startsWith(PROJECTS_PREFIX)) {
+            String projectId = getProjectId(pathInfo);
+            if (StringUtils.isNotBlank(projectId)) {
+                ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
+                project = projectService.getProjectByProjectId(projectId);
+                if (project == null && UUIDUtils.isUUID(projectId)) {
+                    UUID uuid = UUIDUtils.asUUID(projectId);
+                    project = projectService.getByUUID(uuid);
+                    // project not found by UUID, search for deleted project by UUID
+                    if (project == null) {
+                        project = projectService.getDeletedProject(uuid);
+                    }
+                }
+            }
+        }
+        return project;
+    }
+
+    private String getProjectId(String pathInfo) {
+        String s = pathInfo.substring(PROJECTS_PREFIX.length());
+        int posNextSlash = s.indexOf('/');
+        return posNextSlash > 0 ? s.substring(0, posNextSlash) : s;
+    }
 }
