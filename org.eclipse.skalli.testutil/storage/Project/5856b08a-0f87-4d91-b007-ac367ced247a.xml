@@ -83,8 +83,8 @@
   <tags>
     <no-comparator/>
     <string>cool</string>
-    <string>stuff</string>
     <string>osgi</string>
+    <string>stuff</string>
   </tags>
   <logoUrl/>
   <phase>Prototype</phase>
