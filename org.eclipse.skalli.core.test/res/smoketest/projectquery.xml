@@ -1,17 +1,2 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<projects xmlns="http://www.eclipse.org/skalli/2010/API" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eclipse.org/skalli/2010/API http://localhost:${PORT1}/schemas/projects.xsd" apiVersion="1.4" start="0" count="1">
-  <project apiVersion="1.4" lastModified="2011-11-17T16:03:42.861Z" modifiedBy="skalli">
-    <uuid>5856b08a-0f87-4d91-b007-ac367ced247a</uuid>
-    <id>eclipse.skalli</id>
-    <nature>PROJECT</nature>
-    <template>default</template>
-    <name>Skalli</name>
-    <shortName>skalli</shortName>
-    <link rel="project" href="http://localhost:${PORT1}/api/projects/5856b08a-0f87-4d91-b007-ac367ced247a"/>
-    <link rel="browse" href="http://localhost:${PORT1}/projects/eclipse.skalli"/>
-    <link rel="issues" href="http://localhost:${PORT1}/api/projects/5856b08a-0f87-4d91-b007-ac367ced247a/issues"/>
-    <phase>Prototype</phase>
-    <description>The goal of the project is to build an extensible system for organizing projects.</description>
-    <extensions/>
-  </project>
-</projects>
+<projects xmlns="http://www.eclipse.org/skalli/2010/API" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.eclipse.org/skalli/2010/API http://localhost:8182/schemas/projects.xsd" apiVersion="1.4" start="0" count="1"><project apiVersion="1.4" lastModifiedMillis="1321545822861" lastModified="2011-11-17T16:03:42.861Z" modifiedBy="skalli"><uuid>5856b08a-0f87-4d91-b007-ac367ced247a</uuid><id>eclipse.skalli</id><nature>PROJECT</nature><template>default</template><name>Skalli</name><shortName>skalli</shortName><phase>Prototype</phase><descriptionFormat>text</descriptionFormat><description>The goal of the project is to build an extensible system for organizing projects.</description><link rel="project" href="http://localhost:8182/api/projects/5856b08a-0f87-4d91-b007-ac367ced247a"/><link rel="permalink" href="http://localhost:8182/projects/5856b08a-0f87-4d91-b007-ac367ced247a"/><link rel="browse" href="http://localhost:8182/projects/eclipse.skalli"/><link rel="issues" href="http://localhost:8182/api/projects/5856b08a-0f87-4d91-b007-ac367ced247a/issues"/><link rel="subprojects" href="http://localhost:8182/api/projects/5856b08a-0f87-4d91-b007-ac367ced247a/subprojects"/><subprojects/><members/><extensions/></project></projects>

@@ -202,7 +202,7 @@ public abstract class ResourceBase extends ServerResource {
         if (StringUtils.isNotBlank(restVersion)) {
             return "v1".equalsIgnoreCase(restVersion);
         }
-        return true;
+        return false;
     }
 
     /**
