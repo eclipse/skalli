@@ -122,5 +122,7 @@ public class ProjectApplication extends com.vaadin.Application implements HttpSe
 
     @Override
     public void onRequestEnd(HttpServletRequest request, HttpServletResponse response) {
+        PermitService permitService = Services.getRequiredService(PermitService.class);
+        permitService.logout(request);
     }
 }
