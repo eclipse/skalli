@@ -135,6 +135,12 @@ public class ProjectComponent extends EntityServiceBase<Project> implements Proj
     }
 
     @Override
+    public Project loadProject(String id) {
+        Project project = getProject(id);
+        return project != null ? loadEntity(Project.class, project.getUuid()) : null;
+    }
+
+    @Override
     public Project getProjectByProjectId(String projectId) {
         for (Project p : getAll()) {
             if (p.getProjectId().equalsIgnoreCase(projectId)) {

@@ -85,7 +85,7 @@ public class InheritableExtensionResource extends ResourceBase {
 
         String id = (String) getRequestAttributes().get(RestUtils.PARAM_ID);
         ProjectService projectService = ((ProjectService)EntityServices.getByEntityClass(Project.class));
-        Project project = projectService.getProject(id);
+        Project project = projectService.loadProject(id);
         if (project == null) {
             setStatus(Status.CLIENT_ERROR_NOT_FOUND, MessageFormat.format("Project {0} not found", id));
             return null;

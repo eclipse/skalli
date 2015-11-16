@@ -193,6 +193,30 @@ public interface ProjectService extends EntityService<Project>, Issuer {
     public Project getProject(String id);
 
     /**
+     * Loads the entity with the given identifier from storage. The identifier may either be the
+     * project's {@link Project#getUuid() UUID} or its {@link Project#getProjectId() symbolic name}.
+     * <p>
+     * The chain of {@link Project#getParentEntity() parent projects} of the project is resolved and
+     * loaded from storage if necessary, but neither the {@link Project#getFirstChild() children}
+     * nor {@link Project#getNextSibling() siblings} of the project are resolved.
+     * <p>
+     * This method returns a fresh instance of the project, which excusively belongs to the caller.
+     * It can safely be changed and persisted afterwards.
+     * <p>
+     * Note that the projects in the parent hierarchy are in general shared objects and should be
+     * treated in a read-only fashion. Changing properties of parent projects may have undesirable
+     * side effects.
+     *
+     * @param id
+     *          a project's {@link Project#getUuid() UUID} or
+     *          {@link Project#getProjectId() symbolic name}.
+     *
+     * @return  the project matching the given identifier, or
+     *          <code>null</code> if no such project exists.
+     */
+    public Project loadProject(String id);
+
+    /**
      * Returns the project with the given project identifier.
      *
      * @param projectId
