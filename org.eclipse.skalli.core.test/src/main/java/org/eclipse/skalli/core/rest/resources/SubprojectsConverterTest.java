@@ -39,10 +39,11 @@ public class SubprojectsConverterTest extends RestWriterTestBase {
 
     private static final String COMMON_PART_JSON = MessageFormat.format(
             "'{'"
-            + "\"apiVersion\":\"{0}\",\"links\":"
-            + "['{'\"rel\":\"self\",\"href\":\"http://example.org/api/projects/{1}/subprojects\"},"
-            + "'{'\"rel\":\"project\",\"href\":\"http://example.org/api/projects/{1}\"}]",
-            SubprojectsConverter.API_VERSION, TestUUIDs.TEST_UUIDS[0]);
+            + "\"namespace\":\"{0}\","
+            + "\"apiVersion\":\"{1}\",\"links\":"
+            + "['{'\"rel\":\"self\",\"href\":\"http://example.org/api/projects/{2}/subprojects\"},"
+            + "'{'\"rel\":\"project\",\"href\":\"http://example.org/api/projects/{2}\"}]",
+            SubprojectsConverter.NAMESPACE, SubprojectsConverter.API_VERSION, TestUUIDs.TEST_UUIDS[0]);
 
     @Test
     public void testMarshalEmptySubprojectsXML() throws Exception {

@@ -21,6 +21,7 @@ import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.services.rest.RestReader;
 import org.eclipse.skalli.services.rest.RestWriter;
+import org.restlet.data.MediaType;
 
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 
@@ -64,6 +65,7 @@ public abstract class RestConverterBase<T> implements RestConverter<T> {
     private static final String LAST_MODIFIED = "lastModified"; //$NON-NLS-1$
     private static final String LAST_MODIFIED_MILLIS = "lastModifiedMillis"; //$NON-NLS-1$
     private static final String API_VERSION = "apiVersion"; //$NON-NLS-1$
+    private static final String NAMESPACE = "namespace"; //$NON-NLS-1$
     private static final String HREF = "href"; //$NON-NLS-1$
     private static final String REL = "rel"; //$NON-NLS-1$
     private static final String LINK = "link"; //$NON-NLS-1$
@@ -494,7 +496,11 @@ public abstract class RestConverterBase<T> implements RestConverter<T> {
      * @param writer  the writer to use for marshaling.
      */
     protected void namespaces(RestConverter<?> converter) throws IOException {
-        writer.namespace(XMLUtils.XMLNS, converter.getNamespace());
+        if (writer.isMediaType(MediaType.TEXT_XML)) {
+            writer.namespace(XMLUtils.XMLNS, converter.getNamespace());
+        } else {
+            writer.attribute(NAMESPACE, converter.getNamespace());
+        }
         writer.namespace(XMLUtils.XMLNS_XSI, XMLUtils.XSI_INSTANCE_NS);
         if (StringUtils.isNotBlank(writer.getHost()) && StringUtils.isNotBlank(converter.getXsdFileName())) {
             writer.namespace(XMLUtils.XSI_SCHEMA_LOCATION, getSchemaLocation(converter));

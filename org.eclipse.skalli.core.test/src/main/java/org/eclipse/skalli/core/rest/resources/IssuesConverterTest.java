@@ -39,11 +39,12 @@ public class IssuesConverterTest extends RestWriterTestBase {
 
     private static final String COMMON_PART_JSON = MessageFormat.format(
             "'{'"
-            + "\"apiVersion\":\"{0}\",\"links\":"
-            + "['{'\"rel\":\"self\",\"href\":\"http://example.org/api/projects/{1}/issues\"},"
-            + "'{'\"rel\":\"project\",\"href\":\"http://example.org/api/projects/{1}\"}],"
-            + "\"uuid\":\"{1}\",",
-            IssuesConverter.API_VERSION, TestUUIDs.TEST_UUIDS[0]);
+            + "\"namespace\":\"{0}\","
+            + "\"apiVersion\":\"{1}\",\"links\":"
+            + "['{'\"rel\":\"self\",\"href\":\"http://example.org/api/projects/{2}/issues\"},"
+            + "'{'\"rel\":\"project\",\"href\":\"http://example.org/api/projects/{2}\"}],"
+            + "\"uuid\":\"{2}\",",
+            IssuesConverter.NAMESPACE, IssuesConverter.API_VERSION, TestUUIDs.TEST_UUIDS[0]);
 
     private static final Issue[] ISSUES = {
         new Issue(Severity.INFO, TestEntityService.class, TestUUIDs.TEST_UUIDS[2],

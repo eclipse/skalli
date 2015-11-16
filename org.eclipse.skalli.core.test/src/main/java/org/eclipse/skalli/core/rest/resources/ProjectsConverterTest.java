@@ -38,8 +38,8 @@ public class ProjectsConverterTest extends RestWriterTestBase {
 
     private static final String COMMON_PART_JSON(int start, int count) {
         return MessageFormat.format(
-            "'{'\"apiVersion\":\"{0}\",\"start\":{1},\"count\":{2}",
-            ProjectConverter.API_VERSION, start, count);
+            "'{'\"namespace\":\"{0}\",\"apiVersion\":\"{1}\",\"start\":{2},\"count\":{3}",
+            ProjectConverter.NAMESPACE, ProjectConverter.API_VERSION, start, count);
     }
 
     @Test

@@ -61,7 +61,9 @@ public class UserConverterTest extends RestWriterTestBase {
         User user = new User("me");
         JSONRestWriter restWriter = new JSONRestWriter(writer, "http://example.org");
         marshalUser(user, restWriter);
-        assertEqualsJSON("{\"apiVersion\":\"1.0\","
+        assertEqualsJSON("{"
+                + "\"namespace\":\""+ UserConverter.NAMESPACE
+                + "\",\"apiVersion\":\"" + UserConverter.API_VERSION + "\","
                 + "\"link\":{\"rel\":\"self\",\"href\":\"http://example.org/api/users/me\"},"
                 + "\"userId\":\"me\"}");
     }
@@ -71,7 +73,9 @@ public class UserConverterTest extends RestWriterTestBase {
         User user = newUser();
         JSONRestWriter restWriter = new JSONRestWriter(writer, "http://example.org");
         marshalUser(user, restWriter);
-        assertEqualsJSON("{\"apiVersion\":\"1.0\","
+        assertEqualsJSON("{"
+                + "\"namespace\":\""+ UserConverter.NAMESPACE
+                + "\",\"apiVersion\":\"" + UserConverter.API_VERSION + "\","
                 + "\"link\":{\"rel\":\"self\",\"href\":\"http://example.org/api/users/me\"},"
                 + "\"userId\":\"me\","
                 + "\"firstname\":\"john\","

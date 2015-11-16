@@ -240,13 +240,15 @@ public class CommonProjectConverterTest extends RestWriterTestBase {
 
     public static final String EXTENSIONS_SECTION_JSON() {
         return MessageFormat.format("'{'\"extensions\":'{'"
-            + "\"info\":'{'\"apiVersion\":\"{0}\",\"lastModifiedMillis\":{1},\"lastModified\":\"{2}\","
+            + "\"info\":'{'\"namespace\":\"{0}\",\"apiVersion\":\"{1}\",\"lastModifiedMillis\":{2},\"lastModified\":\"{3}\","
             + "\"inherited\":true,\"derived\":false,"
             + "\"homepage\":\"foobar\",\"mailingLists\":[]},"
-            + "\"tags\":'{'\"apiVersion\":\"{3}\",\"modifiedBy\":\"{4}\",\"inherited\":false,\"derived\":false,"
+            + "\"tags\":'{'\"namespace\":\"{4}\",\"apiVersion\":\"{5}\",\"modifiedBy\":\"{6}\","
+            + "\"inherited\":false,\"derived\":false,"
             + "\"items\":[\"a\",\"b\"]}"
             + "}}",
-            InfoConverter.API_VERSION, LAST_MODIFIED_MILLIS, LAST_MODIFIED, TagsConverter.API_VERSION, LAST_MODIFIER);
+            InfoConverter.NAMESPACE, InfoConverter.API_VERSION, LAST_MODIFIED_MILLIS, LAST_MODIFIED,
+            TagsConverter.NAMESPACE, TagsConverter.API_VERSION, LAST_MODIFIER);
     }
 
     public static final String MINIMAL_PROJECT_BEGIN_JSON(UUID uuid, String id, String name, boolean omitAttributes) {
