@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.model.Derived;
@@ -230,22 +231,14 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
 
     @SuppressWarnings("nls")
     private Project unmarshal(Project project) throws RestException, IOException {
+        String apiVersion = null;
+        String namespace = null;
         reader.object();
         while (reader.hasMore()) {
             if (reader.isKeyAnyOf("apiVersion")) {
-                String apiVersion = reader.attributeString();
-                if (!getApiVersion().equals(apiVersion)) {
-                    throw new RestException(MessageFormat.format(
-                            "Unsupported API version (requested: ''{0}'', expected: ''{1}'')",
-                            apiVersion, getApiVersion()));
-                }
-            } else if (reader.isKeyAnyOf(XMLUtils.XMLNS)) {
-                String namespace = reader.attributeString();
-                if (!getNamespace().equals(namespace)) {
-                    throw new RestException(MessageFormat.format(
-                            "Unsupported namespace (requested: ''{0}'', expected: ''{1}'')",
-                            namespace, getNamespace()));
-                }
+                apiVersion = reader.attributeString();
+            } else if (reader.isKeyAnyOf(XMLUtils.XMLNS, "namespace")) {
+                namespace = reader.attributeString();
             } else if (reader.isKey("id")) {
                 project.setProjectId(reader.valueString());
             } else if (reader.isKey("name")) {
@@ -267,6 +260,22 @@ public class CommonProjectConverter extends RestConverterBase<Project> {
             }
         }
         reader.end();
+        if (StringUtils.isBlank(apiVersion)) {
+            throw new RestException("Missing required apiVersion attribute");
+        }
+        if (!getApiVersion().equals(apiVersion)) {
+            throw new RestException(MessageFormat.format(
+                    "Unsupported API version (requested: ''{0}'', expected: ''{1}'')",
+                    apiVersion, getApiVersion()));
+        }
+        if (StringUtils.isBlank(namespace)) {
+            throw new RestException("Missing required namespace attribute");
+        }
+        if (!getNamespace().equals(namespace)) {
+            throw new RestException(MessageFormat.format(
+                    "Unsupported namespace (requested: ''{0}'', expected: ''{1}'')",
+                    namespace, getNamespace()));
+        }
         return project;
     }
 

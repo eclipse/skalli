@@ -13,6 +13,7 @@ package org.eclipse.skalli.core.rest.resources;
 import java.io.IOException;
 import java.text.MessageFormat;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.XMLUtils;
 import org.eclipse.skalli.model.Derived;
 import org.eclipse.skalli.model.ExtensionEntityBase;
@@ -83,23 +84,15 @@ public class InheritableExtensionConverter extends RestConverterBase<Inheritable
 
     @SuppressWarnings("nls")
     private void unmarshallCommonAttributes(InheritableExtension inheritable) throws IOException, RestException {
+        String apiVersion = null;
+        String namespace = null;
         while (reader.hasMore()) {
             if (reader.isKeyAnyOf("inherited")) {
                 inheritable.setInherited(reader.attributeBoolean());
             } else if (reader.isKeyAnyOf("apiVersion")) {
-                String apiVersion = reader.attributeString();
-                if (!getApiVersion().equals(apiVersion)) {
-                    throw new RestException(MessageFormat.format(
-                            "Unsupported API version (requested: ''{0}'', expected: ''{1}'')",
-                            apiVersion, getApiVersion()));
-                }
-            } else if (reader.isKeyAnyOf(XMLUtils.XMLNS)) {
-                String namespace = reader.attributeString();
-                if (!getNamespace().equals(namespace)) {
-                    throw new RestException(MessageFormat.format(
-                            "Unsupported namespace (requested: ''{0}'', expected: ''{1}'')",
-                            namespace, getNamespace()));
-                }
+                apiVersion = reader.attributeString();
+            } else if (reader.isKeyAnyOf(XMLUtils.XMLNS, "namespace")) {
+                namespace = reader.attributeString();
             } else if (reader.isKeyAnyOf(XMLUtils.XMLNS_XSI, XMLUtils.XSI_SCHEMA_LOCATION,
                     "lastModified", "lastModifiedMillis", "modifiedBy", "derived")) {
                 // ignore these attributes
@@ -108,6 +101,22 @@ public class InheritableExtensionConverter extends RestConverterBase<Inheritable
                 // first unknown attribute indicates begin of extension attributes
                 break;
             }
+        }
+        if (StringUtils.isBlank(apiVersion)) {
+            throw new RestException("Missing required apiVersion attribute");
+        }
+        if (!getApiVersion().equals(apiVersion)) {
+            throw new RestException(MessageFormat.format(
+                    "Unsupported API version (requested: ''{0}'', expected: ''{1}'')",
+                    apiVersion, getApiVersion()));
+        }
+        if (StringUtils.isBlank(namespace)) {
+            throw new RestException("Missing required namespace attribute");
+        }
+        if (!getNamespace().equals(namespace)) {
+            throw new RestException(MessageFormat.format(
+                    "Unsupported namespace (requested: ''{0}'', expected: ''{1}'')",
+                    namespace, getNamespace()));
         }
     }
 
