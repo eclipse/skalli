@@ -15,6 +15,13 @@
         <provide interface="org.eclipse.skalli.services.user.UserService"/>
     </service>
     <reference
+        name="LdapContextProvider"
+        interface="org.eclipse.skalli.services.user.ldap.LdapContextProvider"
+        cardinality="0..n"
+        policy="dynamic"
+        bind="bindLdapContextProvider"
+        unbind="unbindLdapContextProvider"/>
+    <reference
         name="EventService"
         interface="org.eclipse.skalli.services.event.EventService"
         cardinality="0..1"

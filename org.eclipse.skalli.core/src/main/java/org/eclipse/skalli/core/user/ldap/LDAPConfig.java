@@ -10,62 +10,47 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.user.ldap;
 
-import org.eclipse.skalli.services.configuration.Protect;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("ldap")
 public class LDAPConfig {
 
-    @Protect
-    private String password;
-    @Protect
-    private String username;
-    private String authentication;
-    private String referral;
-    private String providerUrl;
-    private String ctxFactory;
-    private boolean sslNoVerify;
-
+    private String providerId;
+    private String destination;
     private String baseDN;
     private String searchScope;
-
     private String cacheSize;
 
     // do not remove: required by xstream
     public LDAPConfig() {
     }
 
-    public String getPassword() {
-        return password;
+    /**
+     * @return the providerId
+     */
+    public String getProviderId() {
+        return providerId;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    /**
+     * @param providerId the providerId to set
+     */
+    public void setProviderId(String providerId) {
+        this.providerId = providerId;
     }
 
-    public String getUsername() {
-        return username;
+    /**
+     * @return the destination
+     */
+    public String getDestination() {
+        return destination;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getProviderUrl() {
-        return providerUrl;
-    }
-
-    public void setProviderUrl(String providerUrl) {
-        this.providerUrl = providerUrl;
-    }
-
-    public String getCtxFactory() {
-        return ctxFactory;
-    }
-
-    public void setCtxFactory(String ctxFactory) {
-        this.ctxFactory = ctxFactory;
+    /**
+     * @param destination the destination to set
+     */
+    public void setDestination(String destination) {
+        this.destination = destination;
     }
 
     public String getBaseDN() {
@@ -82,48 +67,6 @@ public class LDAPConfig {
 
     public void setCacheSize(String cacheSize) {
         this.cacheSize = cacheSize;
-    }
-
-    /**
-     * @return the authentication
-     */
-    public String getAuthentication() {
-        return authentication;
-    }
-
-    /**
-     * @param authentication the authentication to set
-     */
-    public void setAuthentication(String authentication) {
-        this.authentication = authentication;
-    }
-
-    /**
-     * @return the referral
-     */
-    public String getReferral() {
-        return referral;
-    }
-
-    /**
-     * @param referral the referral to set
-     */
-    public void setReferral(String referral) {
-        this.referral = referral;
-    }
-
-    /**
-     * @return the sslVerify
-     */
-    public boolean isSslNoVerify() {
-        return sslNoVerify;
-    }
-
-    /**
-     * @param sslVerify the sslVerify to set
-     */
-    public void setSslNoVerify(boolean sslNoVerify) {
-        this.sslNoVerify = sslNoVerify;
     }
 
     /**
