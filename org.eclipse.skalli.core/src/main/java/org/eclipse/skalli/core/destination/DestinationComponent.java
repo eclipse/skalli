@@ -143,27 +143,33 @@ public class DestinationComponent implements DestinationService {
         }
 
         for (DestinationConfig destination : config.getDestinations()) {
-            Pattern regex = Pattern.compile(destination.getPattern());
-            Matcher matcher = regex.matcher(url.toExternalForm());
-            if (matcher.matches()) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(MessageFormat.format("matched URL {0} with destination ''{1}''", url.toExternalForm(),
-                            destination.getId()));
-                }
-
-                if (StringUtils.isNotBlank(destination.getUser()) && StringUtils.isNotBlank(destination.getPattern())) {
-                    String authenticationMethod = destination.getAuthenticationMethod();
-                    if ("basic".equalsIgnoreCase(authenticationMethod)) { //$NON-NLS-1$
-                        CredentialsProvider credsProvider = new BasicCredentialsProvider();
-                        credsProvider.setCredentials(AuthScope.ANY,
-                                new UsernamePasswordCredentials(destination.getUser(), destination.getPassword()));
-                        client.setCredentialsProvider(credsProvider);
-                    } else if (StringUtils.isNotBlank(authenticationMethod)) {
-                        LOG.warn(MessageFormat.format("Authentication method ''{1}'' is not supported",
-                                authenticationMethod));
+            if (StringUtils.isNotBlank(destination.getUrlPattern())
+                    && (StringUtils.isBlank(destination.getType()) || HTTP.equalsIgnoreCase(destination.getType()))) {
+                Pattern regex = Pattern.compile(destination.getUrlPattern());
+                Matcher matcher = regex.matcher(url.toExternalForm());
+                if (matcher.matches()) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug(MessageFormat.format("matched URL {0} with destination ''{1}''", url.toExternalForm(),
+                                destination.getId()));
                     }
+                    setCredentials(client, destination);
+                    break;
                 }
-                break;
+            }
+        }
+    }
+
+    private void setCredentials(DefaultHttpClient client, DestinationConfig destination) {
+        if (StringUtils.isNotBlank(destination.getUser())) {
+            String authentication = destination.getAuthentication();
+            if ("basic".equalsIgnoreCase(authentication)) { //$NON-NLS-1$
+                CredentialsProvider credsProvider = new BasicCredentialsProvider();
+                credsProvider.setCredentials(AuthScope.ANY,
+                        new UsernamePasswordCredentials(destination.getUser(), destination.getPassword()));
+                client.setCredentialsProvider(credsProvider);
+            } else if (StringUtils.isNotBlank(authentication)) {
+                LOG.warn(MessageFormat.format("Authentication method ''{1}'' is not supported",
+                        authentication));
             }
         }
     }

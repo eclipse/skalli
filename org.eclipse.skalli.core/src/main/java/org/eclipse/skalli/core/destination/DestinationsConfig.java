@@ -33,11 +33,24 @@ public class DestinationsConfig {
         return destinations;
     }
 
-    public void setDestinations(List<DestinationConfig> destinations) {
-        this.destinations = destinations;
-    }
-
     public void addDestination(DestinationConfig dest) {
         getDestinations().add(dest);
     }
+
+    /**
+     * Returns the destination for a given unique identifier.
+     *
+     * @param id  the identifier to search for.
+     * @return a destination configuration, or <code>null</code> if no matching
+     * configuration could be found.
+     */
+    public DestinationConfig getDestination(String id) {
+        for (DestinationConfig dest: getDestinations()) {
+            if (dest.getId().equals(id)) {
+                return dest;
+            }
+        }
+        return null;
+    }
+
 }

@@ -10,33 +10,32 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.destination;
 
+import java.util.Properties;
+
 import org.eclipse.skalli.services.configuration.Protect;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("destination")
 public class DestinationConfig {
+
     private String id;
-    private String authenticationMethod;
-    private String pattern;
+    private String name;
+    private String description;
+    private String contact;
+
+    private String type;
+    private String urlPattern;
+
+    private String authentication;
     private String user;
     @Protect
     private String password;
-    private String service;
+
+    private Properties properties;
 
     // do not remove: required by xstream
     public DestinationConfig() {
-    }
-
-    public DestinationConfig(String id) {
-        this.id = id;
-    }
-
-    public DestinationConfig(String id, String pattern, String user, String password) {
-        this.id = id;
-        this.pattern = pattern;
-        this.user = user;
-        this.password = password;
     }
 
     public String getId() {
@@ -47,43 +46,127 @@ public class DestinationConfig {
         this.id = id;
     }
 
-    public String getPattern() {
-        return pattern;
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
     }
 
-    public void setPattern(String pattern) {
-        this.pattern = pattern;
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * @return the contact
+     */
+    public String getContact() {
+        return contact;
+    }
+
+    /**
+     * @param contact the contact to set
+     */
+    public void setContact(String contact) {
+        this.contact = contact;
+    }
+
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
+     * @return the urlPattern
+     */
+    public String getUrlPattern() {
+        return urlPattern;
+    }
+
+    /**
+     * @param urlPattern the urlPattern to set
+     */
+    public void setUrlPattern(String urlPattern) {
+        this.urlPattern = urlPattern;
+    }
+
+    /**
+     * @return the authentication
+     */
+    public String getAuthentication() {
+        return authentication;
+    }
+
+    /**
+     * @param authentication the authentication to set
+     */
+    public void setAuthentication(String authentication) {
+        this.authentication = authentication;
+    }
+
+    /**
+     * @return the user
+     */
     public String getUser() {
         return user;
     }
 
+    /**
+     * @param user the user to set
+     */
     public void setUser(String user) {
         this.user = user;
     }
 
-    public String getAuthenticationMethod() {
-        return authenticationMethod;
-    }
-
-    public void setAuthenticationMethod(String authenticationMethod) {
-        this.authenticationMethod = authenticationMethod;
-    }
-
+    /**
+     * @return the password
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * @param password the password to set
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public String getService() {
-        return service;
+    /**
+     * @return the properties
+     */
+    public Properties getProperties() {
+        return properties != null ? properties : new Properties();
     }
 
-    public void setService(String service) {
-        this.service = service;
+    public String getProperty(String name) {
+        return getProperties().getProperty(name);
     }
+
 }
