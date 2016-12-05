@@ -32,7 +32,6 @@ import javax.naming.ldap.LdapContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
-import org.eclipse.skalli.commons.VisibleForTesting;
 import org.eclipse.skalli.core.cache.Cache;
 import org.eclipse.skalli.core.cache.GroundhogCache;
 import org.eclipse.skalli.core.user.NormalizeUtil;
@@ -121,7 +120,6 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
         ctxProviders.remove(ctxProvider.getId());
     }
 
-    @VisibleForTesting
     protected synchronized void initialize() {
         int cacheSize = DEFAULT_CACHE_SIZE;
         LDAPConfig ldapConfig = Configurations.getConfiguration(LDAPConfig.class);
