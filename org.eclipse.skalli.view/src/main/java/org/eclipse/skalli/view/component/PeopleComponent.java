@@ -98,7 +98,11 @@ public class PeopleComponent extends CustomComponent {
             TreeSet<User> sortedUsers = new TreeSet<User>(new Comparator<User>() {
                 @Override
                 public int compare(User u1, User u2) {
-                    return u1.getDisplayName().compareTo(u2.getDisplayName());
+                    int result = u1.getDisplayName().compareTo(u2.getDisplayName());
+                    if(result == 0){
+                        result = u1.getUserId().compareTo(u2.getUserId());
+                    }
+                    return result;
                 }
             });
             sortedUsers.addAll(users);
