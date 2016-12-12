@@ -55,7 +55,7 @@ public class DestinationComponent implements DestinationService {
     private static final String HTTP_PROXY_PORT = "http.proxyPort"; //$NON-NLS-1$
     private static final String HTTPS_PROXY_HOST = "https.proxyHost"; //$NON-NLS-1$
     private static final String HTTPS_PROXY_PORT = "https.proxyPort"; //$NON-NLS-1$
-    private static final String NON_PROXY_HOSTS = "proxy.nonProxyHosts"; //$NON-NLS-1$
+    private static final String NON_PROXY_HOSTS = "http.nonProxyHosts"; //$NON-NLS-1$
 
     @SuppressWarnings("nls")
     private static final String[] SSL_PROTOCOLS = new String[] { "TLS", "SSLv3", "SSLv2", "SSL" };
