@@ -13,7 +13,6 @@ package org.eclipse.skalli.core.persistence;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.*;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,7 +23,6 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import javax.xml.bind.DatatypeConverter;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringUtils;
 import org.easymock.EasyMock;
@@ -46,7 +44,6 @@ import org.junit.Test;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 import com.thoughtworks.xstream.converters.Converter;
 
@@ -381,7 +378,7 @@ public class XStreamPersistenceTest {
     }
 
     @Test
-    public void testSetLastModiefiedAttribute() throws SAXException, IOException, ParserConfigurationException {
+    public void testSetLastModifiedAttribute() throws Exception {
         XStreamPersistence xp = new TestXStreamPersistence();
         Element element = XMLUtils.documentFromString("<dummy></dummy>").getDocumentElement();
         xp.setLastModifiedAttribute(element);

@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.persistence;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
@@ -127,19 +128,19 @@ public class EntityManagerServiceBase implements EntityManagerService {
      *
      * @return an entity manager instance, never <code>null</code>.
      *
-     * @throws StorageException  if neither the platform could provide a suitable entity manager
+     * @throws IOException  if neither the platform could provide a suitable entity manager
      * factory, nor suitable configuration properties have been provided that would allow to
      * construct one, or the creation of the entity manager failed.
      **/
     @Override
-    public EntityManager getEntityManager() throws StorageException {
+    public EntityManager getEntityManager() throws IOException {
         return getEntityManager(getConfiguredProperties(persistenceUnitName));
     }
 
     // package protected for tests
-    EntityManager getEntityManager(Map<String, Object> properties) throws StorageException {
+    EntityManager getEntityManager(Map<String, Object> properties) throws IOException {
         if (StringUtils.isBlank(persistenceUnitName)) {
-            throw new StorageException("Failed to create an entity manager: no persistence unit name available");
+            throw new IOException("Failed to create an entity manager: no persistence unit name available");
         }
 
         // if explicit JPA properties are provided, create the entity manager based
@@ -153,19 +154,19 @@ public class EntityManagerServiceBase implements EntityManagerService {
         // otherwise: use the entity manager factory provided by the runtime - if any!
         EntityManagerFactory entityManagerFactory = getEntityManagerFactory();
         if (entityManagerFactory == null) {
-            throw new StorageException(MessageFormat.format("Failed to create an entity manager: no entity manager" +
+            throw new IOException(MessageFormat.format("Failed to create an entity manager: no entity manager" +
                 "factory available for persistence unit {0}", persistenceUnitName));
         }
         return createEntityManager(entityManagerFactory);
     }
 
-    private EntityManager createEntityManager(Map<String, Object> properties) throws StorageException {
+    private EntityManager createEntityManager(Map<String, Object> properties) throws IOException {
         if (emfb == null) {
-            throw new StorageException("Failed to create entity manager: no entity manager factory builder available");
+            throw new IOException("Failed to create entity manager: no entity manager factory builder available");
         }
         List<String> missingProperties = getMissingRequiredProperties(properties);
         if (missingProperties.size() > 0) {
-            throw new StorageException(MessageFormat.format(
+            throw new IOException(MessageFormat.format(
                     "Failed to create an entity manager: required persistence properties missing ({0})",
                     CollectionUtils.toString(missingProperties, ',')));
         }
@@ -207,11 +208,11 @@ public class EntityManagerServiceBase implements EntityManagerService {
         return instance;
     }
 
-    private EntityManager createEntityManager(EntityManagerFactory entityManagerFactory) throws StorageException {
+    private EntityManager createEntityManager(EntityManagerFactory entityManagerFactory) throws IOException {
         try {
             return entityManagerFactory.createEntityManager();
         } catch (IllegalStateException e) {
-            throw new StorageException(MessageFormat.format("Failed to create an entity manager using factory {0}",
+            throw new IOException(MessageFormat.format("Failed to create an entity manager using factory {0}",
                     entityManagerFactory.getClass()), e);
         }
     }
@@ -226,7 +227,7 @@ public class EntityManagerServiceBase implements EntityManagerService {
         return missing;
     }
 
-    private Map<String, Object> getConfiguredProperties(String jpaUnitName) throws StorageException {
+    private Map<String, Object> getConfiguredProperties(String jpaUnitName) {
         Map<String, Object> cachedProps = propertiesCache.get(jpaUnitName);
         if (cachedProps != null) {
             return cachedProps;

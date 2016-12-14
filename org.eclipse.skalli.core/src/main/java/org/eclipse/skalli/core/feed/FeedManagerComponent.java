@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.feed;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,7 +27,6 @@ import org.eclipse.skalli.services.feed.FeedManager;
 import org.eclipse.skalli.services.feed.FeedPersistenceService;
 import org.eclipse.skalli.services.feed.FeedProvider;
 import org.eclipse.skalli.services.feed.FeedUpdater;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
@@ -173,7 +173,7 @@ public class FeedManagerComponent implements FeedManager {
                                 setEntryId(entry);
                             }
                             feedPersistenceService.merge(entries);
-                        } catch (StorageException e) {
+                        } catch (IOException e) {
                             LOG.error(MessageFormat.format(
                                     "Failed to merge feed entries for project {0}",
                                     project.getProjectId()), e);

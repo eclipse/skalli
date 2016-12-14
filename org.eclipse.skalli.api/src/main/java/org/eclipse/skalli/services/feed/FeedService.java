@@ -10,11 +10,10 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.feed;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-
-import org.eclipse.skalli.services.persistence.StorageException;
 
 /**
  * Interface for a service that provides a timeline for a certain project, such as commits in a
@@ -39,9 +38,9 @@ public interface FeedService {
      * @return a list of timeline entries sorted by descending
      * {@link Entry#getPublished() publishing date}, or an empty list.
      *
-     * @throws StorageException if the method failed to retrieve the timeline entries.
+     * @throws IOException if an i/o error occured when retrieving timeline entries.
      */
-    public List<Entry> findEntries(UUID projectId, int maxResults) throws StorageException;
+    public List<Entry> findEntries(UUID projectId, int maxResults) throws IOException;
 
     /**
      * Returns up to <code>maxResult</code> timeline entries for a project coming
@@ -58,9 +57,9 @@ public interface FeedService {
      * @return a list of timeline entries ordered by descending
      * {@link Entry#getPublished() publishing date}, or an empty list.
      *
-     * @throws StorageException if the method failed to retrieve the timeline entries.
+     * @throws IOException if an i/o error occured when retrieving timeline entries.
      */
-    public List<Entry> findEntries(UUID projectId, Collection<String> sources, int maxResults) throws StorageException;
+    public List<Entry> findEntries(UUID projectId, Collection<String> sources, int maxResults) throws IOException;
 
     /**
      * Returns a list of sources of timeline entries this service can provide for a given project.
@@ -75,7 +74,7 @@ public interface FeedService {
      *
      * @return a list of source identifiers sorted alphanumerically, or an empty list.
      *
-     * @throws StorageException if the method failed to retrieve the sources.
+     * @throws IOException if an i/o error occured when listing sources.
      */
-    public List<String> findSources(UUID projectId) throws StorageException;
+    public List<String> findSources(UUID projectId) throws IOException;
 }

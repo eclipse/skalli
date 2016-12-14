@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
 
 /**
@@ -102,16 +101,12 @@ public class HashMapStorageService implements StorageService {
     }
 
     @Override
-    public void write(String category, String key, InputStream blob) throws StorageException {
-        try {
-            store.put(new Key(category, key), IOUtils.toByteArray(blob));
-        } catch (IOException e) {
-            throw new StorageException(e);
-        }
+    public void write(String category, String key, InputStream blob) throws IOException {
+        store.put(new Key(category, key), IOUtils.toByteArray(blob));
     }
 
     @Override
-    public InputStream read(String category, String key) throws StorageException {
+    public InputStream read(String category, String key) throws IOException {
         byte[] content = store.get(new Key(category, key));
         if (content == null) {
             return null;
@@ -122,13 +117,13 @@ public class HashMapStorageService implements StorageService {
     }
 
     @Override
-    public void archive(String category, String key) throws StorageException {
+    public void archive(String category, String key) throws IOException {
         //yet there is no way to read out the history again, so do nothing now
         return;
     }
 
     @Override
-    public List<String> keys(String category) throws StorageException {
+    public List<String> keys(String category) throws IOException {
         List<String> result = new ArrayList<String>();
         Set<Key> allKeys = store.keySet();
         for (Key key : allKeys) {

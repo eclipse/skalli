@@ -24,7 +24,6 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.skalli.services.BundleProperties;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
@@ -82,20 +81,12 @@ public class FileStorageComponent implements StorageService {
     }
 
     @Override
-   public void write(String category, String key, InputStream blob) throws StorageException {
+   public void write(String category, String key, InputStream blob) throws IOException {
         File file = getFile(category, key);
-        FileOutputStream fos;
+        FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(file);
-        } catch (FileNotFoundException e1) {
-            throw new StorageException("Failed to write " + getPath(category, key), e1);
-        }
-        try {
             IOUtils.copy(blob, fos);
-        } catch (FileNotFoundException e) {
-            throw new StorageException("Failed to write " + getPath(category, key), e);
-        } catch (IOException e) {
-            throw new StorageException("Failed to write " + getPath(category, key), e);
         } finally {
             IOUtils.closeQuietly(fos);
         }
@@ -109,7 +100,7 @@ public class FileStorageComponent implements StorageService {
     }
 
     @Override
-    public InputStream read(String category, String key) throws StorageException {
+    public InputStream read(String category, String key) throws IOException {
         File file = getFile(category, key);
         try {
             return new FileInputStream(file);
@@ -140,7 +131,7 @@ public class FileStorageComponent implements StorageService {
     }
 
     @Override
-    public List<String> keys(String category) throws StorageException {
+    public List<String> keys(String category) {
         List<String> list = new ArrayList<String>();
 
         File storageBaseEntityName = new File(storageBase, category);

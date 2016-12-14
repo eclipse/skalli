@@ -11,6 +11,7 @@
 
 package org.eclipse.skalli.view.ext.impl.internal.infobox;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +36,6 @@ import org.eclipse.skalli.services.feed.FeedManager;
 import org.eclipse.skalli.services.feed.FeedProvider;
 import org.eclipse.skalli.services.feed.FeedService;
 import org.eclipse.skalli.services.feed.FeedUpdater;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.view.component.FloatLayout;
 import org.eclipse.skalli.view.ext.ExtensionUtil;
 import org.eclipse.skalli.view.ext.InfoBox;
@@ -162,7 +162,7 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
     private List<String> getSources(Project project) {
         try {
             return feedService.findSources(project.getUuid());
-        } catch (StorageException e) {
+        } catch (IOException e) {
             LOG.error(MessageFormat.format("Failed to retrieve feed sources for project {0}",
                     project.getProjectId()), e);
         }
@@ -213,7 +213,7 @@ public class FeedInfoBox extends InfoBoxBase implements InfoBox {
                     addMoreButton(layout, project, userId, sourceFilter);
                 }
             }
-        } catch (StorageException e) {
+        } catch (IOException e) {
             LOG.error(MessageFormat.format("Failed to retrieve feed entries for project {0}",
                     project.getProjectId()), e);
         }

@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -318,28 +319,28 @@ public class EntityManagerServiceImplTest {
     }
 
     @Test
-    public void testGetEntityManagerReturnsConfiguredProps() throws StorageException {
+    public void testGetEntityManagerReturnsConfiguredProps() throws Exception {
         Map<String, Object> expectedProps = getDefaultPersistenceProperties();
         Map<String, Object> aktualProps = getPropertiesOfGetEntityManagerCall(expectedProps);
         assertPersistenceProperties(aktualProps);
     }
 
     @Test
-    public void testGetEntityManagerMissingConfigProperties() throws StorageException {
+    public void testGetEntityManagerMissingConfigProperties() throws Exception {
         for (String property: EntityManagerServiceBase.REQUIRED_PROPERTIES) {
             Map<String, Object> expectedProps = getDefaultPersistenceProperties();
             expectedProps.remove(property);
             try {
                 getPropertiesOfGetEntityManagerCall(expectedProps);
                 fail("StorageException expected due to missing property " + property);
-            } catch (StorageException e) {
+            } catch (IOException e) {
                 // expected
             }
         }
     }
 
     @Test
-    public void testGetEntityManagerFromInjectedFactory() throws StorageException {
+    public void testGetEntityManagerFromInjectedFactory() throws Exception {
         Hashtable<String, String> serviceProps = new Hashtable<String, String>();
         serviceProps.put("osgi.unit.name", TEST_JPA_UNIT_NAME);
 
@@ -362,13 +363,13 @@ public class EntityManagerServiceImplTest {
         assertLazyFactory(1000, 250, 1000);
     }
 
-    @Test(expected=StorageException.class)
+    @Test(expected=IOException.class)
     public void testGetEntityManagerLazyFactoryAppearsTooLate() throws Exception {
         // factory appears with delay of 250 millisecond, client is willing to wait for 100 millisecond only => failure
         assertLazyFactory(100, 250, 1000);
     }
 
-    @Test(expected=StorageException.class)
+    @Test(expected=IOException.class)
     public void testGetEntityManagerNoWait() throws Exception {
         // factory appears with delay of 10 milliseconds only, client is not willing to wait at all => failure
         assertLazyFactory(-1, 10, 1000);
@@ -437,7 +438,7 @@ public class EntityManagerServiceImplTest {
         assertThat(aktualProps.size(), is(5));
     }
 
-    private Map<String, Object> getPropertiesOfGetEntityManagerCall(Map<String, Object> expectedProps) throws StorageException {
+    private Map<String, Object> getPropertiesOfGetEntityManagerCall(Map<String, Object> expectedProps) throws IOException {
         EntityManagerServiceBase ems = new EntityManagerServiceBase() {
             @Override
             protected EntityManagerFactory locateEntityManagerFactory() {
@@ -515,7 +516,7 @@ public class EntityManagerServiceImplTest {
                 assertPersistenceProperties(aktualProps);
                 latchDone.countDown();
                 done = true;
-            } catch (StorageException e) {
+            } catch (IOException e) {
                 failure = e;
             } finally {
                 System.clearProperty(EntityManagerServiceBase.SKALLI_EMF_TIMEOUT);

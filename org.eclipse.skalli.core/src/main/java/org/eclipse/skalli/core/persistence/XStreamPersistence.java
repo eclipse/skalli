@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.persistence;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -39,7 +40,6 @@ import org.eclipse.skalli.services.entity.EntityService;
 import org.eclipse.skalli.services.extension.DataMigration;
 import org.eclipse.skalli.services.extension.MigrationException;
 import org.eclipse.skalli.services.extension.MigrationUtils;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,9 +73,9 @@ public class XStreamPersistence implements Issuer {
 
     public <T extends EntityBase> T loadEntity(EntityService<T> entityService, String key, Set<ClassLoader> classLoaders,
             Set<DataMigration> migrations, Map<String, Class<?>> aliases, Set<Converter> converters)
-            throws StorageException, MigrationException {
+            throws MigrationException, IOException {
         if (entityService == null) {
-            throw new StorageException(MessageFormat.format(
+            throw new IOException(MessageFormat.format(
                     "Could not load entity {0}: No corresponding entity service available", key));
         }
         Class<T> entityClass = entityService.getEntityClass();
@@ -101,7 +101,7 @@ public class XStreamPersistence implements Issuer {
 
     public <T extends EntityBase> List<T> loadEntities(EntityService<T> entityService, Set<ClassLoader> entityClassLoaders,
             Set<DataMigration> migrations, Map<String, Class<?>> aliases, Set<Converter> converters)
-            throws StorageException, MigrationException {
+            throws MigrationException, IOException {
         List<T> loadEntities = new ArrayList<T>();
         List<String> keys = storageService.keys(entityService.getEntityClass().getSimpleName());
         for (String key : keys) {
@@ -114,7 +114,7 @@ public class XStreamPersistence implements Issuer {
     }
 
     public void saveEntity(EntityService<?> entityService, EntityBase entity, String userId,
-            Map<String, Class<?>> aliases, Set<Converter> converters) throws StorageException, MigrationException {
+            Map<String, Class<?>> aliases, Set<Converter> converters) throws MigrationException, IOException {
 
         Class<? extends EntityBase> entityClass = entity.getClass();
         String category = entityClass.getSimpleName();
@@ -134,7 +134,7 @@ public class XStreamPersistence implements Issuer {
         try {
             is = XMLUtils.documentToStream(newDoc);
         } catch (TransformerException e) {
-            throw new StorageException(MessageFormat.format("Failed to transform entity {0} to XML", entity), e);
+            throw new IOException(MessageFormat.format("Failed to transform entity {0} to XML", entity), e);
         }
 
         storageService.write(category, key, is);
@@ -325,12 +325,12 @@ public class XStreamPersistence implements Issuer {
 
 
     private EntityBase domToEntity(Set<ClassLoader> entityClassLoaders, Map<String, Class<?>> aliases,
-            Set<Converter> converters, Document doc) throws StorageException {
+            Set<Converter> converters, Document doc) throws IOException {
         String xml = null;
         try {
             xml = XMLUtils.documentToString(doc);
         } catch (TransformerException e) {
-            throw new StorageException("Failed to transform XML to entity", e);
+            throw new IOException("Failed to transform XML to entity", e);
         }
         XStream xstream = IgnoreUnknownElementsXStream.getXStreamInstance(converters, entityClassLoaders, aliases);
         EntityBase entity = null;
@@ -343,19 +343,19 @@ public class XStreamPersistence implements Issuer {
     }
 
     private Document entityToDom(EntityBase entity, Map<String, Class<?>> aliases, Set<Converter> converters)
-            throws StorageException {
+            throws IOException {
         Document newDoc = null;
         try {
             XStream xstream = IgnoreUnknownElementsXStream.getXStreamInstance(converters, null, aliases);
             String xml = xstream.toXML(entity);
             newDoc = XMLUtils.documentFromString(xml);
         } catch (Exception e) {
-            throw new StorageException(MessageFormat.format("Failed to transform entity {0} to XML", entity), e);
+            throw new IOException(MessageFormat.format("Failed to transform entity {0} to XML", entity), e);
         }
         return newDoc;
     }
 
-    private Document getEntityAsDom(Class<? extends EntityBase> entityClass, String key) throws StorageException {
+    private Document getEntityAsDom(Class<? extends EntityBase> entityClass, String key) throws IOException {
         InputStream stream = storageService.read(entityClass.getSimpleName(), key);
         if (stream == null) {
             LOG.warn(MessageFormat.format("Storage services has no entity with key {0}", key));
@@ -366,7 +366,7 @@ public class XStreamPersistence implements Issuer {
         try {
             doc = XMLUtils.documentFromStream(stream);
         } catch (Exception e) {
-            throw new StorageException(MessageFormat.format(
+            throw new IOException(MessageFormat.format(
                     "Failed to convert stream to dom for entity {0} of type {1}", key, entityClass), e);
         }
         return doc;

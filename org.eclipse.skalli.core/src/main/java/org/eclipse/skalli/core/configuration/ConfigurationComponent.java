@@ -11,6 +11,7 @@
 package org.eclipse.skalli.core.configuration;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
@@ -29,7 +30,6 @@ import org.eclipse.skalli.services.configuration.ConfigurationService;
 import org.eclipse.skalli.services.configuration.EventConfigUpdate;
 import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.permit.Permits;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
@@ -167,7 +167,7 @@ public class ConfigurationComponent implements ConfigurationService {
         } catch (UnsupportedEncodingException e) {
             // should never happen for UTF-8
             throw new IllegalStateException(e);
-        } catch (StorageException e) {
+        } catch (IOException e) {
             LOG.error(MessageFormat.format("Failed to store configuration ''{0}''", storageKey), e);
         } finally {
             IOUtils.closeQuietly(is);
@@ -213,7 +213,7 @@ public class ConfigurationComponent implements ConfigurationService {
             LOG.error(MessageFormat.format(
                     "Failed to unmarshal configuration ''{0}'' ",
                     storageKey), e);
-        } catch (StorageException e) {
+        } catch (IOException e) {
             LOG.error(MessageFormat.format(
                     "Failed to retrieve configuration ''{0}''",
                     storageKey), e);
@@ -240,7 +240,7 @@ public class ConfigurationComponent implements ConfigurationService {
                     List<String> storageKeys = Collections.emptyList();
                     try {
                         storageKeys = storageService.keys(CATEGORY_CUSTOMIZATION);
-                    } catch (StorageException e) {
+                    } catch (IOException e) {
                         LOG.error("Failed to retrieve configuration keys", e);
                         return;
                     }

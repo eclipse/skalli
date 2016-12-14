@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.persistence;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashSet;
@@ -27,7 +28,6 @@ import org.eclipse.skalli.services.entity.EntityService;
 import org.eclipse.skalli.services.entity.EntityServices;
 import org.eclipse.skalli.services.extension.MigrationException;
 import org.eclipse.skalli.services.persistence.PersistenceService;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
@@ -142,7 +142,7 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
         try {
             xstreamPersistence.saveEntity(entityService, entity, userId,
                     getAliases(entityClass), getConverters(entityClass));
-        } catch (StorageException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (MigrationException e) {
             throw new RuntimeException(e);
@@ -181,7 +181,7 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
         try {
             entity = xstreamPersistence.loadEntity(entityService, uuid.toString(), getClassLoaders(entityClass),
                     getMigrations(entityClass), getAliases(entityClass), getConverters(entityClass));
-        } catch (StorageException e) {
+        } catch (IOException e) {
             LOG.warn(MessageFormat.format("Cannot load entity {0}/{1} of type {2}):",
                     entityClass, uuid, entityClass.getName()), e);
         } catch (MigrationException e) {
@@ -304,7 +304,7 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
             loadedEntities = xstreamPersistence.loadEntities(entityService,
                     getClassLoaders(entityClass), getMigrations(entityClass),
                     getAliases(entityClass), getConverters(entityClass));
-        } catch (StorageException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (MigrationException e) {
             throw new RuntimeException(e);

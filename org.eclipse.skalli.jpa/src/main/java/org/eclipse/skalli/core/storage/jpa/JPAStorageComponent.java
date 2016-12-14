@@ -11,6 +11,7 @@
 package org.eclipse.skalli.core.storage.jpa;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
@@ -24,7 +25,6 @@ import javax.persistence.TypedQuery;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.skalli.services.persistence.EntityManagerService;
 import org.eclipse.skalli.services.persistence.EntityManagerServiceBase;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
@@ -50,7 +50,7 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
     }
 
     @Override
-    public void write(String category, String id, InputStream blob) throws StorageException {
+    public void write(String category, String id, InputStream blob) throws IOException {
         EntityManager em = getEntityManager();
 
         em.getTransaction().begin();
@@ -69,14 +69,14 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
             }
             em.getTransaction().commit();
         } catch (Exception e) {
-            throw new StorageException("Failed to write data", e);
+            throw new IOException("Failed to write data", e);
         } finally {
             em.close();
         }
     }
 
     @Override
-    public InputStream read(String category, String id) throws StorageException {
+    public InputStream read(String category, String id) throws IOException {
         EntityManager em = getEntityManager();
 
         ByteArrayInputStream returnStream = null;
@@ -86,7 +86,7 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
                 returnStream = new ByteArrayInputStream(item.getContent().getBytes("UTF-8"));
             }
         } catch (UnsupportedEncodingException e) {
-            throw new StorageException("Failed to read data", e);
+            throw new IOException("Failed to read data", e);
         } finally {
             em.close();
         }
@@ -95,7 +95,7 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
     }
 
     @Override
-    public void archive(String category, String id) throws StorageException {
+    public void archive(String category, String id) throws IOException {
         EntityManager em = getEntityManager();
 
         try {
@@ -113,14 +113,14 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
             em.persist(histItem);
             em.getTransaction().commit();
         } catch (Exception e) {
-            throw new StorageException("Failed to archive data", e);
+            throw new IOException("Failed to archive data", e);
         } finally {
             em.close();
         }
     }
 
     @Override
-    public List<String> keys(String category) throws StorageException {
+    public List<String> keys(String category) throws IOException {
         EntityManager em = getEntityManager();
 
         List<String> resultList = new ArrayList<String>();
@@ -129,7 +129,7 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
             query.setParameter("category", category);
             resultList = query.getResultList();
         } catch (Exception e) {
-            throw new StorageException("Failed to retrieve IDs", e);
+            throw new IOException("Failed to retrieve IDs", e);
         } finally {
             em.close();
         }
@@ -137,7 +137,7 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
         return resultList;
     }
 
-    public List<HistoryStorageItem> getHistory(String category, String id) throws StorageException {
+    public List<HistoryStorageItem> getHistory(String category, String id) throws IOException {
         EntityManager em = getEntityManager();
 
         List<HistoryStorageItem> resultList;
@@ -148,7 +148,7 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
             query.setParameter("id", id);
             resultList = query.getResultList();
         } catch (Exception e) {
-            throw new StorageException("Failed to retrieve historical data", e);
+            throw new IOException("Failed to retrieve historical data", e);
         } finally {
             em.close();
         }
@@ -156,12 +156,12 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
         return resultList;
     }
 
-    private StorageItem findStorageItem(String category, String id, EntityManager em) throws StorageException {
+    private StorageItem findStorageItem(String category, String id, EntityManager em) throws IOException {
         StorageItem item;
         try {
             item = em.find(StorageItem.class, new StorageId(category, id));
         } catch (Exception e) {
-            throw new StorageException("Failed to find item", e);
+            throw new IOException("Failed to find item", e);
         }
         return item;
     }

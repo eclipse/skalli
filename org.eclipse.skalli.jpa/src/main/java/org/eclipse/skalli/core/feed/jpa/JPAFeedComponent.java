@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.feed.jpa;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +26,6 @@ import org.eclipse.skalli.commons.CollectionUtils;
 import org.eclipse.skalli.services.feed.Entry;
 import org.eclipse.skalli.services.feed.FeedService;
 import org.eclipse.skalli.services.persistence.EntityManagerServiceBase;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -50,13 +50,13 @@ public class JPAFeedComponent extends EntityManagerServiceBase implements FeedSe
     }
 
     @Override
-    public List<Entry> findEntries(UUID projectId, int maxResults) throws StorageException {
+    public List<Entry> findEntries(UUID projectId, int maxResults) throws IOException {
         return findEntries(projectId, null, maxResults);
     }
 
     @Override
     public List<Entry> findEntries(UUID projectId, Collection<String> sources, int maxResults)
-            throws StorageException {
+            throws IOException {
         if (projectId == null) {
             throw new IllegalArgumentException("argument 'projectId' must not be null");
         }
@@ -87,11 +87,11 @@ public class JPAFeedComponent extends EntityManagerServiceBase implements FeedSe
                 results = new ArrayList<Entry>();
             }
             tx.rollback();
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             if (tx != null && tx.isActive()) {
                 tx.rollback();
             }
-            throw new StorageException(MessageFormat.format(
+            throw new IOException(MessageFormat.format(
                     "Can''t find feed entries for project {0}", projectId.toString(), e));
         } finally {
             em.close();
@@ -100,7 +100,7 @@ public class JPAFeedComponent extends EntityManagerServiceBase implements FeedSe
     }
 
     @Override
-    public List<String> findSources(UUID projectId) throws StorageException {
+    public List<String> findSources(UUID projectId) throws IOException {
         if (projectId == null) {
             throw new IllegalArgumentException("argument 'projectId' must not be null");
         }
@@ -118,11 +118,11 @@ public class JPAFeedComponent extends EntityManagerServiceBase implements FeedSe
                 results = new ArrayList<String>();
             }
             tx.rollback();
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             if (tx != null && tx.isActive()) {
                 tx.rollback();
             }
-            throw new StorageException(MessageFormat.format(
+            throw new IOException(MessageFormat.format(
                     "Can''t find feed sources for project {0}", projectId.toString()), e);
         } finally {
             em.close();

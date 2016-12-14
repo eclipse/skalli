@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.commands;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -18,7 +19,6 @@ import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.skalli.commons.UUIDUtils;
 import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.persistence.PersistenceService;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.osgi.framework.Constants;
 
@@ -58,7 +58,7 @@ public class StorageCommand {
         List<String> keys;
         try {
             keys = source.keys(category);
-        } catch (StorageException e) {
+        } catch (IOException e) {
             intr.printStackTrace(e);
             return;
         }
@@ -85,7 +85,7 @@ public class StorageCommand {
                     noUUIDKeys.append(key);
                     noUUIDKeys.append("';");
                 }
-            } catch (StorageException e) {
+            } catch (IOException e) {
                 intr.printStackTrace(e);
             } finally {
                 IOUtils.closeQuietly(blob);

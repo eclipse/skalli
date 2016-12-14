@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.persistence;
 
+import java.io.IOException;
+
 import javax.persistence.EntityManager;
 
 public interface EntityManagerService {
@@ -19,8 +21,8 @@ public interface EntityManagerService {
      *
      * @return an entity manager instance, never <code>null</code>.
      *
-     * @throws StorageException
-     *             if no entity manager could be created.
+     * @throws IOException
+     *             if an i/o error occured when creating an entity manager.
      */
-    public EntityManager getEntityManager() throws StorageException;
+    public EntityManager getEntityManager() throws IOException;
 }

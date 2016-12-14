@@ -30,7 +30,6 @@ import org.eclipse.skalli.services.extension.rest.RestUtils;
 import org.eclipse.skalli.services.feed.Entry;
 import org.eclipse.skalli.services.feed.FeedService;
 import org.eclipse.skalli.services.permit.Permits;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.project.ProjectService;
 import org.jsoup.safety.Whitelist;
 import org.restlet.data.MediaType;
@@ -107,7 +106,7 @@ public class TimelineResource extends ResourceBase {
         try {
              entries = feedService.findEntries(project.getUuid(),
                      sources != null? CollectionUtils.asSet(sources) : null, count);
-        } catch (StorageException e) {
+        } catch (IOException e) {
             LOG.error(MessageFormat.format("Failed to retrieve timeline entries for {0}", project.getUuid()), e);
             setStatus(Status.SERVER_ERROR_INTERNAL);
             return null;

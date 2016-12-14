@@ -10,9 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.services.feed;
 
+import java.io.IOException;
 import java.util.Collection;
-
-import org.eclipse.skalli.services.persistence.StorageException;
 
 /**
  * Service to persist entries for a project timeline.
@@ -25,8 +24,9 @@ public interface FeedPersistenceService extends FeedFactory {
      * {@link Entry#getId() unique identifiers}, duplicates are rejected.
      *
      * @param entries  a collection of feed entries to merge.
-     * @throws StorageException  if the feed entries could not be merged.
+     *
+     * @throws IOException  if an i/o error occured when merging the entries.
      */
-    public void merge(Collection<FeedEntry> entries) throws StorageException;
+    public void merge(Collection<FeedEntry> entries) throws IOException;
 
 }

@@ -32,7 +32,6 @@ import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.persistence.PersistenceService;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.eclipse.skalli.services.search.SearchQuery;
 import org.restlet.data.Disposition;
@@ -118,7 +117,7 @@ public class ProjectBackupResource extends ResourceBase {
                 } else {
                     rejected.add(category);
                 }
-            } catch (StorageException e) {
+            } catch (IOException e) {
                 LOG.error(MessageFormat.format("Failed to retrieve keys for category {0} ({1})",
                         category, ERROR_ID_FAILED_TO_RETRIEVE_KEYS), e);
                 return createErrorRepresentation(Status.SERVER_ERROR_INTERNAL, ERROR_ID_FAILED_TO_RETRIEVE_KEYS ,
@@ -163,7 +162,7 @@ public class ProjectBackupResource extends ResourceBase {
                             }
                             try {
                                 storageService.write(category, key, zipStream);
-                            } catch (StorageException e) {
+                            } catch (IOException e) {
                                 LOG.error(MessageFormat.format(
                                         "Failed to store entity with key {0} and category {1} ({2})",
                                         key, category, ERROR_ID_FAILED_TO_STORE), e);
@@ -250,14 +249,12 @@ public class ProjectBackupResource extends ResourceBase {
                     }
                     write(category, out);
                 }
-            } catch (StorageException e) {
-                throw new IOException(e);
             } finally {
                 IOUtils.closeQuietly(out);
             }
         }
 
-        private void write(String category, ZipOutputStream out) throws StorageException, IOException {
+        private void write(String category, ZipOutputStream out) throws IOException {
             List<String> keys = storageService.keys(category);
             BufferedInputStream origin = null;
             for (String key: keys) {

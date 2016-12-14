@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.feed.jpa;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Collection;
 
@@ -19,7 +20,6 @@ import javax.persistence.EntityTransaction;
 import org.eclipse.skalli.services.feed.FeedEntry;
 import org.eclipse.skalli.services.feed.FeedPersistenceService;
 import org.eclipse.skalli.services.persistence.EntityManagerServiceBase;
-import org.eclipse.skalli.services.persistence.StorageException;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class JPAFeedPersistenceComponent extends EntityManagerServiceBase implem
     }
 
     @Override
-    public void merge(Collection<FeedEntry> entries) throws StorageException {
+    public void merge(Collection<FeedEntry> entries) throws IOException {
         for (FeedEntry entry : entries) {
             EntityManager em = getEntityManager();
             EntityTransaction tx = null;
@@ -53,11 +53,11 @@ public class JPAFeedPersistenceComponent extends EntityManagerServiceBase implem
                 tx.begin();
                 em.merge(entry);
                 tx.commit();
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 if (tx != null && tx.isActive()) {
                     tx.rollback();
                 }
-                throw new StorageException(MessageFormat.format("Failed to persist {0} ({1})",
+                throw new IOException(MessageFormat.format("Failed to persist {0} ({1})",
                         EntryJPA.class.getSimpleName(), entry.getProjectId().toString()), e);
             } finally {
                 em.close();

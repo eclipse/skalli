@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.testutil.feeds;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -26,7 +27,6 @@ import org.eclipse.skalli.services.feed.FeedPersistenceService;
 import org.eclipse.skalli.services.feed.FeedService;
 import org.eclipse.skalli.services.feed.Link;
 import org.eclipse.skalli.services.feed.Person;
-import org.eclipse.skalli.services.persistence.StorageException;
 
 /**
  * A simple HashMap Service implementing FeedService and FeedPersistenceService.
@@ -127,7 +127,6 @@ public class HashMapFeedService implements FeedService, FeedPersistenceService {
                     + ", published=" + published + ", author=" + author + ", projectId=" + projectId + ", source="
                     + source + "]";
         }
-
     }
 
     Map<String, Entry> entries = new HashMap<String, Entry>();
@@ -140,29 +139,20 @@ public class HashMapFeedService implements FeedService, FeedPersistenceService {
         return entries.values();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.skalli.api.java.feeds.FeedPersistenceService#createEntry()
-     */
     @Override
     public FeedEntry createEntry() {
         return new SimpleEntry();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.skalli.api.java.feeds.FeedPersistenceService#merge(java.util.Collection)
-     */
     @Override
-    public void merge(Collection<FeedEntry> newEntries) throws StorageException {
+    public void merge(Collection<FeedEntry> newEntries) throws IOException {
         for (Entry newEntry : newEntries) {
             this.entries.put(newEntry.getId(), newEntry);
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.skalli.api.java.feeds.FeedService#findEntries(java.util.UUID, int)
-     */
     @Override
-    public List<Entry> findEntries(UUID projectId, int maxResults) throws StorageException {
+    public List<Entry> findEntries(UUID projectId, int maxResults) throws IOException {
         List<Entry> result = new ArrayList<Entry>();
         Collection<Entry> values = entries.values();
         for (Entry entry : values) {
@@ -173,12 +163,9 @@ public class HashMapFeedService implements FeedService, FeedPersistenceService {
         return result;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.skalli.api.java.feeds.FeedService#findEntries(java.util.UUID, java.util.Collection, int)
-     */
     @Override
     public List<Entry> findEntries(UUID projectId, Collection<String> sources, int maxResults)
-            throws StorageException {
+            throws IOException {
         List<Entry> result = new ArrayList<Entry>();
         Collection<Entry> values = entries.values();
         for (Entry entry : values) {
@@ -191,11 +178,8 @@ public class HashMapFeedService implements FeedService, FeedPersistenceService {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.skalli.api.java.feeds.FeedService#findSources(java.util.UUID)
-     */
     @Override
-    public List<String> findSources(UUID projectId) throws StorageException {
+    public List<String> findSources(UUID projectId) throws IOException {
         TreeSet<String> sources = new TreeSet<String>();
         List<Entry> projectEntys = findEntries(projectId, -1);
         for (Entry entry : projectEntys) {
@@ -203,6 +187,4 @@ public class HashMapFeedService implements FeedService, FeedPersistenceService {
         }
         return new ArrayList<String>(sources);
     }
-
-
 }
