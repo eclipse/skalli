@@ -94,9 +94,9 @@ public class FileStorageComponent implements StorageService {
     }
 
     @Override
-    public void archive(String category, String key) {
+    public void archive(String category, String key) throws IOException {
         File oldEntityFile = getFile(category, key);
-        new Historian().historize(oldEntityFile, true);
+        new Historian(new File(storageBase, category)).historize(oldEntityFile);
     }
 
     @Override

@@ -26,31 +26,20 @@ public class HistorianTest {
 
     private File tmpDir;
     private File fileOrig;
-    private File file0;
-    private File file1;
     private File fileOther;
-    private File fileNext;
     private File fileHistory;
 
     @Before
     public void setup() throws Exception {
         tmpDir = TestUtils.createTempDir("HistorianTest");
 
-        fileOrig = new File(tmpDir.getAbsolutePath() + "/bla.xml");
+        fileOrig = new File(tmpDir, "bla.xml");
         FileUtils.writeStringToFile(fileOrig, "TEST CONTENT");
 
-        file0 = new File(tmpDir.getAbsolutePath() + "/bla.xml.0.history");
-        FileUtils.writeStringToFile(file0, "TEST CONTENT");
-
-        file1 = new File(tmpDir.getAbsolutePath() + "/bla.xml.1.HISTORY");
-        FileUtils.writeStringToFile(file1, "TEST CONTENT");
-
-        fileNext = new File(tmpDir.getAbsolutePath() + "/bla.xml.2.history");
-
-        fileOther = new File(tmpDir.getAbsolutePath() + "/blubb.xml");
+        fileOther = new File(tmpDir, "blubb.xml");
         FileUtils.writeStringToFile(fileOther, "TEST CONTENT");
 
-        fileHistory = new File(tmpDir.getAbsolutePath() + "/.history");
+        fileHistory = new File(tmpDir, ".history");
     }
 
     @After
@@ -61,44 +50,22 @@ public class HistorianTest {
     }
 
     @Test
-    public void testGetLastHistoryNumber() {
-        Historian h = new Historian();
-        int res = h.getLastHistoryNumber(fileOrig);
-        Assert.assertEquals(1, res);
-    }
-
-    @Test
-    public void testGetLastHistoryNumber_wrongFilename() {
-        Historian h = new Historian();
-        int res = h.getLastHistoryNumber(fileOther);
-        Assert.assertEquals(-1, res);
-    }
-
-    @Test
-    public void testHistorizeMultipleFiles() {
-        Historian h = new Historian();
-        Assert.assertFalse(fileNext.exists());
-        h.historize(fileOrig, false);
-        Assert.assertTrue(fileNext.exists());
-    }
-
-    @Test
     public void testHistorizeSingleFile() throws Exception {
-        Historian h = new Historian();
+        Historian h = new Historian(tmpDir);
         Assert.assertFalse(fileHistory.exists());
-        h.historize(fileOrig, true);
+        h.historize(fileOrig);
 
-        h = new Historian();
-        h.historize(fileOrig, true);
+        h = new Historian(tmpDir);
+        h.historize(fileOrig);
 
-        h = new Historian();
-        h.historize(fileOther, true);
+        h = new Historian(tmpDir);
+        h.historize(fileOther);
 
-        h = new Historian();
-        h.historize(fileOrig, true);
+        h = new Historian(tmpDir);
+        h.historize(fileOrig);
 
-        h = new Historian();
-        h.historize(fileOrig, true);
+        h = new Historian(tmpDir);
+        h.historize(fileOrig);
 
         Assert.assertTrue(fileHistory.exists());
         assertHistoryEntries(h, 5);
@@ -110,7 +77,7 @@ public class HistorianTest {
         int i = 0;
         HistoryIterator it = null;
         try {
-            it = h.getHistory();
+            it = h.getHistory(null);
             while (it.hasNext()) {
                 it.next();
                 ++i;
@@ -129,7 +96,6 @@ public class HistorianTest {
             while (it.hasNext()) {
                 HistoryEntry next = it.next();
                 Assert.assertEquals(id, next.getId());
-                Assert.assertEquals(i, next.getVersion());
                 Assert.assertEquals("TEST CONTENT", next.getContent());
                 Assert.assertTrue(next.getTimestamp() > 0);
                 ++i;
