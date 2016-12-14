@@ -80,7 +80,7 @@ public class XStreamPersistence implements Issuer {
         }
         Class<T> entityClass = entityService.getEntityClass();
         LOG.info(MessageFormat.format("Loading entity {0} of type {1}", key, entityClass));
-        Document doc = getEntityAsDom(entityClass, key);
+        Document doc = entityToDom(entityClass, key);
         if (doc == null) {
             return null;
         }
@@ -115,7 +115,6 @@ public class XStreamPersistence implements Issuer {
 
     public void saveEntity(EntityService<?> entityService, EntityBase entity, String userId,
             Map<String, Class<?>> aliases, Set<Converter> converters) throws MigrationException, IOException {
-
         Class<? extends EntityBase> entityClass = entity.getClass();
         String category = entityClass.getSimpleName();
         String key = entity.getUuid().toString();
@@ -127,7 +126,7 @@ public class XStreamPersistence implements Issuer {
         Document newDoc = entityToDom(entity, aliases, converters);
         mapInheritedExtensions(newDoc, byClassNames(aliases));
 
-        Document oldDoc = getEntityAsDom(entityClass, entity.getUuid().toString());
+        Document oldDoc = entityToDom(entityClass, entity.getUuid().toString());
         postProcessXML(newDoc, oldDoc, aliases, userId, entityService.getModelVersion());
 
         InputStream is;
@@ -355,7 +354,7 @@ public class XStreamPersistence implements Issuer {
         return newDoc;
     }
 
-    private Document getEntityAsDom(Class<? extends EntityBase> entityClass, String key) throws IOException {
+    private Document entityToDom(Class<? extends EntityBase> entityClass, String key) throws IOException {
         InputStream stream = storageService.read(entityClass.getSimpleName(), key);
         if (stream == null) {
             LOG.warn(MessageFormat.format("Storage services has no entity with key {0}", key));
