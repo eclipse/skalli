@@ -56,6 +56,26 @@ public interface StorageService {
     public void archive(String category, String key) throws IOException;
 
     /**
+     * Writes the given content to the archive
+     *
+     * @param category
+     * @param key
+     * @param blob
+     * @throws IOException if an i/o error occured while eriting to the archive.
+     */
+    public void writeToArchive(String category, String key, long timestamp, InputStream blob) throws IOException;
+
+    /**
+     * Provides all archived content for the given category and key to the specified consumer.
+     *
+     * @param category  category of archived items to provide.
+     * @param key  the unique key of the content within its category.
+     * @param consumer consumer for archived items.
+     * @throws IOException  if an i/o error occured while reading content from the store.
+     */
+    public void readFromArchive(String category, String key, StorageConsumer consumer) throws IOException;
+
+    /**
      * Returns the keys of storage entries for the given category.
      *
      * @param category  category or type of the content.

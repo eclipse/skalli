@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.eclipse.skalli.services.persistence.StorageConsumer;
 import org.eclipse.skalli.services.persistence.StorageService;
 
 /**
@@ -59,14 +60,24 @@ public class HashMapStorageService implements StorageService {
         StorageKey key = keyOf(category, id);
         ByteArrayStorageItem item = store.get(key);
         if (item != null) {
-            List<ByteArrayStorageItem> items = archive.get(key);
-            if (items == null) {
-                items = new ArrayList<ByteArrayStorageItem>();
-                archive.put(key, items);
-            }
-            items.add(new ByteArrayStorageItem(key, IOUtils.toByteArray(item.getContent())));
+            writeToArchive(key, System.currentTimeMillis(), item.getContent());
         }
         return;
+    }
+
+    @Override
+    public void writeToArchive(String category, String id, long timestamp, InputStream blob) throws IOException {
+        writeToArchive(keyOf(category, id), timestamp, blob);
+    }
+
+    @Override
+    public void readFromArchive(String category, String id, StorageConsumer consumer) throws IOException {
+        List<ByteArrayStorageItem> items = archive.get(keyOf(category, id));
+        if (items != null) {
+            for (ByteArrayStorageItem next: items) {
+                consumer.consume(category, next.getId(), next.lastModified(), next.getContent());
+            }
+        }
     }
 
     @Override
@@ -84,5 +95,14 @@ public class HashMapStorageService implements StorageService {
     @Override
     public String toString() {
         return "HashMapStorageService [blobStore=" + store + "]";
+    }
+
+    private void writeToArchive(StorageKey key, long timestamp, InputStream blob) throws IOException {
+        List<ByteArrayStorageItem> items = archive.get(key);
+        if (items == null) {
+            items = new ArrayList<ByteArrayStorageItem>();
+            archive.put(key, items);
+        }
+        items.add(new ByteArrayStorageItem(key, timestamp, IOUtils.toByteArray(blob)));
     }
 }

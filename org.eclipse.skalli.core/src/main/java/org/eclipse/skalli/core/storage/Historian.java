@@ -58,6 +58,24 @@ public class Historian {
         }
     }
 
+    void historize(String id, long timestamp, InputStream blob) throws IOException {
+        OutputStream out = null;
+        try {
+            byte[] buf = IOUtils.toByteArray(blob);
+            out = new BufferedOutputStream(new FileOutputStream(historyFile, historyFile.exists()));
+            String header = MessageFormat.format("{0}:{1}:{2}", //$NON-NLS-1$
+                    getNextEntryName(id), 
+                    Long.toString(buf.length),
+                    Long.toString(timestamp));
+            out.write(header.getBytes("UTF-8")); //$NON-NLS-1$
+            out.write(CRLF.getBytes("UTF-8")); //$NON-NLS-1$
+            out.write(buf);
+            out.write(CRLF.getBytes("UTF-8")); //$NON-NLS-1$
+        } finally {
+            IOUtils.closeQuietly(out);
+        }
+    }
+
     String getNextEntryName(String fileName) throws IOException {
         int count = 0;
         InputStream in = null;

@@ -69,5 +69,4 @@ public class StorageItem {
     public void setDateModified(Date dateModified) {
         this.dateModified = dateModified;
     }
-
 }

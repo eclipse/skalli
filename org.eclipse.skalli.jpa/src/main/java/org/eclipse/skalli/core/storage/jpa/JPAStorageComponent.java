@@ -13,18 +13,22 @@ package org.eclipse.skalli.core.storage.jpa;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.apache.commons.io.IOUtils;
+import org.eclipse.persistence.config.HintValues;
+import org.eclipse.persistence.config.QueryHints;
+import org.eclipse.persistence.queries.CursoredStream;
 import org.eclipse.skalli.services.persistence.EntityManagerService;
 import org.eclipse.skalli.services.persistence.EntityManagerServiceBase;
+import org.eclipse.skalli.services.persistence.StorageConsumer;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
@@ -34,6 +38,9 @@ import org.slf4j.LoggerFactory;
 public class JPAStorageComponent extends EntityManagerServiceBase implements EntityManagerService, StorageService {
 
     private static final Logger LOG = LoggerFactory.getLogger(JPAStorageComponent.class);
+
+    // page size for mass operations
+    private static final int PAGE_SIZE = 100;
 
     @Override
     protected void activate(ComponentContext context) {
@@ -52,7 +59,6 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
     @Override
     public void write(String category, String id, InputStream blob) throws IOException {
         EntityManager em = getEntityManager();
-
         em.getTransaction().begin();
         try {
             StorageItem item = findStorageItem(category, id, em);
@@ -61,15 +67,13 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
                 newItem.setId(id);
                 newItem.setCategory(category);
                 newItem.setDateModified(new Date());
-                newItem.setContent(IOUtils.toString(blob, "UTF-8"));
+                newItem.setContent(IOUtils.toString(blob, "UTF-8")); //$NON-NLS-1$
                 em.persist(newItem);
             } else { //update
                 item.setDateModified(new Date());
-                item.setContent(IOUtils.toString(blob, "UTF-8"));
+                item.setContent(IOUtils.toString(blob, "UTF-8")); //$NON-NLS-1$
             }
             em.getTransaction().commit();
-        } catch (Exception e) {
-            throw new IOException("Failed to write data", e);
         } finally {
             em.close();
         }
@@ -78,42 +82,79 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
     @Override
     public InputStream read(String category, String id) throws IOException {
         EntityManager em = getEntityManager();
-
         ByteArrayInputStream returnStream = null;
         try {
             StorageItem item = findStorageItem(category, id, em);
             if (item != null) {
-                returnStream = new ByteArrayInputStream(item.getContent().getBytes("UTF-8"));
+                returnStream = new ByteArrayInputStream(item.getContent().getBytes("UTF-8")); //$NON-NLS-1$
             }
-        } catch (UnsupportedEncodingException e) {
-            throw new IOException("Failed to read data", e);
         } finally {
             em.close();
         }
-
         return returnStream;
     }
 
     @Override
     public void archive(String category, String id) throws IOException {
         EntityManager em = getEntityManager();
-
         try {
             em.getTransaction().begin();
-
-            // find original StorageItem
             StorageItem item = findStorageItem(category, id, em);
             if (item == null) {
-                // nothing to archive
                 return;
             }
-
-            // write to HistoryStorage
-            HistoryStorageItem histItem = new HistoryStorageItem(item);
+            HistoryStorageItem histItem = new HistoryStorageItem();
+            histItem.setCategory(category);
+            histItem.setId(id);
+            histItem.setContent(item.getContent());
+            histItem.setDateCreated(new Date());
             em.persist(histItem);
             em.getTransaction().commit();
-        } catch (Exception e) {
-            throw new IOException("Failed to archive data", e);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void writeToArchive(String category, String id, long timestamp, InputStream blob) throws IOException {
+        EntityManager em = getEntityManager();
+        try {
+            em.getTransaction().begin();
+            HistoryStorageItem histItem = new HistoryStorageItem();
+            histItem.setCategory(category);
+            histItem.setId(id);
+            histItem.setContent(IOUtils.toString(blob, "UTF-8")); //$NON-NLS-1$
+            histItem.setDateCreated(new Date(timestamp));
+            em.persist(histItem);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public void readFromArchive(String category, String id, StorageConsumer consumer) throws IOException {
+        EntityManager em = getEntityManager();
+        try {
+            Query query = em.createNamedQuery("getItemsByCompositeKey", HistoryStorageItem.class); //$NON-NLS-1$
+            query.setHint(QueryHints.CURSOR, HintValues.TRUE);
+            query.setHint(QueryHints.CURSOR_INITIAL_SIZE, PAGE_SIZE);
+            query.setHint(QueryHints.CURSOR_PAGE_SIZE, PAGE_SIZE);
+            query.setParameter("category", category); //$NON-NLS-1$
+            query.setParameter("id", id); //$NON-NLS-1$
+            CursoredStream cursor = null;
+            try {
+                cursor = (CursoredStream) query.getSingleResult();
+                while (cursor.hasNext()) {
+                    HistoryStorageItem next = (HistoryStorageItem)cursor.next();
+                    consumer.consume(next.getCategory(), next.getId(), next.getDateCreated().getTime(),
+                            asStream(next.getContent()));
+                }
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
         } finally {
             em.close();
         }
@@ -122,47 +163,22 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
     @Override
     public List<String> keys(String category) throws IOException {
         EntityManager em = getEntityManager();
-
         List<String> resultList = new ArrayList<String>();
         try {
-            TypedQuery<String> query = em.createNamedQuery("getIdsByCategory", String.class);
-            query.setParameter("category", category);
+            TypedQuery<String> query = em.createNamedQuery("getIdsByCategory", String.class); //$NON-NLS-1$
+            query.setParameter("category", category); //$NON-NLS-1$
             resultList = query.getResultList();
-        } catch (Exception e) {
-            throw new IOException("Failed to retrieve IDs", e);
         } finally {
             em.close();
         }
-
         return resultList;
     }
 
-    public List<HistoryStorageItem> getHistory(String category, String id) throws IOException {
-        EntityManager em = getEntityManager();
-
-        List<HistoryStorageItem> resultList;
-        try {
-            TypedQuery<HistoryStorageItem> query = em.createNamedQuery("getItemsByCompositeKey",
-                    HistoryStorageItem.class);
-            query.setParameter("category", category);
-            query.setParameter("id", id);
-            resultList = query.getResultList();
-        } catch (Exception e) {
-            throw new IOException("Failed to retrieve historical data", e);
-        } finally {
-            em.close();
-        }
-
-        return resultList;
+    private static StorageItem findStorageItem(String category, String id, EntityManager em) {
+        return em.find(StorageItem.class, new StorageId(category, id));
     }
 
-    private StorageItem findStorageItem(String category, String id, EntityManager em) throws IOException {
-        StorageItem item;
-        try {
-            item = em.find(StorageItem.class, new StorageId(category, id));
-        } catch (Exception e) {
-            throw new IOException("Failed to find item", e);
-        }
-        return item;
+    private static InputStream asStream(String content) throws IOException {
+        return new ByteArrayInputStream(content.getBytes("UTF-8")); //$NON-NLS-1$
     }
 }

@@ -46,49 +46,35 @@ public class HistoryStorageItem {
     @Column(length = 100000)
     private String content;
 
-    public HistoryStorageItem() {
-        // just needed for JPA
-    }
-
-    /**
-     * Creates a HistoryStorageItem using the current date.
-     *
-     */
-    public HistoryStorageItem(StorageItem item) {
-        this.category = item.getCategory();
-        this.id = item.getId();
-        this.content = item.getContent();
-
-        this.dateCreated = new Date();
-    }
-
-    /**
-     * Creates a HistoryStorageItem using the supplied date.
-     *
-     */
-    public HistoryStorageItem(StorageItem item, Date dateCreated) {
-        this(item);
-
-        this.dateCreated = dateCreated;
-    }
-
-    public int getAutoId() {
-        return autoId;
-    }
-
     public String getCategory() {
         return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public String getId() {
         return id;
     }
 
-    public String getContent() {
-        return content;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Date getDateCreated() {
         return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }
