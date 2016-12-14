@@ -11,6 +11,7 @@
 package org.eclipse.skalli.commands;
 
 import static org.easymock.EasyMock.createMock;
+import static org.eclipse.skalli.testutil.StorageKey.keyOf;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -19,7 +20,6 @@ import java.util.Arrays;
 
 import org.eclipse.osgi.framework.console.CommandInterpreter;
 import org.eclipse.skalli.testutil.HashMapStorageService;
-import org.eclipse.skalli.testutil.HashMapStorageService.Key;
 import org.eclipse.skalli.testutil.TestUUIDs;
 import org.junit.Test;
 
@@ -43,10 +43,10 @@ public class StorageCommandTest {
 
         assertTrue(Arrays.equals(
                 TEST_CONTENT_1,
-                destination.asMap().get(new Key(CATEGORY_PROJECT, KEY_1))));
+                destination.asMap().get(keyOf(CATEGORY_PROJECT, KEY_1))));
         assertTrue(Arrays.equals(
                 TEST_CONTENT_2,
-                destination.asMap().get(new Key(CATEGORY_PROJECT, KEY_2))));
+                destination.asMap().get(keyOf(CATEGORY_PROJECT, KEY_2))));
     }
 
     private static byte[] getBytesUTF8(String s) {

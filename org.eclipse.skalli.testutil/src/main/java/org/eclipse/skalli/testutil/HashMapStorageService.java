@@ -10,13 +10,15 @@
  *******************************************************************************/
 package org.eclipse.skalli.testutil;
 
-import java.io.ByteArrayInputStream;
+import static org.eclipse.skalli.testutil.StorageKey.keyOf;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
@@ -29,104 +31,49 @@ import org.eclipse.skalli.services.persistence.StorageService;
 @SuppressWarnings("nls")
 public class HashMapStorageService implements StorageService {
 
-    public static class Key {
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((category == null) ? 0 : category.hashCode());
-            result = prime * result + ((key == null) ? 0 : key.hashCode());
-            return result;
+    private Map<StorageKey, ByteArrayStorageItem> store = new HashMap<StorageKey, ByteArrayStorageItem>();
+    private Map<StorageKey, List<ByteArrayStorageItem>> archive = new HashMap<StorageKey, List<ByteArrayStorageItem>>();
+
+    public Map<StorageKey, byte[]> asMap() {
+        Map<StorageKey, byte[]> result = new HashMap<StorageKey, byte[]>();
+        for (Entry<StorageKey, ByteArrayStorageItem> next: store.entrySet()) {
+            result.put(next.getKey(), next.getValue().toByteArray());
         }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            Key other = (Key) obj;
-            if (category == null) {
-                if (other.category != null) {
-                    return false;
-                }
-            } else if (!category.equalsIgnoreCase((other.category))) {
-                return false;
-            }
-            if (key == null) {
-                if (other.key != null) {
-                    return false;
-                }
-            } else if (!key.equals(other.key)) {
-                return false;
-            }
-            return true;
-        }
-
-        private String category;
-        private String key;
-
-        public String getCategory() {
-            return category;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public Key(String category, String key) {
-            this.category = category;
-            this.key = key;
-        }
-
-        /* (non-Javadoc)
-         * @see java.lang.Object#toString()
-         */
-        @Override
-        public String toString() {
-            return category + "/" + key; //$NON-NLS-1$
-        }
-
-    }
-
-    private Map<Key, byte[]> store = new HashMap<Key, byte[]>();
-
-    public Map<Key, byte[]> asMap() {
-        return store;
+        return result;
     }
 
     @Override
-    public void write(String category, String key, InputStream blob) throws IOException {
-        store.put(new Key(category, key), IOUtils.toByteArray(blob));
+    public void write(String category, String id, InputStream blob) throws IOException {
+        StorageKey key = keyOf(category, id);
+        store.put(key, new ByteArrayStorageItem(key, IOUtils.toByteArray(blob)));
     }
 
     @Override
-    public InputStream read(String category, String key) throws IOException {
-        byte[] content = store.get(new Key(category, key));
-        if (content == null) {
-            return null;
-        }
-        else {
-            return new ByteArrayInputStream(content);
-        }
+    public InputStream read(String category, String id) throws IOException {
+        ByteArrayStorageItem item = store.get(keyOf(category, id));
+        return item != null ? item.getContent() : null;
     }
 
     @Override
-    public void archive(String category, String key) throws IOException {
-        //yet there is no way to read out the history again, so do nothing now
+    public void archive(String category, String id) throws IOException {
+        StorageKey key = keyOf(category, id);
+        ByteArrayStorageItem item = store.get(key);
+        if (item != null) {
+            List<ByteArrayStorageItem> items = archive.get(key);
+            if (items == null) {
+                items = new ArrayList<ByteArrayStorageItem>();
+                archive.put(key, items);
+            }
+            items.add(new ByteArrayStorageItem(key, IOUtils.toByteArray(item.getContent())));
+        }
         return;
     }
 
     @Override
     public List<String> keys(String category) throws IOException {
         List<String> result = new ArrayList<String>();
-        Set<Key> allKeys = store.keySet();
-        for (Key key : allKeys) {
+        Set<StorageKey> allKeys = store.keySet();
+        for (StorageKey key : allKeys) {
             if (key.getCategory().equalsIgnoreCase(category)) {
                 result.add(key.getKey());
             }
@@ -138,6 +85,4 @@ public class HashMapStorageService implements StorageService {
     public String toString() {
         return "HashMapStorageService [blobStore=" + store + "]";
     }
-
-
 }

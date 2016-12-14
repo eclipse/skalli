@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.persistence;
 
+import static org.eclipse.skalli.testutil.StorageKey.keyOf;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.*;
 
@@ -34,7 +35,7 @@ import org.eclipse.skalli.core.xstream.NoopConverter;
 import org.eclipse.skalli.model.EntityBase;
 import org.eclipse.skalli.services.extension.DataMigration;
 import org.eclipse.skalli.testutil.HashMapStorageService;
-import org.eclipse.skalli.testutil.HashMapStorageService.Key;
+import org.eclipse.skalli.testutil.StorageKey;
 import org.eclipse.skalli.testutil.TestExtensibleEntityBase;
 import org.eclipse.skalli.testutil.TestExtensibleEntityEntityService;
 import org.eclipse.skalli.testutil.TestExtension;
@@ -90,13 +91,13 @@ public class XStreamPersistenceTest {
             super(new HashMapStorageService());
         }
 
-        private static Key getHashMapKeyForEntry(TestExtensibleEntityBase entity) {
-            return new HashMapStorageService.Key(TestExtensibleEntityBase.class.getSimpleName(),
+        private static StorageKey getStorageKey(TestExtensibleEntityBase entity) {
+            return keyOf(TestExtensibleEntityBase.class.getSimpleName(),
                     entity.getUuid().toString());
         }
 
         private byte[] getContentFromHashMap(TestExtensibleEntityBase entityKey) {
-            return ((HashMapStorageService) storageService).asMap().get(getHashMapKeyForEntry(entityKey));
+            return ((HashMapStorageService) storageService).asMap().get(getStorageKey(entityKey));
         }
 
         private Document getDocumentFromHashMap(TestExtensibleEntityBase entityKey) throws Exception {

@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.skalli.core.persistence;
 
+import static org.eclipse.skalli.testutil.StorageKey.keyOf;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -115,7 +117,7 @@ public class XStreamPersistenceComponentTest {
             Assert.assertNotNull(entity);
 
             byte[] blob = hashMapStorageService.asMap().get(
-                    new HashMapStorageService.Key(entity.getClass().getSimpleName(), entity.getUuid().toString()));
+                    keyOf(entity.getClass().getSimpleName(), entity.getUuid().toString()));
             Document doc = XMLUtils.documentFromString(new String(blob, "UTF-8"));
 
             // check that the extensible entity has been persisted with its default alias
