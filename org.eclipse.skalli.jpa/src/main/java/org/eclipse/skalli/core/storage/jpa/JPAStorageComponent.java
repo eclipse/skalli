@@ -95,6 +95,33 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
     }
 
     @Override
+    public void readAll(String category, StorageConsumer consumer) throws IOException {
+        EntityManager em = getEntityManager();
+        try {
+            Query query = em.createNamedQuery("getByCategory", StorageItem.class); //$NON-NLS-1$
+            query.setHint(QueryHints.CURSOR, HintValues.TRUE);
+            query.setHint(QueryHints.CURSOR_INITIAL_SIZE, PAGE_SIZE);
+            query.setHint(QueryHints.CURSOR_PAGE_SIZE, PAGE_SIZE);
+            query.setParameter("category", category); //$NON-NLS-1$
+            CursoredStream cursor = null;
+            try {
+                cursor = (CursoredStream) query.getSingleResult();
+                while (cursor.hasNext()) {
+                    StorageItem next = (StorageItem)cursor.next();
+                    consumer.consume(next.getCategory(), next.getId(), next.getDateModified().getTime(),
+                            asStream(next.getContent()));
+                }
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
     public void archive(String category, String id) throws IOException {
         EntityManager em = getEntityManager();
         try {

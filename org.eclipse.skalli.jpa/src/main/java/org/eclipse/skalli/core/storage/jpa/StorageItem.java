@@ -24,6 +24,7 @@ import javax.persistence.TemporalType;
 @IdClass(StorageId.class)
 @Table(name = "Storage")
 @NamedQueries({
+        @NamedQuery(name = "getByCategory", query = "SELECT r FROM StorageItem r WHERE r.category = :category"),
         @NamedQuery(name = "getIdsByCategory", query = "SELECT r.id FROM StorageItem r WHERE r.category = :category")
 })
 @Entity

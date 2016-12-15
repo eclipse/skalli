@@ -56,6 +56,13 @@ public class HashMapStorageService implements StorageService {
     }
 
     @Override
+    public void readAll(String category, StorageConsumer consumer) throws IOException {
+       for (ByteArrayStorageItem next: store.values()) {
+           consumer.consume(category, next.getId(), next.lastModified(), next.getContent());
+       }
+    }
+
+    @Override
     public void archive(String category, String id) throws IOException {
         StorageKey key = keyOf(category, id);
         ByteArrayStorageItem item = store.get(key);
