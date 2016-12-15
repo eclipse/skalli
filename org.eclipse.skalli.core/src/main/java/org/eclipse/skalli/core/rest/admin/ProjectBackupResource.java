@@ -13,6 +13,7 @@ package org.eclipse.skalli.core.rest.admin;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.HashSet;
@@ -33,6 +34,7 @@ import org.eclipse.skalli.services.Services;
 import org.eclipse.skalli.services.extension.rest.ResourceBase;
 import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.persistence.PersistenceService;
+import org.eclipse.skalli.services.persistence.StorageConsumer;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.eclipse.skalli.services.search.SearchQuery;
 import org.restlet.data.Disposition;
@@ -67,7 +69,7 @@ public class ProjectBackupResource extends ResourceBase {
 
     @SuppressWarnings("nls")
     private static final Set<String> CATEGORIES = CollectionUtils.asSet("customization", "Project", "Issues",
-            "Favorites", "User", "Group");
+            "Favorites", "User", "Group", "History");
 
     @Get
     public Representation backup() {
@@ -232,19 +234,21 @@ public class ProjectBackupResource extends ResourceBase {
         private StorageService storageService;
         private Set<String> included;
         private Set<String> excluded;
+        private boolean withHistory;
 
         public ZipOutputRepresentation(StorageService storageService, Set<String> included, Set<String> excluded) {
             super(MediaType.APPLICATION_ZIP);
             this.storageService = storageService;
             this.included = included;
             this.excluded = excluded;
+            this.withHistory = included.contains("History"); //$NON-NLS-1$
         }
 
         @Override
-        public void write(OutputStream paramOutputStream) throws IOException {
-            ZipOutputStream out = null;
+        public void write(OutputStream out) throws IOException {
+            ZipOutputStream zipStream = null;
             try {
-                out = new ZipOutputStream(new BufferedOutputStream(paramOutputStream));
+                zipStream = new ZipOutputStream(new BufferedOutputStream(out));
                 for (String category: CATEGORIES) {
                     // if there is an explicit include list, ensure that the
                     // category is contained in that list
@@ -256,29 +260,53 @@ public class ProjectBackupResource extends ResourceBase {
                     if (excluded.size() > 0 && excluded.contains(category)) {
                         continue;
                     }
-                    write(category, out);
+                    write(category, zipStream);
                 }
             } finally {
-                IOUtils.closeQuietly(out);
+                IOUtils.closeQuietly(zipStream);
             }
         }
 
-        private void write(String category, ZipOutputStream out) throws IOException {
+        private void write(String category, ZipOutputStream target) throws IOException {
             List<String> keys = storageService.keys(category);
-            BufferedInputStream origin = null;
             for (String key: keys) {
-                try {
-                    origin = new BufferedInputStream(storageService.read(category, key), BUFFER);
-                    ZipEntry entry = new ZipEntry(MessageFormat.format("{0}/{1}.xml", category, key)); //$NON-NLS-1$
-                    out.putNextEntry(entry);
-                    int count;
-                    byte data[] = new byte[BUFFER];
-                    while ((count = origin.read(data, 0, BUFFER)) != -1) {
-                        out.write(data, 0, count);
-                    }
-                } finally {
-                    IOUtils.closeQuietly(origin);
+                write(category, key, target);
+                if (withHistory) {
+                    writeHistory(category, key, target);
                 }
+            }
+        }
+
+        private void write(String category, String key, final ZipOutputStream target) throws IOException {
+            String entryName = MessageFormat.format("{0}/{1}.xml", category, key); //$NON-NLS-1$
+            write(entryName, storageService.read(category, key), target);
+        }
+
+        private void writeHistory(String category, String key, final ZipOutputStream target) throws IOException {
+            storageService.readFromArchive(category, key, new StorageConsumer() {
+                @Override
+                public void consume(String category, String key, long lastModified, InputStream blob)
+                        throws IOException {
+                    String entryName = MessageFormat.format("{0}/{1}_{2}.xml", //$NON-NLS-1$
+                            category, key, Long.toString(lastModified));
+                    write(entryName, blob, target);
+                }
+            });
+        }
+
+        private void write(String entryName, InputStream blob, ZipOutputStream target) throws IOException {
+            BufferedInputStream source = null;
+            try {
+                source = new BufferedInputStream(blob, BUFFER);
+                ZipEntry entry = new ZipEntry(entryName);
+                target.putNextEntry(entry);
+                int count;
+                byte data[] = new byte[BUFFER];
+                while ((count = source.read(data, 0, BUFFER)) != -1) {
+                    target.write(data, 0, count);
+                }
+            } finally {
+                IOUtils.closeQuietly(source);
             }
         }
     }
