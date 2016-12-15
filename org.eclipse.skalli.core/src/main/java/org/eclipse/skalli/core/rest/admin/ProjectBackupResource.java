@@ -25,6 +25,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.commons.ThreadPool;
 import org.eclipse.skalli.core.storage.FileStorageComponent;
 import org.eclipse.skalli.services.BundleProperties;
 import org.eclipse.skalli.services.ServiceFilter;
@@ -186,11 +187,19 @@ public class ProjectBackupResource extends ResourceBase {
         }
 
         // ensure that the persistence service attached to the storage
-        // refreshes all caches and reloads all entities
-        PersistenceService persistenceService = Services.getService(PersistenceService.class);
-        if (persistenceService != null) {
-            persistenceService.refreshAll();
-        }
+        // refreshes all caches and reloads all entities --- do that
+        // in the background, otherwise we might run into timeouts
+        ThreadPool.submit(new Runnable() {
+            @Override
+            public void run() {
+                PersistenceService persistenceService = Services.getService(PersistenceService.class);
+                if (persistenceService != null) {
+                    LOG.info("Refreshing all caches");
+                    persistenceService.refreshAll();
+                }
+            }
+        });
+
         setStatus(Status.SUCCESS_NO_CONTENT);
         return null;
     }
