@@ -81,12 +81,12 @@ public class ProjectBackupResource extends ResourceBase {
         if (storageService == null) {
             return createServiceUnavailableRepresentation(ERROR_ID_NO_STORAGE_SERVICE, "Storage Service");
         }
-        Set<String> included = getCategories(INCLUDE_PARAM);
-        Set<String> excluded = getCategories(EXCLUDE_PARAM);
-        ZipOutputRepresentation zipRepresentation = new ZipOutputRepresentation(storageService, included, excluded);
+        Set<String> categories = getCategories();
+        ZipOutputRepresentation zipRepresentation = new ZipOutputRepresentation(storageService, categories);
         Disposition disposition = new Disposition(Disposition.TYPE_ATTACHMENT);
         disposition.setFilename(FILE_NAME);
         zipRepresentation.setDisposition(disposition);
+        setStatus(Status.SUCCESS_OK);
         return zipRepresentation;
     }
 
@@ -101,30 +101,25 @@ public class ProjectBackupResource extends ResourceBase {
             return createServiceUnavailableRepresentation(ERROR_ID_NO_STORAGE_SERVICE, "Storage Service");
         }
 
-        String action = getQuery().getValues(ACTION_PARAM);
-        Set<String> included = getCategories(INCLUDE_PARAM);
-        Set<String> excluded = getCategories(EXCLUDE_PARAM);
+        String action = getQueryAttribute(ACTION_PARAM);
+        Set<String> categories = getCategories();
 
         Set<String> accepted = new HashSet<String>();
         Set<String> rejected = new HashSet<String>();
         for (String category: CATEGORIES) {
-            if (included.size() > 0 && !included.contains(category)) {
-                continue;
-            }
-            if (excluded.size() > 0 && excluded.contains(category)) {
-                continue;
-            }
-            try {
-                if (ACTION_OVERWRITE.equals(action) || storageService.keys(category).isEmpty()) {
-                    accepted.add(category);
-                } else {
-                    rejected.add(category);
+            if (categories.contains(category)) {
+                try {
+                    if (ACTION_OVERWRITE.equals(action) || storageService.keys(category).isEmpty()) {
+                        accepted.add(category);
+                    } else {
+                        rejected.add(category);
+                    }
+                } catch (IOException e) {
+                    LOG.error(MessageFormat.format("Failed to retrieve keys for category {0} ({1})",
+                            category, ERROR_ID_FAILED_TO_RETRIEVE_KEYS), e);
+                    return createErrorRepresentation(Status.SERVER_ERROR_INTERNAL, ERROR_ID_FAILED_TO_RETRIEVE_KEYS ,
+                            "Failed to store the attached backup resource");
                 }
-            } catch (IOException e) {
-                LOG.error(MessageFormat.format("Failed to retrieve keys for category {0} ({1})",
-                        category, ERROR_ID_FAILED_TO_RETRIEVE_KEYS), e);
-                return createErrorRepresentation(Status.SERVER_ERROR_INTERNAL, ERROR_ID_FAILED_TO_RETRIEVE_KEYS ,
-                        "Failed to store the attached backup resource");
             }
         }
         if (rejected.size() > 0) {
@@ -132,7 +127,7 @@ public class ProjectBackupResource extends ResourceBase {
                     Status.CLIENT_ERROR_PRECONDITION_FAILED,
                     ERROR_ID_OVERWRITE_EXISTING_DATA,
                     MessageFormat.format(
-                            "Restore might overwrite existing project data in the folling categories:\n{0}\n" +
+                            "Restore might overwrite existing data in the folling categories:\n{0}\n" +
                             "Either exclude these categories from the restore with a \"exclude=<comma-separated-list>\" " +
                             "parameter or enforce the restore with \"action=overwrite\".",
                              CollectionUtils.toString(rejected, '\n')));
@@ -206,13 +201,24 @@ public class ProjectBackupResource extends ResourceBase {
         return null;
     }
 
-    private Set<String> getCategories(String paramId) {
-        String[] categories = null;
-        String ignoreAttribute = getQuery().getValues(paramId);
-        if (ignoreAttribute != null) {
-            categories = StringUtils.split(ignoreAttribute, SearchQuery.PARAM_LIST_SEPARATOR);
+    /**
+     * Start with a result set that contains all entries from CATEGORIES,
+     * except if there is an include list; in this case start with an empty
+     * result set. Then first add all categories contained in the include list
+     * and remove afterwards all entries contained in the exclude list.
+     */
+    private Set<String> getCategories() {
+        Set<String> categories = new HashSet<String>(CATEGORIES);
+        Set<String> include = CollectionUtils.asSet(StringUtils.split(getQueryAttribute(INCLUDE_PARAM),
+                SearchQuery.PARAM_LIST_SEPARATOR));
+        Set<String> exclude = CollectionUtils.asSet(StringUtils.split(getQueryAttribute(EXCLUDE_PARAM),
+                SearchQuery.PARAM_LIST_SEPARATOR));
+        if (!include.isEmpty()) {
+            categories.removeAll(CATEGORIES);
         }
-        return CollectionUtils.asSet(categories);
+        categories.addAll(include);
+        categories.removeAll(exclude);
+        return categories;
     }
 
     private StorageService getStorageService() {
@@ -232,16 +238,14 @@ public class ProjectBackupResource extends ResourceBase {
         private static final int BUFFER = 2048;
 
         private StorageService storageService;
-        private Set<String> included;
-        private Set<String> excluded;
+        private Set<String> categories;
         private boolean withHistory;
 
-        public ZipOutputRepresentation(StorageService storageService, Set<String> included, Set<String> excluded) {
+        public ZipOutputRepresentation(StorageService storageService, Set<String> categories) {
             super(MediaType.APPLICATION_ZIP);
             this.storageService = storageService;
-            this.included = included;
-            this.excluded = excluded;
-            this.withHistory = included.contains("History"); //$NON-NLS-1$
+            this.categories = categories;
+            this.withHistory = categories.contains("History"); //$NON-NLS-1$
         }
 
         @Override
@@ -250,18 +254,11 @@ public class ProjectBackupResource extends ResourceBase {
             try {
                 zipStream = new ZipOutputStream(new BufferedOutputStream(out));
                 for (String category: CATEGORIES) {
-                    // if there is an explicit include list, ensure that the
-                    // category is contained in that list
-                    if (included.size() > 0 && !included.contains(category)) {
-                        continue;
+                    if (categories.contains(category)) {
+                        write(category, zipStream);
                     }
-                    // if there is an explicit exclude list, ensure that the
-                    // category is not contained in that list
-                    if (excluded.size() > 0 && excluded.contains(category)) {
-                        continue;
-                    }
-                    write(category, zipStream);
                 }
+                zipStream.flush();
             } finally {
                 IOUtils.closeQuietly(zipStream);
             }
