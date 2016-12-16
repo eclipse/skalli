@@ -25,7 +25,9 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
+import org.eclipse.skalli.commons.FormatUtils;
 import org.eclipse.skalli.commons.ThreadPool;
 import org.eclipse.skalli.core.storage.FileStorageComponent;
 import org.eclipse.skalli.services.BundleProperties;
@@ -136,7 +138,10 @@ public class ProjectBackupResource extends ResourceBase {
             setStatus(Status.SUCCESS_NO_CONTENT);
             return null;
         }
+        boolean withHistory = accepted.contains("History"); //$NON-NLS-1$
 
+        int countItems = 0;
+        int countHistoryItems = 0;
         ZipInputStream zipStream = null;
         try {
             zipStream = new ZipInputStream(entity.getStream());
@@ -150,22 +155,42 @@ public class ProjectBackupResource extends ResourceBase {
                             LOG.info(MessageFormat.format("Restore: {0} is not recognized as entity key", entryName));
                             continue;
                         }
+                        String category = parts[0];
+                        String name = parts[1];
+                        if (name.endsWith(".xml")) { //$NON-NLS-1$
+                            name = name.substring(0, name.length() - 4);
+                        };
+                        String[] nameParts = StringUtils.split(name, '_');
+                        String key = nameParts[0];
+                        long timestamp = NumberUtils.toLong(nameParts.length == 2 ? nameParts[1] : null, -1L);
+
                         // ensure that the category of the entry, i.e. the directory name,
                         // is in the set of accepted categories
-                        String category = parts[0];
-                        String key = parts[1];
                         if (accepted.contains(category)) {
-                            if (key.endsWith(".xml")) { //$NON-NLS-1$
-                                key = key.substring(0, key.length() - 4);
-                            }
-                            try {
-                                storageService.write(category, key, zipStream);
-                            } catch (IOException e) {
-                                LOG.error(MessageFormat.format(
-                                        "Failed to store entity with key {0} and category {1} ({2})",
-                                        key, category, ERROR_ID_FAILED_TO_STORE), e);
-                                return createErrorRepresentation(Status.SERVER_ERROR_INTERNAL, ERROR_ID_FAILED_TO_STORE,
-                                        "Failed to store the attached backup");
+                            if (timestamp < 0) {
+                                try {
+                                    storageService.write(category, key, zipStream);
+                                    ++countItems;
+                                } catch (IOException e) {
+                                    LOG.error(MessageFormat.format(
+                                            "Failed to store entity with key {0} and category {1} ({2})",
+                                            key, category, ERROR_ID_FAILED_TO_STORE), e);
+                                    return createErrorRepresentation(Status.SERVER_ERROR_INTERNAL, ERROR_ID_FAILED_TO_STORE,
+                                            "Failed to store the attached backup");
+                                }
+                            } else if (withHistory) {
+                                try {
+                                    storageService.writeToArchive(category, key, timestamp, zipStream);
+                                    ++countHistoryItems;
+                                } catch (IOException e) {
+                                    LOG.error(MessageFormat.format(
+                                            "Failed to store history entry for timestamp {0} with key {1} and category {2} ({3})",
+                                            FormatUtils.formatUTCWithMillis(timestamp), key, category,
+                                            ERROR_ID_FAILED_TO_STORE), e);
+                                    return createErrorRepresentation(Status.SERVER_ERROR_INTERNAL,
+                                            ERROR_ID_FAILED_TO_STORE,
+                                            "Failed to store the attached backup");
+                                }
                             }
                         } else {
                             LOG.info(MessageFormat.format("Restore: Excluded {0} (category ''{1}'' not accepted)",
@@ -181,6 +206,9 @@ public class ProjectBackupResource extends ResourceBase {
             return createIOErrorRepresentation(ERROR_ID_IO_ERROR, e);
         } finally {
             IOUtils.closeQuietly(zipStream);
+        }
+        if (LOG.isInfoEnabled()) {
+            LOG.info(MessageFormat.format("Restored {0} items and {1} history items", countItems, countHistoryItems));
         }
 
         // ensure that the persistence service attached to the storage

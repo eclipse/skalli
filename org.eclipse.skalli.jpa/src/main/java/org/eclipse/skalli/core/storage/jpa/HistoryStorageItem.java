@@ -18,6 +18,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
@@ -27,7 +28,10 @@ import javax.persistence.TemporalType;
 import org.eclipse.persistence.annotations.Index;
 
 @Table(name = "HistoryStorage")
-@NamedQuery(name = "getItemsByCompositeKey", query = "SELECT r FROM HistoryStorageItem r WHERE r.category = :category AND r.id = :id")
+@NamedQueries({
+    @NamedQuery(name = "getItemsByCompositeKey", query = "SELECT r FROM HistoryStorageItem r WHERE r.category = :category AND r.id = :id"),
+    @NamedQuery(name = "getItemByTimestamp", query = "SELECT r FROM HistoryStorageItem r WHERE r.category = :category AND r.id = :id AND r.dateCreated = :dateCreated")
+})
 @Entity
 public class HistoryStorageItem {
     @Id
@@ -43,7 +47,6 @@ public class HistoryStorageItem {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreated;
     @Lob
-    @Column(length = 100000)
     private String content;
 
     public String getCategory() {

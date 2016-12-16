@@ -147,12 +147,17 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
         EntityManager em = getEntityManager();
         try {
             em.getTransaction().begin();
-            HistoryStorageItem histItem = new HistoryStorageItem();
-            histItem.setCategory(category);
-            histItem.setId(id);
-            histItem.setContent(IOUtils.toString(blob, "UTF-8")); //$NON-NLS-1$
-            histItem.setDateCreated(new Date(timestamp));
-            em.persist(histItem);
+            HistoryStorageItem item = findHistoryItem(category, id, timestamp, em);
+            if (item == null) {
+                HistoryStorageItem newItem = new HistoryStorageItem();
+                newItem.setCategory(category);
+                newItem.setId(id);
+                newItem.setContent(IOUtils.toString(blob, "UTF-8")); //$NON-NLS-1$
+                newItem.setDateCreated(new Date(timestamp));
+                em.persist(newItem);
+            } else {
+                item.setContent(IOUtils.toString(blob, "UTF-8")); //$NON-NLS-1$
+            }
             em.getTransaction().commit();
         } finally {
             em.close();
@@ -203,6 +208,18 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
 
     private static StorageItem findStorageItem(String category, String id, EntityManager em) {
         return em.find(StorageItem.class, new StorageId(category, id));
+    }
+
+    private static HistoryStorageItem findHistoryItem(String category, String id, long timestamp, EntityManager em) {
+        TypedQuery<HistoryStorageItem> query = em.createNamedQuery("getItemByTimestamp", HistoryStorageItem.class); //$NON-NLS-1$
+        query.setParameter("category", category); //$NON-NLS-1$
+        query.setParameter("id", id); //$NON-NLS-1$
+        query.setParameter("dateCreated", new Date(timestamp)); //$NON-NLS-1$
+        List<HistoryStorageItem> resultList = query.getResultList();
+        if (resultList.size() > 1) {
+            throw new IllegalStateException();
+        }
+        return resultList.isEmpty() ? null : resultList.get(0);
     }
 
     private static InputStream asStream(String content) throws IOException {

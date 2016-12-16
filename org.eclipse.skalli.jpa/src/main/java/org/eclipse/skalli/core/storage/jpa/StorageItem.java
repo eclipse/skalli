@@ -10,7 +10,6 @@ package org.eclipse.skalli.core.storage.jpa;
 
 import java.util.Date;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
@@ -34,7 +33,6 @@ public class StorageItem {
     @Id
     private String id;
     @Lob
-    @Column(length = 100000)
     private String content;
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateModified;
