@@ -115,12 +115,17 @@ public class FileStorageComponent implements StorageService {
     }
 
     @Override
+    public void read(String category, String key, StorageConsumer consumer) throws IOException {
+        File file = getFile(category, key);
+        if (file.exists() && file.isFile()) {
+            consumer.consume(category, key, file.lastModified(), toStream(file));
+        }
+    }
+
+    @Override
     public void readAll(String category, StorageConsumer consumer) throws IOException {
         for (String key: keys(category)) {
-            File file = getFile(category, key);
-            if (file.exists() && file.isFile()) {
-                consumer.consume(category, key, file.lastModified(), toStream(file));
-            }
+            read(category, key, consumer);
         }
     }
 

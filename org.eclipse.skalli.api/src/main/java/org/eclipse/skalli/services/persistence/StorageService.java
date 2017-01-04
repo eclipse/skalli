@@ -46,6 +46,15 @@ public interface StorageService {
      */
     public InputStream read(String category, String key) throws IOException;
 
+    /** Reads the content specified by its category and key from the storage.
+     *
+     * @param category  category or type of the content.
+     * @param key  the unique key of the content within its category.
+     * @param consumer consumer for the content.
+     * @throws IOException  if an i/o error occured while reading content from the store.
+     */
+    public void read(String category, String key, StorageConsumer consumer) throws IOException;
+
     /**
      * Provides all stored content for the given category to the specified consumer.
      *

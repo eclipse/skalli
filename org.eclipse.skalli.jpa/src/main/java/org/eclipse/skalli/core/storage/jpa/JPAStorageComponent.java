@@ -95,6 +95,20 @@ public class JPAStorageComponent extends EntityManagerServiceBase implements Ent
     }
 
     @Override
+    public void read(String category, String id, StorageConsumer consumer) throws IOException {
+        EntityManager em = getEntityManager();
+        try {
+            StorageItem item = findStorageItem(category, id, em);
+            if (item != null) {
+                consumer.consume(item.getCategory(), item.getId(), item.getDateModified().getTime(),
+                        asStream(item.getContent()));
+            }
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
     public void readAll(String category, StorageConsumer consumer) throws IOException {
         EntityManager em = getEntityManager();
         try {
