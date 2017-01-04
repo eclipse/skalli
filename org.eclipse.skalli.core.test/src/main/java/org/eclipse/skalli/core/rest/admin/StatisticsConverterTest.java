@@ -37,7 +37,7 @@ public class StatisticsConverterTest {
     @Before
     public void setup() throws Exception {
         writer = new StringBufferHierarchicalStreamWriter();
-        converter = new StatisticsConverter("http://localhost", new StatisticsQuery(new HashMap<String,String>()));
+        converter = new StatisticsConverter("http://localhost", new BackupQuery(new HashMap<String,String>()));
     }
 
     @Test

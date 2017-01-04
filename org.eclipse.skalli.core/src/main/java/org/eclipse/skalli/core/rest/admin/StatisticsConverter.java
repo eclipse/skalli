@@ -45,9 +45,9 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
     public static final String API_VERSION = "1.0"; //$NON-NLS-1$
     public static final String NAMESPACE = "http://www.eclipse.org/skalli/2010/API/Admin"; //$NON-NLS-1$
 
-    private final StatisticsQuery query;
+    private final BackupQuery query;
 
-    public StatisticsConverter(StatisticsQuery query) {
+    public StatisticsConverter(BackupQuery query) {
         super(Statistics.class);
         this.query = query;
     }
@@ -434,7 +434,7 @@ class StatisticsConverter extends RestConverterBase<Statistics> {
     }
 
     @Deprecated
-    public StatisticsConverter(String host, StatisticsQuery query) {
+    public StatisticsConverter(String host, BackupQuery query) {
         super(Statistics.class, "statistics", host); //$NON-NLS-1$
         this.query = query;
     }

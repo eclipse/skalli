@@ -21,7 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.eclipse.skalli.commons.CollectionUtils;
 
-public class StatisticsQuery {
+public class BackupQuery {
 
     public static final String PARAM_ALL = "all"; //$NON-NLS-1$
     public static final String PARAM_PERIOD = "period"; //$NON-NLS-1$
@@ -40,15 +40,12 @@ public class StatisticsQuery {
     private Set<String> excluded;
     private Set<String> filters;
 
-    public StatisticsQuery(Map<String, String> params)  {
+    public BackupQuery(Map<String, String> params)  {
         this(params, System.currentTimeMillis());
     }
 
-    StatisticsQuery(Map<String, String> params, long now)  {
-        if (params.containsKey(PARAM_ALL)) {
-            from = 0;
-            to = 0;
-        } else {
+    BackupQuery(Map<String, String> params, long now)  {
+        if (!params.containsKey(PARAM_ALL)) {
             period = Math.abs(getTimeInterval(params.get(PARAM_PERIOD)));
             from = parseDateTime(params.get(PARAM_FROM), now);
             to = parseDateTime(params.get(PARAM_TO), now);
@@ -67,6 +64,9 @@ public class StatisticsQuery {
             if (from > to) {
                 from = to;
             }
+        } else { // all
+            from = 0;
+            to = 0;
         }
 
         included =  CollectionUtils.asSet(StringUtils.split(params.get(PARAM_INCLUDE), ','));
@@ -155,5 +155,9 @@ public class StatisticsQuery {
 
     public boolean showByFilter(String filterName) {
         return filters.isEmpty() || filters.contains(filterName);
+    }
+
+    public boolean inRange(long timestamp) {
+        return (from <= 0 || from <=  timestamp) && (to <= 0 || timestamp <= to);
     }
 }

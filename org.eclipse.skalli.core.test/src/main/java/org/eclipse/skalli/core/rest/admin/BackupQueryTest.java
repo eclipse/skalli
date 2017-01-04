@@ -24,7 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 @SuppressWarnings("nls")
-public class StatisticsQueryTest {
+public class BackupQueryTest {
 
     @Test
     public void testPeriod() throws Exception {
@@ -71,7 +71,7 @@ public class StatisticsQueryTest {
 
     private void assertPeriodQuery(String period, int value, TimeUnit unit) {
         long now = System.currentTimeMillis();
-        StatisticsQuery query = new StatisticsQuery(getParams(null, null, period), now);
+        BackupQuery query = new BackupQuery(getParams(null, null, period), now);
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(value, unit), query.getFrom());
         Assert.assertEquals(now, query.getTo());
     }
@@ -83,7 +83,7 @@ public class StatisticsQueryTest {
         long fromMillis = now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS);
         cal.setTimeInMillis(fromMillis);
         String fromStr = DatatypeConverter.printDateTime(cal);
-        StatisticsQuery query = new StatisticsQuery(getParams(fromStr, null, null), now);
+        BackupQuery query = new BackupQuery(getParams(fromStr, null, null), now);
         Assert.assertEquals(fromMillis, query.getFrom());
         Assert.assertEquals(now, query.getTo());
     }
@@ -95,7 +95,7 @@ public class StatisticsQueryTest {
         long toMillis = now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS);
         cal.setTimeInMillis(toMillis);
         String toStr = DatatypeConverter.printDateTime(cal);
-        StatisticsQuery query = new StatisticsQuery(getParams(null, toStr, null), now);
+        BackupQuery query = new BackupQuery(getParams(null, toStr, null), now);
         Assert.assertEquals(0, query.getFrom());
         Assert.assertEquals(toMillis, query.getTo());
     }
@@ -116,22 +116,22 @@ public class StatisticsQueryTest {
         String fromStr = DatatypeConverter.printDateTime(cal);
         cal.setTimeInMillis(toMillis);
         String toStr = DatatypeConverter.printDateTime(cal);
-        StatisticsQuery query = new StatisticsQuery(getParams(fromStr, toStr, null), now);
+        BackupQuery query = new BackupQuery(getParams(fromStr, toStr, null), now);
         Assert.assertEquals(fromMillis, query.getFrom());
         Assert.assertEquals(toMillis, query.getTo());
 
         // period is ignored, if both from and to are specified
-        query = new StatisticsQuery(getParams(fromStr, toStr, "3d"), now);
+        query = new BackupQuery(getParams(fromStr, toStr, "3d"), now);
         Assert.assertEquals(fromMillis, query.getFrom());
         Assert.assertEquals(toMillis, query.getTo());
 
         // from == to
-        query = new StatisticsQuery(getParams(fromStr, fromStr, null), now);
+        query = new BackupQuery(getParams(fromStr, fromStr, null), now);
         Assert.assertEquals(fromMillis, query.getFrom());
         Assert.assertEquals(fromMillis, query.getTo());
 
         // from > to
-        query = new StatisticsQuery(getParams(toStr, fromStr, null), now);
+        query = new BackupQuery(getParams(toStr, fromStr, null), now);
         Assert.assertEquals(fromMillis, query.getFrom());
         Assert.assertEquals(fromMillis, query.getTo());
     }
@@ -139,50 +139,50 @@ public class StatisticsQueryTest {
     @Test
     public void testFromToIntervals() throws Exception {
         long now = System.currentTimeMillis();
-        StatisticsQuery query = new StatisticsQuery(getParams("-1d", null, null), now);
+        BackupQuery query = new BackupQuery(getParams("-1d", null, null), now);
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS), query.getFrom());
         Assert.assertEquals(now, query.getTo());
 
-        query = new StatisticsQuery(getParams(null, "-1d", null), now);
+        query = new BackupQuery(getParams(null, "-1d", null), now);
         Assert.assertEquals(0, query.getFrom());
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS), query.getTo());
 
-        query = new StatisticsQuery(getParams("-2d", "-1d", null), now);
+        query = new BackupQuery(getParams("-2d", "-1d", null), now);
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(2, TimeUnit.DAYS), query.getFrom());
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS), query.getTo());
 
-        query = new StatisticsQuery(getParams("-1d", null, "1h"), now);
+        query = new BackupQuery(getParams("-1d", null, "1h"), now);
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS), query.getFrom());
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS) +
                 TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS), query.getTo());
 
-        query = new StatisticsQuery(getParams(null, "-1d", "1h"), now);
+        query = new BackupQuery(getParams(null, "-1d", "1h"), now);
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS) -
                 TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS), query.getFrom());
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS), query.getTo());
 
         // from + period > now => to = now
-        query = new StatisticsQuery(getParams("-1d", null, "2d"), now);
+        query = new BackupQuery(getParams("-1d", null, "2d"), now);
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS), query.getFrom());
         Assert.assertEquals(now, query.getTo());
 
         // period is ignored, if from and to are specified
-        query = new StatisticsQuery(getParams("-2d", "-1d", "1h"), now);
+        query = new BackupQuery(getParams("-2d", "-1d", "1h"), now);
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(2, TimeUnit.DAYS), query.getFrom());
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS), query.getTo());
 
         // positive to interval is treated as not specified => to = now
-        query = new StatisticsQuery(getParams("-1d", "4711d", null), now);
+        query = new BackupQuery(getParams("-1d", "4711d", null), now);
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS), query.getFrom());
         Assert.assertEquals(now, query.getTo());
 
         // positive from interval is treated as not specified => from = 0
-        query = new StatisticsQuery(getParams("4711d", "-1d", null), now);
+        query = new BackupQuery(getParams("4711d", "-1d", null), now);
         Assert.assertEquals(0, query.getFrom());
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS), query.getTo());
 
         // positive from interval are treated as not specified => show 1 day
-        query = new StatisticsQuery(getParams("4711d", "4711d", null), now);
+        query = new BackupQuery(getParams("4711d", "4711d", null), now);
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS), query.getFrom());
         Assert.assertEquals(now, query.getTo());
     }
@@ -192,31 +192,31 @@ public class StatisticsQueryTest {
         Calendar cal = Calendar.getInstance();
         long now = cal.getTimeInMillis();
 
-        StatisticsQuery query = new StatisticsQuery(getParams(null, "now", null), now);
+        BackupQuery query = new BackupQuery(getParams(null, "now", null), now);
         Assert.assertEquals(0, query.getFrom());
         Assert.assertEquals(now, query.getTo());
 
-        query = new StatisticsQuery(getParams("-1h", "now", null), now);
+        query = new BackupQuery(getParams("-1h", "now", null), now);
         Assert.assertEquals(now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS), query.getFrom());
         Assert.assertEquals(now, query.getTo());
 
         long fromMillis = now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS);
         cal.setTimeInMillis(fromMillis);
         String fromStr = DatatypeConverter.printDateTime(cal);
-        query = new StatisticsQuery(getParams(fromStr, "now", null), now);
+        query = new BackupQuery(getParams(fromStr, "now", null), now);
         Assert.assertEquals(fromMillis, query.getFrom());
         Assert.assertEquals(now, query.getTo());
 
-        query = new StatisticsQuery(getParams("now", null, null), now);
+        query = new BackupQuery(getParams("now", null, null), now);
         Assert.assertEquals(now, query.getFrom());
         Assert.assertEquals(now, query.getTo());
 
-        query = new StatisticsQuery(getParams("now", "now", null), now);
+        query = new BackupQuery(getParams("now", "now", null), now);
         Assert.assertEquals(now, query.getFrom());
         Assert.assertEquals(now, query.getTo());
 
         // period is ignored, if from and to are specified
-        query = new StatisticsQuery(getParams("now", "now", "1d"), now);
+        query = new BackupQuery(getParams("now", "now", "1d"), now);
         Assert.assertEquals(now, query.getFrom());
         Assert.assertEquals(now, query.getTo());
     }
@@ -232,7 +232,7 @@ public class StatisticsQueryTest {
     public void testAllQuery() throws Exception {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("all", null);
-        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        BackupQuery query = new BackupQuery(params, System.currentTimeMillis());
         Assert.assertEquals(0, query.getFrom());
         Assert.assertEquals(0, query.getTo());
     }
@@ -242,7 +242,7 @@ public class StatisticsQueryTest {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("include", "a,b");
         params.put("exclude", "c");
-        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        BackupQuery query = new BackupQuery(params, System.currentTimeMillis());
         query.setSection("foobar");
         Assert.assertTrue(query.showSection("foobar"));
         Assert.assertFalse(query.showSection("a"));
@@ -253,14 +253,14 @@ public class StatisticsQueryTest {
     @Test
     public void testNoFilters() throws Exception {
         HashMap<String, String> params = new HashMap<String, String>();
-        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        BackupQuery query = new BackupQuery(params, System.currentTimeMillis());
         Assert.assertTrue(query.showByFilter("byDate"));
     }
 
     @Test
     public void testSetFilter() throws Exception {
         HashMap<String, String> params = new HashMap<String, String>();
-        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        BackupQuery query = new BackupQuery(params, System.currentTimeMillis());
         query.setFilter("byDate");
         Assert.assertTrue(query.showByFilter("byDate"));
         Assert.assertFalse(query.showByFilter("foobar"));
@@ -270,7 +270,7 @@ public class StatisticsQueryTest {
     public void testFiltersAttribute() throws Exception {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("filters", "byDate,byRole");
-        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        BackupQuery query = new BackupQuery(params, System.currentTimeMillis());
         Assert.assertTrue(query.showByFilter("byDate"));
         Assert.assertTrue(query.showByFilter("byRole"));
         Assert.assertFalse(query.showByFilter("foobar"));
@@ -280,7 +280,7 @@ public class StatisticsQueryTest {
     public void testSetFilterOverwritesFiltersAttribute() throws Exception {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("filters", "byDate,byRole");
-        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        BackupQuery query = new BackupQuery(params, System.currentTimeMillis());
         query.setFilter("byDate");
         Assert.assertTrue(query.showByFilter("byDate"));
         Assert.assertFalse(query.showByFilter("byRole"));
@@ -291,7 +291,7 @@ public class StatisticsQueryTest {
     public void testSummaryFilter() throws Exception {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("filters", "byDate,byRole,summary");
-        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        BackupQuery query = new BackupQuery(params, System.currentTimeMillis());
         Assert.assertFalse(query.showByFilter("byDate"));
         Assert.assertFalse(query.showByFilter("byRole"));
         Assert.assertTrue(query.showByFilter("summary"));
@@ -314,7 +314,7 @@ public class StatisticsQueryTest {
     public void testIncluded() throws Exception {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("include", "a,b,c");
-        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        BackupQuery query = new BackupQuery(params, System.currentTimeMillis());
         AssertUtils.assertEqualsAnyOrder("includes", CollectionUtils.asSet("a", "b", "c"), query.getIncluded());
     }
 
@@ -322,7 +322,7 @@ public class StatisticsQueryTest {
     public void testExcluded() throws Exception {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("exclude", "foo,bar");
-        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        BackupQuery query = new BackupQuery(params, System.currentTimeMillis());
         AssertUtils.assertEqualsAnyOrder("includes", CollectionUtils.asSet("foo", "bar"), query.getExcluded());
     }
 
@@ -330,7 +330,7 @@ public class StatisticsQueryTest {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("include", include);
         params.put("exclude", exclude);
-        StatisticsQuery query = new StatisticsQuery(params, System.currentTimeMillis());
+        BackupQuery query = new BackupQuery(params, System.currentTimeMillis());
         for (String s: included) {
             Assert.assertTrue(query.showSection(s));
         }
@@ -345,7 +345,7 @@ public class StatisticsQueryTest {
         long fromMillis = now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS);
         cal.setTimeInMillis(fromMillis);
         String fromStr = DatatypeConverter.printDateTime(cal);
-        StatisticsQuery query = new StatisticsQuery(getParams(fromStr, null, period), now);
+        BackupQuery query = new BackupQuery(getParams(fromStr, null, period), now);
         Assert.assertEquals(fromMillis, query.getFrom());
         Assert.assertEquals(fromMillis + TimeUnit.MILLISECONDS.convert(value, unit), query.getTo());
     }
@@ -356,7 +356,7 @@ public class StatisticsQueryTest {
         long toMillis = now - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS);
         cal.setTimeInMillis(toMillis);
         String toStr = DatatypeConverter.printDateTime(cal);
-        StatisticsQuery query = new StatisticsQuery(getParams(null, toStr, period), now);
+        BackupQuery query = new BackupQuery(getParams(null, toStr, period), now);
         Assert.assertEquals(toMillis - TimeUnit.MILLISECONDS.convert(value, unit), query.getFrom());
         Assert.assertEquals(toMillis, query.getTo());
     }
@@ -364,13 +364,13 @@ public class StatisticsQueryTest {
     private Map<String, String> getParams(String from, String to, String period) {
         HashMap<String, String> params = new HashMap<String, String>();
         if (StringUtils.isNotBlank(from)) {
-            params.put(StatisticsQuery.PARAM_FROM, from);
+            params.put(BackupQuery.PARAM_FROM, from);
         }
         if (StringUtils.isNotBlank(to)) {
-            params.put(StatisticsQuery.PARAM_TO, to);
+            params.put(BackupQuery.PARAM_TO, to);
         }
         if (StringUtils.isNotBlank(period)) {
-            params.put(StatisticsQuery.PARAM_PERIOD, period);
+            params.put(BackupQuery.PARAM_PERIOD, period);
         }
         return params;
     }

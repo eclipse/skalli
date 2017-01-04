@@ -38,7 +38,7 @@ public class StatisticsResource extends ResourceBase {
             return null;
         }
 
-        StatisticsQuery query = new StatisticsQuery(getQueryAttributes());
+        BackupQuery query = new BackupQuery(getQueryAttributes());
         String section = (String) getRequestAttributes().get(PARAM_SECTION);
         if (StringUtils.isNotBlank(section)) {
             query.setSection(section);
@@ -62,11 +62,11 @@ public class StatisticsResource extends ResourceBase {
         if (!Permits.isAllowed(getAction(), getPath())) {
             return createUnauthorizedRepresentation();
         }
-        if (!hasQueryAttribute(StatisticsQuery.PARAM_TO)) {
+        if (!hasQueryAttribute(BackupQuery.PARAM_TO)) {
             return createErrorRepresentation(Status.CLIENT_ERROR_BAD_REQUEST, ERROR_ID_INVALID_QUERY,
                     "Query attribute \"to\" is mandatory");
         }
-        StatisticsQuery query = new StatisticsQuery(getQueryAttributes());
+        BackupQuery query = new BackupQuery(getQueryAttributes());
         Statistics statistics = Statistics.getDefault();
         statistics.clear(query.getFrom(), query.getTo());
         setStatus(Status.SUCCESS_NO_CONTENT);

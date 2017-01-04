@@ -55,7 +55,7 @@ public class StatisticsBackupResource extends ResourceBase {
         if (!Permits.isAllowed(getAction(), getPath())) {
             return createUnauthorizedRepresentation();
         }
-        StatisticsQuery query = new StatisticsQuery(getQueryAttributes());
+        BackupQuery query = new BackupQuery(getQueryAttributes());
         Statistics statistics = new Statistics(Statistics.getDefault(), query.getFrom(), query.getTo());
         ZipOutputRepresentation zipRepresentation = new ZipOutputRepresentation(statistics);
         Disposition disposition = new Disposition(Disposition.TYPE_ATTACHMENT);
