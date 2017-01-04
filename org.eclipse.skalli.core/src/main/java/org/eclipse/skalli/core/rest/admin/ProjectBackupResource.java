@@ -38,7 +38,6 @@ import org.eclipse.skalli.services.permit.Permits;
 import org.eclipse.skalli.services.persistence.PersistenceService;
 import org.eclipse.skalli.services.persistence.StorageConsumer;
 import org.eclipse.skalli.services.persistence.StorageService;
-import org.eclipse.skalli.services.search.SearchQuery;
 import org.restlet.data.Disposition;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -54,9 +53,6 @@ public class ProjectBackupResource extends ResourceBase {
     private static final Logger LOG = LoggerFactory.getLogger(ProjectBackupResource.class);
 
     private static final String FILE_NAME = "backup.zip"; //$NON-NLS-1$
-
-    private static final String EXCLUDE_PARAM = "exclude"; //$NON-NLS-1$
-    private static final String INCLUDE_PARAM = "include"; //$NON-NLS-1$
 
     private static final String ACTION_PARAM = "action"; //$NON-NLS-1$
     private static final String ACTION_OVERWRITE = "overwrite"; //$NON-NLS-1$
@@ -83,8 +79,11 @@ public class ProjectBackupResource extends ResourceBase {
         if (storageService == null) {
             return createServiceUnavailableRepresentation(ERROR_ID_NO_STORAGE_SERVICE, "Storage Service");
         }
-        Set<String> categories = getCategories();
-        ZipOutputRepresentation zipRepresentation = new ZipOutputRepresentation(storageService, categories);
+
+        BackupQuery query = new BackupQuery(getQueryAttributes());
+        Set<String> categories = getCategories(query);
+        ZipOutputRepresentation zipRepresentation = new ZipOutputRepresentation(storageService, categories,
+                query.getFrom(), query.getTo());
         Disposition disposition = new Disposition(Disposition.TYPE_ATTACHMENT);
         disposition.setFilename(FILE_NAME);
         zipRepresentation.setDisposition(disposition);
@@ -103,8 +102,9 @@ public class ProjectBackupResource extends ResourceBase {
             return createServiceUnavailableRepresentation(ERROR_ID_NO_STORAGE_SERVICE, "Storage Service");
         }
 
+        BackupQuery query = new BackupQuery(getQueryAttributes());
         String action = getQueryAttribute(ACTION_PARAM);
-        Set<String> categories = getCategories();
+        Set<String> categories = getCategories(query);
 
         Set<String> accepted = new HashSet<String>();
         Set<String> rejected = new HashSet<String>();
@@ -235,12 +235,10 @@ public class ProjectBackupResource extends ResourceBase {
      * result set. Then first add all categories contained in the include list
      * and remove afterwards all entries contained in the exclude list.
      */
-    private Set<String> getCategories() {
+    private Set<String> getCategories(BackupQuery query) {
         Set<String> categories = new HashSet<String>(CATEGORIES);
-        Set<String> include = CollectionUtils.asSet(StringUtils.split(getQueryAttribute(INCLUDE_PARAM),
-                SearchQuery.PARAM_LIST_SEPARATOR));
-        Set<String> exclude = CollectionUtils.asSet(StringUtils.split(getQueryAttribute(EXCLUDE_PARAM),
-                SearchQuery.PARAM_LIST_SEPARATOR));
+        Set<String> include = query.getIncluded();
+        Set<String> exclude = query.getExcluded();
         if (!include.isEmpty()) {
             categories.removeAll(CATEGORIES);
         }
@@ -265,14 +263,18 @@ public class ProjectBackupResource extends ResourceBase {
 
         private static final int BUFFER = 2048;
 
-        private StorageService storageService;
-        private Set<String> categories;
-        private boolean withHistory;
+        private final StorageService storageService;
+        private final Set<String> categories;
+        private final long startDate;
+        private final long endDate;
+        private final boolean withHistory;
 
-        public ZipOutputRepresentation(StorageService storageService, Set<String> categories) {
+        public ZipOutputRepresentation(StorageService storageService, Set<String> categories, long startDate, long endDate) {
             super(MediaType.APPLICATION_ZIP);
             this.storageService = storageService;
             this.categories = categories;
+            this.startDate = startDate;
+            this.endDate = endDate;
             this.withHistory = categories.contains("History"); //$NON-NLS-1$
         }
 
@@ -303,8 +305,16 @@ public class ProjectBackupResource extends ResourceBase {
         }
 
         private void write(String category, String key, final ZipOutputStream target) throws IOException {
-            String entryName = MessageFormat.format("{0}/{1}.xml", category, key); //$NON-NLS-1$
-            write(entryName, storageService.read(category, key), target);
+            storageService.read(category, key, new StorageConsumer() {
+                @Override
+                public void consume(String category, String key, long lastModified, InputStream blob)
+                        throws IOException {
+                    if (inRange(lastModified)) {
+                        String entryName = MessageFormat.format("{0}/{1}.xml", category, key); //$NON-NLS-1$
+                        write(entryName, blob, target);
+                    }
+                }
+            });
         }
 
         private void writeHistory(String category, String key, final ZipOutputStream target) throws IOException {
@@ -312,9 +322,11 @@ public class ProjectBackupResource extends ResourceBase {
                 @Override
                 public void consume(String category, String key, long lastModified, InputStream blob)
                         throws IOException {
-                    String entryName = MessageFormat.format("{0}/{1}_{2}.xml", //$NON-NLS-1$
-                            category, key, Long.toString(lastModified));
-                    write(entryName, blob, target);
+                    if (inRange(lastModified)) {
+                        String entryName = MessageFormat.format("{0}/{1}_{2}.xml", //$NON-NLS-1$
+                                category, key, Long.toString(lastModified));
+                        write(entryName, blob, target);
+                    }
                 }
             });
         }
@@ -334,6 +346,9 @@ public class ProjectBackupResource extends ResourceBase {
                 IOUtils.closeQuietly(source);
             }
         }
-    }
 
+        private boolean inRange(long lastModified) {
+            return (startDate <= 0 || startDate <=  lastModified) && (endDate <= 0 || lastModified <= endDate);
+        }
+    }
 }
