@@ -14,6 +14,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 
 import org.apache.http.client.HttpClient;
+import org.eclipse.skalli.services.BundleProperties;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
@@ -21,6 +22,9 @@ import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Utility class for creating instances of {@link HttpClient} for given URLs.
+ */
 public class Destinations {
 
     private static final String DEFAULT = "default"; //$NON-NLS-1$
@@ -31,8 +35,25 @@ public class Destinations {
 
     private static BundleContext context = FrameworkUtil.getBundle(Destinations.class).getBundleContext();
 
+    // if set as bundle or system property, selects the active destination service; otherwise all registered
+    // destination services will be tried; if no registered destination service can handle the given URL,
+    // a client will be created with the default destination service
+    private static String destinationService = BundleProperties.getProperty(BundleProperties.PROPERTY_DESTINATION_SERVICE);
+
     /**
-     * @return null or a HttpClient to read from the parameter <code>url</code>.
+     * Returns an HTTP client for the given URL.
+     * <p>
+     * The active {@link DestinationService} can be selected with the system or bundle property
+     * <tt>"skalli.destinationService"</tt>. The value must match the <tt>"destinationService.type"</tt>
+     * property of a registered destination service. If the specified destination service is available,
+     * it is called to create a suitable client.
+     * <p>
+     * If this property is not set, this method asks all registered destination services for a client.
+     * The first client returned will be the result of this method. If none of the registered destination
+     * services can deliver a client, a default client will be returned.
+     *
+     * @return an Http client for the given URL, or <code>null</code> if no registered
+     * destination service was capable or willing to handle that URL.
      */
     public static HttpClient getClient(URL url) {
         HttpClient client = null;
@@ -48,17 +69,16 @@ public class Destinations {
         if (serviceRefs != null) {
             for (int i = 0; client == null && i < serviceRefs.length; ++i) {
                 ServiceReference<?> serviceRef = serviceRefs[i];
-
-                if (!DEFAULT.equals(serviceRef.getProperty(DESTINATION_SERVICE_TYPE))) {
-                    client = getClient(serviceRef, url);
-
-                } else {
+                String serviceType = (String)serviceRef.getProperty(DESTINATION_SERVICE_TYPE);
+                if (DEFAULT.equals(serviceType)) {
                     defaultServiceRef = serviceRef;
+                } else if (destinationService == null || destinationService.equalsIgnoreCase(serviceType)) {
+                    client = getClient(serviceRef, url);
                 }
             }
         }
 
-        if (client == null) {
+        if (client == null && destinationService == null) {
             if (defaultServiceRef != null) {
                 client = getClient(defaultServiceRef, url);
                 if (client == null) {

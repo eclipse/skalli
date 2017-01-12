@@ -33,6 +33,9 @@ public class BundleProperties {
     /** Name of the property specifying the active storage service: <tt>{@value}</tt> */
     public static final String PROPERTY_STORAGE_SERVICE = "skalli.storageService"; //$NON-NLS-1$
 
+    /** Name of the property specifying the active destination service: <tt>{@value}</tt> */
+    public static final String PROPERTY_DESTINATION_SERVICE = "skalli.destinationService"; //$NON-NLS-1$
+
     /** Name of the property specifying the workig directory for file storage: <tt>{@value}</tt> */
     public static final String PROPERTY_WORKDIR = "workdir"; //$NON-NLS-1$
 

@@ -189,8 +189,6 @@ public class HostReachableValidator implements Issuer, PropertyValidator {
             } finally {
                 HttpUtils.consumeQuietly(response);
             }
-        } else {
-            CollectionUtils.addSafe(issues, getIssueByReachableHost(minSeverity, entityId, item, url.getHost()));
         }
     }
 
