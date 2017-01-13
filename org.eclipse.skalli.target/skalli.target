@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde version="3.6"?>
 
-<target includeMode="feature" name="Skalli Target Platform" sequenceNumber="6">
+<target includeMode="feature" name="Skalli Target Platform" sequenceNumber="7">
 <locations>
 <location includeAllPlatforms="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.core.contenttype" version="3.4.200.v20130326-1255"/>
@@ -80,8 +80,8 @@
 <unit id="javax.servlet.jsp.jstl" version="1.2.0.v201105211821"/>
 <unit id="javax.xml" version="1.3.4.v201005080400"/>
 <unit id="javax.xml.stream" version="1.0.1.v201004272200"/>
-<unit id="org.apache.commons.codec" version="1.3.0.v201101211617"/>
-<unit id="org.apache.commons.codec.source" version="1.3.0.v201101211617"/>
+<unit id="org.apache.commons.codec" version="1.4.0.v201209201156"/>
+<unit id="org.apache.commons.codec.source" version="1.4.0.v201209201156"/>
 <unit id="org.apache.commons.collections" version="3.2.0.v2013030210310"/>
 <unit id="org.apache.commons.collections.source" version="3.2.0.v2013030210310"/>
 <unit id="org.apache.commons.io" version="1.4.0.v20081110-1000"/>
