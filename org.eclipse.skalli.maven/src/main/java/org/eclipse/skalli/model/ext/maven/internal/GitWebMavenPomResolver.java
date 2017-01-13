@@ -20,18 +20,19 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 
 /**
- * Maven pom resolver that provides the {@link MavenPom} for a Git repository
- * specified by the location of the SCM repository and the path to the resource within
- * that repository. For example, for a Git repository with the SCM location
- * <tt>scm:git:git://git.example.org/project.git</tt> and the path <tt>"."</tt>
- * the resolver parses the maven pom from
- * <tt>http://git.example.org:50000/git/?p=project.git;a=blob_plain;f=pom.xml;hb=HEAD</tt>
+ * Maven POM resolver that reads from a gitweb backend.
+ *
+ * Provides a stream for reading the pom.xml file for a given repository and path
+ * within the repository. For example, for a  repository with {@code scmLocation}
+ * <tt>"scm:git:git://git.example.org/project.git"</tt> and {@relativePath} path <tt>"."</tt>
+ * the method would return
+ * <tt>"http://git.example.org:50000/git/?p=project.git;a=blob_plain;f=pom.xml;hb=HEAD"</tt>
  */
 public class GitWebMavenPomResolver extends HttpMavenPomResolverBase {
 
     @Override
     protected String getProvider() {
-        return "gitweb";
+        return "gitweb"; //$NON-NLS-1$
     }
 
     @Override
@@ -48,20 +49,10 @@ public class GitWebMavenPomResolver extends HttpMavenPomResolverBase {
         }
         sb.append(repositoryRoot);
         sb.append(";a=blob_plain;f="); //$NON-NLS-1$
-        if (StringUtils.isBlank(relativePath) || ".".equals(relativePath)) { //$NON-NLS-1$
-            sb.append(DEFAULT_POM_FILENAME);
-        }
-        else if (!relativePath.endsWith(DEFAULT_POM_FILENAME)) {
-            appendPath(sb, relativePath);
-            if (!relativePath.endsWith("/")) { //$NON-NLS-1$
-                sb.append("/"); //$NON-NLS-1$
-            }
-            sb.append(DEFAULT_POM_FILENAME);
-        }
-        else {
-            appendPath(sb, relativePath);
-        }
-        sb.append(";hb=HEAD"); //$NON-NLS-1$
+
+        String fileName = getPomFileName(relativePath);
+        sb.append(fileName).append(";hb=HEAD"); //$NON-NLS-1$
+
         return new URL(sb.toString());
     }
 
