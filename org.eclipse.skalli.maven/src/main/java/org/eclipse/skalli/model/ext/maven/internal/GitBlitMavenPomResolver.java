@@ -20,11 +20,20 @@ import java.util.zip.ZipInputStream;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 
+/**
+ * Maven pom resolver that reads from a <a href="http://gitblit.com/">gitblit</a> backend.
+ *
+ * Provides a stream for reading the pom.xml file for a given repository and path
+ * within the repository. For example, for a  repository with {@code scmLocation}
+ * <tt>"scm:git:git://git.example.org/project.git"</tt> and {@relativePath} path <tt>"."</tt>
+ * the method would return
+ * <tt>"http://git.example.org/zip/?r=projectt&p=pom.xml&h=HEAD"</tt>
+ */
 public class GitBlitMavenPomResolver extends HttpMavenPomResolverBase {
 
     @Override
     protected String getProvider() {
-        return "gitblit";
+        return "gitblit"; //$NON-NLS-1$
     }
 
     @Override
@@ -54,6 +63,4 @@ public class GitBlitMavenPomResolver extends HttpMavenPomResolverBase {
         ZipInputStream zipInputStream = new ZipInputStream(entity.getContent());
         return ZipHelper.getEntry(zipInputStream, getPomFileName(relativePath));
     }
-
-
 }
