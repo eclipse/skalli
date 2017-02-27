@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.skalli.view.internal.container;
 
-import java.io.Serializable;
+import static org.eclipse.skalli.view.internal.container.IndexedUserContainer.PROPERTY_USER;
+
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -20,8 +20,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.skalli.model.Member;
-import org.eclipse.skalli.model.PropertyName;
 import org.eclipse.skalli.model.User;
+import org.eclipse.skalli.services.event.EventListener;
+import org.eclipse.skalli.services.event.EventService;
+import org.eclipse.skalli.services.user.EventUserUpdate;
 import org.eclipse.skalli.services.user.UserService;
 import org.eclipse.skalli.services.user.UserServices;
 
@@ -29,56 +31,20 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
 
-public class UserContainer extends IndexedContainer implements Serializable {
+public class UserContainer implements EventListener<EventUserUpdate> {
 
-    private static final long serialVersionUID = 632503436661743735L;
-    private static UserContainer container;
+    private static IndexedUserContainer container = new IndexedUserContainer();
 
-    @PropertyName(position = 0)
-    public static final Object PROPERTY_USER = "user"; //$NON-NLS-1$
-
-    private UserContainer(Collection<User> users) {
-        super();
-        addContainerProperty(User.PROPERTY_FIRSTNAME, String.class, null);
-        addContainerProperty(User.PROPERTY_LASTNAME, String.class, null);
-        addContainerProperty(User.PROPERTY_EMAIL, String.class, null);
-        addContainerProperty(User.PROPERTY_DISPLAY_NAME, String.class, null);
-        addContainerProperty(PROPERTY_USER, User.class, null);
-        for (User user : users) {
-            addItem(user);
-        }
+    protected void bindEventService(EventService eventService) {
+        eventService.registerListener(EventUserUpdate.class, this);
     }
 
-    private Item addItem(User user) {
-        String userId = user.getUserId();
-        Item item = getItem(userId);
-        if (item == null) {
-            item = addItem(user.getUserId()); // IndexedContainer#addItem return null, if entry already exists!!!
-        }
-        if (item != null) {
-            item.getItemProperty(User.PROPERTY_FIRSTNAME).setValue(user.getFirstname());
-            item.getItemProperty(User.PROPERTY_LASTNAME).setValue(user.getLastname());
-            item.getItemProperty(User.PROPERTY_EMAIL).setValue(user.getEmail());
-            item.getItemProperty(User.PROPERTY_DISPLAY_NAME).setValue(user.getDisplayName());
-            item.getItemProperty(PROPERTY_USER).setValue(user);
-        }
-        return item;
+    protected void unbindEventService(EventService eventService) {
+        eventService.unregisterListener(EventUserUpdate.class, this);
     }
 
-    public static synchronized UserContainer createWithData() {
-        if (container == null) {
-            List<User> users = Collections.emptyList();
-            UserService userService = UserServices.getUserService();
-            if (userService != null) {
-                users = userService.getUsers();
-            }
-            container = new UserContainer(users);
-        }
+    public static IndexedContainer getInstance() {
         return container;
-    }
-
-    public static void refresh() {
-        container = null;
     }
 
     public static User getUser(Object userId) {
@@ -120,7 +86,6 @@ public class UserContainer extends IndexedContainer implements Serializable {
     }
 
     private static Item searchAndAddUser(String userId) {
-        UserContainer container = UserContainer.createWithData();
         Item item = container.getItem(userId);
         if (item == null) {
             User user = UserServices.getUser(userId.toString());
@@ -149,7 +114,6 @@ public class UserContainer extends IndexedContainer implements Serializable {
     }
 
     public static Set<User> getUsers(Set<Member> members) {
-        UserContainer container = UserContainer.createWithData();
         Set<User> users = new TreeSet<User>();
         Set<String> userIds = new HashSet<String>();
         for (Member member : members) {
@@ -178,4 +142,15 @@ public class UserContainer extends IndexedContainer implements Serializable {
         return users;
     }
 
+    /**
+     * When the user service notifies about a change in the user base
+     * update the indexed container.
+     */
+     @Override
+     public void onEvent(EventUserUpdate event) {
+         User user = event.getUser();
+         if (user != null) {
+            container.addItem(user);
+         }
+     }
 }

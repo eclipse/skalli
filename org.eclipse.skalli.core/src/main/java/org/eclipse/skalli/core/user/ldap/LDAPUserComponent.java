@@ -41,6 +41,7 @@ import org.eclipse.skalli.services.configuration.Configurations;
 import org.eclipse.skalli.services.configuration.EventConfigUpdate;
 import org.eclipse.skalli.services.event.EventListener;
 import org.eclipse.skalli.services.event.EventService;
+import org.eclipse.skalli.services.user.EventUserUpdate;
 import org.eclipse.skalli.services.user.UserService;
 import org.eclipse.skalli.services.user.ldap.LdapContextProvider;
 import org.osgi.service.component.ComponentConstants;
@@ -72,6 +73,7 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
     private String destination;
     private String baseDN;
     private String searchScope;
+    private EventService eventService;
 
     private Cache<String, User> cache;
 
@@ -98,10 +100,12 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
 
     protected void bindEventService(EventService eventService) {
         eventService.registerListener(EventConfigUpdate.class, this);
+        this.eventService = eventService;
     }
 
     protected void unbindEventService(EventService eventService) {
         eventService.unregisterListener(EventConfigUpdate.class, this);
+        this.eventService = null;
     }
 
     protected void bindConfigurationService(ConfigurationService configurationService) {
@@ -152,11 +156,25 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
         List<User> users = searchUserByName(searchText);
         for (User user : users) {
             if (user != null) {
-                cache.put(StringUtils.lowerCase(user.getUserId()), user);
+                addUserToCache(user);
             }
         }
         return users;
     }
+
+    /**
+     * Adds or updates the given user within the cache class data member.
+     * Also fires an event so other user cache instances can be updated (See UserContainer class).
+     * @param user
+     */
+    private void addUserToCache(User user){
+        cache.put(user.getUserId().toLowerCase(Locale.ENGLISH), user);
+
+        if (this.eventService != null) {
+            this.eventService.fireEvent(new EventUserUpdate(user));
+        }
+    }
+
 
     @Override
     public synchronized User getUserById(String userId) {
@@ -171,7 +189,7 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
             }
             user = searchUserById(userId);
             if (user != null) {
-                cache.put(lowerCaseUserId, user);
+                addUserToCache(user);
             }
         }
         return user;
@@ -210,8 +228,8 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
                 if (user != null) {
                     String userId = user.getUserId();
                     if (StringUtils.isNotBlank(userId)) {
-                        cache.put(userId.toLowerCase(Locale.ENGLISH), user);
                         users.add(user);
+                        addUserToCache(user);
                     }
                 }
             }

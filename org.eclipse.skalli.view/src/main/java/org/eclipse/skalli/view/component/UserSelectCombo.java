@@ -22,7 +22,7 @@ public class UserSelectCombo extends ComboBox {
     public UserSelectCombo(String caption, String width) {
         super(caption);
         setWidth(width);
-        setContainerDataSource(UserContainer.createWithData());
+        setContainerDataSource(UserContainer.getInstance());
         setItemCaptionPropertyId(User.PROPERTY_DISPLAY_NAME);
         setFilteringMode(ComboBox.FILTERINGMODE_CONTAINS);
         setImmediate(true);

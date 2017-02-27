@@ -31,6 +31,7 @@ Import-Package: com.thoughtworks.xstream.annotations,
  org.eclipse.skalli.services,
  org.eclipse.skalli.services.configuration,
  org.eclipse.skalli.services.entity,
+ org.eclipse.skalli.services.event,
  org.eclipse.skalli.services.extension,
  org.eclipse.skalli.services.extension.rest,
  org.eclipse.skalli.services.favorites,
@@ -57,7 +58,8 @@ Service-Component: OSGI-INF/FeedbackConfigSection.xml,
  OSGI-INF/TopLinksConfigSection.xml,
  OSGI-INF/NewsConfigSection.xml,
  OSGI-INF/UserDetailsConfigSection.xml,
- OSGI-INF/BrandingConfigSection.xml
+ OSGI-INF/BrandingConfigSection.xml,
+ OSGI-INF/UserContainer.xml
 Web-ContextPath: /
 Webapp-Context: /
 Export-Package: org.eclipse.skalli.view,

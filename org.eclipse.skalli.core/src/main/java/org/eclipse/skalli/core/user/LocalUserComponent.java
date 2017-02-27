@@ -28,7 +28,9 @@ import org.eclipse.skalli.model.Severity;
 import org.eclipse.skalli.model.User;
 import org.eclipse.skalli.model.ValidationException;
 import org.eclipse.skalli.services.entity.EntityServiceBase;
+import org.eclipse.skalli.services.event.EventService;
 import org.eclipse.skalli.services.extension.DataMigration;
+import org.eclipse.skalli.services.user.EventUserUpdate;
 import org.eclipse.skalli.services.user.UserService;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.component.ComponentContext;
@@ -50,6 +52,7 @@ public class LocalUserComponent extends EntityServiceBase<User> implements UserS
     private static final Logger LOG = LoggerFactory.getLogger(LocalUserComponent.class);
 
     private static final int CURRENT_MODEL_VERISON = 20;
+    private EventService eventService;
 
     private Map<String, User> cache;
 
@@ -61,6 +64,11 @@ public class LocalUserComponent extends EntityServiceBase<User> implements UserS
     protected void deactivate(ComponentContext context) {
         LOG.info(MessageFormat.format("[UserService][local] {0} : deactivated",
                 (String) context.getProperties().get(ComponentConstants.COMPONENT_NAME)));
+    }
+
+    @Override
+    protected void bindEventService(EventService eventService) {
+        this.eventService = eventService;
     }
 
     @Override
@@ -92,6 +100,10 @@ public class LocalUserComponent extends EntityServiceBase<User> implements UserS
             cache = new HashMap<String, User>();
             for (User user: getAll()) {
                 cache.put(user.getUserId(), user);
+
+                if (this.eventService != null) {
+                    this.eventService.fireEvent(new EventUserUpdate(user));
+                }
             }
         }
         return cache;
