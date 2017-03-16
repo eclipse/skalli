@@ -56,6 +56,7 @@ public class ProjectIndexer extends IndexerBase<Project> {
                 addField(MEMBERS_DISPLAY_NAME, user.getDisplayName(), false, true);
             }
         }
+        addField(Project.PROPERTY_LAST_MODIFIED_MILLIS, Long.toString(project.getLastModifiedMillis()), true, true);
     }
 
     @Override
@@ -67,6 +68,7 @@ public class ProjectIndexer extends IndexerBase<Project> {
         ret.add(Project.PROPERTY_DESCRIPTION);
         ret.add(ALL_MEMBERS);
         ret.add(MEMBERS_DISPLAY_NAME);
+        ret.add(Project.PROPERTY_LAST_MODIFIED_MILLIS);
         return ret;
     }
 

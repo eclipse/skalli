@@ -70,6 +70,10 @@ public abstract class EntityBase {
 
     @Derived
     @PropertyName
+    public static final String PROPERTY_LAST_MODIFIED_MILLIS = "lastModifiedMillis"; //$NON-NLS-1$
+
+    @Derived
+    @PropertyName
     public static final String PROPERTY_LAST_MODIFIED_BY = "lastModifiedBy"; //$NON-NLS-1$
 
 
