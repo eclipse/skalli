@@ -161,7 +161,7 @@ public class EntityBaseTest {
         ext.setExtensibleEntity(base);
         AssertUtils.assertEqualsAnyOrder("getPropertyNames",
                 CollectionUtils.asSet("parentEntity", "str", "items", "parentEntityId",
-                        "uuid", "bool", "deleted", "lastModified", "lastModifiedBy",
+                        "uuid", "bool", "deleted", "lastModified", "lastModifiedMillis", "lastModifiedBy",
                         "firstChild", "nextSibling"),
                 ext.getPropertyNames());
     }

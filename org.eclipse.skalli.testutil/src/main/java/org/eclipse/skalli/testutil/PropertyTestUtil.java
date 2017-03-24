@@ -50,6 +50,7 @@ public class PropertyTestUtil {
         Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ENGLISH); //$NON-NLS-1$
         String lastModified = DatatypeConverter.printDateTime(now);
         values.put(EntityBase.PROPERTY_LAST_MODIFIED, lastModified);
+        values.put(EntityBase.PROPERTY_LAST_MODIFIED_MILLIS, DatatypeConverter.parseDateTime(lastModified).getTimeInMillis());
         values.put(EntityBase.PROPERTY_LAST_MODIFIED_BY, "homer"); //$NON-NLS-1$
         return values;
     }
