@@ -72,6 +72,7 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
     private LdapContextProvider ctxProvider;
     private String destination;
     private String baseDN;
+    private LDAPSubDNs subDNs;
     private String searchScope;
     private EventService eventService;
 
@@ -134,6 +135,7 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
             ctxProvider = ctxProviders.get(providerId);
             destination = ldapConfig.getDestination();
             baseDN = ldapConfig.getBaseDN();
+            subDNs = ldapConfig.getLDAPSubDNs();
             searchScope = ldapConfig.getSearchScope();
             cacheSize = NumberUtils.toInt(ldapConfig.getCacheSize(), DEFAULT_CACHE_SIZE);
         }
@@ -249,7 +251,7 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
         try {
             ctx = ctxProvider.getLdapContext(destination);
             return searchUserById(ctx, userId);
-        }  catch (Exception e) {
+        } catch (Exception e) {
             LOG.debug(MessageFormat.format("Failed to retrieve user ''{0}''", userId), e);
             return new User(userId);
         } finally {
@@ -296,24 +298,19 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
 
     private User searchUserById(LdapContext ctx, String userId) throws NamingException {
         SearchControls sc = getSearchControls();
-        NamingEnumeration<SearchResult> results = null;
-        try {
-            results = ctx.search(baseDN,
-                MessageFormat.format("(&(objectClass=user)(sAMAccountName={0}))", userId), sc); //$NON-NLS-1$
-            while (results != null && results.hasMore()) {
-                SearchResult entry = results.next();
-                User user = processEntry(entry);
-                if (user != null) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug(MessageFormat.format("Success reading from LDAP: {0}, {1} <{2}>", //$NON-NLS-1$
-                                user.getUserId(), user.getDisplayName(), user.getEmail()));
-                    }
-                    return user;
+        ArrayList<SearchResult> results = null;
+        results = ctxSearch(MessageFormat.format("(&(objectClass=user)(sAMAccountName={0}))", userId), sc, ctx);//$NON-NLS-1$
+        for (SearchResult entry : results) {
+            User user = processEntry(entry);
+            if (user != null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(MessageFormat.format("Success reading from LDAP: {0}, {1} <{2}>", //$NON-NLS-1$
+                            user.getUserId(), user.getDisplayName(), user.getEmail()));
                 }
+                return user;
             }
-        } finally {
-            closeQuietly(results);
         }
+
         return new User(userId);
     }
 
@@ -323,46 +320,33 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
             boolean somethingAdded = false;
             SearchControls sc = getSearchControls();
             String[] parts = StringUtils.split(NormalizeUtil.normalize(name), " ,"); //$NON-NLS-1$
+
             if (parts.length == 1) {
                 somethingAdded = search(parts[0], ret, ctx, sc);
-            }
-            else if (parts.length > 1) {
+            } else if (parts.length > 1) {
+
                 // givenname surname ('Michael Ochmann'), or surname givenname('Ochmann, Michael')
-                NamingEnumeration<SearchResult> results = null;
-                try {
-                    results = ctx.search(baseDN,
-                        MessageFormat.format("(&(objectClass=user)(givenName={0}*)(sn={1}*))", //$NON-NLS-1$
-                                parts[0], parts[1]), sc);
-                    somethingAdded |= addLDAPSearchResult(ret, results);
-                } finally {
-                    closeQuietly(results);
-                }
-                try {
-                    results = ctx.search(baseDN,
-                            MessageFormat.format("(&(objectClass=user)(sn={0}*)(givenName={1}*))", //$NON-NLS-1$
-                                    parts[0], parts[1]), sc);
-                    somethingAdded |= addLDAPSearchResult(ret, results);
-                } finally {
-                    closeQuietly(results);
-                }
+                ArrayList<SearchResult> results = null;
+
+                results = ctxSearch(MessageFormat.format("(&(objectClass=user)(givenName={0}*)(sn={1}*))", //$NON-NLS-1$
+                        parts[0], parts[1]), sc, ctx);
+                somethingAdded |= addLDAPSearchResult(ret, results);
+
+                results = ctxSearch(MessageFormat.format("(&(objectClass=user)(sn={0}*)(givenName={1}*))", //$NON-NLS-1$
+                        parts[0], parts[1]), sc, ctx);
+                somethingAdded |= addLDAPSearchResult(ret, results);
+
                 // givenname initial surname, e.g. 'Michael R. Ochmann'
                 if (parts.length > 2) {
-                    try {
-                        results = ctx.search(baseDN,
-                                MessageFormat.format("(&(objectClass=user)(givenName={0}*)(sn={1}*))", //$NON-NLS-1$
-                                        parts[0], parts[2]), sc);
-                        somethingAdded |= addLDAPSearchResult(ret, results);
-                    } finally {
-                        closeQuietly(results);
-                    }
-                    try {
-                        results = ctx.search(baseDN,
-                                MessageFormat.format("(&(objectClass=user)(sn={0}*)(givenName={1}*))", //$NON-NLS-1$
-                                        parts[0], parts[2]), sc);
-                        somethingAdded |= addLDAPSearchResult(ret, results);
-                    } finally {
-                        closeQuietly(results);
-                    }
+
+                    results = ctxSearch(MessageFormat.format("(&(objectClass=user)(givenName={0}*)(sn={1}*))", //$NON-NLS-1$
+                            parts[0], parts[2]), sc, ctx);
+                    somethingAdded |= addLDAPSearchResult(ret, results);
+
+                    results = ctxSearch(MessageFormat.format("(&(objectClass=user)(sn={0}*)(givenName={1}*))", //$NON-NLS-1$
+                            parts[0], parts[2]), sc, ctx);
+                    somethingAdded |= addLDAPSearchResult(ret, results);
+
                 }
                 if (!somethingAdded) {
                     // try to match each part individually
@@ -381,53 +365,65 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
     private boolean search(String s, List<User> ret, LdapContext ctx, SearchControls sc) throws NamingException {
         // try a match with surname*
         boolean somethingAdded = false;
-        NamingEnumeration<SearchResult> results = null;
-        try {
-            results = ctx.search(baseDN,
-                    MessageFormat.format("(&(objectClass=user)(|(sn={0}*)(givenName={1}*)))", s, s), sc); //$NON-NLS-1$
-            somethingAdded = addLDAPSearchResult(ret, results);
-        } finally {
-            closeQuietly(results);
+        ArrayList<SearchResult> results = null;
+
+        results = ctxSearch(MessageFormat.format("(&(objectClass=user)(|(sn={0}*)(givenName={1}*)))", s, s), sc, //$NON-NLS-1$
+                    ctx);
+        somethingAdded = addLDAPSearchResult(ret, results);
+
+        if (!somethingAdded) {
+            // try a match with the account name and mail address
+            results = ctxSearch(MessageFormat.format("(&(objectClass=user)(sAMAccountName={0}*))", s), sc, ctx); //$NON-NLS-1$
+            somethingAdded |= addLDAPSearchResult(ret, results);
         }
         if (!somethingAdded) {
-            try {
-                // try a match with the account name and mail address
-                results = ctx.search(baseDN,
-                        MessageFormat.format("(&(objectClass=user)(sAMAccountName={0}*))", s), sc); //$NON-NLS-1$
-                somethingAdded |= addLDAPSearchResult(ret, results);
-            } finally {
-                closeQuietly(results);
-            }
-            if (!somethingAdded) {
-                try {
-                    // try to match surname~= or givenname~=
-                    results = ctx.search(baseDN,
-                            MessageFormat.format("(&(objectClass=user)(|(sn~={0})(givenName~={1})))", s, s), sc); //$NON-NLS-1$
-                    somethingAdded |= addLDAPSearchResult(ret, results);
-                } finally {
-                    closeQuietly(results);
-                }
-                if (!somethingAdded) {
-                    try {
-                        results = ctx.search(baseDN,
-                                MessageFormat.format("(&(objectClass=user)(mail={0}*))", s), sc); //$NON-NLS-1$
-                        somethingAdded |= addLDAPSearchResult(ret, results);
-                    } finally {
-                        closeQuietly(results);
-                    }
-                }
-            }
+            // try to match surname~= or givenname~=
+            results = ctxSearch(MessageFormat.format("(&(objectClass=user)(|(sn~={0})(givenName~={1})))", s, s), //$NON-NLS-1$
+                    sc, ctx);
+            somethingAdded |= addLDAPSearchResult(ret, results);
         }
+        if (!somethingAdded) {
+            results = ctxSearch(MessageFormat.format("(&(objectClass=user)(mail={0}*))", s), sc, ctx); //$NON-NLS-1$
+            somethingAdded |= addLDAPSearchResult(ret, results);
+        }
+
         return somethingAdded;
     }
 
+    private ArrayList<SearchResult> ctxSearch(String query, SearchControls sc, LdapContext ctx)
+            throws NamingException {
+        ArrayList<SearchResult> result = new ArrayList<SearchResult>();
+        if (subDNs != null && subDNs.size() > 0){
+            for (String subDN : subDNs.getList()) {
+                addSearchResult(result, subDN + "," + baseDN, query, sc, ctx);
+            }
+        }
+        else {
+            //in case subDNs are not set, we search only using baseDN
+            addSearchResult(result, baseDN, query, sc, ctx);
+        }
+        return result;
+    }
+
+    private void addSearchResult(List<SearchResult> result, String dn, String query, SearchControls sc, LdapContext ctx)
+            throws NamingException {
+        NamingEnumeration<SearchResult> resultQuery = ctx.search(dn, query, sc); //$NON-NLS-1$
+        try {
+            if (resultQuery != null && resultQuery.hasMore()) {
+                result.addAll(Collections.list(resultQuery));
+            }
+        }
+        finally {
+            closeQuietly(resultQuery);
+            resultQuery = null;
+        }
+    }
+
     // Iterate over a batch of search results sent by the server
-    private boolean addLDAPSearchResult(List<User> users, NamingEnumeration<SearchResult> results)
+    private boolean addLDAPSearchResult(List<User> users, ArrayList<SearchResult> results)
             throws NamingException {
         boolean somethingAdded = false;
-        while (results != null && results.hasMore()) {
-            // Display an entry
-            SearchResult entry = results.next();
+        for (SearchResult entry : results) {
             User user = processEntry(entry);
             if (user != null) {
                 if (LOG.isDebugEnabled()) {
@@ -496,7 +492,7 @@ public class LDAPUserComponent implements UserService, EventListener<EventConfig
     private void closeQuietly(LdapContext ctx) {
         if (ctx != null) {
             try {
-                ctx .close();
+                ctx.close();
             } catch (NamingException e) {
                 LOG.error("Failed to close LDAP connection", e);
             }

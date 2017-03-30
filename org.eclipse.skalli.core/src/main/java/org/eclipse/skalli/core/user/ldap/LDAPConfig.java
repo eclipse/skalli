@@ -18,6 +18,7 @@ public class LDAPConfig {
     private String providerId;
     private String destination;
     private String baseDN;
+    private LDAPSubDNs subDNs;
     private String searchScope;
     private String cacheSize;
 
@@ -59,6 +60,14 @@ public class LDAPConfig {
 
     public void setBaseDN(String baseDN) {
         this.baseDN = baseDN;
+    }
+
+    public LDAPSubDNs getLDAPSubDNs() {
+        return subDNs;
+    }
+
+    public void setLDAPSubDNs(LDAPSubDNs subDNs) {
+        this.subDNs = subDNs;
     }
 
     public String getCacheSize() {
