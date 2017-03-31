@@ -184,9 +184,6 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
         } catch (IOException e) {
             LOG.warn(MessageFormat.format("Cannot load entity {0}/{1} of type {2}):",
                     entityClass, uuid, entityClass.getName()), e);
-        } catch (MigrationException e) {
-            LOG.warn(MessageFormat.format("Cannot load entity {0}/{1} of type {2}):",
-                    entityClass, uuid, entityClass.getName()), e);
         }
 
         // resolve the parent chain; if necessary, load missing entities from storage
@@ -305,8 +302,6 @@ public class XStreamPersistenceComponent extends PersistenceServiceBase implemen
                     getClassLoaders(entityClass), getMigrations(entityClass),
                     getAliases(entityClass), getConverters(entityClass));
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (MigrationException e) {
             throw new RuntimeException(e);
         }
         for (EntityBase loadedEntity : loadedEntities) {

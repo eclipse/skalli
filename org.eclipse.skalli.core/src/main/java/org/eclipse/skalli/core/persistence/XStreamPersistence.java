@@ -40,6 +40,7 @@ import org.eclipse.skalli.services.entity.EntityService;
 import org.eclipse.skalli.services.extension.DataMigration;
 import org.eclipse.skalli.services.extension.MigrationException;
 import org.eclipse.skalli.services.extension.MigrationUtils;
+import org.eclipse.skalli.services.persistence.StorageConsumer;
 import org.eclipse.skalli.services.persistence.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +66,50 @@ public class XStreamPersistence implements Issuer {
 
     private static final Logger LOG = LoggerFactory.getLogger(XStreamPersistence.class);
 
+    private static class XStreamConsumer<T extends EntityBase> implements StorageConsumer {
+
+        private final EntityService<T> entityService;
+        private final Set<ClassLoader> classLoaders;
+        private final Set<DataMigration> migrations;
+        private final Map<String, Class<?>> aliases;
+        private final Set<Converter> converters;
+
+        private List<T> loadEntities = new ArrayList<T>();
+
+        public XStreamConsumer(EntityService<T> entityService, Set<ClassLoader> classLoaders,
+                Set<DataMigration> migrations, Map<String, Class<?>> aliases, Set<Converter> converters) {
+            this.entityService = entityService;
+            this.classLoaders = classLoaders;
+            this.migrations = migrations;
+            this.aliases = aliases;
+            this.converters = converters;
+        }
+
+        public List<T> getLoadedEntities() {
+            return loadEntities;
+        }
+
+        @Override
+        public void consume(String category, String key, long lastModified, InputStream stream)
+                throws IOException {
+            try {
+                Document doc = XMLUtils.documentFromStream(stream);
+                preProcessXML(doc, migrations, aliases, entityService.getModelVersion());
+                mapInheritedExtensions(doc, byAlias(aliases));
+
+                EntityBase entity = domToEntity(classLoaders, aliases, converters, doc);
+                if (entity != null) {
+                    postProcessEntity(doc, entity, aliases);
+                    loadEntities.add(entityService.getEntityClass().cast(entity));
+                    LOG.info(MessageFormat.format("Loaded entity {0}", entity.getUuid()));
+                }
+            } catch (Exception e) {
+                throw new IOException(MessageFormat.format(
+                        "Failed to process entity {0} of type {1}", key, category), e);
+            }
+        }
+    }
+
     StorageService storageService;
 
     public XStreamPersistence(StorageService storageService) {
@@ -73,44 +118,29 @@ public class XStreamPersistence implements Issuer {
 
     public <T extends EntityBase> T loadEntity(EntityService<T> entityService, String key, Set<ClassLoader> classLoaders,
             Set<DataMigration> migrations, Map<String, Class<?>> aliases, Set<Converter> converters)
-            throws MigrationException, IOException {
+            throws IOException {
         if (entityService == null) {
             throw new IOException(MessageFormat.format(
                     "Could not load entity {0}: No corresponding entity service available", key));
         }
-        Class<T> entityClass = entityService.getEntityClass();
-        LOG.info(MessageFormat.format("Loading entity {0} of type {1}", key, entityClass));
-        Document doc = entityToDom(entityClass, key);
-        if (doc == null) {
+        XStreamConsumer<T> consumer = new XStreamConsumer<T>(entityService, classLoaders, migrations, aliases, converters);
+        storageService.read(entityService.getEntityClass().getSimpleName(), key, consumer);
+        List<T> loadedEntities = consumer.getLoadedEntities();
+        if (loadedEntities.isEmpty()) {
             return null;
         }
-
-        preProcessXML(doc, migrations, aliases, entityService.getModelVersion());
-        mapInheritedExtensions(doc, byAlias(aliases));
-
-        EntityBase entity = domToEntity(classLoaders, aliases, converters, doc);
-        if (entity == null) {
-            return null;
-        }
-
-        postProcessEntity(doc, entity, aliases);
-        LOG.info(MessageFormat.format("Loaded entity {0}", entity.getUuid()));
-
-        return entityClass.cast(entity);
+        return entityService.getEntityClass().cast(loadedEntities.get(0));
     }
 
-    public <T extends EntityBase> List<T> loadEntities(EntityService<T> entityService, Set<ClassLoader> entityClassLoaders,
+    public <T extends EntityBase> List<T> loadEntities(EntityService<T> entityService, Set<ClassLoader> classLoaders,
             Set<DataMigration> migrations, Map<String, Class<?>> aliases, Set<Converter> converters)
-            throws MigrationException, IOException {
-        List<T> loadEntities = new ArrayList<T>();
-        List<String> keys = storageService.keys(entityService.getEntityClass().getSimpleName());
-        for (String key : keys) {
-            T entity = loadEntity(entityService, key, entityClassLoaders, migrations, aliases, converters);
-            if (entity != null) {
-                loadEntities.add(entity);
-            }
-        }
-        return loadEntities;
+            throws IOException {
+        // Read all entities with one request to the storage service
+        // instead of one by one. This will improve the startup time
+        // considerably.
+        XStreamConsumer<T> consumer = new XStreamConsumer<T>(entityService, classLoaders, migrations, aliases, converters);
+        storageService.readAll(entityService.getEntityClass().getSimpleName(), consumer);
+        return consumer.getLoadedEntities();
     }
 
     public void saveEntity(EntityService<?> entityService, EntityBase entity, String userId,
@@ -139,7 +169,7 @@ public class XStreamPersistence implements Issuer {
         storageService.write(category, key, is);
     }
 
-    void preProcessXML(Document doc, Set<DataMigration> migrations, Map<String, Class<?>> aliases, int modelVersion)
+    static void preProcessXML(Document doc, Set<DataMigration> migrations, Map<String, Class<?>> aliases, int modelVersion)
             throws MigrationException {
         int version = getVersionAttribute(doc);
         if (migrations != null) {
@@ -148,7 +178,7 @@ public class XStreamPersistence implements Issuer {
         }
     }
 
-    void postProcessXML(Document newDoc, Document oldDoc, Map<String, Class<?>> aliases, String userId, int modelVersion)
+    static void postProcessXML(Document newDoc, Document oldDoc, Map<String, Class<?>> aliases, String userId, int modelVersion)
             throws MigrationException {
         Element newDocElement = newDoc.getDocumentElement();
         Element oldDocElement = oldDoc != null ? oldDoc.getDocumentElement() : null;
@@ -166,7 +196,7 @@ public class XStreamPersistence implements Issuer {
         setVersionAttribute(newDoc, modelVersion);
     }
 
-    void postProcessEntity(Document doc, EntityBase entity, Map<String, Class<?>> aliases)
+    static void postProcessEntity(Document doc, EntityBase entity, Map<String, Class<?>> aliases)
             throws MigrationException {
         EntityHelper.normalize(entity);
         Element docElement = doc.getDocumentElement();
@@ -187,7 +217,7 @@ public class XStreamPersistence implements Issuer {
         }
     }
 
-    int getVersionAttribute(Document doc) {
+    static int getVersionAttribute(Document doc) {
         int version = 0;
         String versionAttr = doc.getDocumentElement().getAttribute(TAG_VERSION);
         if (StringUtils.isNotBlank(versionAttr)) {
@@ -196,7 +226,7 @@ public class XStreamPersistence implements Issuer {
         return version;
     }
 
-    void setVersionAttribute(Document doc, int version) {
+    static void setVersionAttribute(Document doc, int version) {
         Element documentElement = doc.getDocumentElement();
         if (doc.getDocumentElement().hasAttribute(TAG_VERSION)) {
             throw new RuntimeException(MessageFormat.format("<{0}> element already has a ''{1}'' attribute",
@@ -205,35 +235,35 @@ public class XStreamPersistence implements Issuer {
         documentElement.setAttribute(TAG_VERSION, Integer.toString(version));
     }
 
-    String getLastModifiedAttribute(Element element) {
+    static String getLastModifiedAttribute(Element element) {
         String value = element.getAttribute(TAG_LAST_MODIFIED);
         return StringUtils.isNotBlank(value) ? value : null;
     }
 
-    String getLastModifiedByAttribute(Element element) {
+    static String getLastModifiedByAttribute(Element element) {
         String value = element.getAttribute(TAG_MODIFIED_BY);
         return StringUtils.isNotBlank(value) ? value : null;
     }
 
-    void setLastModifiedAttribute(Element element) {
+    static void setLastModifiedAttribute(Element element) {
         Calendar now = Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ENGLISH); //$NON-NLS-1$
         String lastModified = DatatypeConverter.printDateTime(now);
         setLastModifiedAttribute(element, lastModified);
     }
 
-    void setLastModifiedAttribute(Element element, String lastModified) {
+    static void setLastModifiedAttribute(Element element, String lastModified) {
         if (StringUtils.isNotBlank(lastModified)) {
             element.setAttribute(TAG_LAST_MODIFIED, lastModified);
         }
     }
 
-    void setLastModifiedByAttribute(Element element, String userId) {
+    static void setLastModifiedByAttribute(Element element, String userId) {
         if (StringUtils.isNotBlank(userId)) {
             element.setAttribute(TAG_MODIFIED_BY, userId);
         }
     }
 
-    void setLastModifiedAttributes(Element newElement, Element oldElement, String userId) {
+    static  void setLastModifiedAttributes(Element newElement, Element oldElement, String userId) {
         String lastModified = oldElement != null? getLastModifiedAttribute(oldElement) : null;
         if (lastModified != null) {
             setLastModifiedAttribute(newElement, lastModified);
@@ -248,7 +278,7 @@ public class XStreamPersistence implements Issuer {
         }
     }
 
-    SortedMap<String, Element> getExtensions(Document doc, Map<String, Class<?>> aliases, boolean byClassName)
+    static SortedMap<String, Element> getExtensions(Document doc, Map<String, Class<?>> aliases, boolean byClassName)
             throws MigrationException {
         TreeMap<String, Element> result = new TreeMap<String, Element>();
         if (aliases != null && aliases.size() > 0) {
@@ -268,17 +298,17 @@ public class XStreamPersistence implements Issuer {
         return result;
     }
 
-    SortedMap<String, Element> getExtensionsByAlias(Document doc, Map<String, Class<?>> aliases)
+    static SortedMap<String, Element> getExtensionsByAlias(Document doc, Map<String, Class<?>> aliases)
             throws MigrationException {
         return getExtensions(doc, aliases, false);
     }
 
-    SortedMap<String, Element> getExtensionsByClassName(Document doc, Map<String, Class<?>> aliases)
+    static SortedMap<String, Element> getExtensionsByClassName(Document doc, Map<String, Class<?>> aliases)
             throws MigrationException {
         return getExtensions(doc, aliases, true);
     }
 
-    void mapInheritedExtensions(Document doc, Map<String, String> aliases) throws MigrationException {
+    static void mapInheritedExtensions(Document doc, Map<String, String> aliases) throws MigrationException {
         if (aliases == null || aliases.isEmpty()) {
             return;
         }
@@ -296,7 +326,7 @@ public class XStreamPersistence implements Issuer {
         }
     }
 
-    void mapTextContent(Element stringElement, Map<String, String> aliases) {
+    static void mapTextContent(Element stringElement, Map<String, String> aliases) {
         String alias = stringElement.getTextContent();
         if (StringUtils.isNotBlank(alias)) {
             String mapped = aliases.get(alias);
@@ -306,7 +336,7 @@ public class XStreamPersistence implements Issuer {
         }
     }
 
-    Map<String, String> byAlias(Map<String, Class<?>> aliases) {
+    static Map<String, String> byAlias(Map<String, Class<?>> aliases) {
         Map<String, String> map = new HashMap<String, String>(aliases.size());
         for (Map.Entry<String, Class<?>> entry: aliases.entrySet()) {
             map.put(entry.getKey(), entry.getValue().getName());
@@ -314,7 +344,7 @@ public class XStreamPersistence implements Issuer {
         return map;
     }
 
-    Map<String, String> byClassNames(Map<String, Class<?>> aliases) {
+    static Map<String, String> byClassNames(Map<String, Class<?>> aliases) {
         Map<String, String> map = new HashMap<String, String>(aliases.size());
         for (Map.Entry<String, Class<?>> entry: aliases.entrySet()) {
             map.put(entry.getValue().getName(), entry.getKey());
@@ -323,7 +353,7 @@ public class XStreamPersistence implements Issuer {
     }
 
 
-    private EntityBase domToEntity(Set<ClassLoader> entityClassLoaders, Map<String, Class<?>> aliases,
+    private static EntityBase domToEntity(Set<ClassLoader> entityClassLoaders, Map<String, Class<?>> aliases,
             Set<Converter> converters, Document doc) throws IOException {
         String xml = null;
         try {
@@ -341,7 +371,7 @@ public class XStreamPersistence implements Issuer {
         return entity;
     }
 
-    private Document entityToDom(EntityBase entity, Map<String, Class<?>> aliases, Set<Converter> converters)
+    private static Document entityToDom(EntityBase entity, Map<String, Class<?>> aliases, Set<Converter> converters)
             throws IOException {
         Document newDoc = null;
         try {
